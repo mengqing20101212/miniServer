@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Appenders>
+        <!-- 控制台输出 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level - %msg%n" />
+        </Console>
+
+        <!-- 网络日志 -->
+        <RollingFile name="netRollingFile" fileName="logs/net.log"
+                     filePattern="logs/net-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+
+        <!-- 系统日志 -->
+        <RollingFile name="systemRollingFile" fileName="logs/system.log"
+                     filePattern="logs/system-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- 指定 net 和 system 的 Logger -->
+        <Logger name="netLogger" level="INFO" additivity="false">
+            <AppenderRef ref="netRollingFile" />
+            <AppenderRef ref="Console" />
+        </Logger>
+
+        <Logger name="systemLogger" level="INFO" additivity="false">
+            <AppenderRef ref="systemRollingFile" />
+            <AppenderRef ref="Console" />
+        </Logger>
+
+        <Root level="INFO">
+            <AppenderRef ref="Console" />
+        </Root>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,1 @@
+python handle_table_mac.py 0
