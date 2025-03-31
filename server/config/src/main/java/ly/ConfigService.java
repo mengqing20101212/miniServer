@@ -38,26 +38,27 @@ public class ConfigService {
 
       // 扫描该目录中的所有文件
       File dirFiles = new File(currentClassPath + File.separator + "config");
+      if (dirFiles.length() > 0) {
+        Arrays.stream(dirFiles.listFiles())
+            .filter(File::isFile)
+            .forEach(
+                file -> {
+                  try {
+                    Class c = Class.forName("ly.config." + file.getName().replace(".class", ""));
+                    // 判断加载的类是否是 InterfaceConfigManager 的子类
+                    if (!c.getSimpleName().equals(InterfaceConfigManagerProxy.class.getSimpleName())
+                        && InterfaceConfigManagerProxy.class.isAssignableFrom(c)) {
+                      // 如果是 InterfaceConfigManager 类型的类
+                      configManagerList.add((InterfaceConfigManagerProxy) c.newInstance());
+                    }
 
-      Arrays.stream(dirFiles.listFiles())
-          .filter(File::isFile)
-          .forEach(
-              file -> {
-                try {
-                  Class c = Class.forName("ly.config." + file.getName().replace(".class", ""));
-                  // 判断加载的类是否是 InterfaceConfigManager 的子类
-                  if (!c.getSimpleName().equals(InterfaceConfigManagerProxy.class.getSimpleName())
-                      && InterfaceConfigManagerProxy.class.isAssignableFrom(c)) {
-                    // 如果是 InterfaceConfigManager 类型的类
-                    configManagerList.add((InterfaceConfigManagerProxy) c.newInstance());
+                  } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.printf("[ERROR] Class not found: %s\n", file.getName());
+                    throw new RuntimeException(e);
                   }
-
-                } catch (Exception e) {
-                  e.printStackTrace();
-                  System.out.printf("[ERROR] Class not found: %s\n", file.getName());
-                  throw new RuntimeException(e);
-                }
-              });
+                });
+      }
     } else {
       System.out.println("Class file not found!");
     }

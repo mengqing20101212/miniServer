@@ -21,9 +21,11 @@ import org.apache.logging.log4j.core.Logger;
  */
 public class ActivityInfoConfigManager implements InterfaceConfigManagerProxy {
   AtomicBoolean switched = new AtomicBoolean(false);
-  private static ActivityInfoConfigManager instance = new ActivityInfoConfigManager();
-  private static ActivityInfoConfigManagerImpl instanceImplA = new ActivityInfoConfigManagerImpl();
-  private static ActivityInfoConfigManagerImpl instanceImplB = new ActivityInfoConfigManagerImpl();
+  private static final ActivityInfoConfigManager instance = new ActivityInfoConfigManager();
+  private static final ActivityInfoConfigManagerImpl instanceImplA =
+      new ActivityInfoConfigManagerImpl();
+  private static final ActivityInfoConfigManagerImpl instanceImplB =
+      new ActivityInfoConfigManagerImpl();
 
   public boolean isSwitched() {
     return switched.getAndSet(!switched.get());
