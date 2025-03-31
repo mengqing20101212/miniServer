@@ -71,13 +71,11 @@ public class ConfigService {
           long loadConfigBeginTime = System.currentTimeMillis();
           configManager.loadConfig(logger, configDir);
           long loadConfigEndTime = System.currentTimeMillis();
-          if (loadConfigEndTime - loadConfigBeginTime > 20) {
-            logger.error(
-                String.format(
-                    "加载策划表 %s  耗时过长 %d (毫秒)",
-                    configManager.getClass().getSimpleName(),
-                    loadConfigEndTime - loadConfigBeginTime));
-          }
+          logger.info(
+              String.format(
+                  "加载策划表 %s  耗时过长 %d (毫秒)",
+                  configManager.getClass().getSimpleName(),
+                  loadConfigEndTime - loadConfigBeginTime));
         });
     logger.info(String.format("加载配置表完成, 耗时:%d (毫秒)", System.currentTimeMillis() - startTime));
   }
