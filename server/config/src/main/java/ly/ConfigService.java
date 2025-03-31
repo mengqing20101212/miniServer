@@ -66,17 +66,18 @@ public class ConfigService {
   public void loadAllConfig(Logger logger, String configDir) {
     long startTime = System.currentTimeMillis();
     logger.info("开始加载配置表");
-    configManagerList.forEach(
-        configManager -> {
-          long loadConfigBeginTime = System.currentTimeMillis();
-          configManager.loadConfig(logger, configDir);
-          long loadConfigEndTime = System.currentTimeMillis();
-          logger.info(
-              String.format(
-                  "加载策划表 %s  耗时过长 %d (毫秒)",
-                  configManager.getClass().getSimpleName(),
-                  loadConfigEndTime - loadConfigBeginTime));
-        });
+    configManagerList.parallelStream()
+        .forEach(
+            configManager -> {
+              long loadConfigBeginTime = System.currentTimeMillis();
+              configManager.loadConfig(logger, configDir);
+              long loadConfigEndTime = System.currentTimeMillis();
+              logger.info(
+                  String.format(
+                      "加载策划表 %s  耗时过长 %d (毫秒)",
+                      configManager.getClass().getSimpleName(),
+                      loadConfigEndTime - loadConfigBeginTime));
+            });
     logger.info(String.format("加载配置表完成, 耗时:%d (毫秒)", System.currentTimeMillis() - startTime));
   }
 }
