@@ -1,0 +1,15 @@
+package ly;
+
+/*
+ * Author: liuYang
+ * Date: 2025/3/31
+ * File: InterfaceConfigManager
+ */
+public interface InterfaceConfigManagerProxy {
+    /**
+     * 加载策划表
+     * @param configDir 策划表目录
+     * @throw 加载失败
+     */
+    public abstract void loadConfig(String configDir) throws ConfigLoadException;
+}
