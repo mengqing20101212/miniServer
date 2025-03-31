@@ -5,11 +5,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.core.Logger;
 
 public class ConfigService {
-  Logger logger = Logger.getLogger(ConfigService.class.getSimpleName());
 
   private ConfigService() {}
 
@@ -65,17 +63,16 @@ public class ConfigService {
     }
   }
 
-  public void loadAllConfig(String configDir) {
+  public void loadAllConfig(Logger logger, String configDir) {
     long startTime = System.currentTimeMillis();
     logger.info("开始加载配置表");
     configManagerList.forEach(
         configManager -> {
           long loadConfigBeginTime = System.currentTimeMillis();
-          configManager.loadConfig(configDir);
+          configManager.loadConfig(logger, configDir);
           long loadConfigEndTime = System.currentTimeMillis();
           if (loadConfigEndTime - loadConfigBeginTime > 20) {
-            logger.log(
-                Level.WARNING,
+            logger.error(
                 String.format(
                     "加载策划表 %s  耗时过长 %d (毫秒)",
                     configManager.getClass().getSimpleName(),
