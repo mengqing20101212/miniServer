@@ -7,6 +7,11 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.logging.log4j.core.Logger;
 
+/*
+ * Author: liuYang
+ * Date: 2025/3/31
+ * File: ConfigService
+ */
 public class ConfigService {
 
   private ConfigService() {}
