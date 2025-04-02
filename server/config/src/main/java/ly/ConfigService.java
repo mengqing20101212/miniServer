@@ -75,11 +75,15 @@ public class ConfigService {
     configManagerList.forEach(
         configManager -> {
           long loadConfigBeginTime = System.currentTimeMillis();
-          configManager.loadConfig(logger, configDir);
+          try {
+            configManager.loadConfig(logger, configDir);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
           long loadConfigEndTime = System.currentTimeMillis();
           logger.info(
               String.format(
-                  "加载策划表 %s  耗时过长 %d (毫秒)",
+                  "加载策划表 %s  耗时 %d (毫秒)",
                   configManager.getClass().getSimpleName(),
                   loadConfigEndTime - loadConfigBeginTime));
         });
