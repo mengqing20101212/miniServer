@@ -1,6 +1,5 @@
 package ly;
 
-import ly.config.ActivityInfoConfigManager;
 import org.apache.logging.log4j.core.Logger;
 
 public class ServerContext {
@@ -11,7 +10,6 @@ public class ServerContext {
     logger.info("服务器开始启动");
     ConfigService.getInstance()
         .loadAllConfig(logger, "D:\\WORK\\me\\miniServer\\excel\\serverConfig");
-    ActivityInfoConfigManager.getInstance();
 
     logger.info("服务器 启动成功 耗时: " + (System.currentTimeMillis() - startTime) + "ms");
   }

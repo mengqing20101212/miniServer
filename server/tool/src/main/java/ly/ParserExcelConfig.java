@@ -40,6 +40,7 @@ public class ParserExcelConfig {
       System.out.println("未发现可以解析的配置表，请检查目录:" + excelFileDir);
       return;
     }
+    //    parserFile("D:\\WORK\\me\\miniServer\\excel\\heroInfo.xlsx");
     for (String fileName : excelFileList) {
       Thread.ofVirtual()
           .start(
@@ -80,7 +81,9 @@ public class ParserExcelConfig {
     File[] files = dir.listFiles();
     for (File file : files) {
       if (file.isFile() && (file.getName().endsWith(".xls") || file.getName().endsWith(".xlsx"))) {
-        excelFileList.add(file.getAbsolutePath());
+        if (!file.getName().startsWith("@")) {
+          excelFileList.add(file.getAbsolutePath());
+        }
       }
       countDownLatch = new CountDownLatch(excelFileList.size());
     }
@@ -123,64 +126,149 @@ public class ParserExcelConfig {
         StringBuffer serverLines = new StringBuffer();
         StringBuffer clientLines = new StringBuffer();
         for (Row row : sheet) {
-          // 遍历每一列
-          int j = 0;
-          for (Cell cell : row) {
-            // 根据不同的单元格类型，获取对应的值
-            String value = getCellValue(evaluator, cell);
-            if (i == 0 && j != 0) {
-              if (value == null) continue;
-              if (serverHeadTitleList.contains(value)) {
-                serverHeadTitleList.add(null);
-              } else {
-                addHeadTitle(value, serverHeadTitleList);
-              }
-            } else if (i == 1 && j != 0) {
-              if (value == null) continue;
-              if (clientHeadTitleList.contains(value)) {
-                clientHeadTitleList.add(null);
-              } else {
-                addHeadTitle(value, clientHeadTitleList);
-              }
-            } else if (i == 2 && j != 0) {
-              if (value == null) continue;
-              addHeadTitle(value, tokenType);
-            } else if (i == 3 && j != 0) {
-              if (value == null) continue;
-              addHeadTitle(value, descList);
-            } else if (i > 3) {
-              if (j == 0 && (value == null || !value.equals("#"))) {
-                break;
-              }
-              if (j > 0) {
-                if (j < serverHeadTitleList.size() && serverHeadTitleList.get(j - 1) != null) {
-                  if (value == null) {
-                    if (tokenType.get(j - 1).equalsIgnoreCase("STRING")) {
-                      value = "";
-                    } else if (tokenType.get(j - 1).equalsIgnoreCase("INT")) {
-                      value = "0";
-                    }
-                  }
-                  serverLines.append(value).append("\t");
-                }
-                if (j < clientHeadTitleList.size() && clientHeadTitleList.get(j) != null) {
-                  clientLines.append(value).append("\t");
-                }
-              }
-            }
-            j++;
+          row.getRowNum();
+          if (row.getRowNum() == 0) {
+            addServerHeadTitle(evaluator, row);
+          } else if (row.getRowNum() == 1) {
+            addClientHeadTitle(evaluator, row);
+          } else if (row.getRowNum() == 2) {
+            addTokens(evaluator, row);
+          } else if (row.getRowNum() == 3) {
+            addDescHeadTitle(evaluator, row);
+          } else if (row.getRowNum() >= 5) {
+            makeTextData(serverLines, clientLines, evaluator, row);
           }
-          if (serverLines.length() > 0) {
-            serverLines.deleteCharAt(serverLines.length() - 1);
-            serverLines.append("\r\n");
-          }
-          i++;
         }
-        if (serverLines.length() > 0) {
+        if (!serverLines.isEmpty()) {
           writeServerLineConfig(serverLines);
         }
       } catch (Exception e) {
         e.printStackTrace();
+      }
+    }
+
+    private void addTokens(FormulaEvaluator evaluator, Row row) {
+      int findBlackNum = 0;
+      for (Cell cell : row) {
+        if (cell.getColumnIndex() == 0) continue;
+        if (cell.getCellType() == CellType.STRING) {
+          tokenType.add(cell.getStringCellValue());
+        } else {
+          findBlackNum++;
+          if (findBlackNum > 2) {
+            return;
+          }
+          System.err.printf("表 %s, 数据类型 第 %d 列 为空, 请检查%n \n", configName, cell.getColumnIndex());
+        }
+      }
+    }
+
+    private void makeTextData(
+        StringBuffer serverLines, StringBuffer clientLines, FormulaEvaluator evaluator, Row row) {
+      List<String> serverDataList = new ArrayList<>(128);
+      List<String> clientDataList = new ArrayList<>(128);
+      createTempDataList(serverDataList, serverHeadTitleList);
+
+      createTempDataList(clientDataList, clientHeadTitleList);
+      Cell flagCell = row.getCell(0);
+      if (flagCell == null) {
+        return;
+      }
+      String flag = getCellValue(evaluator, flagCell);
+      if (flag == null || !flag.equals("#")) {
+        return;
+      }
+      for (Cell cell : row) {
+        int index = cell.getColumnIndex();
+        String value = getCellValue(evaluator, cell);
+        if (index == 0) {
+          continue;
+        }
+        if (value != null
+            && index <= serverDataList.size()
+            && serverHeadTitleList.get(index - 1) != null) {
+          try {
+            serverDataList.set(index - 1, value);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+        if (value != null
+            && index <= clientDataList.size()
+            && clientHeadTitleList.get(index - 1) != null) {
+          clientDataList.set(index - 1, value);
+        }
+      }
+
+      serverDataList.forEach(
+          v -> {
+            if (v != null) {
+              serverLines.append(v).append("\t");
+            }
+          });
+      clientDataList.forEach(
+          v -> {
+            if (v != null) {
+              clientLines.append(v).append("\t");
+            }
+          });
+      serverLines.deleteCharAt(serverLines.length() - 1);
+      clientLines.deleteCharAt(clientLines.length() - 1);
+      serverLines.append("\n");
+      clientLines.append("\n");
+    }
+
+    private void createTempDataList(List<String> dataList, List<String> headTitleList) {
+      for (int i = 0; i < headTitleList.size(); i++) {
+        String v = headTitleList.get(i);
+        if (v == null) {
+          dataList.add(null);
+        } else {
+          String token = tokenType.get(i);
+          if (token.equalsIgnoreCase("INT")) {
+            dataList.add("0");
+          } else {
+            dataList.add(" ");
+          }
+        }
+      }
+    }
+
+    private void addDescHeadTitle(FormulaEvaluator evaluator, Row row) {
+      for (Cell cell : row) {
+        if (cell.getColumnIndex() == 0) continue;
+        if (cell.getCellType() == CellType.STRING) {
+          descList.add(cell.getStringCellValue().replaceAll("\n", ", "));
+        } else {
+          descList.add("  null");
+        }
+      }
+    }
+
+    private void addClientHeadTitle(FormulaEvaluator evaluator, Row row) {
+      for (Cell cell : row) {
+        if (cell.getColumnIndex() == 0) continue;
+        if (cell.getCellType() == CellType.STRING) {
+          clientHeadTitleList.add(cell.getStringCellValue());
+        } else {
+          clientHeadTitleList.add(null);
+        }
+      }
+    }
+
+    private void addServerHeadTitle(FormulaEvaluator evaluator, Row row) {
+      for (Cell cell : row) {
+        if (cell.getColumnIndex() == 0) continue;
+        if (cell.getCellType() == CellType.STRING) {
+          String value = cell.getStringCellValue();
+          if (isJavaKeyValue(value)) {
+            System.err.printf("%s 表头字段(%s)是Java关键字，请换一个 \n", configName, value);
+            value = value.toUpperCase();
+          }
+          serverHeadTitleList.add(value);
+        } else {
+          serverHeadTitleList.add(null);
+        }
       }
     }
 
@@ -515,7 +603,11 @@ public class ParserExcelConfig {
 
       for (int i = 0; i < serverHeadTitleList.size(); i++) {
         String title = serverHeadTitleList.get(i);
-        String type = tokenType.get(i);
+        if (i > tokenType.size() - 1) {
+          break;
+        }
+        String type = "";
+        type = tokenType.get(i);
         String descStr = "";
         if (title == null) {
           continue;
@@ -533,13 +625,19 @@ public class ParserExcelConfig {
               .append(descStr.replaceAll("\n", " "))
               .append("\n");
         }
+
         parserStr
+            .append("            if (" + "!arr[")
+            .append(i)
+            .append("].trim()")
+            .append(".isEmpty()) {\n")
             .append("            ")
             .append("config.")
             .append(title)
             .append(" = ")
             .append(makeStr(i, type))
-            .append(";\n\n");
+            .append(";\n            }")
+            .append("\n\n");
       }
 
       String template =
@@ -668,19 +766,20 @@ public class ParserExcelConfig {
     }
 
     private String makeStr(int i, String type) {
+
       if (type.equalsIgnoreCase("STRING")) {
-        return "arr[" + i + "]";
+        return "arr[" + i + "].trim()";
       } else if (type.equalsIgnoreCase("INT")) {
-        return " Integer.parseInt(arr[" + i + "])";
+        return " Integer.parseInt(arr[" + i + "].trim())";
       } else if (type.equalsIgnoreCase("LONG")) {
-        return " Long.parseLong(arr[" + i + "])";
+        return " Long.parseLong(arr[" + i + "].trim())";
       } else if (type.equalsIgnoreCase("DOUBLE")) {
-        return " Double.parseDouble(arr[" + i + "])";
+        return " Double.parseDouble(arr[" + i + "].trim())";
       } else if (type.equalsIgnoreCase("BOOLEAN")) {
-        return " Boolean.parseBoolean(arr[" + i + "])";
+        return " Boolean.parseBoolean(arr[" + i + "].trim())";
       } else if (type.equalsIgnoreCase("FLOAT")) {
-        return " Float.parseFloat(arr[" + i + "])";
-      } else if (type.equalsIgnoreCase("LIST<INT>")) return "arr[" + i + "]";
+        return " Float.parseFloat(arr[" + i + "].trim())";
+      } else if (type.equalsIgnoreCase("LIST<INT>")) return "arr[" + i + "].trim()";
       else {
         return null;
       }
@@ -702,5 +801,13 @@ public class ParserExcelConfig {
   public static void main(String[] args) {
     var parser = new ParserExcelConfig("D:\\WORK\\me\\miniServer\\excel");
     parser.startParser();
+
+    List<String> list = new ArrayList<>();
+    list.add("1231");
+    list.add("1231");
+    list.add(null);
+    list.add("1231");
+    System.out.println(list.get(2));
+    System.out.println(list.get(3));
   }
 }
