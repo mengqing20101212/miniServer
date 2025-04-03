@@ -9,5 +9,7 @@
     <file url="file://$PROJECT_DIR$/server/logger/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/proto/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/proto/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/server/tool/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/server/tool/src/main/resources" charset="UTF-8" />
   </component>
 </project>
