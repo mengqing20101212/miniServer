@@ -8,11 +8,19 @@ import ly.db.DbMeta;
  * Date: 2025/4/3
  * File: ShareEnumConfigEntry
  */
-@DbMeta.DbVersion
+@DbMeta.DbTable(name = "share_enum_config")
 public class ShareEnumConfigEntry extends AbstractEntry {
+  @DbMeta.DbMasterKey(autoIncrement = true, name = "id")
+  @DbMeta.DbField(name = "id")
   private long id;
+
+  @DbMeta.DbField(name = "code")
   private String code;
+
+  @DbMeta.DbField(name = "name")
   private String name;
+
+  @DbMeta.DbField(name = "config_desc")
   private String config_desc;
 
   public ShareEnumConfigEntry() {}
@@ -51,5 +59,42 @@ public class ShareEnumConfigEntry extends AbstractEntry {
   public void setConfig_desc(String config_desc) {
     this.config_desc = config_desc;
     autoAddCurVersion();
+  }
+
+  public void save() {
+    ShareEnumConfigHelper.save(this);
+  }
+
+  public void update() {
+    ShareEnumConfigHelper.update(this);
+  }
+
+  public void delete() {
+    ShareEnumConfigHelper.delete(this);
+  }
+
+  public void asyncSave() {
+    ShareEnumConfigHelper.asyncSave(this);
+  }
+
+  public void asyncUpdate() {
+    ShareEnumConfigHelper.asyncUpdate(this);
+  }
+
+  @Override
+  public String toString() {
+    return "ShareEnumConfigEntry{"
+        + "id="
+        + id
+        + ", code='"
+        + code
+        + '\''
+        + ", name='"
+        + name
+        + '\''
+        + ", config_desc='"
+        + config_desc
+        + '\''
+        + '}';
   }
 }

@@ -95,7 +95,7 @@ public class MysqlConnector {
         if (logger.isDebugEnabled()) {
           logger.debug(
               String.format(
-                  "select 执行sql:%s, params:%s,  耗时:%d 毫秒",
+                  "select 执行sql: %s , params: %s ,  耗时: %d 毫秒",
                   sql, getParamStr(params), System.currentTimeMillis() - startTime));
         }
       }
@@ -186,7 +186,7 @@ public class MysqlConnector {
       if (logger.isDebugEnabled()) {
         logger.debug(
             String.format(
-                "execute 执行sql:%s, params:%s %s, 耗时:%d 毫秒",
+                "execute 执行sql: %s , params: %s %s, 耗时: %d 毫秒",
                 sql,
                 getParamStr(params),
                 result ? "成功" : "失败",
@@ -219,15 +219,6 @@ public class MysqlConnector {
     dataSource.close();
     logger.info("数据库连接关闭");
   }
-
-  /*CREATE TABLE `share_enum_config` (
-          `id` int NOT NULL AUTO_INCREMENT,
-  `code` varchar(255) DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `config_desc` varchar(2048) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `code_UNIQUE` (`code`)
-          ) ENGINE=InnoDB AUTO_INCREMENT=5695 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;*/
 
   public static void main(String[] args) {
     String jdbcUrl = "jdbc:mysql://139.224.80.204:3306/pick_money";
