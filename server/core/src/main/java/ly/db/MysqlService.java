@@ -84,11 +84,7 @@ public class MysqlService {
     List<Object> params = new ArrayList<>();
     try {
       String saveSql = getInsertSql(entry, params);
-      if (mysqlConnector.execute(saveSql, params.toArray())) {
-        return true;
-      } else {
-        return false;
-      }
+      return mysqlConnector.execute(saveSql, params.toArray());
     } catch (IllegalAccessException e) {
       e.printStackTrace();
       logger.error(" 保存数据[%s] 报错 ", entry.toString(), e);
@@ -103,11 +99,7 @@ public class MysqlService {
     List<Object> params = new ArrayList<>();
     try {
       String saveSql = getUpdateSql(entry, params, updateFileds);
-      if (mysqlConnector.execute(saveSql, params.toArray())) {
-        return true;
-      } else {
-        return false;
-      }
+      return mysqlConnector.execute(saveSql, params.toArray());
     } catch (IllegalAccessException e) {
       e.printStackTrace();
       logger.error(" 保存数据[%s] 报错 ", entry.toString(), e);
