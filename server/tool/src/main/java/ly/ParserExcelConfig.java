@@ -506,7 +506,7 @@ public class ParserExcelConfig {
       }
     }
 
-    private String readFile(File file) {
+    static String readFile(File file) {
       try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
         StringBuilder content = new StringBuilder();
         String line;
@@ -533,7 +533,7 @@ public class ParserExcelConfig {
     }
 
     // 提取自定义方法区的内容
-    private String extractMethodStr(String source) {
+    static String extractMethodStr(String source) {
       StringBuilder methodStr = new StringBuilder();
       Pattern pattern =
           Pattern.compile("// @@@@@自定义方法开始区@@@@@(.+?)// @@@@@自定义方法结束区@@@@@", Pattern.DOTALL);
@@ -544,7 +544,7 @@ public class ParserExcelConfig {
       return methodStr.toString();
     }
 
-    String formatJavaCode(String source) {
+    static String formatJavaCode(String source) {
       return source;
     }
 

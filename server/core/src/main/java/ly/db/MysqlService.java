@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import ly.LoggerDef;
 import ly.db.entry.ShareEnumConfigEntry;
-import ly.db.entry.ShareEnumConfigHelper;
+import ly.db.entry.ShareEnumConfigEntryHelper;
 import org.apache.logging.log4j.Logger;
 
 /*
@@ -394,15 +394,15 @@ public class MysqlService {
     getInstance().init(jdbcUrl, username, password, 0, 0, 0, 0);
     ShareEnumConfigEntry entry =
         getInstance().selectOnce(ShareEnumConfigEntry.class, new String[] {"name"}, "1231");
-    ShareEnumConfigHelper.getShareEnumConfigEntryById(1231);
+    ShareEnumConfigEntryHelper.getShareEnumConfigEntryById(1231);
 
     ShareEnumConfigEntry data = new ShareEnumConfigEntry();
     data.setCode("qqqqq");
     data.setName("wwwwwwww");
-    data.setConfig_desc("ssssssss");
+    data.setConfigDesc("ssssssss");
     //    getInstance().save(data);
     entry = getInstance().selectOnce(ShareEnumConfigEntry.class, new String[] {"code"}, "qqqqq");
-    entry.setConfig_desc("ffffffff");
+    entry.setConfigDesc("dadaw");
     getInstance().update(entry);
     getInstance().delete(entry);
   }
