@@ -1,0 +1,4 @@
+id	type	description	mainForward	route0	route1	route2	route3	
+1	1	L型回路	0	1,2,3	4,5	 	 
+2	2	倒T型回路	0	1,2,3	4	 	5
+3	3	弓型回路	0	5	1,2	 	3,4

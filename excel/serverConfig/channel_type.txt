@@ -1,0 +1,18 @@
+id	spname	spid	spcode	spdownloadurl	checkserverip	checkserverport	groupid	check_login_test_url	check_login_url	login_interface	appid	appsec	isExteral	
+1	微信	1	{1-1}	wx.com	115.159.146.208	1111	1	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	3ce1366874b282510b1f6ea69c090e43	0
+2	手Q	2	{1-2}	wx.com	115.159.146.208	1111	1	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	3ce1366874b282510b1f6ea69c090e43	0
+3	游客	3	{1-3}	wx.com	115.159.146.208	1111	1	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	3ce1366874b282510b1f6ea69c090e43	0
+4	内部测试	1	{C826E323-4F9C1C68}	wx.com	115.159.146.208	1111	2	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	 	0
+5	facebook	4	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+6	google	5	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+7	line	6	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+8	twitter	7	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+9	apple	8	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+10	huawei	9	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+11	oppo	10	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+12	vivo	11	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+13	Qoo	12	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+14	visitor	13	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+15	Guest	14	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+16	naver	15	{3-1}	wx.com	115.159.146.208	1111	3	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	d665e407c46b147935e319ad5b7a2d10	1
+17	腾讯IOS	15	{1-4}	wx.com	115.159.146.208	1111	1	https://hktest.itop.qq.com/	https://itop.qq.com/	/v2/auth/verify_login	27840	3ce1366874b282510b1f6ea69c090e43	0

@@ -1,0 +1,7 @@
+id	defaultAni	p1	groupName	clickAniList	moveDistance	cameraHight	cameraDistance	npcDistance	textPrefabType	
+1	maincity_super_idle_loop	1	黄金球、弹簧胡子	maincity_super_talk_start|0|zhucheng2,maincity_super_talk_loop|1|zhucheng2idle,maincity_super_talk_end	9,0	1	2	0	1
+2	maincity_super_idle_loop	1	背心黑洞、背心猛虎	maincity_super_talk_start|0|zhucheng2,maincity_super_talk_loop|1|zhucheng2idle,maincity_super_talk_end	9,0	1	2	0	5
+3	maincity_super_idle_loop	1	原子武士、居合庵	maincity_super_talk_start|0|zhucheng2,maincity_super_talk_loop|1|zhucheng2idle,maincity_super_talk_end	9,0	1	2	0	6
+4	maincity_super_idle_loop	1	银色獠牙、茶岚子	maincity_super_talk_start|0|zhucheng2,maincity_super_talk_loop|1|zhucheng2idle,maincity_super_talk_end	9,0	1	2	0	4
+5	maincity_super_idle_loop	1	战栗的龙卷、吹雪	maincity_super_talk_start|0|zhucheng2,maincity_super_talk_loop|1|zhucheng2idle,maincity_super_talk_end	9,0	1	2	0	2
+6	maincity_super_idle_loop	1	十字键、丧服吊带裤	maincity_super_talk_start|0|zhucheng2,maincity_super_talk_loop|1|zhucheng2idle,maincity_super_talk_end	9,0	1	2	0	3

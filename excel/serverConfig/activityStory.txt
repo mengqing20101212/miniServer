@@ -1,0 +1,7 @@
+id	scheDuling	name	picture	holographic	activtyId	trueActivityId	
+1	1	角色特辑（战栗的龙卷）	340580001	0	6	73
+2	2	角色特辑（超合金黑光）	340580005	0	7	73
+3	3	角色特辑（闪光弗莱士）	340580002	0	8	73
+4	1	六星SSR	 	0	57	0
+5	2	六星SSR二期	 	0	58	0
+6	1	角色特辑（阿修罗）	340580002	0	0	141

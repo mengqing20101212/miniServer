@@ -1,0 +1,4 @@
+id	description	BGMID	
+1	主城	551000001
+2	埼玉家	580000058
+3	loading	580000075

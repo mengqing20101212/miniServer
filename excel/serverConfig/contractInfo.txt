@@ -1,0 +1,3 @@
+id	welfareId	contractType	item	num	contractNum	dropId	sumAwardId	desc	
+1	1	1	1120110	1	1	501	 	投产1次
+2	1	1	1120110	10	10	501	 	投产10次

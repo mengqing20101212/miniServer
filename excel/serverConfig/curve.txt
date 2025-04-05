@@ -1,0 +1,15 @@
+id	curve_resname	
+0	curve_normal
+1	curve_line
+1001	curve_move_away_normal
+3001	curve_animation_fly_pos_x_curve
+3002	curve_animation_fly_pos_y_curve
+3003	curve_animation_fly_pos_z_curve
+17031	bezier_qingyan_skill3
+1006011	bezier_tanglang_skill1
+1014011	bezier_tiankongwang_skill1_1
+1014012	bezier_tiankongwang_skill1_2
+1014013	bezier_tiankongwang_skill2_1
+1014014	bezier_tiankongwang_skill2_2
+1401	bezier_huangjinqiu_skill1
+2703	bezier_mogu_skill3

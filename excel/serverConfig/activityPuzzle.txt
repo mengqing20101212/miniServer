@@ -1,0 +1,2 @@
+id	Puzzleid	lossItem	poolGift	
+1	1	1,1,1,1,1,1,1,1,1,1,1,1	20000656

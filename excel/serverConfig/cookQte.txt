@@ -1,0 +1,4 @@
+id	type	qtePara	bonusList	pointList	turn	time	setList	
+1	1	 	0,10,15	2,4,6	3	2	1,|2,4|3,5
+2	2	 	0,10,15	 	0	 	 
+3	3	 	0,10,15	 	0	 	 

@@ -1,0 +1,75 @@
+id	config_name	characterModelId	defaultAni	bornShowAni	clickType	clickAniList	clickCameraList	moveDistance	cameraDistance	clickText	groupText	ActivityType	param_1	param_2	npcGrounpId	showPriority	decorationId	decorationPoint	
+4000211	杰诺斯(武装)（主城展示）	4000211	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	为了变强，我什么困难都会努力克服！	 	0	 	 	 	1,0	 	 
+4000311	战栗的龙卷（主城展示）	4000311	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	1	嗯？你有什么疑问吗？	乖乖回家去，事情交给我处理就够了。	0	 	 	5,1	 	 	 
+4000321	战栗的龙卷（星月魔女主城展示）	4000321	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	1	嗯？你有什么疑问吗？	乖乖回家去，事情交给我处理就够了。	0	 	 	5,1	 	 	 
+4000421	银色獠牙（主城展示）	4000421	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	好久没有做过剧烈运动了……	……茶岚子，你留下来看家。	0	 	 	4,2	 	 	 
+4000511	King（主城展示）	4000511	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	我很忙，你还是去找其它英雄比较好……	 	0	 	 	 	 	 	 
+4000611	原子武士（主城展示）	4000611	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|0|zhuchengidle,maincity_talk_end	0	9,0	2	我只认同强者。	居合，你的剑术之道还没到头呢。	0	 	 	3,2	 	 	 
+4000711	金属骑士（主城展示）	4000711	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	3	下一款武器该搭载什么功能呢……	 	0	 	 	 	 	 	 
+4000811	金属球棒（主城展示）	4000811	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	不屈不挠地战斗吧！	 	0	 	 	 	 	 	 
+4000911	性感囚犯（主城展示）	4000911	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	3	哈哈哈，为了见你，我很努力！	 	0	 	 	 	 	 	 
+4001011	甜心假面（主城展示）	4001011	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	若闹得太过分，可是会伤到自己的。	 	0	 	 	 	 	 	 
+4001111	闪电麦克斯（主城展示）	4001111	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	尝尝闪电飞踢的厉害吧！	 	0	 	 	 	 	 	 
+4001211	居合庵（主城展示）	4001211	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	我的刀不会让你失望的。	是，师父……！	0	 	 	3,1	 	 	 
+4001311	毒刺（主城展示）	4001311	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	人气英雄闪亮登场！	 	0	 	 	 	 	 	 
+4001411	黄金球（主城展示）	4001411	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|0|zhuchengidle,maincity_talk_end	0	9,0	2	先下手为强，这就是我的信条。	嗯，早点解决完事。	0	 	 	1,2	 	 	 
+4001511	弹簧胡子（主城展示）	4001511	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	优雅地战斗……这就是我的信条。	抓紧时间调查吧。	0	 	 	1,1	 	 	 
+4001611	斯奈克（主城展示）	4001611	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	你也赶快变成和我一样的优秀的前辈吧！	 	0	 	 	 	 	 	 
+4001711	青焰（主城展示）	4001711	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	我会把邪恶烧成灰烬。	 	0	 	 	 	 	 	 
+4001811	雷光源氏（主城展示）	4001811	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	趁动作变慢时决出胜负。	 	0	 	 	 	 	 	 
+4001911	微笑超人（主城展示）	4001911	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	没问题吗？记得小心应对。	 	0	 	 	 	 	 	 
+4002011	重型金刚（主城展示）	4002011	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	3	没有问题，我们出发吧。	 	0	 	 	 	 	 	 
+4002111	地狱的吹雪（主城展示）	4002111	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	1	要来加入吹雪组吗？	姐……姐姐？	0	 	 	5,2	 	 	 
+4002121	地狱的吹雪（圣诞节主城展示）	4002121	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	1	要来加入吹雪组吗？	姐……姐姐？	0	 	 	5,2	 	 	 
+4002211	冲天好小子（主城展示）	4002211	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	喷射之力，火箭直拳！	 	0	 	 	 	 	 	 
+4002311	背心黑洞（主城展示）	4002311	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	没人可以欺负我的弟弟！	哦，弟弟，是你呀。今天也为提升排名而奋斗吧！	0	 	 	2,2	 	 	 
+4002411	睫毛（主城展示）	4002411	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	你好，我是吹雪组的睫毛。	 	0	 	 	 	 	 	 
+4002511	山猿（主城展示）	4002511	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	听吹雪大人的准没错。	 	0	 	 	 	 	 	 
+4002611	三节棍莉莉（主城展示）	4002611	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	1	吹雪大人是最强的。	 	0	 	 	 	 	 	 
+4002711	蘑菇（主城展示）	4002711	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	我是蘑菇，一定能帮到你的。	 	0	 	 	 	 	 	 
+4002811	无证骑士（主城展示）	4002811	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	一定有我能做到的事！	 	0	 	 	 	 	 	 
+4002911	背心猛虎（主城展示）	4002911	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	3	英雄背心猛虎，参上。	只要有我们兄弟俩，就没有无法肃清的邪恶！	0	 	 	2,1	 	 	 
+4003011	大背头男（主城展示）	4003011	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	英雄总是要挺身而出的。	 	0	 	 	 	 	 	 
+4003111	嗡嗡侠（主城展示）	4003111	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	嗡嗡拳是很强的哦！	 	0	 	 	 	 	 	 
+4003211	十字键（主城展示）	4003211	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	见识下我们的实力吧。	机会难得，来练习下那个吧。英雄，十字键——	0	 	 	6,1	 	 	 
+4003311	电池侠（主城展示）	4003311	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	平时也要好好注意节约用电啊！	 	0	 	 	 	 	 	 
+4003411	装甲股长（主城展示）	4003411	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	我的胃药放哪儿了？	 	0	 	 	 	 	 	 
+4003511	丧服吊带裤（主城展示）	4003511	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	准备完毕，架势摆的刚刚好。	与英雄，丧服吊带裤——登场！！	0	 	 	6,2	 	 	 
+4003611	防毒面具（主城展示）	4003611	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	臭鼬那么可爱，不许迫害它。	 	0	 	 	 	 	 	 
+4003711	乌马洪（主城展示）	4003711	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	咴咴咴咴！	 	0	 	 	 	 	 	 
+4003811	火男面（主城展示）	4003811	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	3	您对火男舞有兴趣吗？	 	0	 	 	 	 	 	 
+4003911	音速索尼克（主城展示）	4003911	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	你能跟上我这超越音速的速度吗！	 	0	 	 	 	 	 	 
+4004011	钉锤头（主城展示）	4004011	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	人为什么一定要工作？	 	0	 	 	 	 	 	 
+4004111	茶岚子（主城展示）	4004111	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	我是邦古老师的首席弟子哦！	师父，您要小心啊！	0	 	 	4,1	 	 	 
+4004211	超合金黑光（展示）	4004211	idle_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4004311	猪神（展示）	4004311	idle_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4004511	僵尸男（展示）	4004511	idle_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4004711	背心尊者（展示）	4004711	idle_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4004811	闪光弗莱士（展示）	4004811	idle_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4004911	警犬侠（展示）	4004911	idle_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4005011	杰诺斯（主城展示）	4005011	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	我日后一定会破坏掉那个暴走的改造人。	 	0	 	 	 	1,1	 	 
+4005021	杰诺斯（西装）（主城展示）	4005021	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	我日后一定会破坏掉那个暴走的改造人。	 	0	 	 	 	1,1	 	 
+4005111	桃源团成员A（主城展示）	4005111	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4005211	桃源团成员B（主城展示）	4005211	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4006011	蚊子女一阶（主城展示）	4006011	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|2,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4006211	阿修罗独角仙1阶（主城展示）	4006211	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|3,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4006411	装甲大猩猩（主城展示）	4006411	idle_show_loop|0	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|4,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4006511	兽王（主城展示）	4006511	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|5,maincity_talk_end	0	9,0	2	 	 	0	 	 	 	 	 	 
+4200111	工作人员_男（主城展示）	4200111	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	请问你有什么事	 	0	 	 	 	 	 	 
+4200211	工作人员_女（主城展示）	4200211	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	请问你有什么事	 	0	 	 	 	 	 	 
+5200111	工作人员_男（主线）	4200111	idle_loop|1	born_show	0	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	请问你有什么事	 	0	 	 	 	 	 	 
+5200211	工作人员_女（主线）	5200211	idle_loop|1	born_show	0	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	请问你有什么事	 	0	 	 	 	 	 	 
+6000121	埼玉_埼玉家（睡衣）（卤蛋脸）（埼玉家）	6000121	qiyujia_idle_loop|1	 	0	 	 	 	 	 	 	1	home_action_pushup_loop,home_action_squat_loop,home_action_pushup_loop,home_action_squat_loop	 	 	 	 	 
+6000421	银色獠牙（埼玉家）	6000421	qiyujia_idle_loop|1	 	0	 	 	 	 	 	 	0	 	 	 	 	 	 
+6000511	King（埼玉家）	6000511	qiyujia_idle_loop|1	 	0	 	 	 	 	 	 	0	 	 	 	 	190121000	point_qiyujia_shoubing
+6002111	地狱的吹雪（埼玉家）	6002111	qiyujia_idle_loop|1	 	0	 	 	 	 	 	 	0	 	 	 	 	190081000	point_qiyujia_chabei
+6004111	茶岚子（埼玉家）	6004111	qiyujia_idle_loop|1	 	0	 	 	 	 	 	 	0	 	 	 	 	 	 
+6005011	杰诺斯（普通）（埼玉家）	6005011	qiyujia_idle_loop|1	 	2	 	 	 	 	 	 	0	 	 	 	 	 	 
+690041	电饭锅	190041	close_loop	 	0	 	 	 	 	 	 	0	 	 	 	 	 	 
+690061	日历	190061	idle_loop	 	0	 	 	 	 	 	 	0	 	 	 	 	 	 
+690071	埼玉玩具	190071	 	 	0	 	 	 	 	 	 	0	 	 	 	 	 	 
+690091	电视	190091	 	 	0	 	 	 	 	 	 	0	 	 	 	 	 	 
+690101	睡衣	190101	 	 	0	 	 	 	 	 	 	0	 	 	 	 	 	 
+7002811	无证骑士（体力3本）	4002811	idle_loop|0	born_show	0	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	 	 	2	idle_loop,idle2_loop,idle_loop,idle2_loop,idle_loop,idle2_loop,idle_loop,idle2_loop,idle_loop,idle2_loop,	 	 	 	 	 
+8200211	工作人员_女（抽卡）	4200211	zhaomu_idle_loop|1	 	0	 	0	9,0	2	 	 	3	zhaomu_chouka	 	 	 	190101000	point_chouka
+8200212	工作人员_女（筛选关）	4200211	zhaomu_idle_loop|1	 	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	诶？您是？	 	4	<size=38>初次见面，我是新入职的作战执行人，接下来将分担作战部署、战斗指挥等方面的工作。</size>$我$2|欢迎！来的太及时了。$协会职员A$1|<size=42>由于之前的上司旧病复发，现在这里无人指挥，正乱作一团呢……</size>$协会职员A$1|是……是吗。$我$2|	story1_wuzui_loop|zhaomu_idle_loop|zhaomu_born	 	 	190101000	point_chouka

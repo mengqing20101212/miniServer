@@ -1,0 +1,6 @@
+id	name	callback	
+1	pr2_gray	1
+2	pr2_official	2
+3	weekly	3
+4	tencent_paidtest	4
+5	tencent_preview	5
