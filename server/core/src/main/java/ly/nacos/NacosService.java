@@ -37,12 +37,15 @@ public class NacosService {
   private static NacosService instance = new NacosService();
   private static ExecutorService executorService = Executors.newFixedThreadPool(1);
   private static NamingService namingService;
+  int a = 0;
 
   /***nacos 请求操作最大超时时间戳*/
   static final long MAX_TIME_OUT = 5000;
 
   /** 存活的服务器节点信息 */
   private Map<String, NacosServerNode> nodeMap = new ConcurrentHashMap<>();
+
+  private static NacosServerNode currentNode;
 
   private NacosService() {}
 
@@ -84,26 +87,26 @@ public class NacosService {
           public void onChange(NamingChangeEvent event) {
             if (event.isAdded()) {
               event
-                  .getModifiedInstances()
+                  .getAddedInstances()
                   .forEach(
-                      instance -> {
-                        addNewNode(instance);
+                      data -> {
+                        addNewNode(data);
                       });
             }
             if (event.isRemoved()) {
               event
-                  .getModifiedInstances()
+                  .getRemovedInstances()
                   .forEach(
-                      instance -> {
-                        delNode(instance.getInstanceId());
+                      data -> {
+                        delNode(data.getInstanceId());
                       });
             }
             if (event.isModified()) {
               event
                   .getModifiedInstances()
                   .forEach(
-                      instance -> {
-                        updateNode(instance);
+                      data -> {
+                        updateNode(data);
                       });
             }
           }
@@ -119,23 +122,32 @@ public class NacosService {
 
   private void updateNode(Instance instance) {
     NacosServerNode node = nodeMap.get(instance.getInstanceId());
-    logger.info("更新服务器节点:" + instance);
     if (node == null) {
+      logger.info(String.format("updateNode 当前节点数量:%d 该节点不存在，直接添加: %s ", nodeMap.size(), instance));
       addNewNode(instance);
     } else {
       node.update(instance);
+      logger.info(String.format("updateNode 当前节点数量:%d, 更新服务器节点: %s", nodeMap.size(), instance));
     }
   }
 
   private void delNode(String instanceId) {
-    logger.info(String.format(" 删除服务器节点: %s", instanceId));
+    NacosServerNode delNode = nodeMap.remove(instanceId);
+    logger.info(String.format("当前节点数量:%d, 删除服务器节点: %s", nodeMap.size(), delNode));
     nodeMap.remove(instanceId);
   }
 
   private void addNewNode(Instance instance) {
-    logger.info("新增服务器节点:" + instance);
+    logger.info(String.format("当前节点数量:%d, 新增服务器节点: %s", nodeMap.size(), instance));
     NacosServerNode newNode = NacosServerNode.createNacosServerNode(instance);
+    if (newNode.getServerId().equals(ServerContext.getServerId())) {
+      currentNode = newNode;
+    }
     nodeMap.put(newNode.getServerId(), newNode);
+  }
+
+  public static NacosServerNode getCurrentNode() {
+    return currentNode;
   }
 
   private void registerServerNode(NamingService namingService) throws NacosException {
@@ -191,8 +203,7 @@ public class NacosService {
 
   private void parserServerConfig(String str) {
     try {
-      ServerConfig newConfig = CommonUtils.parserYaml(ServerConfig.class, str);
-      ServerContext.serverConfig = newConfig;
+      ServerContext.serverConfig = CommonUtils.parserYaml(ServerConfig.class, str);
     } catch (Exception e) {
       logger.error(String.format("解析配置文件报错 \n\n  %s, \n\n%s", str, e.getMessage()));
       e.printStackTrace();
@@ -201,6 +212,24 @@ public class NacosService {
 
   public void shutdown() throws NacosException {
     namingService.shutDown();
+    nodeMap.clear();
     logger.info("关闭 Nacos ");
   }
+
+  /* public static void main(String[] args) {
+    String nacosUrl = "localhost:8848";
+    String serverType = "GAME";
+    String serverId = "game1001";
+    String env = "ly";
+    ServerContext.ENV = env;
+    ServerContext.serverType = ServerTypeEnum.GAME;
+    for (int i = 0; i < 100; i++) {
+      getInstance().startUp(nacosUrl, ServerTypeEnum.getByType(serverType), serverId, env);
+    }
+    try {
+      Thread.sleep(Integer.MAX_VALUE);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }*/
 }

@@ -46,4 +46,12 @@ public enum ServerTypeEnum {
     }
     throw new IllegalArgumentException("服务器类型不对 type:" + type);
   }
+
+  public static int getSize() {
+    return ServerTypeEnum.values().length;
+  }
+
+  public static ServerTypeEnum getByIndex(int index) {
+    return ServerTypeEnum.values()[index];
+  }
 }

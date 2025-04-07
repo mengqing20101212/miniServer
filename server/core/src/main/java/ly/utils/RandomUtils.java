@@ -31,4 +31,13 @@ public class RandomUtils {
 
     return new String(sb.toString().getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
   }
+
+  public static int RandomInt(int min, int max) {
+    Random random = new Random();
+    return random.nextInt(max - min) + min;
+  }
+
+  public static double RandomInt(int max) {
+    return RandomInt(0, max);
+  }
 }
