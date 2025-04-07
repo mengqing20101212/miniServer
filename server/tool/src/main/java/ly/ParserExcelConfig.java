@@ -600,7 +600,7 @@ public class ParserExcelConfig {
         putMapStr = "          configMap.put(config." + idStr + ", config);\n";
         mapClearStr = "      configMap.clear();\n";
       }
-
+      int x = 0;
       for (int i = 0; i < serverHeadTitleList.size(); i++) {
         String title = serverHeadTitleList.get(i);
         if (i > tokenType.size() - 1) {
@@ -628,16 +628,17 @@ public class ParserExcelConfig {
 
         parserStr
             .append("            if (" + "!arr[")
-            .append(i)
+            .append(x)
             .append("].trim()")
             .append(".isEmpty()) {\n")
             .append("            ")
             .append("config.")
             .append(title)
             .append(" = ")
-            .append(makeStr(i, type))
+            .append(makeStr(x, type))
             .append(";\n            }")
             .append("\n\n");
+        x++;
       }
 
       String template =
