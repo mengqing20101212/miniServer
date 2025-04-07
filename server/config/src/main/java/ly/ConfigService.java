@@ -43,7 +43,7 @@ public class ConfigService {
 
       // 扫描该目录中的所有文件
       File dirFiles = new File(currentClassPath + File.separator + "config");
-      if (dirFiles.length() > 0) {
+      if (dirFiles.listFiles().length > 0) {
         Arrays.stream(dirFiles.listFiles())
             .filter(File::isFile)
             .forEach(
