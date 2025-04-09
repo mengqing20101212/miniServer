@@ -13,7 +13,7 @@ public abstract class AbstractMessagePacket {
   static final byte MESSAGE_PACKET_TYPE_SERVER_TO_SERVER = 1;
   static final byte MESSAGE_PACKET_TYPE_CLIENT_TO_SERVER = 2;
   private short length;
-  private int type;
+  private final int type;
 
   public AbstractMessagePacket(int type) {
     this.type = type;
@@ -35,8 +35,12 @@ public abstract class AbstractMessagePacket {
     return new byte[length];
   }
 
+  public void setSid(int sid) {}
+
+  public void setSeq(int seq) {}
+
   protected short getAbstractPacketLen() {
-    return 2;
+    return 3;
   }
 
   public int getSeq() {
@@ -59,7 +63,7 @@ public abstract class AbstractMessagePacket {
 
   protected void encode(ByteBuf byteBuf) {
     byteBuf.writeShort(getPacketLen());
-    byteBuf.writeInt(type);
+    byteBuf.writeByte(type);
   }
 
   public abstract boolean decode(int packetLen, ByteBuf in);

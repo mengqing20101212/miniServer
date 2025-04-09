@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import ly.LoggerDef;
 import org.apache.logging.log4j.core.Logger;
 
@@ -20,15 +21,15 @@ public class NetService {
   static final int SO_RCVBUF = 1024 * 32;
 
   static final Logger log = LoggerDef.SystemLogger;
-
+  GameObjectProvider gameObjectProvider;
   static final int SO_SNDBUF = 1024 * 32;
   private static final NetService INSTANCE = new NetService();
   static EventLoopGroup boss = new NioEventLoopGroup(1);
   static EventLoopGroup worker = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
   List<NetServer> servers = new ArrayList<NetServer>();
-  IGuidCreator guidCreator;
   Map<Long, GameObject> gameObjectMaps = new ConcurrentHashMap<>();
   Map<ChannelHandlerContext, GameObject> gameObjectContextMaps = new ConcurrentHashMap<>();
+  AtomicInteger sidCreator = new AtomicInteger();
 
   private NetService() {}
 
@@ -36,11 +37,15 @@ public class NetService {
     return INSTANCE;
   }
 
-  public void startUp(IGuidCreator guidCreator, int... ports) {
+  public int createSid() {
+    return sidCreator.incrementAndGet();
+  }
+
+  public void startUp(GameObjectProvider gameObjectProvider, int... ports) {
     if (ports.length == 0) {
       throw new IllegalArgumentException("No ports provided");
     }
-    this.guidCreator = guidCreator;
+    this.gameObjectProvider = gameObjectProvider;
 
     Thread.ofVirtual()
         .name("send-packet-task")
@@ -72,34 +77,25 @@ public class NetService {
     GameObject object = gameObjectContextMaps.remove(ctx);
     if (object != null) {
       gameObjectMaps.remove(object.getGuid());
+      object.closeChannel();
     }
-    object.closeChannel();
     log.info(
         String.format("关闭远端连接 sid:%s, :%s  ", ctx.channel().id(), ctx.channel().remoteAddress()));
   }
 
-  public void addChannel(ChannelHandlerContext ctx) {
-    GameObject object = new GameObject(guidCreator.createGuid());
-    object.setConnector(new Connector(ctx, ctx.channel().id().asLongText()));
+  public GameObject addChannel(ChannelHandlerContext ctx) {
+    GameObject object = gameObjectProvider.createGameObject(ctx);
+    object.setConnector(new Connector(ctx, createSid()));
     gameObjectMaps.put(object.getGuid(), object);
     gameObjectContextMaps.put(ctx, object);
+    return object;
   }
 
   public GameObject getGameObject(ChannelHandlerContext channelHandlerContext) {
-    return gameObjectMaps.get(channelHandlerContext.channel().id());
+    return gameObjectContextMaps.get(channelHandlerContext);
   }
 
-  public static void main(String[] args) {
-    getInstance()
-        .startUp(
-            new IGuidCreator() {
-              @Override
-              public long createGuid() {
-                return 0;
-              }
-            },
-            5525,
-            5526,
-            5527);
+  public Map<Long, GameObject> getGameObjectMaps() {
+    return gameObjectMaps;
   }
 }

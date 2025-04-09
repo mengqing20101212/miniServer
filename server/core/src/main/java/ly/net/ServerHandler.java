@@ -1,9 +1,8 @@
 package ly.net;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import java.util.concurrent.atomic.AtomicInteger;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
 import org.apache.logging.log4j.core.Logger;
@@ -62,6 +61,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePa
     super.channelActive(ctx);
     log.error(
         String.format("收到新连接sid:%s, :[%s]", ctx.channel().id(), ctx.channel().remoteAddress()));
-    NetService.getInstance().addChannel(ctx);
+    GameObject object = NetService.getInstance().addChannel(ctx);
+    object.getConnector().setStatus(Connector.CONNECT_STATUS_OPEN);
   }
 }

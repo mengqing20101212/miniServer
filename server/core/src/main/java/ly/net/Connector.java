@@ -21,9 +21,10 @@ public class Connector {
 
   ChannelHandlerContext socketChannel;
   int status = CONNECT_STATUS_INIT;
-  String sessionId;
+  int sessionId;
+  int seq;
 
-  public Connector(ChannelHandlerContext socketChannel, String sessionId) {
+  public Connector(ChannelHandlerContext socketChannel, int sessionId) {
     this.sessionId = sessionId;
     this.socketChannel = socketChannel;
   }
@@ -49,19 +50,21 @@ public class Connector {
     } else {
       LoggerDef.NetLogger.error(
           String.format(
-              "该连接未准备好,不可使用 sid:%s,remoteAddress:%s",
+              "该连接未准备好,不可使用 sid:%d,remoteAddress:%s",
               sessionId, socketChannel.channel().remoteAddress()));
     }
   }
 
-  public boolean write(AbstractMessagePacket packet) {
+  public synchronized boolean write(AbstractMessagePacket packet) {
+    packet.setSid(sessionId);
+    packet.setSeq(++seq);
     if (isConnected()) {
       socketChannel.channel().writeAndFlush(packet);
       return true;
     } else {
       LoggerDef.NetLogger.error(
           String.format(
-              "该连接未准备好,不可使用 sid:%s,remoteAddress:%s",
+              "该连接未准备好,不可使用 sid:%d,remoteAddress:%s",
               sessionId, socketChannel.channel().remoteAddress()));
     }
     return false;

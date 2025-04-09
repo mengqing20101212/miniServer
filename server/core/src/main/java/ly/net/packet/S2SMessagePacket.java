@@ -14,7 +14,7 @@ public class S2SMessagePacket extends AbstractMessagePacket {
   /***消息号*/
   private int cmd;
 
-  /** 会话id session id */
+  /** 会话由服务器端分配 id session id */
   private int sid;
 
   /** 包的序列号，自增 客户端用来检查是否丢包 */
@@ -34,6 +34,43 @@ public class S2SMessagePacket extends AbstractMessagePacket {
     this.data = data;
   }
 
+  public S2SMessagePacket(long guid, int cmd, int seq, byte[] data) {
+    super(MESSAGE_PACKET_TYPE_SERVER_TO_SERVER);
+    this.guid = guid;
+    this.cmd = cmd;
+    this.seq = seq;
+    this.data = data;
+  }
+
+  public int getCmd() {
+    return cmd;
+  }
+
+  public void setCmd(int cmd) {
+    this.cmd = cmd;
+  }
+
+  @Override
+  public void setSeq(int seq) {
+    this.seq = seq;
+  }
+
+  public long getGuid() {
+    return guid;
+  }
+
+  public void setGuid(long guid) {
+    this.guid = guid;
+  }
+
+  public byte[] getData() {
+    return data;
+  }
+
+  public void setData(byte[] data) {
+    this.data = data;
+  }
+
   public S2SMessagePacket(long guid, int cmd, int sid, int seq, AbstractMessage message) {
     super(MESSAGE_PACKET_TYPE_SERVER_TO_SERVER);
     this.guid = guid;
@@ -49,8 +86,8 @@ public class S2SMessagePacket extends AbstractMessagePacket {
 
   @Override
   protected short getHeadLength() {
-    //      包头 默认长度  + 包头类型(1 ) + cmd 长度(4) +  seq 长度(4) + sid 长度(2) + guid 长度(8)
-    return (short) (getAbstractPacketLen() + 1 + 4 + 4 + 2 + 8);
+    //      包头 默认长度  + cmd 长度(4) +  seq 长度(4) + sid 长度(4) + guid 长度(8)
+    return (short) (getAbstractPacketLen() + 4 + 4 + 4 + 8);
   }
 
   @Override
@@ -59,11 +96,16 @@ public class S2SMessagePacket extends AbstractMessagePacket {
   }
 
   @Override
+  public void setSid(int sid) {
+    this.sid = sid;
+  }
+
+  @Override
   public boolean encode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) {
     encode(byteBuf);
     byteBuf.writeInt(cmd);
     byteBuf.writeInt(seq);
-    byteBuf.writeShort(Short.parseShort(channelHandlerContext.channel().id().asShortText()));
+    byteBuf.writeInt(sid);
     byteBuf.writeLong(guid);
     byteBuf.writeBytes(data);
     return true;

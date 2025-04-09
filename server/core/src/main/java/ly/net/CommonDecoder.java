@@ -24,11 +24,11 @@ public class CommonDecoder extends ByteToMessageDecoder {
       in.markReaderIndex();
       try {
         short len = in.readShort();
-        if (in.readableBytes() < len) {
+        if (in.readableBytes() < len - 2) {
           in.resetReaderIndex();
           break;
         }
-        int type = in.readUnsignedByte();
+        int type = in.readByte();
         AbstractMessagePacket packet = MessagePacketFactory.createMessagePacket(type);
         if (packet != null && packet.decode(len, in)) {
           list.add(packet);
@@ -36,7 +36,7 @@ public class CommonDecoder extends ByteToMessageDecoder {
           in.resetReaderIndex();
           log.error(
               String.format(
-                  "CommonDecoder 解析配置报错, cid:%d packet:%s ",
+                  "CommonDecoder 解析配置报错, cid:%s packet:%s ",
                   channelHandlerContext.channel().id(),
                   packet == null ? "null" : packet.getClass().getSimpleName()));
           break;

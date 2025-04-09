@@ -58,6 +58,7 @@ public class GameObject {
     if (!receivePacketQueue.offer(packet)) {
       logger.warn("Too many receive packets, dropping packet. size: " + receivePacketQueue.size());
     }
+    this.lastReceivedSeq = packet.getSeq();
   }
 
   public boolean canAddReceivePacket(AbstractMessagePacket packet) {
@@ -91,7 +92,7 @@ public class GameObject {
    * @param packet 待发送消息
    * @return true 发送成功， false发送失败
    */
-  public synchronized boolean sendPacket(AbstractMessagePacket packet) {
+  public boolean sendPacket(AbstractMessagePacket packet) {
     if (connector != null) {
       return connector.write(packet);
     }

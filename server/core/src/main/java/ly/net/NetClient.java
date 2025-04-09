@@ -3,7 +3,6 @@ package ly.net;
 import com.google.protobuf.AbstractMessage;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -33,8 +32,24 @@ public class NetClient {
     this.port = port;
   }
 
-  public void start() {
-    group = new NioEventLoopGroup();
+  public String getId() {
+    return channel.id().asLongText();
+  }
+
+  public String getHost() {
+    return host;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public String getIpPortKey() {
+    return host + ":" + port;
+  }
+
+  public void start(EventLoopGroup group) {
+    this.group = group;
     connectOnce();
   }
 
@@ -83,6 +98,10 @@ public class NetClient {
     }
   }
 
+  public int getSendSeq() {
+    return sendSeq.getAndIncrement();
+  }
+
   public void stop() {
     if (group != null) {
       group.shutdownGracefully();
@@ -124,7 +143,8 @@ public class NetClient {
     return new ArrayList<>();
   }
 
-  private boolean sendPacket(AbstractMessagePacket packet) {
+  private synchronized boolean sendPacket(AbstractMessagePacket packet) {
+    packet.setSid(sid);
     channel.writeAndFlush(packet);
     return true;
   }
@@ -136,5 +156,20 @@ public class NetClient {
 
   public Channel getChannel() {
     return channel;
+  }
+
+  @Override
+  public String toString() {
+    return "NetClient{"
+        + "host='"
+        + host
+        + '\''
+        + ", port="
+        + port
+        + ", sid="
+        + sid
+        + ", sendSeq="
+        + sendSeq
+        + '}';
   }
 }

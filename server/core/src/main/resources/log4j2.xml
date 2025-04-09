@@ -36,7 +36,7 @@
 
     <Loggers>
         <!-- 指定 net 和 system 的 Logger -->
-        <Logger name="netLogger" level="INFO" additivity="false">
+        <Logger name="netLogger" level="DEBUG" additivity="false">
             <AppenderRef ref="netRollingFile"/>
             <AppenderRef ref="Console"/>
         </Logger>

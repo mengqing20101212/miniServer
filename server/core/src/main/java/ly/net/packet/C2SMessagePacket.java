@@ -25,6 +25,11 @@ public class C2SMessagePacket extends AbstractMessagePacket {
   }
 
   @Override
+  public void setSid(int sid) {
+    this.sid = sid;
+  }
+
+  @Override
   protected short getPacketLen() {
     return (short) (getHeadLength() + data.length);
   }
@@ -60,5 +65,10 @@ public class C2SMessagePacket extends AbstractMessagePacket {
   @Override
   public int getSeq() {
     return seq;
+  }
+
+  @Override
+  public void setSeq(int seq) {
+    this.seq = seq;
   }
 }

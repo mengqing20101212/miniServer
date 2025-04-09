@@ -43,7 +43,7 @@ public class S2CMessagePacket extends AbstractMessagePacket {
   @Override
   protected short getHeadLength() {
     //      包头 默认长度 + cmd 长度 +  seq 长度 + sid 长度 + time 长度
-    return (short) (getAbstractPacketLen() + 4 + 4 + 2 + 4);
+    return (short) (getAbstractPacketLen() + 4 + 4 + 4 + 4);
   }
 
   @Override
@@ -52,12 +52,22 @@ public class S2CMessagePacket extends AbstractMessagePacket {
   }
 
   @Override
+  public void setSid(int sid) {
+    this.sid = sid;
+  }
+
+  @Override
+  public void setSeq(int seq) {
+    this.seq = seq;
+  }
+
+  @Override
   public boolean encode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) {
     try {
       encode(byteBuf);
       byteBuf.writeInt(cmd);
       byteBuf.writeInt(seq);
-      byteBuf.writeShort(Short.parseShort(channelHandlerContext.channel().id().asLongText()));
+      byteBuf.writeInt(sid);
       byteBuf.writeInt(time);
       byteBuf.writeBytes(data);
       return true;
@@ -72,7 +82,7 @@ public class S2CMessagePacket extends AbstractMessagePacket {
     int bodyLen = getBodyLen(packetLen);
     this.cmd = in.readInt();
     this.seq = in.readInt();
-    this.sid = in.readShort();
+    this.sid = in.readInt();
     this.time = in.readInt();
     this.data = new byte[bodyLen];
     in.readBytes(data);
