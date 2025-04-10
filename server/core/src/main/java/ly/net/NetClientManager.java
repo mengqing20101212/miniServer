@@ -18,8 +18,7 @@ public class NetClientManager {
 
   private EventLoopGroup group;
   private static NetClientManager instance = new NetClientManager();
-  Map<String, NetClient> netClientMap = new ConcurrentHashMap<>();
-  Map<String, NetClient> channelIdClientMap = new ConcurrentHashMap<>();
+  Map<String, NetClient> netClientMap = new ConcurrentHashMap<>(1204);
 
   private NetClientManager() {
     group = NetService.worker;
@@ -27,10 +26,6 @@ public class NetClientManager {
 
   public static NetClientManager getInstance() {
     return instance;
-  }
-
-  public NetClient getNetClient(String id) {
-    return channelIdClientMap.get(id);
   }
 
   public NetClient getNetClient(String ip, int port) {
@@ -51,13 +46,8 @@ public class NetClientManager {
   public NetClient reconnetNetClient(String ip, int port) {
     NetClient netClient = getNetClient(ip, port);
     if (netClient == null) {
-      netClient = new NetClient(ip, port);
+      netClient = new NetClient(ip, port, true);
       netClient.start(group);
-      if (netClient.isConnected()) {
-        addNewClient(netClient, true);
-      } else {
-        logger.error("connetNetClient Failed to connect to " + ip + ":" + port);
-      }
     }
     return netClient;
   }
@@ -67,29 +57,28 @@ public class NetClientManager {
    *
    * @param ip
    * @param port
-   * @return 新创建的 NetClient
+   * @return 新创建的 NetClient , 注意 外部使用的时候需要判断该连接是否准备好，可能未创建成功处于3次握手中
    */
   public NetClient newNetClient(String ip, int port) {
-    NetClient netClient = new NetClient(ip, port);
+    NetClient netClient = new NetClient(ip, port, false);
     netClient.start(group);
-    if (netClient.isConnected()) {
-      addNewClient(netClient, false);
-    } else {
-      logger.error("newNetClient Failed to connect to " + ip + ":" + port);
-    }
     return netClient;
   }
 
-  private void addNewClient(NetClient netClient, boolean reconnect) {
-    logger.info("addNewClient " + netClient);
-    channelIdClientMap.put(netClient.getId(), netClient);
-    if (reconnect) {
+  void addNewClient(NetClient netClient) {
+    logger.info(
+        "addNewClient "
+            + netClient
+            + ", Channel:"
+            + netClient.getChannel()
+            + ", canUse:"
+            + netClient.isReady());
+    if (netClient.isMultiplex()) {
       netClientMap.put(netClient.getIpPortKey(), netClient);
     }
   }
 
-  public void delNetClient(String id) {
-    NetClient client = channelIdClientMap.remove(id);
+  public void delNetClient(NetClient client) {
     if (client != null) {
       NetClient ipNetClient = netClientMap.get(client.getIpPortKey());
       if (ipNetClient != null && ipNetClient == client) {

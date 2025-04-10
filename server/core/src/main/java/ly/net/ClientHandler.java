@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.ConnectionAckPacket;
 import org.apache.logging.log4j.core.Logger;
 
 public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePacket> {
@@ -15,12 +16,10 @@ public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePa
     if (LoggerDef.NetLogger.isDebugEnabled()) {
       LoggerDef.NetLogger.debug(
           String.format(
-              "客户端(sid:%s, remote:%s)收到消息：%s",
+              "客户端(sid:%s, remote:%s), 收到消息：%s",
               ctx.channel().id(), ctx.channel().remoteAddress(), msg));
     }
-    // 可以加入 GameObject 或其他业务处理
-    NetClient netClient =
-        NetClientManager.getInstance().getNetClient(ctx.channel().id().asLongText());
+    NetClient netClient = ctx.channel().attr(NetClient.SELF_ATTR_KEY).get();
     if (netClient == null) {
       ctx.channel().close();
     } else {
@@ -36,28 +35,36 @@ public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePa
             + ", remote:"
             + ctx.channel().remoteAddress(),
         cause);
-    ctx.close();
-    NetClientManager.getInstance().delNetClient(ctx.channel().id().asLongText());
+    NetClient netClient = ctx.channel().attr(NetClient.SELF_ATTR_KEY).get();
+    NetClientManager.getInstance().delNetClient(netClient);
   }
 
   @Override
   public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-    logger.warn(
-        "连接被断开 sid: "
-            + ctx.channel().id().asLongText()
-            + ", remote: "
-            + ctx.channel().remoteAddress());
-    // 可在此触发重连机制
-    NetClientManager.getInstance().delNetClient(ctx.channel().id().asLongText());
+    String closeStr = "本端主动断开";
+    Boolean selfClosed = ctx.channel().attr(NetService.SELF_CLOSED).get();
+    if (Boolean.TRUE.equals(selfClosed)) {
+      closeStr = "连接是本端主动关闭的";
+    } else {
+      closeStr = "连接是对端关闭的";
+    }
+    logger.info(
+        String.format(
+            "连接断开 :[%s], sid:%s,  原因: %s",
+            ctx.channel().remoteAddress(), ctx.channel().id(), closeStr));
+    NetClient netClient = ctx.channel().attr(NetClient.SELF_ATTR_KEY).get();
+    NetClientManager.getInstance().delNetClient(netClient);
   }
 
   @Override
   public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
     logger.info(
-        "客户端连接成功 "
+        "ClientHandler channelActive 客户端连接成功 "
             + ctx.channel().id().asLongText()
             + ", remote: "
             + ctx.channel().remoteAddress());
+    // 连接成功 请求 sessionId
+    ctx.channel().writeAndFlush(new ConnectionAckPacket());
   }
 }

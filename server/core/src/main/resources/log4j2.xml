@@ -3,13 +3,13 @@
     <Appenders>
         <!-- 控制台输出 -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level - %msg%n"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level - %msg%n"/>
         </Console>
 
         <!-- 网络日志 -->
         <RollingFile name="netRollingFile" fileName="logs/net.log"
                      filePattern="logs/net-%d{yyyy-MM-dd}.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
             </Policies>
@@ -18,7 +18,7 @@
         <!-- 系统日志 -->
         <RollingFile name="systemRollingFile" fileName="logs/system.log"
                      filePattern="logs/system-%d{yyyy-MM-dd}.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
             </Policies>
@@ -27,7 +27,7 @@
         <!-- 系统日志 -->
         <RollingFile name="DbRollingFile" fileName="logs/db.log"
                      filePattern="logs/db-%d{yyyy-MM-dd}.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
             </Policies>

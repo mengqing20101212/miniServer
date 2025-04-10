@@ -4,6 +4,7 @@ import com.google.protobuf.AbstractMessage;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.AttributeKey;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.ConnectionAckPacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.net.packet.S2SMessagePacket;
 import org.apache.logging.log4j.core.Logger;
@@ -23,13 +25,20 @@ public class NetClient {
   private final int port;
   private Channel channel;
   private EventLoopGroup group;
+  private final boolean isMultiplex;
   private int sid;
   BlockingQueue<AbstractMessagePacket> receivePacketQueue = new ArrayBlockingQueue<>(1024);
   AtomicInteger sendSeq = new AtomicInteger(0);
+  static AttributeKey<NetClient> SELF_ATTR_KEY = AttributeKey.valueOf("NET_CLIENT");
 
-  public NetClient(String host, int port) {
+  public NetClient(String host, int port, boolean isMultiplex) {
+    this.isMultiplex = isMultiplex;
     this.host = host;
     this.port = port;
+  }
+
+  public boolean isMultiplex() {
+    return isMultiplex;
   }
 
   public String getId() {
@@ -55,6 +64,8 @@ public class NetClient {
 
   private void connectOnce() {
     Bootstrap bootstrap = new Bootstrap();
+    setSid(0);
+    final NetClient SELF = this;
     bootstrap
         .group(group)
         .channel(NioSocketChannel.class)
@@ -67,6 +78,7 @@ public class NetClient {
             new ChannelInitializer<Channel>() {
               @Override
               protected void initChannel(Channel ch) throws Exception {
+                ch.attr(SELF_ATTR_KEY).set(SELF);
                 ch.pipeline()
                     .addLast(new CommonDecoder())
                     .addLast(new CommonEncoder())
@@ -75,10 +87,29 @@ public class NetClient {
             });
 
     try {
+      final long begin = System.currentTimeMillis();
       ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port)).sync();
       if (future.isSuccess()) {
         channel = future.channel();
-        logger.info("Netty 客户端连接成功：" + host + ":" + port);
+        NetClientManager.getInstance().addNewClient(this);
+        logger.info(
+            "Netty 客户端连接成功："
+                + " channelId:"
+                + channel.id().asLongText()
+                + ",  "
+                + host
+                + ":"
+                + port
+                + ",  耗时:"
+                + (System.currentTimeMillis() - begin)
+                + "毫秒");
+        int maxTimeOut = 1000;
+        while (!isReady() && maxTimeOut > 0) {
+          Thread.sleep(3);
+          maxTimeOut -= 3;
+        }
+      } else {
+        logger.error("客户端连接失败", future.cause());
       }
     } catch (Exception e) {
       logger.error("客户端连接失败", e);
@@ -93,7 +124,7 @@ public class NetClient {
   }
 
   public void setSid(int sid) {
-    if (this.sid != 0) {
+    if (this.sid == 0) {
       this.sid = sid;
     }
   }
@@ -104,11 +135,12 @@ public class NetClient {
 
   public void stop() {
     if (group != null) {
-      group.shutdownGracefully();
+      channel.attr(NetService.SELF_CLOSED).set(true);
+      channel.close();
     }
   }
 
-  public boolean isConnected() {
+  protected boolean isConnected() {
     return channel != null && channel.isActive();
   }
 
@@ -146,15 +178,18 @@ public class NetClient {
   private synchronized boolean sendPacket(AbstractMessagePacket packet) {
     packet.setSid(sid);
     if (LoggerDef.NetLogger.isDebugEnabled()) {
-      LoggerDef.NetLogger.debug(String.format("send packet:%s", packet));
+      LoggerDef.NetLogger.debug(String.format("sid:%d send packet:%s", sid, packet));
     }
     channel.writeAndFlush(packet);
     return true;
   }
 
   public void addReceivePacket(AbstractMessagePacket packet) {
-    setSid(packet.getSid());
-    receivePacketQueue.add(packet);
+    if (packet instanceof ConnectionAckPacket ackPacket) {
+      setSid(ackPacket.getSessionId());
+    } else {
+      receivePacketQueue.add(packet);
+    }
   }
 
   public Channel getChannel() {
@@ -173,6 +208,12 @@ public class NetClient {
         + sid
         + ", sendSeq="
         + sendSeq
+        + ", channelId="
+        + (channel == null ? "null" : channel.id().asLongText())
         + '}';
+  }
+
+  public boolean isReady() {
+    return isConnected() && sid != 0;
   }
 }

@@ -19,6 +19,9 @@ public class MessagePacketFactory {
       case AbstractMessagePacket.MESSAGE_PACKET_TYPE_CLIENT_TO_SERVER -> {
         return new C2SMessagePacket();
       }
+      case AbstractMessagePacket.MESSAGE_PACKET_TYPE_CONNECT_ACK -> {
+        return new ConnectionAckPacket();
+      }
     }
     return null;
   }

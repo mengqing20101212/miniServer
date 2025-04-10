@@ -35,7 +35,7 @@ public class NetServer {
       bootstrap
           .group(boss, worker)
           .channel(NioServerSocketChannel.class)
-          .option(ChannelOption.SO_BACKLOG, 128) // backlog 是 ServerSocket 的选项
+          .option(ChannelOption.SO_BACKLOG, 1024) // backlog 是 ServerSocket 的选项
           .childOption(
               ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000) // childOption 是针对客户端连接的 SocketChannel
           .childOption(ChannelOption.TCP_NODELAY, true)

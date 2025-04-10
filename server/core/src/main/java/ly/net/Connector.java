@@ -10,6 +10,7 @@ import ly.net.packet.AbstractMessagePacket;
  * File: Connector
  */
 public class Connector {
+
   /** 该socket 刚刚被初始化 不可读写 */
   static int CONNECT_STATUS_INIT = 0;
 
@@ -36,6 +37,7 @@ public class Connector {
   public void close() {
     status = CONNECT_STATUS_CLOSE;
     if (socketChannel != null) {
+      socketChannel.channel().attr(NetService.SELF_CLOSED).set(true);
       socketChannel.close();
     }
   }

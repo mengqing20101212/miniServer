@@ -12,6 +12,7 @@ public abstract class AbstractMessagePacket {
   static final byte MESSAGE_PACKET_TYPE_SERVER_TO_CLIENT = 0;
   static final byte MESSAGE_PACKET_TYPE_SERVER_TO_SERVER = 1;
   static final byte MESSAGE_PACKET_TYPE_CLIENT_TO_SERVER = 2;
+  static final byte MESSAGE_PACKET_TYPE_CONNECT_ACK = 3;
   private short length;
   private final int type;
 

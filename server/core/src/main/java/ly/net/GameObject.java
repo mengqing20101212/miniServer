@@ -67,7 +67,13 @@ public class GameObject {
       return false;
     }
     if (packet.getSeq() != 0 && lastReceivedSeq != packet.getSeq() - 1) {
-      logger.error(String.format("丢包了，上一个包的序列号:%d, 当前包序列号:%d", lastReceivedSeq, packet.getSeq()));
+      logger.error(
+          String.format(
+              "sid[%s : %d]  丢包了，上一个包的序列号:%d, 当前包序列号:%d",
+              connector.socketChannel.channel().id(),
+              connector.sessionId,
+              lastReceivedSeq,
+              packet.getSeq()));
       return false;
     }
     return checkAddReceivePacket(packet);

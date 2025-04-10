@@ -3,6 +3,7 @@ package ly.net;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.util.AttributeKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,8 @@ import org.apache.logging.log4j.core.Logger;
  * File: NetServcie
  */
 public class NetService {
+  protected static final AttributeKey<Boolean> SELF_CLOSED = AttributeKey.valueOf("selfClosed");
+
   /** tcp 收包 缓冲池大小 32K* */
   static final int SO_RCVBUF = 1024 * 32;
 
