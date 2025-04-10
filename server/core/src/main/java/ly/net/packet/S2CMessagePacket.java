@@ -57,6 +57,16 @@ public class S2CMessagePacket extends AbstractMessagePacket {
   }
 
   @Override
+  public int getCmd() {
+    return cmd;
+  }
+
+  @Override
+  public byte[] getData() {
+    return data;
+  }
+
+  @Override
   public void setSeq(int seq) {
     this.seq = seq;
   }

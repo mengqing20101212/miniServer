@@ -71,4 +71,14 @@ public class C2SMessagePacket extends AbstractMessagePacket {
   public void setSeq(int seq) {
     this.seq = seq;
   }
+
+  @Override
+  public int getCmd() {
+    return cmd;
+  }
+
+  @Override
+  public byte[] getData() {
+    return data;
+  }
 }

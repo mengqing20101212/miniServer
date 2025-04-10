@@ -1,4 +1,6 @@
+import com.google.protobuf.AbstractMessage;
 import io.netty.channel.ChannelHandlerContext;
+import ly.ProtoMessageFactory;
 import ly.net.GameObject;
 import ly.net.GameObjectProvider;
 import ly.net.NetService;
@@ -56,6 +58,8 @@ public class TestServer {
               packet -> {
                 S2SMessagePacket msg =
                     MessagePacketFactory.copyMessagePacket((S2SMessagePacket) packet);
+                AbstractMessage protoMsg =
+                    ProtoMessageFactory.createProtoMessage(packet.getCmd(), packet.getData());
                 sendPacket(msg);
               });
     }

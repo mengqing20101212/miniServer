@@ -32,8 +32,8 @@ public abstract class AbstractMessagePacket {
     return type;
   }
 
-  public byte[] getBytes() {
-    return new byte[length];
+  public byte[] getData() {
+    return new byte[] {};
   }
 
   public void setSid(int sid) {}
@@ -59,6 +59,10 @@ public abstract class AbstractMessagePacket {
   protected abstract short getHeadLength();
 
   protected abstract short getPacketLen();
+
+  public int getCmd() {
+    return 0;
+  }
 
   public abstract boolean encode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf);
 

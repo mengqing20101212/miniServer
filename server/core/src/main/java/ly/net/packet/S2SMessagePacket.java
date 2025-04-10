@@ -42,6 +42,7 @@ public class S2SMessagePacket extends AbstractMessagePacket {
     this.data = data;
   }
 
+  @Override
   public int getCmd() {
     return cmd;
   }
@@ -63,6 +64,7 @@ public class S2SMessagePacket extends AbstractMessagePacket {
     this.guid = guid;
   }
 
+  @Override
   public byte[] getData() {
     return data;
   }
