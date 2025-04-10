@@ -4,7 +4,6 @@ import io.netty.channel.EventLoopGroup;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import ly.LoggerDef;
-import ly.net.packet.S2SMessagePacket;
 import org.apache.logging.log4j.core.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,13 +41,20 @@ public class NetClientManager {
     return null;
   }
 
-  public NetClient connetNetClient(String ip, int port) {
+  /**
+   * 该接口创建的 NetClient IP port 会被复用
+   *
+   * @param ip
+   * @param port
+   * @return 新的 NetClient
+   */
+  public NetClient reconnetNetClient(String ip, int port) {
     NetClient netClient = getNetClient(ip, port);
     if (netClient == null) {
       netClient = new NetClient(ip, port);
       netClient.start(group);
       if (netClient.isConnected()) {
-        addNewClient(netClient);
+        addNewClient(netClient, true);
       } else {
         logger.error("connetNetClient Failed to connect to " + ip + ":" + port);
       }
@@ -56,16 +62,39 @@ public class NetClientManager {
     return netClient;
   }
 
-  private void addNewClient(NetClient netClient) {
+  /**
+   * 每次调用 创建新的 NetClient ，该连接 不会被复用
+   *
+   * @param ip
+   * @param port
+   * @return 新创建的 NetClient
+   */
+  public NetClient newNetClient(String ip, int port) {
+    NetClient netClient = new NetClient(ip, port);
+    netClient.start(group);
+    if (netClient.isConnected()) {
+      addNewClient(netClient, false);
+    } else {
+      logger.error("newNetClient Failed to connect to " + ip + ":" + port);
+    }
+    return netClient;
+  }
+
+  private void addNewClient(NetClient netClient, boolean reconnect) {
     logger.info("addNewClient " + netClient);
     channelIdClientMap.put(netClient.getId(), netClient);
-    netClientMap.put(netClient.getIpPortKey(), netClient);
+    if (reconnect) {
+      netClientMap.put(netClient.getIpPortKey(), netClient);
+    }
   }
 
   public void delNetClient(String id) {
     NetClient client = channelIdClientMap.remove(id);
     if (client != null) {
-      netClientMap.remove(client.getIpPortKey());
+      NetClient ipNetClient = netClientMap.get(client.getIpPortKey());
+      if (ipNetClient != null && ipNetClient == client) {
+        netClientMap.remove(client.getIpPortKey());
+      }
       client.stop();
     }
     logger.info("delNetClient " + client);

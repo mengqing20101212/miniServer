@@ -59,6 +59,9 @@ public class Connector {
     packet.setSid(sessionId);
     packet.setSeq(++seq);
     if (isConnected()) {
+      if (LoggerDef.NetLogger.isDebugEnabled()) {
+        LoggerDef.NetLogger.debug(String.format("send packet:%s", packet));
+      }
       socketChannel.channel().writeAndFlush(packet);
       return true;
     } else {

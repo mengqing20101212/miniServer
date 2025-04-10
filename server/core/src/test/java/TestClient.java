@@ -9,15 +9,26 @@ import ly.net.packet.S2SMessagePacket;
  */
 public class TestClient {
   public static void main(String[] args) {
-    for (int i = 0; i < 1; i++) {
-      testClient(i, "127.0.0.1", 5526);
+    for (int i = 0; i < 1000; i++) {
+      Thread.ofVirtual()
+          .start(
+              () -> {
+                testClient(0, "127.0.0.1", 5526);
+              });
+    }
+    try {
+      Thread.sleep(Integer.MAX_VALUE);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
   }
 
   private static void testClient(int guid, String ip, int port) {
-    NetClient client = NetClientManager.getInstance().connetNetClient(ip, port);
-    S2SMessagePacket packet =
-        new S2SMessagePacket(guid, 1, 0, client.getSendSeq(), new byte[] {1, 2, 3, 4});
-    client.send(packet);
+    NetClient client = NetClientManager.getInstance().newNetClient(ip, port);
+    for (int i = 0; i < 1000; i++) {
+      S2SMessagePacket packet =
+          new S2SMessagePacket(i, 1, 0, client.getSendSeq(), new byte[] {1, 2, 3, 4});
+      client.send(packet);
+    }
   }
 }

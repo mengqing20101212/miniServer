@@ -13,9 +13,9 @@ public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePa
   protected void channelRead0(ChannelHandlerContext ctx, AbstractMessagePacket msg)
       throws Exception {
     if (LoggerDef.NetLogger.isDebugEnabled()) {
-      logger.debug(
+      LoggerDef.NetLogger.debug(
           String.format(
-              "客户端(sid:%s, remote:%s)收到消息：",
+              "客户端(sid:%s, remote:%s)收到消息：%s",
               ctx.channel().id(), ctx.channel().remoteAddress(), msg));
     }
     // 可以加入 GameObject 或其他业务处理

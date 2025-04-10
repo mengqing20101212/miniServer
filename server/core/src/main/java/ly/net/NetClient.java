@@ -145,6 +145,9 @@ public class NetClient {
 
   private synchronized boolean sendPacket(AbstractMessagePacket packet) {
     packet.setSid(sid);
+    if (LoggerDef.NetLogger.isDebugEnabled()) {
+      LoggerDef.NetLogger.debug(String.format("send packet:%s", packet));
+    }
     channel.writeAndFlush(packet);
     return true;
   }
