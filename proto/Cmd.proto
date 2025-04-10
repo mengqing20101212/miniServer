@@ -1,0 +1,15 @@
+syntax = "proto3";
+option java_package = "ly.proto";
+
+// 注意 双号是上行包，单号是下行包
+enum CMD
+{
+  cs_null = 0;
+  CS_Login = 100;                                                                   //登录协议请求
+  SC_Login = 101;                                                                   //登录协议响应
+  ////////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用///////////////////////////////////////
+  CS_Server2Server = 10000;                                                         //server2server 服务器之间通信的消息号 请求
+  SC_Server2Server = 10001;                                                         //server2server 服务器之间通信的消息号 响应
+  cs_MaxServeMsgId = 20000;                                                         //maxServeMsgId 服务器之间通信消息号最大值
+  ///////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用////////////////////////////////////////
+}
