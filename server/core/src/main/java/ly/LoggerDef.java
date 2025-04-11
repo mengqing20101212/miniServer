@@ -1,11 +1,11 @@
 package ly;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoggerDef {
 
-  public static Logger SystemLogger = (Logger) LogManager.getLogger("systemLogger");
-  public static Logger DbLogger = (Logger) LogManager.getLogger("DbLogger");
-  public static Logger NetLogger = (Logger) LogManager.getLogger("netLogger");
+  public static Logger SystemLogger = LoggerFactory.getLogger("systemLogger");
+  public static Logger DbLogger = LoggerFactory.getLogger("DbLogger");
+  public static Logger NetLogger = LoggerFactory.getLogger("netLogger");
 }

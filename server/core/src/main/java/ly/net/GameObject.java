@@ -8,7 +8,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
-import org.apache.logging.log4j.core.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /*

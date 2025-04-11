@@ -5,7 +5,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.ConnectionAckPacket;
-import org.apache.logging.log4j.core.Logger;
+import org.slf4j.Logger;
 
 public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePacket> {
   static Logger logger = LoggerDef.SystemLogger;

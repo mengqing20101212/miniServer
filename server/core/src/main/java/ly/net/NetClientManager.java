@@ -4,7 +4,7 @@ import io.netty.channel.EventLoopGroup;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import ly.LoggerDef;
-import org.apache.logging.log4j.core.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /*

@@ -656,7 +656,7 @@ public class ParserExcelConfig {
               + "import ly.AbstractConfigManger;\n"
               + "import ly.ConfigLoadException;\n"
               + "import ly.InterfaceConfigManagerProxy;\n"
-              + "import org.apache.logging.log4j.core.Logger;\n"
+              + "import org.slf4j.Logger;\n"
               + "\n"
               + "/*\n"
               + " * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@\n"

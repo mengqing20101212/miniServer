@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import ly.LoggerDef;
 import ly.utils.RandomUtils;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 /** 负责操作MySQL,不是线程安全 Author: liuYang Date: 2025/4/3 File: MysqlConnector */
 public class MysqlConnector {

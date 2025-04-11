@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.ConnectionAckPacket;
-import org.apache.logging.log4j.core.Logger;
+import org.slf4j.Logger;
 
 /*
  * Author: liuYang

@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
-import org.apache.logging.log4j.core.Logger;
+import org.slf4j.Logger;
 
 /*
  * Author: liuYang

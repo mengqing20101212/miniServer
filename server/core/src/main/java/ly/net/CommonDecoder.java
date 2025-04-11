@@ -7,7 +7,7 @@ import java.util.List;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.MessagePacketFactory;
-import org.apache.logging.log4j.core.Logger;
+import org.slf4j.Logger;
 
 /*
  * Author: liuYang
@@ -42,7 +42,7 @@ public class CommonDecoder extends ByteToMessageDecoder {
           break;
         }
       } catch (Exception e) {
-        log.error(e);
+        log.error(e.getMessage());
         in.resetReaderIndex();
         e.printStackTrace();
         break;

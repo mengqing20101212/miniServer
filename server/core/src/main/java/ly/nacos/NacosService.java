@@ -23,7 +23,7 @@ import ly.ServerContext;
 import ly.config.ServerConfig;
 import ly.config.ServerTypeEnum;
 import ly.utils.CommonUtils;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 /*
  * Nacos 服务 用于节点的发现，注册，以及配置文件的监听
@@ -216,14 +216,14 @@ public class NacosService {
     logger.info("关闭 Nacos ");
   }
 
-  /* public static void main(String[] args) {
+  public static void main(String[] args) {
     String nacosUrl = "localhost:8848";
     String serverType = "GAME";
     String serverId = "game1001";
     String env = "ly";
     ServerContext.ENV = env;
     ServerContext.serverType = ServerTypeEnum.GAME;
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1; i++) {
       getInstance().startUp(nacosUrl, ServerTypeEnum.getByType(serverType), serverId, env);
     }
     try {
@@ -231,5 +231,5 @@ public class NacosService {
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
-  }*/
+  }
 }

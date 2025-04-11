@@ -4,7 +4,7 @@ import ly.config.RunModuleEnum;
 import ly.config.ServerConfig;
 import ly.config.ServerTypeEnum;
 import ly.nacos.NacosService;
-import org.apache.logging.log4j.core.Logger;
+import org.slf4j.Logger;
 
 public class ServerContext {
   private static final Logger logger = ly.LoggerDef.SystemLogger;

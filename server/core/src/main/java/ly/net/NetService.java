@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import ly.LoggerDef;
-import org.apache.logging.log4j.core.Logger;
+import org.slf4j.Logger;
 
 /*
  * Author: liuYang

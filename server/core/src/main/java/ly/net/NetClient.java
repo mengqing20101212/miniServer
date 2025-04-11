@@ -16,7 +16,7 @@ import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.ConnectionAckPacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.net.packet.S2SMessagePacket;
-import org.apache.logging.log4j.core.Logger;
+import org.slf4j.Logger;
 
 public class NetClient {
   static Logger logger = LoggerDef.NetLogger;

@@ -1,6 +1,6 @@
 package ly;
 
-import org.apache.logging.log4j.core.Logger;
+import org.slf4j.Logger;
 
 /*
  * Author: liuYang

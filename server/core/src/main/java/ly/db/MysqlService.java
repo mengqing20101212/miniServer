@@ -9,7 +9,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import ly.LoggerDef;
 import ly.db.entry.ShareEnumConfigEntry;
 import ly.db.entry.ShareEnumConfigEntryHelper;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 /*
  * Author: liuYang
