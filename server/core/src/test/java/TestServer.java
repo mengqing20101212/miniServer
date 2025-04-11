@@ -1,5 +1,6 @@
 import com.google.protobuf.AbstractMessage;
 import io.netty.channel.ChannelHandlerContext;
+import ly.ProtoMessageFactory;
 import ly.net.GameObject;
 import ly.net.GameObjectProvider;
 import ly.net.NetService;
