@@ -1,9 +1,15 @@
 package ly;
 
+import io.netty.channel.ChannelHandlerContext;
 import ly.config.RunModuleEnum;
 import ly.config.ServerConfig;
 import ly.config.ServerTypeEnum;
 import ly.nacos.NacosService;
+import ly.net.GameObject;
+import ly.net.GameObjectProvider;
+import ly.net.NetServer;
+import ly.net.NetService;
+import ly.redis.RedisUtils;
 import org.slf4j.Logger;
 
 public class ServerContext {
@@ -25,7 +31,16 @@ public class ServerContext {
     NacosService.getInstance().startUp(nacosUrl, serverType, serverId, env);
     // 加载策划表
     ConfigService.getInstance().loadAllConfig(logger, serverConfig.configPath);
-
+    RedisUtils.init();
+    NetService.getInstance()
+        .startUp(
+            new GameObjectProvider() {
+              @Override
+              public GameObject createGameObject(ChannelHandlerContext ctx) {
+                return new GameObject(1);
+              }
+            },
+            serverConfig.serverPort);
     logger.info("服务器 启动成功 耗时: " + (System.currentTimeMillis() - startTime) + "ms");
   }
 
