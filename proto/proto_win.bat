@@ -15,5 +15,6 @@ if not exist "%outputDir%" (
 :: 可选：列出生成的文件
 echo Generated Java files:
 dir /s /b "%outputDir%"
-
+echo create ProtoMessageFactory
+java -jar .\tool-1.0-SNAPSHOT.jar ParserProto
 pause

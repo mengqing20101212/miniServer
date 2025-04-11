@@ -25,9 +25,9 @@ public final class Cmd {
   public enum CMD
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
-     * <code>cs_null = 0;</code>
+     * <code>CMD_null = 0;</code>
      */
-    cs_null(0),
+    CMD_null(0),
     /**
      * <pre>
      *登录协议请求
@@ -65,16 +65,16 @@ public final class Cmd {
      *maxServeMsgId 服务器之间通信消息号最大值
      * </pre>
      *
-     * <code>cs_MaxServeMsgId = 20000;</code>
+     * <code>MaxServeMsgId = 20000;</code>
      */
-    cs_MaxServeMsgId(20000),
+    MaxServeMsgId(20000),
     UNRECOGNIZED(-1),
     ;
 
     /**
-     * <code>cs_null = 0;</code>
+     * <code>CMD_null = 0;</code>
      */
-    public static final int cs_null_VALUE = 0;
+    public static final int CMD_null_VALUE = 0;
     /**
      * <pre>
      *登录协议请求
@@ -112,9 +112,9 @@ public final class Cmd {
      *maxServeMsgId 服务器之间通信消息号最大值
      * </pre>
      *
-     * <code>cs_MaxServeMsgId = 20000;</code>
+     * <code>MaxServeMsgId = 20000;</code>
      */
-    public static final int cs_MaxServeMsgId_VALUE = 20000;
+    public static final int MaxServeMsgId_VALUE = 20000;
 
 
     public final int getNumber() {
@@ -141,12 +141,12 @@ public final class Cmd {
      */
     public static CMD forNumber(int value) {
       switch (value) {
-        case 0: return cs_null;
+        case 0: return CMD_null;
         case 100: return CS_Login;
         case 101: return SC_Login;
         case 10000: return CS_Server2Server;
         case 10001: return SC_Server2Server;
-        case 20000: return cs_MaxServeMsgId;
+        case 20000: return MaxServeMsgId;
         default: return null;
       }
     }
@@ -212,10 +212,10 @@ public final class Cmd {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\tCmd.proto*t\n\003CMD\022\013\n\007cs_null\020\000\022\014\n\010CS_Lo" +
-      "gin\020d\022\014\n\010SC_Login\020e\022\025\n\020CS_Server2Server\020" +
-      "\220N\022\025\n\020SC_Server2Server\020\221N\022\026\n\020cs_MaxServe" +
-      "MsgId\020\240\234\001B\n\n\010ly.protob\006proto3"
+      "\n\tCmd.proto*r\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_L" +
+      "ogin\020d\022\014\n\010SC_Login\020e\022\025\n\020CS_Server2Server" +
+      "\020\220N\022\025\n\020SC_Server2Server\020\221N\022\023\n\rMaxServeMs" +
+      "gId\020\240\234\001B\n\n\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
