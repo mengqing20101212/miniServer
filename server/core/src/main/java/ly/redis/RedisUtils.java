@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import ly.LoggerDef;
 import ly.ServerContext;
 import org.apache.logging.log4j.core.Logger;
@@ -243,17 +244,20 @@ public class RedisUtils {
   }
 
   /** 使用分布式锁执行回调函数（带超时时间） */
-  public static void lockWithCallBack(String key, long timeout, TimeUnit unit, Runnable callback) {
+  public static void lockWithCallBack(
+      String key, long timeout, TimeUnit unit, Function<Boolean, Void> callback) {
     boolean locked = false;
     try {
       locked = lock(key, timeout, unit);
       if (locked) {
-        callback.run();
+        callback.apply(true);
       } else {
         logger.warn("[Redis] 未获取到锁，key='{}'，callback 未执行", key);
+        callback.apply(false);
       }
     } catch (Exception e) {
       logger.error("[Redis] 执行回调发生异常 key='{}'，error={}", key, e.getMessage(), e);
+      callback.apply(false);
     } finally {
       if (locked) {
         unlock(key);
@@ -262,7 +266,7 @@ public class RedisUtils {
   }
 
   /** 使用分布式锁执行回调函数（默认超时时间 1 秒） */
-  public static void lockWithCallBack(String key, Runnable callback) {
+  public static void lockWithCallBack(String key, Function<Boolean, Void> callback) {
     lockWithCallBack(key, 1, TimeUnit.SECONDS, callback);
   }
 
