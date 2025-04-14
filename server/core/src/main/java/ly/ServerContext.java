@@ -7,7 +7,6 @@ import ly.config.ServerTypeEnum;
 import ly.nacos.NacosService;
 import ly.net.GameObject;
 import ly.net.GameObjectProvider;
-import ly.net.NetServer;
 import ly.net.NetService;
 import ly.redis.RedisUtils;
 import org.slf4j.Logger;
@@ -20,7 +19,12 @@ public class ServerContext {
   public static String SERVER_ID;
   public static String ENV;
 
-  public static void startUp(String nacosUrl, String serverTypeStr, String serverId, String env) {
+  public static void startUp(
+      String nacosUrl,
+      String serverTypeStr,
+      String serverId,
+      String env,
+      GameObjectProvider gameObjectProvider) {
     long startTime = System.currentTimeMillis();
     logger.info("服务器开始启动");
     serverType = ServerTypeEnum.getByType(serverTypeStr);
@@ -42,6 +46,21 @@ public class ServerContext {
             },
             serverConfig.serverPort);
     logger.info("服务器 启动成功 耗时: " + (System.currentTimeMillis() - startTime) + "ms");
+  }
+
+  public static void startUp(String nacosUrl, String serverTypeStr, String serverId, String env) {
+    startUp(
+        nacosUrl,
+        serverTypeStr,
+        serverId,
+        env,
+        new GameObjectProvider() {
+
+          @Override
+          public GameObject createGameObject(ChannelHandlerContext ctx) {
+            return new GameObject(1);
+          }
+        });
   }
 
   public static void setServerConfig(ServerConfig newServerConfig) {

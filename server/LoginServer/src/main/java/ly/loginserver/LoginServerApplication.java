@@ -21,6 +21,10 @@ public class LoginServerApplication {
   public void init() {
     System.out.println("nacosUrl:" + loginServerConfig.getNacosUrl());
     ServerContext.startUp(
-        loginServerConfig.getNacosUrl(), ServerTypeEnum.LOGIN.getType(), "loginServer", "ly");
+        loginServerConfig.getNacosUrl(),
+        ServerTypeEnum.LOGIN.getType(),
+        "loginServer",
+        "ly",
+        new LoginGameObjectProvider());
   }
 }

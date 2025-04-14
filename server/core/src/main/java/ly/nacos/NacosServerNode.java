@@ -22,6 +22,10 @@ public class NacosServerNode {
     return instance.getInstanceId();
   }
 
+  public String getServerName() {
+    return instance.getMetadata().getOrDefault("serverName", "null");
+  }
+
   public ServerTypeEnum getServerType() {
     return serverType;
   }
@@ -104,5 +108,9 @@ public class NacosServerNode {
         + ", loadNum="
         + loadNum
         + '}';
+  }
+
+  public boolean canUse() {
+    return instance.isEnabled();
   }
 }
