@@ -170,7 +170,7 @@ public class ParserDbEntry {
                       + "\n"
                       + "  public static List<{javaName}Entry> select(String[] fields, Object... params) {\n"
                       + "\n"
-                      + "    if (fields != null && params != null && fields.length != params.length) {\n"
+                      + "    if (fields != null && params != null && fields.length == params.length) {\n"
                       + "      return MysqlService.getInstance().selectAll({javaName}Entry.class, fields, params);\n"
                       + "    }\n"
                       + "    return new ArrayList<>();\n"
@@ -404,11 +404,11 @@ public class ParserDbEntry {
       case Types.NCHAR:
         return "String";
       case Types.DATE:
-        return "java.sql.Date"; // or java.time.LocalDate
+        return "java.time.LocalDate"; // or java.time.LocalDate
       case Types.TIME:
-        return "java.sql.Time"; // or java.time.LocalTime
+        return "java.time.LocalTime"; // or java.time.LocalTime
       case Types.TIMESTAMP:
-        return "java.sql.Timestamp"; // or java.time.LocalDateTime
+        return "java.time.LocalDateTime"; // or java.time.LocalDateTime
       case Types.BOOLEAN:
       case Types.BIT:
       case Types.TINYINT:
@@ -485,10 +485,7 @@ public class ParserDbEntry {
   }
 
   private String getTableName(String tableName) {
-    if (tableName.contains("_")) {
-      return toUpperCamelCase(tableName);
-    }
-    return tableName;
+    return toUpperCamelCase(tableName);
   }
 
   public static String toUpperCamelCase(String input) {
@@ -508,7 +505,7 @@ public class ParserDbEntry {
   }
 
   public static void main(String[] args) {
-    String str = "test_test_tt";
+    String str = "test";
     System.out.println(toUpperCamelCase(str));
     ParserDbEntry dbParser = new ParserDbEntry();
     dbParser.parser();

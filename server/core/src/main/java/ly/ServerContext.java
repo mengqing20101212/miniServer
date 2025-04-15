@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import ly.config.RunModuleEnum;
 import ly.config.ServerConfig;
 import ly.config.ServerTypeEnum;
+import ly.db.MysqlService;
 import ly.nacos.NacosService;
 import ly.net.GameObject;
 import ly.net.GameObjectProvider;
@@ -36,6 +37,15 @@ public class ServerContext {
     // 加载策划表
     ConfigService.getInstance().loadAllConfig(logger, serverConfig.configPath);
     RedisUtils.init();
+    MysqlService.getInstance()
+        .init(
+            serverConfig.db.jdbcUrl,
+            serverConfig.db.userName,
+            serverConfig.db.passWord,
+            0,
+            0,
+            0,
+            0);
     NetService.getInstance()
         .startUp(
             new GameObjectProvider() {

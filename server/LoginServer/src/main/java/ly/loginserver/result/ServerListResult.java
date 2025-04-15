@@ -14,11 +14,29 @@ public class ServerListResult {
   ServerNode gate;
   List<ServerNode> gameServerList = new ArrayList<>();
   List<MiniPlayer> players = new ArrayList<>();
+  int accountId;
+  String token;
 
   public ServerListResult() {}
 
   public ServerNode getGate() {
     return gate;
+  }
+
+  public int getAccountId() {
+    return accountId;
+  }
+
+  public void setAccountId(int accountId) {
+    this.accountId = accountId;
+  }
+
+  public String getToken() {
+    return token;
+  }
+
+  public void setToken(String token) {
+    this.token = token;
   }
 
   public void setGate(ServerNode gate) {

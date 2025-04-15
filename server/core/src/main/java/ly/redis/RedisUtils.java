@@ -62,6 +62,20 @@ public class RedisUtils {
     }
   }
 
+  public static void setWithExpire(String key, Object value, long expire, TimeUnit timeUnit) {
+    long start = System.nanoTime();
+    try {
+      RBucket<Object> bucket = redissonClient.getBucket(key);
+      bucket.set(value, expire, timeUnit);
+      long cost = System.nanoTime() - start;
+      if (logger.isDebugEnabled()) {
+        logger.debug("[Redis] setWithExpire SET key='{}' 耗时={}μs", key, cost / 1000);
+      }
+    } catch (Exception e) {
+      logger.error("[Redis] setWithExpire SET 操作失败 key='{}', error={}", key, e.getMessage(), e);
+    }
+  }
+
   /** 获取 key 对应的值 */
   @SuppressWarnings("unchecked")
   public static <T> T get(String key) {

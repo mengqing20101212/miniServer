@@ -35,7 +35,7 @@ public class ShareMonthEntryHelper {
 
   public static List<ShareMonthEntry> select(String[] fields, Object... params) {
 
-    if (fields != null && params != null && fields.length != params.length) {
+    if (fields != null && params != null && fields.length == params.length) {
       return MysqlService.getInstance().selectAll(ShareMonthEntry.class, fields, params);
     }
     return new ArrayList<>();

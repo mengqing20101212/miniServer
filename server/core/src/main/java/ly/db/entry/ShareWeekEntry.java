@@ -17,7 +17,7 @@ public class ShareWeekEntry extends AbstractEntry {
 
   /**交易所行情日期*/
   @DbMeta.DbField(name="daily_time")
-  private java.sql.Date daily_time;
+  private java.time.LocalDate daily_time;
 
   /**开盘价*/
   @DbMeta.DbField(name="open")
@@ -92,11 +92,11 @@ public class ShareWeekEntry extends AbstractEntry {
   public String getCode() {
     return code;
   }
- public void setDailyTime(java.sql.Date DailyTime) {
+ public void setDailyTime(java.time.LocalDate DailyTime) {
     this.daily_time = DailyTime;
     autoAddCurVersion();
   }
-  public java.sql.Date getDailyTime() {
+  public java.time.LocalDate getDailyTime() {
     return daily_time;
   }
  public void setOpen(String Open) {

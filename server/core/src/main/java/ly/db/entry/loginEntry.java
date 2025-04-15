@@ -7,7 +7,7 @@ import ly.db.DbMeta;
  * 自动生成的代码, 如需改动需要在 @@@@@自定义区修改@@@@@
  */
 @DbMeta.DbTable(name = "login")
-public class loginEntry extends AbstractEntry {
+public class LoginEntry extends AbstractEntry {
 
 
   /**账号id*/
@@ -21,15 +21,15 @@ public class loginEntry extends AbstractEntry {
 
   /**账号创建时间*/
   @DbMeta.DbField(name="create_time")
-  private java.sql.Timestamp create_time;
+  private java.time.LocalDateTime create_time;
 
   /**账号登录时间*/
   @DbMeta.DbField(name="last_login_time")
-  private java.sql.Timestamp last_login_time;
+  private java.time.LocalDateTime last_login_time;
 
   /**账号登出时间*/
   @DbMeta.DbField(name="last_logout_time")
-  private java.sql.Timestamp last_logout_time;
+  private java.time.LocalDateTime last_logout_time;
 
   /**token */
   @DbMeta.DbField(name="token")
@@ -43,23 +43,23 @@ public class loginEntry extends AbstractEntry {
   @DbMeta.DbField(name="players")
   private String players;
   public void save() {
-    loginEntryHelper.save(this);
+    LoginEntryHelper.save(this);
   }
 
   public void update() {
-    loginEntryHelper.update(this);
+    LoginEntryHelper.update(this);
   }
 
   public void delete() {
-    loginEntryHelper.delete(this);
+    LoginEntryHelper.delete(this);
   }
 
   public void asyncSave() {
-    loginEntryHelper.asyncSave(this);
+    LoginEntryHelper.asyncSave(this);
   }
 
   public void asyncUpdate() {
-    loginEntryHelper.asyncUpdate(this);
+    LoginEntryHelper.asyncUpdate(this);
   }
 
  public void setId(Integer Id) {
@@ -76,25 +76,25 @@ public class loginEntry extends AbstractEntry {
   public String getAccount() {
     return account;
   }
- public void setCreateTime(java.sql.Timestamp CreateTime) {
+ public void setCreateTime(java.time.LocalDateTime CreateTime) {
     this.create_time = CreateTime;
     autoAddCurVersion();
   }
-  public java.sql.Timestamp getCreateTime() {
+  public java.time.LocalDateTime getCreateTime() {
     return create_time;
   }
- public void setLastLoginTime(java.sql.Timestamp LastLoginTime) {
+ public void setLastLoginTime(java.time.LocalDateTime LastLoginTime) {
     this.last_login_time = LastLoginTime;
     autoAddCurVersion();
   }
-  public java.sql.Timestamp getLastLoginTime() {
+  public java.time.LocalDateTime getLastLoginTime() {
     return last_login_time;
   }
- public void setLastLogoutTime(java.sql.Timestamp LastLogoutTime) {
+ public void setLastLogoutTime(java.time.LocalDateTime LastLogoutTime) {
     this.last_logout_time = LastLogoutTime;
     autoAddCurVersion();
   }
-  public java.sql.Timestamp getLastLogoutTime() {
+  public java.time.LocalDateTime getLastLogoutTime() {
     return last_logout_time;
   }
  public void setToken(String Token) {
@@ -125,7 +125,7 @@ public class loginEntry extends AbstractEntry {
 
   @Override
   public String toString() {
-    return "loginEntry{"
+    return "LoginEntry{"
 +
         ", id="+id+
         ", account="+account+

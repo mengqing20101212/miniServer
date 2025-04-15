@@ -35,7 +35,7 @@ public class ShareWeekEntryHelper {
 
   public static List<ShareWeekEntry> select(String[] fields, Object... params) {
 
-    if (fields != null && params != null && fields.length != params.length) {
+    if (fields != null && params != null && fields.length == params.length) {
       return MysqlService.getInstance().selectAll(ShareWeekEntry.class, fields, params);
     }
     return new ArrayList<>();

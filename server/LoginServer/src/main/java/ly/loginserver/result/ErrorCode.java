@@ -10,6 +10,7 @@ public enum ErrorCode {
   FAIL(1, "失败"),
   SYSTEM_ERROR(2, "系统错误"),
   PARAM_ERROR(3, "参数错误"),
+  ACCOUNT_HAS_EXISTS(4, "该账号已经存在，不可在次注册"),
   ;
   private int code;
   private String message;

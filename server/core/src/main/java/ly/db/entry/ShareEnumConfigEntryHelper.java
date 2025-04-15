@@ -35,7 +35,7 @@ public class ShareEnumConfigEntryHelper {
 
   public static List<ShareEnumConfigEntry> select(String[] fields, Object... params) {
 
-    if (fields != null && params != null && fields.length != params.length) {
+    if (fields != null && params != null && fields.length == params.length) {
       return MysqlService.getInstance().selectAll(ShareEnumConfigEntry.class, fields, params);
     }
     return new ArrayList<>();
