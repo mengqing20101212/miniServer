@@ -1,4 +1,4 @@
 logs/
 *.log
 /.idea/google-java-format.xml
-.idea
+.idea/*
