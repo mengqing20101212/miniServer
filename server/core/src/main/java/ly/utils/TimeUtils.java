@@ -1,4 +1,4 @@
-package com.ly.utils;
+package ly.utils;
 
 import java.time.LocalDateTime;
 

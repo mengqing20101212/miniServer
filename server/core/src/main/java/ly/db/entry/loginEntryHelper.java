@@ -12,12 +12,12 @@ public class LoginEntryHelper {
     return MysqlService.getInstance().selectOnce(LoginEntry.class, new String[] {"id"}, id);
   }
 
-  public static void save(LoginEntry LoginEntry) {
-    MysqlService.getInstance().save(LoginEntry);
+  public static boolean save(LoginEntry LoginEntry) {
+    return MysqlService.getInstance().save(LoginEntry);
   }
 
-  public static void update(LoginEntry LoginEntry, String... fileds) {
-    MysqlService.getInstance().update(LoginEntry, fileds);
+  public static boolean update(LoginEntry LoginEntry, String... fileds) {
+    return MysqlService.getInstance().update(LoginEntry, fileds);
   }
 
   public static void delete(LoginEntry LoginEntry) {

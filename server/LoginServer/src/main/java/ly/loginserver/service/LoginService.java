@@ -120,11 +120,14 @@ public class LoginService {
     entry.setToken(createToken(account));
     entry.setCreateTime(now);
     entry.setLastLoginTime(now);
-    entry.save();
-    String key = RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account);
-    RedisUtils.set(key, entry.getId());
-    saveToken(account, entry.getToken());
-    return entry;
+    if (entry.save()) {
+      String key = RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account);
+      RedisUtils.set(key, entry.getId());
+      saveToken(account, entry.getToken());
+      return entry;
+    } else {
+      return null;
+    }
   }
 
   public void saveToken(String account, String token) {
