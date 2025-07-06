@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/server/logger/pom.xml" />
         <option value="$PROJECT_DIR$/server/core/pom.xml" />
         <option value="$PROJECT_DIR$/server/tool/pom.xml" />
+        <option value="$PROJECT_DIR$/server/LoginServer/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

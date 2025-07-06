@@ -17,6 +17,7 @@ import ly.nacos.NacosService;
 import ly.redis.RedisKeys;
 import ly.redis.RedisUtils;
 import ly.utils.RandomUtils;
+import ly.utils.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -112,7 +113,7 @@ public class LoginService {
   }
 
   public LoginEntry createNewAccount(String account, String channel) {
-    LocalDateTime now = com.ly.utils.TimeUtils.now();
+    LocalDateTime now = TimeUtils.now();
     LoginEntry entry = new LoginEntry();
     entry.setAccount(account);
     entry.setChannel(channel);
