@@ -64,9 +64,7 @@ public class NetService {
                                     gameObjectMaps
                                             .values()
                                             .forEach(
-                                                    gameObject -> {
-                                                        gameObject.sendAllPackets();
-                                                    });
+                                                    ConnectSession::sendAllPackets);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }

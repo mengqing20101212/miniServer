@@ -59,7 +59,7 @@ public class ConnectSession {
     public void addReceivePacket(AbstractMessagePacket packet) {
         if (!canAddReceivePacket(packet)) return;
         if (!receivePacketQueue.offer(packet)) {
-            logger.warn("Too many receive packets, dropping packet. size: " + receivePacketQueue.size());
+            logger.warn("Too many receive packets, dropping packet. size: {}", receivePacketQueue.size());
         }
         this.lastReceivedSeq = packet.getSeq();
     }

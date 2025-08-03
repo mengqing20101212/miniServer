@@ -1,0 +1,73 @@
+@startuml
+title 游戏服务器连接关系图（分层版）
+
+skinparam componentStyle rectangle
+skinparam rectangle {
+  BorderColor black
+  RoundCorner 10
+}
+skinparam linetype ortho
+left to right direction
+
+' ==== 公共资源区 ====
+package "公共资源区" #F0F4C3 {
+  component Nacos <<Register>> #F3E5F5
+  component "DataBase\n(MySQL + Redis)" <<DB>> #EDE7F6
+}
+
+' ==== 客户端区 ====
+package "客户端区" #E3F2FD {
+  component client1 <<Client>>
+  component client2 <<Client>>
+}
+
+' ==== 网关区 ====
+package "网关区" #E8F5E9 {
+  component gate1 <<Gate>>
+  component gate2 <<Gate>>
+}
+
+' ==== 游戏区 ====
+package "游戏区" #FFF3E0 {
+  component gameServer1 <<Game>>
+  component gameServer2 <<Game>>
+  component centerServer <<Center>> #FFEBEE
+}
+
+' ==== 聊天区 ====
+package "聊天区" #E0F7FA {
+  component chatServer <<Chat>>
+}
+
+' ==== 注册中心连接 ====
+gate1 -up-> Nacos
+gate2 -up-> Nacos
+gameServer1 -up-> Nacos
+gameServer2 -up-> Nacos
+centerServer -up-> Nacos
+chatServer -up-> Nacos
+
+' ==== Client ↔ Gate 多对多 ====
+client1 --> gate1
+client1 --> gate2
+client2 --> gate1
+client2 --> gate2
+
+' ==== Gate ↔ GameServer 多对多 ====
+gate1 --> gameServer1
+gate1 --> gameServer2
+gate2 --> gameServer1
+gate2 --> gameServer2
+
+' ==== GameServer ↔ CenterServer ====
+gameServer1 --> centerServer
+gameServer2 --> centerServer
+
+' ==== Gate ↔ ChatServer 多对一 ====
+gate1 --> chatServer
+gate2 --> chatServer
+
+' ==== 所有非客户端组件统一连接数据库 ====
+(gate1, gate2, gameServer1, gameServer2, centerServer, chatServer) --> "DataBase\n(MySQL + Redis)"
+
+@enduml
