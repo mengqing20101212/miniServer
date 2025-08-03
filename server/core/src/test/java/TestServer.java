@@ -1,7 +1,7 @@
 import com.google.protobuf.AbstractMessage;
 import io.netty.channel.ChannelHandlerContext;
 import ly.ProtoMessageFactory;
-import ly.net.GameObject;
+import ly.net.ConnectSession;
 import ly.net.GameObjectProvider;
 import ly.net.NetService;
 import ly.net.packet.MessagePacketFactory;
@@ -13,55 +13,55 @@ import ly.net.packet.S2SMessagePacket;
  * File: TestServer
  */
 public class TestServer {
-  public static void main(String[] args) {
-    NetService.getInstance()
-        .startUp(
-            new GameObjectProvider() {
-              long guid;
-
-              @Override
-              public GameObject createGameObject(ChannelHandlerContext ctx) {
-                return new TestPlayer(++guid);
-              }
-            },
-            5525,
-            5526,
-            5527);
-
-    while (true) {
-      try {
-        Thread.sleep(50L);
+    public static void main(String[] args) {
         NetService.getInstance()
-            .getGameObjectMaps()
-            .values()
-            .forEach(
-                gameObject -> {
-                  gameObject.tick();
-                });
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
+                .startUp(
+                        new GameObjectProvider() {
+                            long guid;
 
-  static class TestPlayer extends GameObject {
+                            @Override
+                            public ConnectSession createGameObject(ChannelHandlerContext ctx) {
+                                return new TestPlayer(++guid);
+                            }
+                        },
+                        5525,
+                        5526,
+                        5527);
 
-    public TestPlayer(long guid) {
-      super(guid);
+        while (true) {
+            try {
+                Thread.sleep(50L);
+                NetService.getInstance()
+                        .getGameObjectMaps()
+                        .values()
+                        .forEach(
+                                gameObject -> {
+                                    gameObject.tick();
+                                });
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
-    @Override
-    public void tick() {
-      super.tick();
-      getReceivePacketList()
-          .forEach(
-              packet -> {
-                S2SMessagePacket msg =
-                    MessagePacketFactory.copyMessagePacket((S2SMessagePacket) packet);
-                AbstractMessage protoMsg =
-                    ProtoMessageFactory.createProtoMessage(packet.getCmd(), packet.getData());
-                sendPacket(msg);
-              });
+    static class TestPlayer extends ConnectSession {
+
+        public TestPlayer(long guid) {
+            super(guid);
+        }
+
+        @Override
+        public void tick() {
+            super.tick();
+            getReceivePacketList()
+                    .forEach(
+                            packet -> {
+                                S2SMessagePacket msg =
+                                        MessagePacketFactory.copyMessagePacket((S2SMessagePacket) packet);
+                                AbstractMessage protoMsg =
+                                        ProtoMessageFactory.createProtoMessage(packet.getCmd(), packet.getData());
+                                sendPacket(msg);
+                            });
+        }
     }
-  }
 }

@@ -2,3 +2,5 @@ logs/
 *.log
 /.idea/google-java-format.xml
 .idea
+/server/core/.idea/
+/.idea/

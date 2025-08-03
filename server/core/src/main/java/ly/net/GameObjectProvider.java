@@ -8,5 +8,5 @@ import io.netty.channel.ChannelHandlerContext;
  * File: GameObjectProvider
  */
 public interface GameObjectProvider {
-  public GameObject createGameObject(ChannelHandlerContext ctx);
+    public ConnectSession createGameObject(ChannelHandlerContext ctx);
 }
