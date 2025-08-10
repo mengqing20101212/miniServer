@@ -15,6 +15,15 @@
             </Policies>
         </RollingFile>
 
+        <!-- 协议日志 -->
+        <RollingFile name="protoRollingFile" fileName="logs/protobuf.log"
+                     filePattern="logs/proto-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+
         <!-- 系统日志 -->
         <RollingFile name="systemRollingFile" fileName="logs/system.log"
                      filePattern="logs/system-%d{yyyy-MM-dd}.log">
@@ -24,7 +33,7 @@
             </Policies>
         </RollingFile>
 
-        <!-- 系统日志 -->
+        <!-- 数据库日志 -->
         <RollingFile name="DbRollingFile" fileName="logs/db.log"
                      filePattern="logs/db-%d{yyyy-MM-dd}.log">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n"/>
@@ -40,7 +49,10 @@
             <AppenderRef ref="netRollingFile"/>
             <AppenderRef ref="Console"/>
         </Logger>
-
+        <Logger name="protoLogger" level="DEBUG" additivity="false">
+            <AppenderRef ref="protoRollingFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
         <Logger name="systemLogger" level="INFO" additivity="false">
             <AppenderRef ref="systemRollingFile"/>
             <AppenderRef ref="Console"/>

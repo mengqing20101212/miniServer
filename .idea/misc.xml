@@ -10,10 +10,12 @@
         <option value="$PROJECT_DIR$/server/core/pom.xml" />
         <option value="$PROJECT_DIR$/server/tool/pom.xml" />
         <option value="$PROJECT_DIR$/server/LoginServer/pom.xml" />
+        <option value="$PROJECT_DIR$/server/GateServer/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/server/core/GateServer/pom.xml" />
         <option value="$PROJECT_DIR$/server/logger/pom.xml" />
       </set>
     </option>

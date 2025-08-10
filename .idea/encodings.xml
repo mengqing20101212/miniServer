@@ -2,9 +2,13 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/proto/proto_win.bat" charset="US-ASCII" />
+    <file url="file://$PROJECT_DIR$/server/GateServer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/server/GateServer/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/LoginServer/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/config/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/config/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/server/core/GateServer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/server/core/GateServer/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/core/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/logger/src/main/java" charset="UTF-8" />

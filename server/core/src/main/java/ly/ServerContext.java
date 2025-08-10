@@ -20,12 +20,7 @@ public class ServerContext {
     public static String SERVER_ID;
     public static String ENV;
 
-    public static void startUp(
-            String nacosUrl,
-            String serverTypeStr,
-            String serverId,
-            String env,
-            GameObjectProvider gameObjectProvider) {
+    public static void startUp(String nacosUrl, String serverTypeStr, String serverId, String env, GameObjectProvider gameObjectProvider) {
         long startTime = System.currentTimeMillis();
         logger.info("服务器开始启动");
         serverType = ServerTypeEnum.getByType(serverTypeStr);
@@ -37,40 +32,19 @@ public class ServerContext {
         // 加载策划表
         ConfigService.getInstance().loadAllConfig(logger, serverConfig.configPath);
         RedisUtils.init();
-        MysqlService.getInstance()
-                .init(
-                        serverConfig.db.jdbcUrl,
-                        serverConfig.db.userName,
-                        serverConfig.db.passWord,
-                        0,
-                        0,
-                        0,
-                        0);
-        NetService.getInstance()
-                .startUp(
-                        new GameObjectProvider() {
-                            @Override
-                            public ConnectSession createGameObject(ChannelHandlerContext ctx) {
-                                return new ConnectSession(1);
-                            }
-                        },
-                        serverConfig.serverPort);
+        MysqlService.getInstance().init(serverConfig.db.jdbcUrl, serverConfig.db.userName, serverConfig.db.passWord, 0, 0, 0, 0);
+        NetService.getInstance().startUp(gameObjectProvider, serverConfig.serverPort);
         logger.info("服务器 启动成功 耗时: " + (System.currentTimeMillis() - startTime) + "ms");
     }
 
     public static void startUp(String nacosUrl, String serverTypeStr, String serverId, String env) {
-        startUp(
-                nacosUrl,
-                serverTypeStr,
-                serverId,
-                env,
-                new GameObjectProvider() {
+        startUp(nacosUrl, serverTypeStr, serverId, env, new GameObjectProvider() {
 
-                    @Override
-                    public ConnectSession createGameObject(ChannelHandlerContext ctx) {
-                        return new ConnectSession(1);
-                    }
-                });
+            @Override
+            public ConnectSession createGameObject(ChannelHandlerContext ctx) {
+                return new ConnectSession(1);
+            }
+        });
     }
 
     public static void setServerConfig(ServerConfig newServerConfig) {
