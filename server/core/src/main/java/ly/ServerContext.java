@@ -8,6 +8,7 @@ import ly.db.MysqlService;
 import ly.nacos.NacosService;
 import ly.net.ConnectSession;
 import ly.net.GameObjectProvider;
+import ly.net.IController;
 import ly.net.NetService;
 import ly.redis.RedisUtils;
 import org.slf4j.Logger;
@@ -55,5 +56,11 @@ public class ServerContext {
 
     public static String getServerId() {
         return SERVER_ID;
+    }
+
+    public static void addController(IController... controllers) {
+        for (IController controller : controllers) {
+            controller.registerHandlerRouter();
+        }
     }
 }

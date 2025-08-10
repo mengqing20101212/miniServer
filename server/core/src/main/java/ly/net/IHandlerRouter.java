@@ -4,7 +4,7 @@ import com.google.protobuf.AbstractMessage;
 import ly.net.packet.AbstractMessagePacket;
 
 @FunctionalInterface
-public interface IHandlerRouter {
+public interface IHandlerRouter<S extends ConnectSession, P extends AbstractMessagePacket, R extends AbstractMessage> {
     /**
      * 处理路由
      *
@@ -12,5 +12,5 @@ public interface IHandlerRouter {
      * @param packet  包
      * @param request 请求
      */
-    public abstract void execute(ConnectSession session, AbstractMessagePacket packet, AbstractMessage request);
+    public abstract void execute(S session, P packet, R request);
 }

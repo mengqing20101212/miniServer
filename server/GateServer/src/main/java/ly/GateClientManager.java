@@ -6,12 +6,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GateClientManager {
-    private static GateClientManager gateClientManager;
+    private static GateClientManager gateClientManager = new GateClientManager();
 
     private final Map<Long, GateClient> clientMap = new ConcurrentHashMap<>();
 
     private GateClientManager() {
-        gateClientManager = this;
+        
     }
 
     public static GateClientManager getInstance() {
