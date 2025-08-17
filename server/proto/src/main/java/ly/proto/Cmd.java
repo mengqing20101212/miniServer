@@ -62,6 +62,22 @@ public final class Cmd {
     SC_Server2Server(10001),
     /**
      * <pre>
+     *rpcPing 心跳包
+     * </pre>
+     *
+     * <code>CS_RpcPing = 10002;</code>
+     */
+    CS_RpcPing(10002),
+    /**
+     * <pre>
+     *rpcPing 心跳包响应
+     * </pre>
+     *
+     * <code>SC_RpcPing = 10003;</code>
+     */
+    SC_RpcPing(10003),
+    /**
+     * <pre>
      *maxServeMsgId 服务器之间通信消息号最大值
      * </pre>
      *
@@ -109,6 +125,22 @@ public final class Cmd {
     public static final int SC_Server2Server_VALUE = 10001;
     /**
      * <pre>
+     *rpcPing 心跳包
+     * </pre>
+     *
+     * <code>CS_RpcPing = 10002;</code>
+     */
+    public static final int CS_RpcPing_VALUE = 10002;
+    /**
+     * <pre>
+     *rpcPing 心跳包响应
+     * </pre>
+     *
+     * <code>SC_RpcPing = 10003;</code>
+     */
+    public static final int SC_RpcPing_VALUE = 10003;
+    /**
+     * <pre>
      *maxServeMsgId 服务器之间通信消息号最大值
      * </pre>
      *
@@ -146,6 +178,8 @@ public final class Cmd {
         case 101: return SC_Login;
         case 10000: return CS_Server2Server;
         case 10001: return SC_Server2Server;
+        case 10002: return CS_RpcPing;
+        case 10003: return SC_RpcPing;
         case 20000: return MaxServeMsgId;
         default: return null;
       }
@@ -212,10 +246,11 @@ public final class Cmd {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\tCmd.proto*r\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_L" +
-      "ogin\020d\022\014\n\010SC_Login\020e\022\025\n\020CS_Server2Server" +
-      "\020\220N\022\025\n\020SC_Server2Server\020\221N\022\023\n\rMaxServeMs" +
-      "gId\020\240\234\001B\n\n\010ly.protob\006proto3"
+      "\n\tCmd.proto*\224\001\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_" +
+      "Login\020d\022\014\n\010SC_Login\020e\022\025\n\020CS_Server2Serve" +
+      "r\020\220N\022\025\n\020SC_Server2Server\020\221N\022\017\n\nCS_RpcPin" +
+      "g\020\222N\022\017\n\nSC_RpcPing\020\223N\022\023\n\rMaxServeMsgId\020\240" +
+      "\234\001B\n\n\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -3,6 +3,8 @@ package ly.net.packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 
+import java.util.Arrays;
+
 /*
  * Author: liuYang
  * Date: 2025/4/9
@@ -89,5 +91,21 @@ public class C2SMessagePacket extends AbstractMessagePacket {
     @Override
     public byte[] getData() {
         return data;
+    }
+
+    @Override
+    public String toSimpleString() {
+        return String.format("%d|%d|%d|%d|%d|%d", cmd, sid, guid, seq, data.length, getPacketLen());
+    }
+
+    @Override
+    public String toString() {
+        return "C2SMessagePacket{" +
+                "cmd=" + cmd +
+                ", sid=" + sid +
+                ", guid=" + guid +
+                ", seq=" + seq +
+                ", data=" + Arrays.toString(data) +
+                '}';
     }
 }

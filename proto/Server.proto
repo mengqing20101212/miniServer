@@ -23,3 +23,16 @@ message scServer2Server
   int32 cmd = 2;    //protobufMsg 则为 消息号 ；  structMsg 则为 结构体定义的枚举号
   bytes data = 3;
 }
+
+// 心跳包
+message csRpcPing
+{
+  int64 time = 1;
+  string serverId = 2;
+}
+
+message scRpcPing
+{
+  int64 time = 1;
+}
+

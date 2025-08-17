@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -107,12 +108,14 @@ public class NetClient {
         }
     }
 
-    public boolean sendS2SMessage(long guid, int cmd, AbstractMessage protoData) {
+    public int sendS2SMessage(long guid, int cmd, AbstractMessage protoData) {
+        final int seq = sendSeq.getAndIncrement();
         S2SMessagePacket messagePacket =
                 MessagePacketFactory.createS2SMessagePacket(
-                        guid, cmd, protoData, sendSeq.getAndIncrement(), sid);
-        return send(messagePacket);
+                        guid, cmd, protoData, seq, sid);
+        return send(messagePacket) ? seq : -1;
     }
+
 
     public void setSid(int sid) {
         if (this.sid == 0) {
@@ -207,4 +210,18 @@ public class NetClient {
     public boolean isReady() {
         return isConnected() && sid != 0;
     }
+
+    public AbstractMessagePacket getReceiveMsgBySeq(int sendSeq) {
+        Iterator<AbstractMessagePacket> iterator = receivePacketQueue.iterator();
+        while (iterator.hasNext()) {
+            AbstractMessagePacket packet = iterator.next();
+            if (packet.getSeq() == sendSeq) {
+                iterator.remove();
+                return packet;
+            }
+        }
+        return null;
+    }
+
+
 }

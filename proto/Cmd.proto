@@ -10,6 +10,8 @@ enum CMD{
   ////////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用///////////////////////////////////////
   CS_Server2Server = 10000;                                                         //server2server 服务器之间通信的消息号 请求
   SC_Server2Server = 10001;                                                         //server2server 服务器之间通信的消息号 响应
+  CS_RpcPing = 10002;                                                               //rpcPing 心跳包
+  SC_RpcPing = 10003;                                                               //rpcPing 心跳包响应
   MaxServeMsgId = 20000;                                                         //maxServeMsgId 服务器之间通信消息号最大值
   ///////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用////////////////////////////////////////
 }

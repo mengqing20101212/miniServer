@@ -2,6 +2,7 @@ package ly.net;
 
 import ly.net.packet.C2SMessagePacket;
 import ly.rpc.RpcNodeConnector;
+import ly.rpc.RpcUtils;
 
 public class GateClient {
     private final GateConnectSession session;
@@ -9,6 +10,7 @@ public class GateClient {
     private String account;
     private long playerId;
     private String token;
+    private String gameServerId;
 
     public GateClient(GateConnectSession session) {
         this.session = session;
@@ -48,6 +50,8 @@ public class GateClient {
     }
 
     public void sendPacketToGameServer(C2SMessagePacket csPacket) {
-        
+        RpcUtils.request(gameServerId, csPacket);
     }
+
+
 }

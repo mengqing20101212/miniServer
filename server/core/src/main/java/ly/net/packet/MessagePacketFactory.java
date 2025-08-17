@@ -46,4 +46,6 @@ public class MessagePacketFactory {
                 new C2SMessagePacket(guid, cmd, sid, seq, protoData.toByteArray());
         return messagePacket;
     }
+
+
 }
