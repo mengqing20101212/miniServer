@@ -1,0 +1,24 @@
+syntax = "proto3";
+option java_package = "ly.proto";
+
+enum ErrorCode{
+  Ok = 0; //成功
+  Failed = 1; //失败
+  system_error = 2; //系统错误
+  param_error = 3; //参数错误
+  account_error = 4; //账号错误
+  password_error = 5; //密码错误
+  account_forbidden = 6; //账号被禁用
+  account_online = 7; //账号已登录
+  account_not_register = 8; //账号未注册
+}
+
+
+message csErrorCode{
+  int32 msgId = 1;
+  ErrorCode errorCode = 2;
+}
+
+message scErrorCode{
+
+}

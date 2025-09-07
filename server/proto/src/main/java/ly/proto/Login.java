@@ -15,44 +15,1117 @@ public final class Login {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+  public interface PlayerInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:PlayerInfo)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>int64 playerId = 1;</code>
+     * @return The playerId.
+     */
+    long getPlayerId();
+
+    /**
+     * <code>string playerName = 2;</code>
+     * @return The playerName.
+     */
+    java.lang.String getPlayerName();
+    /**
+     * <code>string playerName = 2;</code>
+     * @return The bytes for playerName.
+     */
+    com.google.protobuf.ByteString
+        getPlayerNameBytes();
+
+    /**
+     * <code>int32 level = 3;</code>
+     * @return The level.
+     */
+    int getLevel();
+
+    /**
+     * <code>int32 vipLevel = 4;</code>
+     * @return The vipLevel.
+     */
+    int getVipLevel();
+
+    /**
+     * <code>int64 createTime = 5;</code>
+     * @return The createTime.
+     */
+    long getCreateTime();
+
+    /**
+     * <code>int64 loginTime = 6;</code>
+     * @return The loginTime.
+     */
+    long getLoginTime();
+
+    /**
+     * <code>int64 lastLogoutTime = 7;</code>
+     * @return The lastLogoutTime.
+     */
+    long getLastLogoutTime();
+  }
+  /**
+   * Protobuf type {@code PlayerInfo}
+   */
+  public static final class PlayerInfo extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:PlayerInfo)
+      PlayerInfoOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use PlayerInfo.newBuilder() to construct.
+    private PlayerInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private PlayerInfo() {
+      playerName_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new PlayerInfo();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return ly.proto.Login.internal_static_PlayerInfo_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return ly.proto.Login.internal_static_PlayerInfo_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              ly.proto.Login.PlayerInfo.class, ly.proto.Login.PlayerInfo.Builder.class);
+    }
+
+    public static final int PLAYERID_FIELD_NUMBER = 1;
+    private long playerId_ = 0L;
+    /**
+     * <code>int64 playerId = 1;</code>
+     * @return The playerId.
+     */
+    @java.lang.Override
+    public long getPlayerId() {
+      return playerId_;
+    }
+
+    public static final int PLAYERNAME_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object playerName_ = "";
+    /**
+     * <code>string playerName = 2;</code>
+     * @return The playerName.
+     */
+    @java.lang.Override
+    public java.lang.String getPlayerName() {
+      java.lang.Object ref = playerName_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        playerName_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string playerName = 2;</code>
+     * @return The bytes for playerName.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getPlayerNameBytes() {
+      java.lang.Object ref = playerName_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        playerName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LEVEL_FIELD_NUMBER = 3;
+    private int level_ = 0;
+    /**
+     * <code>int32 level = 3;</code>
+     * @return The level.
+     */
+    @java.lang.Override
+    public int getLevel() {
+      return level_;
+    }
+
+    public static final int VIPLEVEL_FIELD_NUMBER = 4;
+    private int vipLevel_ = 0;
+    /**
+     * <code>int32 vipLevel = 4;</code>
+     * @return The vipLevel.
+     */
+    @java.lang.Override
+    public int getVipLevel() {
+      return vipLevel_;
+    }
+
+    public static final int CREATETIME_FIELD_NUMBER = 5;
+    private long createTime_ = 0L;
+    /**
+     * <code>int64 createTime = 5;</code>
+     * @return The createTime.
+     */
+    @java.lang.Override
+    public long getCreateTime() {
+      return createTime_;
+    }
+
+    public static final int LOGINTIME_FIELD_NUMBER = 6;
+    private long loginTime_ = 0L;
+    /**
+     * <code>int64 loginTime = 6;</code>
+     * @return The loginTime.
+     */
+    @java.lang.Override
+    public long getLoginTime() {
+      return loginTime_;
+    }
+
+    public static final int LASTLOGOUTTIME_FIELD_NUMBER = 7;
+    private long lastLogoutTime_ = 0L;
+    /**
+     * <code>int64 lastLogoutTime = 7;</code>
+     * @return The lastLogoutTime.
+     */
+    @java.lang.Override
+    public long getLastLogoutTime() {
+      return lastLogoutTime_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (playerId_ != 0L) {
+        output.writeInt64(1, playerId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(playerName_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, playerName_);
+      }
+      if (level_ != 0) {
+        output.writeInt32(3, level_);
+      }
+      if (vipLevel_ != 0) {
+        output.writeInt32(4, vipLevel_);
+      }
+      if (createTime_ != 0L) {
+        output.writeInt64(5, createTime_);
+      }
+      if (loginTime_ != 0L) {
+        output.writeInt64(6, loginTime_);
+      }
+      if (lastLogoutTime_ != 0L) {
+        output.writeInt64(7, lastLogoutTime_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (playerId_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(1, playerId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(playerName_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, playerName_);
+      }
+      if (level_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, level_);
+      }
+      if (vipLevel_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, vipLevel_);
+      }
+      if (createTime_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(5, createTime_);
+      }
+      if (loginTime_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(6, loginTime_);
+      }
+      if (lastLogoutTime_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(7, lastLogoutTime_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof ly.proto.Login.PlayerInfo)) {
+        return super.equals(obj);
+      }
+      ly.proto.Login.PlayerInfo other = (ly.proto.Login.PlayerInfo) obj;
+
+      if (getPlayerId()
+          != other.getPlayerId()) return false;
+      if (!getPlayerName()
+          .equals(other.getPlayerName())) return false;
+      if (getLevel()
+          != other.getLevel()) return false;
+      if (getVipLevel()
+          != other.getVipLevel()) return false;
+      if (getCreateTime()
+          != other.getCreateTime()) return false;
+      if (getLoginTime()
+          != other.getLoginTime()) return false;
+      if (getLastLogoutTime()
+          != other.getLastLogoutTime()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + PLAYERID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getPlayerId());
+      hash = (37 * hash) + PLAYERNAME_FIELD_NUMBER;
+      hash = (53 * hash) + getPlayerName().hashCode();
+      hash = (37 * hash) + LEVEL_FIELD_NUMBER;
+      hash = (53 * hash) + getLevel();
+      hash = (37 * hash) + VIPLEVEL_FIELD_NUMBER;
+      hash = (53 * hash) + getVipLevel();
+      hash = (37 * hash) + CREATETIME_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getCreateTime());
+      hash = (37 * hash) + LOGINTIME_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getLoginTime());
+      hash = (37 * hash) + LASTLOGOUTTIME_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getLastLogoutTime());
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static ly.proto.Login.PlayerInfo parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Login.PlayerInfo parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Login.PlayerInfo parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Login.PlayerInfo parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Login.PlayerInfo parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Login.PlayerInfo parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Login.PlayerInfo parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Login.PlayerInfo parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static ly.proto.Login.PlayerInfo parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static ly.proto.Login.PlayerInfo parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static ly.proto.Login.PlayerInfo parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Login.PlayerInfo parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(ly.proto.Login.PlayerInfo prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code PlayerInfo}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:PlayerInfo)
+        ly.proto.Login.PlayerInfoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return ly.proto.Login.internal_static_PlayerInfo_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return ly.proto.Login.internal_static_PlayerInfo_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                ly.proto.Login.PlayerInfo.class, ly.proto.Login.PlayerInfo.Builder.class);
+      }
+
+      // Construct using ly.proto.Login.PlayerInfo.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        playerId_ = 0L;
+        playerName_ = "";
+        level_ = 0;
+        vipLevel_ = 0;
+        createTime_ = 0L;
+        loginTime_ = 0L;
+        lastLogoutTime_ = 0L;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return ly.proto.Login.internal_static_PlayerInfo_descriptor;
+      }
+
+      @java.lang.Override
+      public ly.proto.Login.PlayerInfo getDefaultInstanceForType() {
+        return ly.proto.Login.PlayerInfo.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public ly.proto.Login.PlayerInfo build() {
+        ly.proto.Login.PlayerInfo result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public ly.proto.Login.PlayerInfo buildPartial() {
+        ly.proto.Login.PlayerInfo result = new ly.proto.Login.PlayerInfo(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(ly.proto.Login.PlayerInfo result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.playerId_ = playerId_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.playerName_ = playerName_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.level_ = level_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.vipLevel_ = vipLevel_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.createTime_ = createTime_;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.loginTime_ = loginTime_;
+        }
+        if (((from_bitField0_ & 0x00000040) != 0)) {
+          result.lastLogoutTime_ = lastLogoutTime_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof ly.proto.Login.PlayerInfo) {
+          return mergeFrom((ly.proto.Login.PlayerInfo)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(ly.proto.Login.PlayerInfo other) {
+        if (other == ly.proto.Login.PlayerInfo.getDefaultInstance()) return this;
+        if (other.getPlayerId() != 0L) {
+          setPlayerId(other.getPlayerId());
+        }
+        if (!other.getPlayerName().isEmpty()) {
+          playerName_ = other.playerName_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (other.getLevel() != 0) {
+          setLevel(other.getLevel());
+        }
+        if (other.getVipLevel() != 0) {
+          setVipLevel(other.getVipLevel());
+        }
+        if (other.getCreateTime() != 0L) {
+          setCreateTime(other.getCreateTime());
+        }
+        if (other.getLoginTime() != 0L) {
+          setLoginTime(other.getLoginTime());
+        }
+        if (other.getLastLogoutTime() != 0L) {
+          setLastLogoutTime(other.getLastLogoutTime());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                playerId_ = input.readInt64();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 18: {
+                playerName_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 24: {
+                level_ = input.readInt32();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              case 32: {
+                vipLevel_ = input.readInt32();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
+              case 40: {
+                createTime_ = input.readInt64();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 40
+              case 48: {
+                loginTime_ = input.readInt64();
+                bitField0_ |= 0x00000020;
+                break;
+              } // case 48
+              case 56: {
+                lastLogoutTime_ = input.readInt64();
+                bitField0_ |= 0x00000040;
+                break;
+              } // case 56
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private long playerId_ ;
+      /**
+       * <code>int64 playerId = 1;</code>
+       * @return The playerId.
+       */
+      @java.lang.Override
+      public long getPlayerId() {
+        return playerId_;
+      }
+      /**
+       * <code>int64 playerId = 1;</code>
+       * @param value The playerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPlayerId(long value) {
+
+        playerId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 playerId = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPlayerId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        playerId_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object playerName_ = "";
+      /**
+       * <code>string playerName = 2;</code>
+       * @return The playerName.
+       */
+      public java.lang.String getPlayerName() {
+        java.lang.Object ref = playerName_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          playerName_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string playerName = 2;</code>
+       * @return The bytes for playerName.
+       */
+      public com.google.protobuf.ByteString
+          getPlayerNameBytes() {
+        java.lang.Object ref = playerName_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          playerName_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string playerName = 2;</code>
+       * @param value The playerName to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPlayerName(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        playerName_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string playerName = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPlayerName() {
+        playerName_ = getDefaultInstance().getPlayerName();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string playerName = 2;</code>
+       * @param value The bytes for playerName to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPlayerNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        playerName_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private int level_ ;
+      /**
+       * <code>int32 level = 3;</code>
+       * @return The level.
+       */
+      @java.lang.Override
+      public int getLevel() {
+        return level_;
+      }
+      /**
+       * <code>int32 level = 3;</code>
+       * @param value The level to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLevel(int value) {
+
+        level_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 level = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLevel() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        level_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int vipLevel_ ;
+      /**
+       * <code>int32 vipLevel = 4;</code>
+       * @return The vipLevel.
+       */
+      @java.lang.Override
+      public int getVipLevel() {
+        return vipLevel_;
+      }
+      /**
+       * <code>int32 vipLevel = 4;</code>
+       * @param value The vipLevel to set.
+       * @return This builder for chaining.
+       */
+      public Builder setVipLevel(int value) {
+
+        vipLevel_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 vipLevel = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearVipLevel() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        vipLevel_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private long createTime_ ;
+      /**
+       * <code>int64 createTime = 5;</code>
+       * @return The createTime.
+       */
+      @java.lang.Override
+      public long getCreateTime() {
+        return createTime_;
+      }
+      /**
+       * <code>int64 createTime = 5;</code>
+       * @param value The createTime to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCreateTime(long value) {
+
+        createTime_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 createTime = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCreateTime() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        createTime_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long loginTime_ ;
+      /**
+       * <code>int64 loginTime = 6;</code>
+       * @return The loginTime.
+       */
+      @java.lang.Override
+      public long getLoginTime() {
+        return loginTime_;
+      }
+      /**
+       * <code>int64 loginTime = 6;</code>
+       * @param value The loginTime to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLoginTime(long value) {
+
+        loginTime_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 loginTime = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLoginTime() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        loginTime_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long lastLogoutTime_ ;
+      /**
+       * <code>int64 lastLogoutTime = 7;</code>
+       * @return The lastLogoutTime.
+       */
+      @java.lang.Override
+      public long getLastLogoutTime() {
+        return lastLogoutTime_;
+      }
+      /**
+       * <code>int64 lastLogoutTime = 7;</code>
+       * @param value The lastLogoutTime to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLastLogoutTime(long value) {
+
+        lastLogoutTime_ = value;
+        bitField0_ |= 0x00000040;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 lastLogoutTime = 7;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLastLogoutTime() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        lastLogoutTime_ = 0L;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:PlayerInfo)
+    }
+
+    // @@protoc_insertion_point(class_scope:PlayerInfo)
+    private static final ly.proto.Login.PlayerInfo DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new ly.proto.Login.PlayerInfo();
+    }
+
+    public static ly.proto.Login.PlayerInfo getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<PlayerInfo>
+        PARSER = new com.google.protobuf.AbstractParser<PlayerInfo>() {
+      @java.lang.Override
+      public PlayerInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<PlayerInfo> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PlayerInfo> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public ly.proto.Login.PlayerInfo getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface csLoginOrBuilder extends
       // @@protoc_insertion_point(interface_extends:csLogin)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string name = 1;</code>
-     * @return The name.
+     * <pre>
+     *账号
+     * </pre>
+     *
+     * <code>string account = 1;</code>
+     * @return The account.
      */
-    java.lang.String getName();
+    java.lang.String getAccount();
     /**
-     * <code>string name = 1;</code>
-     * @return The bytes for name.
+     * <pre>
+     *账号
+     * </pre>
+     *
+     * <code>string account = 1;</code>
+     * @return The bytes for account.
      */
     com.google.protobuf.ByteString
-        getNameBytes();
+        getAccountBytes();
 
     /**
-     * <code>bool male = 2;</code>
-     * @return The male.
+     * <pre>
+     *账号id
+     * </pre>
+     *
+     * <code>int64 accountId = 2;</code>
+     * @return The accountId.
      */
-    boolean getMale();
+    long getAccountId();
 
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @return A list containing the scores.
+     * <pre>
+     *角色id
+     * </pre>
+     *
+     * <code>int64 playerId = 3;</code>
+     * @return The playerId.
      */
-    java.util.List<java.lang.Integer> getScoresList();
+    long getPlayerId();
+
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @return The count of scores.
+     * <pre>
+     *渠道
+     * </pre>
+     *
+     * <code>string channel = 4;</code>
+     * @return The channel.
      */
-    int getScoresCount();
+    java.lang.String getChannel();
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @param index The index of the element to return.
-     * @return The scores at the given index.
+     * <pre>
+     *渠道
+     * </pre>
+     *
+     * <code>string channel = 4;</code>
+     * @return The bytes for channel.
      */
-    int getScores(int index);
+    com.google.protobuf.ByteString
+        getChannelBytes();
+
+    /**
+     * <pre>
+     *游戏服务器id
+     * </pre>
+     *
+     * <code>string gameServerId = 5;</code>
+     * @return The gameServerId.
+     */
+    java.lang.String getGameServerId();
+    /**
+     * <pre>
+     *游戏服务器id
+     * </pre>
+     *
+     * <code>string gameServerId = 5;</code>
+     * @return The bytes for gameServerId.
+     */
+    com.google.protobuf.ByteString
+        getGameServerIdBytes();
+
+    /**
+     * <pre>
+     *token
+     * </pre>
+     *
+     * <code>string token = 6;</code>
+     * @return The token.
+     */
+    java.lang.String getToken();
+    /**
+     * <pre>
+     *token
+     * </pre>
+     *
+     * <code>string token = 6;</code>
+     * @return The bytes for token.
+     */
+    com.google.protobuf.ByteString
+        getTokenBytes();
+
+    /**
+     * <pre>
+     *设备id
+     * </pre>
+     *
+     * <code>string deviceId = 7;</code>
+     * @return The deviceId.
+     */
+    java.lang.String getDeviceId();
+    /**
+     * <pre>
+     *设备id
+     * </pre>
+     *
+     * <code>string deviceId = 7;</code>
+     * @return The bytes for deviceId.
+     */
+    com.google.protobuf.ByteString
+        getDeviceIdBytes();
   }
   /**
    * <pre>
@@ -71,8 +1144,11 @@ public final class Login {
       super(builder);
     }
     private csLogin() {
-      name_ = "";
-      scores_ = emptyIntList();
+      account_ = "";
+      channel_ = "";
+      gameServerId_ = "";
+      token_ = "";
+      deviceId_ = "";
     }
 
     @java.lang.Override
@@ -95,85 +1171,270 @@ public final class Login {
               ly.proto.Login.csLogin.class, ly.proto.Login.csLogin.Builder.class);
     }
 
-    public static final int NAME_FIELD_NUMBER = 1;
+    public static final int ACCOUNT_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
-    private volatile java.lang.Object name_ = "";
+    private volatile java.lang.Object account_ = "";
     /**
-     * <code>string name = 1;</code>
-     * @return The name.
+     * <pre>
+     *账号
+     * </pre>
+     *
+     * <code>string account = 1;</code>
+     * @return The account.
      */
     @java.lang.Override
-    public java.lang.String getName() {
-      java.lang.Object ref = name_;
+    public java.lang.String getAccount() {
+      java.lang.Object ref = account_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        name_ = s;
+        account_ = s;
         return s;
       }
     }
     /**
-     * <code>string name = 1;</code>
-     * @return The bytes for name.
+     * <pre>
+     *账号
+     * </pre>
+     *
+     * <code>string account = 1;</code>
+     * @return The bytes for account.
      */
     @java.lang.Override
     public com.google.protobuf.ByteString
-        getNameBytes() {
-      java.lang.Object ref = name_;
+        getAccountBytes() {
+      java.lang.Object ref = account_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        name_ = b;
+        account_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
 
-    public static final int MALE_FIELD_NUMBER = 2;
-    private boolean male_ = false;
+    public static final int ACCOUNTID_FIELD_NUMBER = 2;
+    private long accountId_ = 0L;
     /**
-     * <code>bool male = 2;</code>
-     * @return The male.
+     * <pre>
+     *账号id
+     * </pre>
+     *
+     * <code>int64 accountId = 2;</code>
+     * @return The accountId.
      */
     @java.lang.Override
-    public boolean getMale() {
-      return male_;
+    public long getAccountId() {
+      return accountId_;
     }
 
-    public static final int SCORES_FIELD_NUMBER = 3;
-    @SuppressWarnings("serial")
-    private com.google.protobuf.Internal.IntList scores_ =
-        emptyIntList();
+    public static final int PLAYERID_FIELD_NUMBER = 3;
+    private long playerId_ = 0L;
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @return A list containing the scores.
+     * <pre>
+     *角色id
+     * </pre>
+     *
+     * <code>int64 playerId = 3;</code>
+     * @return The playerId.
      */
     @java.lang.Override
-    public java.util.List<java.lang.Integer>
-        getScoresList() {
-      return scores_;
+    public long getPlayerId() {
+      return playerId_;
+    }
+
+    public static final int CHANNEL_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object channel_ = "";
+    /**
+     * <pre>
+     *渠道
+     * </pre>
+     *
+     * <code>string channel = 4;</code>
+     * @return The channel.
+     */
+    @java.lang.Override
+    public java.lang.String getChannel() {
+      java.lang.Object ref = channel_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        channel_ = s;
+        return s;
+      }
     }
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @return The count of scores.
+     * <pre>
+     *渠道
+     * </pre>
+     *
+     * <code>string channel = 4;</code>
+     * @return The bytes for channel.
      */
-    public int getScoresCount() {
-      return scores_.size();
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getChannelBytes() {
+      java.lang.Object ref = channel_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        channel_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int GAMESERVERID_FIELD_NUMBER = 5;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object gameServerId_ = "";
+    /**
+     * <pre>
+     *游戏服务器id
+     * </pre>
+     *
+     * <code>string gameServerId = 5;</code>
+     * @return The gameServerId.
+     */
+    @java.lang.Override
+    public java.lang.String getGameServerId() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        gameServerId_ = s;
+        return s;
+      }
     }
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @param index The index of the element to return.
-     * @return The scores at the given index.
+     * <pre>
+     *游戏服务器id
+     * </pre>
+     *
+     * <code>string gameServerId = 5;</code>
+     * @return The bytes for gameServerId.
      */
-    public int getScores(int index) {
-      return scores_.getInt(index);
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getGameServerIdBytes() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        gameServerId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
-    private int scoresMemoizedSerializedSize = -1;
+
+    public static final int TOKEN_FIELD_NUMBER = 6;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object token_ = "";
+    /**
+     * <pre>
+     *token
+     * </pre>
+     *
+     * <code>string token = 6;</code>
+     * @return The token.
+     */
+    @java.lang.Override
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     *token
+     * </pre>
+     *
+     * <code>string token = 6;</code>
+     * @return The bytes for token.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DEVICEID_FIELD_NUMBER = 7;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object deviceId_ = "";
+    /**
+     * <pre>
+     *设备id
+     * </pre>
+     *
+     * <code>string deviceId = 7;</code>
+     * @return The deviceId.
+     */
+    @java.lang.Override
+    public java.lang.String getDeviceId() {
+      java.lang.Object ref = deviceId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        deviceId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     *设备id
+     * </pre>
+     *
+     * <code>string deviceId = 7;</code>
+     * @return The bytes for deviceId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getDeviceIdBytes() {
+      java.lang.Object ref = deviceId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        deviceId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
 
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
@@ -189,19 +1450,26 @@ public final class Login {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(account_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, account_);
       }
-      if (male_ != false) {
-        output.writeBool(2, male_);
+      if (accountId_ != 0L) {
+        output.writeInt64(2, accountId_);
       }
-      if (getScoresList().size() > 0) {
-        output.writeUInt32NoTag(26);
-        output.writeUInt32NoTag(scoresMemoizedSerializedSize);
+      if (playerId_ != 0L) {
+        output.writeInt64(3, playerId_);
       }
-      for (int i = 0; i < scores_.size(); i++) {
-        output.writeInt32NoTag(scores_.getInt(i));
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(channel_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, channel_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, gameServerId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(token_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, token_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(deviceId_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, deviceId_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -212,26 +1480,28 @@ public final class Login {
       if (size != -1) return size;
 
       size = 0;
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(account_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, account_);
       }
-      if (male_ != false) {
+      if (accountId_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(2, male_);
+          .computeInt64Size(2, accountId_);
       }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < scores_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeInt32SizeNoTag(scores_.getInt(i));
-        }
-        size += dataSize;
-        if (!getScoresList().isEmpty()) {
-          size += 1;
-          size += com.google.protobuf.CodedOutputStream
-              .computeInt32SizeNoTag(dataSize);
-        }
-        scoresMemoizedSerializedSize = dataSize;
+      if (playerId_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(3, playerId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(channel_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, channel_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, gameServerId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(token_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, token_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(deviceId_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, deviceId_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -248,12 +1518,20 @@ public final class Login {
       }
       ly.proto.Login.csLogin other = (ly.proto.Login.csLogin) obj;
 
-      if (!getName()
-          .equals(other.getName())) return false;
-      if (getMale()
-          != other.getMale()) return false;
-      if (!getScoresList()
-          .equals(other.getScoresList())) return false;
+      if (!getAccount()
+          .equals(other.getAccount())) return false;
+      if (getAccountId()
+          != other.getAccountId()) return false;
+      if (getPlayerId()
+          != other.getPlayerId()) return false;
+      if (!getChannel()
+          .equals(other.getChannel())) return false;
+      if (!getGameServerId()
+          .equals(other.getGameServerId())) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
+      if (!getDeviceId()
+          .equals(other.getDeviceId())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -265,15 +1543,22 @@ public final class Login {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + NAME_FIELD_NUMBER;
-      hash = (53 * hash) + getName().hashCode();
-      hash = (37 * hash) + MALE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getMale());
-      if (getScoresCount() > 0) {
-        hash = (37 * hash) + SCORES_FIELD_NUMBER;
-        hash = (53 * hash) + getScoresList().hashCode();
-      }
+      hash = (37 * hash) + ACCOUNT_FIELD_NUMBER;
+      hash = (53 * hash) + getAccount().hashCode();
+      hash = (37 * hash) + ACCOUNTID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getAccountId());
+      hash = (37 * hash) + PLAYERID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getPlayerId());
+      hash = (37 * hash) + CHANNEL_FIELD_NUMBER;
+      hash = (53 * hash) + getChannel().hashCode();
+      hash = (37 * hash) + GAMESERVERID_FIELD_NUMBER;
+      hash = (53 * hash) + getGameServerId().hashCode();
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
+      hash = (37 * hash) + DEVICEID_FIELD_NUMBER;
+      hash = (53 * hash) + getDeviceId().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -409,9 +1694,13 @@ public final class Login {
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        name_ = "";
-        male_ = false;
-        scores_ = emptyIntList();
+        account_ = "";
+        accountId_ = 0L;
+        playerId_ = 0L;
+        channel_ = "";
+        gameServerId_ = "";
+        token_ = "";
+        deviceId_ = "";
         return this;
       }
 
@@ -446,14 +1735,25 @@ public final class Login {
       private void buildPartial0(ly.proto.Login.csLogin result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.name_ = name_;
+          result.account_ = account_;
         }
         if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.male_ = male_;
+          result.accountId_ = accountId_;
         }
         if (((from_bitField0_ & 0x00000004) != 0)) {
-          scores_.makeImmutable();
-          result.scores_ = scores_;
+          result.playerId_ = playerId_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.channel_ = channel_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.gameServerId_ = gameServerId_;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.token_ = token_;
+        }
+        if (((from_bitField0_ & 0x00000040) != 0)) {
+          result.deviceId_ = deviceId_;
         }
       }
 
@@ -501,23 +1801,35 @@ public final class Login {
 
       public Builder mergeFrom(ly.proto.Login.csLogin other) {
         if (other == ly.proto.Login.csLogin.getDefaultInstance()) return this;
-        if (!other.getName().isEmpty()) {
-          name_ = other.name_;
+        if (!other.getAccount().isEmpty()) {
+          account_ = other.account_;
           bitField0_ |= 0x00000001;
           onChanged();
         }
-        if (other.getMale() != false) {
-          setMale(other.getMale());
+        if (other.getAccountId() != 0L) {
+          setAccountId(other.getAccountId());
         }
-        if (!other.scores_.isEmpty()) {
-          if (scores_.isEmpty()) {
-            scores_ = other.scores_;
-            scores_.makeImmutable();
-            bitField0_ |= 0x00000004;
-          } else {
-            ensureScoresIsMutable();
-            scores_.addAll(other.scores_);
-          }
+        if (other.getPlayerId() != 0L) {
+          setPlayerId(other.getPlayerId());
+        }
+        if (!other.getChannel().isEmpty()) {
+          channel_ = other.channel_;
+          bitField0_ |= 0x00000008;
+          onChanged();
+        }
+        if (!other.getGameServerId().isEmpty()) {
+          gameServerId_ = other.gameServerId_;
+          bitField0_ |= 0x00000010;
+          onChanged();
+        }
+        if (!other.getToken().isEmpty()) {
+          token_ = other.token_;
+          bitField0_ |= 0x00000020;
+          onChanged();
+        }
+        if (!other.getDeviceId().isEmpty()) {
+          deviceId_ = other.deviceId_;
+          bitField0_ |= 0x00000040;
           onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
@@ -547,31 +1859,40 @@ public final class Login {
                 done = true;
                 break;
               case 10: {
-                name_ = input.readStringRequireUtf8();
+                account_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000001;
                 break;
               } // case 10
               case 16: {
-                male_ = input.readBool();
+                accountId_ = input.readInt64();
                 bitField0_ |= 0x00000002;
                 break;
               } // case 16
               case 24: {
-                int v = input.readInt32();
-                ensureScoresIsMutable();
-                scores_.addInt(v);
+                playerId_ = input.readInt64();
+                bitField0_ |= 0x00000004;
                 break;
               } // case 24
-              case 26: {
-                int length = input.readRawVarint32();
-                int limit = input.pushLimit(length);
-                ensureScoresIsMutable();
-                while (input.getBytesUntilLimit() > 0) {
-                  scores_.addInt(input.readInt32());
-                }
-                input.popLimit(limit);
+              case 34: {
+                channel_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
                 break;
-              } // case 26
+              } // case 34
+              case 42: {
+                gameServerId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
+              case 50: {
+                token_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000020;
+                break;
+              } // case 50
+              case 58: {
+                deviceId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000040;
+                break;
+              } // case 58
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -589,190 +1910,550 @@ public final class Login {
       }
       private int bitField0_;
 
-      private java.lang.Object name_ = "";
+      private java.lang.Object account_ = "";
       /**
-       * <code>string name = 1;</code>
-       * @return The name.
+       * <pre>
+       *账号
+       * </pre>
+       *
+       * <code>string account = 1;</code>
+       * @return The account.
        */
-      public java.lang.String getName() {
-        java.lang.Object ref = name_;
+      public java.lang.String getAccount() {
+        java.lang.Object ref = account_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          name_ = s;
+          account_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>string name = 1;</code>
-       * @return The bytes for name.
+       * <pre>
+       *账号
+       * </pre>
+       *
+       * <code>string account = 1;</code>
+       * @return The bytes for account.
        */
       public com.google.protobuf.ByteString
-          getNameBytes() {
-        java.lang.Object ref = name_;
+          getAccountBytes() {
+        java.lang.Object ref = account_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          name_ = b;
+          account_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>string name = 1;</code>
-       * @param value The name to set.
+       * <pre>
+       *账号
+       * </pre>
+       *
+       * <code>string account = 1;</code>
+       * @param value The account to set.
        * @return This builder for chaining.
        */
-      public Builder setName(
+      public Builder setAccount(
           java.lang.String value) {
         if (value == null) { throw new NullPointerException(); }
-        name_ = value;
+        account_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <code>string name = 1;</code>
+       * <pre>
+       *账号
+       * </pre>
+       *
+       * <code>string account = 1;</code>
        * @return This builder for chaining.
        */
-      public Builder clearName() {
-        name_ = getDefaultInstance().getName();
+      public Builder clearAccount() {
+        account_ = getDefaultInstance().getAccount();
         bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
       /**
-       * <code>string name = 1;</code>
-       * @param value The bytes for name to set.
+       * <pre>
+       *账号
+       * </pre>
+       *
+       * <code>string account = 1;</code>
+       * @param value The bytes for account to set.
        * @return This builder for chaining.
        */
-      public Builder setNameBytes(
+      public Builder setAccountBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) { throw new NullPointerException(); }
         checkByteStringIsUtf8(value);
-        name_ = value;
+        account_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
 
-      private boolean male_ ;
+      private long accountId_ ;
       /**
-       * <code>bool male = 2;</code>
-       * @return The male.
+       * <pre>
+       *账号id
+       * </pre>
+       *
+       * <code>int64 accountId = 2;</code>
+       * @return The accountId.
        */
       @java.lang.Override
-      public boolean getMale() {
-        return male_;
+      public long getAccountId() {
+        return accountId_;
       }
       /**
-       * <code>bool male = 2;</code>
-       * @param value The male to set.
+       * <pre>
+       *账号id
+       * </pre>
+       *
+       * <code>int64 accountId = 2;</code>
+       * @param value The accountId to set.
        * @return This builder for chaining.
        */
-      public Builder setMale(boolean value) {
+      public Builder setAccountId(long value) {
 
-        male_ = value;
+        accountId_ = value;
         bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
       /**
-       * <code>bool male = 2;</code>
+       * <pre>
+       *账号id
+       * </pre>
+       *
+       * <code>int64 accountId = 2;</code>
        * @return This builder for chaining.
        */
-      public Builder clearMale() {
+      public Builder clearAccountId() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        male_ = false;
+        accountId_ = 0L;
         onChanged();
         return this;
       }
 
-      private com.google.protobuf.Internal.IntList scores_ = emptyIntList();
-      private void ensureScoresIsMutable() {
-        if (!scores_.isModifiable()) {
-          scores_ = makeMutableCopy(scores_);
-        }
-        bitField0_ |= 0x00000004;
-      }
+      private long playerId_ ;
       /**
-       * <code>repeated int32 scores = 3;</code>
-       * @return A list containing the scores.
+       * <pre>
+       *角色id
+       * </pre>
+       *
+       * <code>int64 playerId = 3;</code>
+       * @return The playerId.
        */
-      public java.util.List<java.lang.Integer>
-          getScoresList() {
-        scores_.makeImmutable();
-        return scores_;
+      @java.lang.Override
+      public long getPlayerId() {
+        return playerId_;
       }
       /**
-       * <code>repeated int32 scores = 3;</code>
-       * @return The count of scores.
-       */
-      public int getScoresCount() {
-        return scores_.size();
-      }
-      /**
-       * <code>repeated int32 scores = 3;</code>
-       * @param index The index of the element to return.
-       * @return The scores at the given index.
-       */
-      public int getScores(int index) {
-        return scores_.getInt(index);
-      }
-      /**
-       * <code>repeated int32 scores = 3;</code>
-       * @param index The index to set the value at.
-       * @param value The scores to set.
+       * <pre>
+       *角色id
+       * </pre>
+       *
+       * <code>int64 playerId = 3;</code>
+       * @param value The playerId to set.
        * @return This builder for chaining.
        */
-      public Builder setScores(
-          int index, int value) {
+      public Builder setPlayerId(long value) {
 
-        ensureScoresIsMutable();
-        scores_.setInt(index, value);
+        playerId_ = value;
         bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 scores = 3;</code>
-       * @param value The scores to add.
+       * <pre>
+       *角色id
+       * </pre>
+       *
+       * <code>int64 playerId = 3;</code>
        * @return This builder for chaining.
        */
-      public Builder addScores(int value) {
-
-        ensureScoresIsMutable();
-        scores_.addInt(value);
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 scores = 3;</code>
-       * @param values The scores to add.
-       * @return This builder for chaining.
-       */
-      public Builder addAllScores(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureScoresIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, scores_);
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 scores = 3;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearScores() {
-        scores_ = emptyIntList();
+      public Builder clearPlayerId() {
         bitField0_ = (bitField0_ & ~0x00000004);
+        playerId_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object channel_ = "";
+      /**
+       * <pre>
+       *渠道
+       * </pre>
+       *
+       * <code>string channel = 4;</code>
+       * @return The channel.
+       */
+      public java.lang.String getChannel() {
+        java.lang.Object ref = channel_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          channel_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *渠道
+       * </pre>
+       *
+       * <code>string channel = 4;</code>
+       * @return The bytes for channel.
+       */
+      public com.google.protobuf.ByteString
+          getChannelBytes() {
+        java.lang.Object ref = channel_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          channel_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *渠道
+       * </pre>
+       *
+       * <code>string channel = 4;</code>
+       * @param value The channel to set.
+       * @return This builder for chaining.
+       */
+      public Builder setChannel(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        channel_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *渠道
+       * </pre>
+       *
+       * <code>string channel = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearChannel() {
+        channel_ = getDefaultInstance().getChannel();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *渠道
+       * </pre>
+       *
+       * <code>string channel = 4;</code>
+       * @param value The bytes for channel to set.
+       * @return This builder for chaining.
+       */
+      public Builder setChannelBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        channel_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object gameServerId_ = "";
+      /**
+       * <pre>
+       *游戏服务器id
+       * </pre>
+       *
+       * <code>string gameServerId = 5;</code>
+       * @return The gameServerId.
+       */
+      public java.lang.String getGameServerId() {
+        java.lang.Object ref = gameServerId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          gameServerId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *游戏服务器id
+       * </pre>
+       *
+       * <code>string gameServerId = 5;</code>
+       * @return The bytes for gameServerId.
+       */
+      public com.google.protobuf.ByteString
+          getGameServerIdBytes() {
+        java.lang.Object ref = gameServerId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          gameServerId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *游戏服务器id
+       * </pre>
+       *
+       * <code>string gameServerId = 5;</code>
+       * @param value The gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        gameServerId_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *游戏服务器id
+       * </pre>
+       *
+       * <code>string gameServerId = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearGameServerId() {
+        gameServerId_ = getDefaultInstance().getGameServerId();
+        bitField0_ = (bitField0_ & ~0x00000010);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *游戏服务器id
+       * </pre>
+       *
+       * <code>string gameServerId = 5;</code>
+       * @param value The bytes for gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        gameServerId_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object token_ = "";
+      /**
+       * <pre>
+       *token
+       * </pre>
+       *
+       * <code>string token = 6;</code>
+       * @return The token.
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *token
+       * </pre>
+       *
+       * <code>string token = 6;</code>
+       * @return The bytes for token.
+       */
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *token
+       * </pre>
+       *
+       * <code>string token = 6;</code>
+       * @param value The token to set.
+       * @return This builder for chaining.
+       */
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        token_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *token
+       * </pre>
+       *
+       * <code>string token = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearToken() {
+        token_ = getDefaultInstance().getToken();
+        bitField0_ = (bitField0_ & ~0x00000020);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *token
+       * </pre>
+       *
+       * <code>string token = 6;</code>
+       * @param value The bytes for token to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        token_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object deviceId_ = "";
+      /**
+       * <pre>
+       *设备id
+       * </pre>
+       *
+       * <code>string deviceId = 7;</code>
+       * @return The deviceId.
+       */
+      public java.lang.String getDeviceId() {
+        java.lang.Object ref = deviceId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          deviceId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *设备id
+       * </pre>
+       *
+       * <code>string deviceId = 7;</code>
+       * @return The bytes for deviceId.
+       */
+      public com.google.protobuf.ByteString
+          getDeviceIdBytes() {
+        java.lang.Object ref = deviceId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          deviceId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *设备id
+       * </pre>
+       *
+       * <code>string deviceId = 7;</code>
+       * @param value The deviceId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDeviceId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        deviceId_ = value;
+        bitField0_ |= 0x00000040;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *设备id
+       * </pre>
+       *
+       * <code>string deviceId = 7;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearDeviceId() {
+        deviceId_ = getDefaultInstance().getDeviceId();
+        bitField0_ = (bitField0_ & ~0x00000040);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *设备id
+       * </pre>
+       *
+       * <code>string deviceId = 7;</code>
+       * @param value The bytes for deviceId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDeviceIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        deviceId_ = value;
+        bitField0_ |= 0x00000040;
         onChanged();
         return this;
       }
@@ -845,39 +2526,61 @@ public final class Login {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string name = 1;</code>
-     * @return The name.
+     * <code>string account = 1;</code>
+     * @return The account.
      */
-    java.lang.String getName();
+    java.lang.String getAccount();
     /**
-     * <code>string name = 1;</code>
-     * @return The bytes for name.
+     * <code>string account = 1;</code>
+     * @return The bytes for account.
      */
     com.google.protobuf.ByteString
-        getNameBytes();
+        getAccountBytes();
 
     /**
-     * <code>bool male = 2;</code>
-     * @return The male.
+     * <code>int64 playerId = 2;</code>
+     * @return The playerId.
      */
-    boolean getMale();
+    long getPlayerId();
 
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @return A list containing the scores.
+     * <code>string token = 3;</code>
+     * @return The token.
      */
-    java.util.List<java.lang.Integer> getScoresList();
+    java.lang.String getToken();
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @return The count of scores.
+     * <code>string token = 3;</code>
+     * @return The bytes for token.
      */
-    int getScoresCount();
+    com.google.protobuf.ByteString
+        getTokenBytes();
+
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @param index The index of the element to return.
-     * @return The scores at the given index.
+     * <code>string gameServerId = 4;</code>
+     * @return The gameServerId.
      */
-    int getScores(int index);
+    java.lang.String getGameServerId();
+    /**
+     * <code>string gameServerId = 4;</code>
+     * @return The bytes for gameServerId.
+     */
+    com.google.protobuf.ByteString
+        getGameServerIdBytes();
+
+    /**
+     * <code>.PlayerInfo playerInfo = 5;</code>
+     * @return Whether the playerInfo field is set.
+     */
+    boolean hasPlayerInfo();
+    /**
+     * <code>.PlayerInfo playerInfo = 5;</code>
+     * @return The playerInfo.
+     */
+    ly.proto.Login.PlayerInfo getPlayerInfo();
+    /**
+     * <code>.PlayerInfo playerInfo = 5;</code>
+     */
+    ly.proto.Login.PlayerInfoOrBuilder getPlayerInfoOrBuilder();
   }
   /**
    * <pre>
@@ -896,8 +2599,9 @@ public final class Login {
       super(builder);
     }
     private scLogin() {
-      name_ = "";
-      scores_ = emptyIntList();
+      account_ = "";
+      token_ = "";
+      gameServerId_ = "";
     }
 
     @java.lang.Override
@@ -920,85 +2624,160 @@ public final class Login {
               ly.proto.Login.scLogin.class, ly.proto.Login.scLogin.Builder.class);
     }
 
-    public static final int NAME_FIELD_NUMBER = 1;
+    private int bitField0_;
+    public static final int ACCOUNT_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
-    private volatile java.lang.Object name_ = "";
+    private volatile java.lang.Object account_ = "";
     /**
-     * <code>string name = 1;</code>
-     * @return The name.
+     * <code>string account = 1;</code>
+     * @return The account.
      */
     @java.lang.Override
-    public java.lang.String getName() {
-      java.lang.Object ref = name_;
+    public java.lang.String getAccount() {
+      java.lang.Object ref = account_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        name_ = s;
+        account_ = s;
         return s;
       }
     }
     /**
-     * <code>string name = 1;</code>
-     * @return The bytes for name.
+     * <code>string account = 1;</code>
+     * @return The bytes for account.
      */
     @java.lang.Override
     public com.google.protobuf.ByteString
-        getNameBytes() {
-      java.lang.Object ref = name_;
+        getAccountBytes() {
+      java.lang.Object ref = account_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        name_ = b;
+        account_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
 
-    public static final int MALE_FIELD_NUMBER = 2;
-    private boolean male_ = false;
+    public static final int PLAYERID_FIELD_NUMBER = 2;
+    private long playerId_ = 0L;
     /**
-     * <code>bool male = 2;</code>
-     * @return The male.
+     * <code>int64 playerId = 2;</code>
+     * @return The playerId.
      */
     @java.lang.Override
-    public boolean getMale() {
-      return male_;
+    public long getPlayerId() {
+      return playerId_;
     }
 
-    public static final int SCORES_FIELD_NUMBER = 3;
+    public static final int TOKEN_FIELD_NUMBER = 3;
     @SuppressWarnings("serial")
-    private com.google.protobuf.Internal.IntList scores_ =
-        emptyIntList();
+    private volatile java.lang.Object token_ = "";
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @return A list containing the scores.
+     * <code>string token = 3;</code>
+     * @return The token.
      */
     @java.lang.Override
-    public java.util.List<java.lang.Integer>
-        getScoresList() {
-      return scores_;
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
     }
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @return The count of scores.
+     * <code>string token = 3;</code>
+     * @return The bytes for token.
      */
-    public int getScoresCount() {
-      return scores_.size();
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int GAMESERVERID_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object gameServerId_ = "";
+    /**
+     * <code>string gameServerId = 4;</code>
+     * @return The gameServerId.
+     */
+    @java.lang.Override
+    public java.lang.String getGameServerId() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        gameServerId_ = s;
+        return s;
+      }
     }
     /**
-     * <code>repeated int32 scores = 3;</code>
-     * @param index The index of the element to return.
-     * @return The scores at the given index.
+     * <code>string gameServerId = 4;</code>
+     * @return The bytes for gameServerId.
      */
-    public int getScores(int index) {
-      return scores_.getInt(index);
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getGameServerIdBytes() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        gameServerId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
-    private int scoresMemoizedSerializedSize = -1;
+
+    public static final int PLAYERINFO_FIELD_NUMBER = 5;
+    private ly.proto.Login.PlayerInfo playerInfo_;
+    /**
+     * <code>.PlayerInfo playerInfo = 5;</code>
+     * @return Whether the playerInfo field is set.
+     */
+    @java.lang.Override
+    public boolean hasPlayerInfo() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.PlayerInfo playerInfo = 5;</code>
+     * @return The playerInfo.
+     */
+    @java.lang.Override
+    public ly.proto.Login.PlayerInfo getPlayerInfo() {
+      return playerInfo_ == null ? ly.proto.Login.PlayerInfo.getDefaultInstance() : playerInfo_;
+    }
+    /**
+     * <code>.PlayerInfo playerInfo = 5;</code>
+     */
+    @java.lang.Override
+    public ly.proto.Login.PlayerInfoOrBuilder getPlayerInfoOrBuilder() {
+      return playerInfo_ == null ? ly.proto.Login.PlayerInfo.getDefaultInstance() : playerInfo_;
+    }
 
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
@@ -1014,19 +2793,20 @@ public final class Login {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(account_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, account_);
       }
-      if (male_ != false) {
-        output.writeBool(2, male_);
+      if (playerId_ != 0L) {
+        output.writeInt64(2, playerId_);
       }
-      if (getScoresList().size() > 0) {
-        output.writeUInt32NoTag(26);
-        output.writeUInt32NoTag(scoresMemoizedSerializedSize);
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(token_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, token_);
       }
-      for (int i = 0; i < scores_.size(); i++) {
-        output.writeInt32NoTag(scores_.getInt(i));
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, gameServerId_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(5, getPlayerInfo());
       }
       getUnknownFields().writeTo(output);
     }
@@ -1037,26 +2817,22 @@ public final class Login {
       if (size != -1) return size;
 
       size = 0;
-      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(account_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, account_);
       }
-      if (male_ != false) {
+      if (playerId_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(2, male_);
+          .computeInt64Size(2, playerId_);
       }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < scores_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeInt32SizeNoTag(scores_.getInt(i));
-        }
-        size += dataSize;
-        if (!getScoresList().isEmpty()) {
-          size += 1;
-          size += com.google.protobuf.CodedOutputStream
-              .computeInt32SizeNoTag(dataSize);
-        }
-        scoresMemoizedSerializedSize = dataSize;
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(token_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, token_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, gameServerId_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getPlayerInfo());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -1073,12 +2849,19 @@ public final class Login {
       }
       ly.proto.Login.scLogin other = (ly.proto.Login.scLogin) obj;
 
-      if (!getName()
-          .equals(other.getName())) return false;
-      if (getMale()
-          != other.getMale()) return false;
-      if (!getScoresList()
-          .equals(other.getScoresList())) return false;
+      if (!getAccount()
+          .equals(other.getAccount())) return false;
+      if (getPlayerId()
+          != other.getPlayerId()) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
+      if (!getGameServerId()
+          .equals(other.getGameServerId())) return false;
+      if (hasPlayerInfo() != other.hasPlayerInfo()) return false;
+      if (hasPlayerInfo()) {
+        if (!getPlayerInfo()
+            .equals(other.getPlayerInfo())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -1090,14 +2873,18 @@ public final class Login {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + NAME_FIELD_NUMBER;
-      hash = (53 * hash) + getName().hashCode();
-      hash = (37 * hash) + MALE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getMale());
-      if (getScoresCount() > 0) {
-        hash = (37 * hash) + SCORES_FIELD_NUMBER;
-        hash = (53 * hash) + getScoresList().hashCode();
+      hash = (37 * hash) + ACCOUNT_FIELD_NUMBER;
+      hash = (53 * hash) + getAccount().hashCode();
+      hash = (37 * hash) + PLAYERID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getPlayerId());
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
+      hash = (37 * hash) + GAMESERVERID_FIELD_NUMBER;
+      hash = (53 * hash) + getGameServerId().hashCode();
+      if (hasPlayerInfo()) {
+        hash = (37 * hash) + PLAYERINFO_FIELD_NUMBER;
+        hash = (53 * hash) + getPlayerInfo().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -1222,21 +3009,33 @@ public final class Login {
 
       // Construct using ly.proto.Login.scLogin.newBuilder()
       private Builder() {
-
+        maybeForceBuilderInitialization();
       }
 
       private Builder(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getPlayerInfoFieldBuilder();
+        }
       }
       @java.lang.Override
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        name_ = "";
-        male_ = false;
-        scores_ = emptyIntList();
+        account_ = "";
+        playerId_ = 0L;
+        token_ = "";
+        gameServerId_ = "";
+        playerInfo_ = null;
+        if (playerInfoBuilder_ != null) {
+          playerInfoBuilder_.dispose();
+          playerInfoBuilder_ = null;
+        }
         return this;
       }
 
@@ -1271,15 +3070,25 @@ public final class Login {
       private void buildPartial0(ly.proto.Login.scLogin result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.name_ = name_;
+          result.account_ = account_;
         }
         if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.male_ = male_;
+          result.playerId_ = playerId_;
         }
         if (((from_bitField0_ & 0x00000004) != 0)) {
-          scores_.makeImmutable();
-          result.scores_ = scores_;
+          result.token_ = token_;
         }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.gameServerId_ = gameServerId_;
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.playerInfo_ = playerInfoBuilder_ == null
+              ? playerInfo_
+              : playerInfoBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
@@ -1326,24 +3135,26 @@ public final class Login {
 
       public Builder mergeFrom(ly.proto.Login.scLogin other) {
         if (other == ly.proto.Login.scLogin.getDefaultInstance()) return this;
-        if (!other.getName().isEmpty()) {
-          name_ = other.name_;
+        if (!other.getAccount().isEmpty()) {
+          account_ = other.account_;
           bitField0_ |= 0x00000001;
           onChanged();
         }
-        if (other.getMale() != false) {
-          setMale(other.getMale());
+        if (other.getPlayerId() != 0L) {
+          setPlayerId(other.getPlayerId());
         }
-        if (!other.scores_.isEmpty()) {
-          if (scores_.isEmpty()) {
-            scores_ = other.scores_;
-            scores_.makeImmutable();
-            bitField0_ |= 0x00000004;
-          } else {
-            ensureScoresIsMutable();
-            scores_.addAll(other.scores_);
-          }
+        if (!other.getToken().isEmpty()) {
+          token_ = other.token_;
+          bitField0_ |= 0x00000004;
           onChanged();
+        }
+        if (!other.getGameServerId().isEmpty()) {
+          gameServerId_ = other.gameServerId_;
+          bitField0_ |= 0x00000008;
+          onChanged();
+        }
+        if (other.hasPlayerInfo()) {
+          mergePlayerInfo(other.getPlayerInfo());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -1372,31 +3183,32 @@ public final class Login {
                 done = true;
                 break;
               case 10: {
-                name_ = input.readStringRequireUtf8();
+                account_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000001;
                 break;
               } // case 10
               case 16: {
-                male_ = input.readBool();
+                playerId_ = input.readInt64();
                 bitField0_ |= 0x00000002;
                 break;
               } // case 16
-              case 24: {
-                int v = input.readInt32();
-                ensureScoresIsMutable();
-                scores_.addInt(v);
-                break;
-              } // case 24
               case 26: {
-                int length = input.readRawVarint32();
-                int limit = input.pushLimit(length);
-                ensureScoresIsMutable();
-                while (input.getBytesUntilLimit() > 0) {
-                  scores_.addInt(input.readInt32());
-                }
-                input.popLimit(limit);
+                token_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
                 break;
               } // case 26
+              case 34: {
+                gameServerId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
+              case 42: {
+                input.readMessage(
+                    getPlayerInfoFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -1414,192 +3226,373 @@ public final class Login {
       }
       private int bitField0_;
 
-      private java.lang.Object name_ = "";
+      private java.lang.Object account_ = "";
       /**
-       * <code>string name = 1;</code>
-       * @return The name.
+       * <code>string account = 1;</code>
+       * @return The account.
        */
-      public java.lang.String getName() {
-        java.lang.Object ref = name_;
+      public java.lang.String getAccount() {
+        java.lang.Object ref = account_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          name_ = s;
+          account_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>string name = 1;</code>
-       * @return The bytes for name.
+       * <code>string account = 1;</code>
+       * @return The bytes for account.
        */
       public com.google.protobuf.ByteString
-          getNameBytes() {
-        java.lang.Object ref = name_;
+          getAccountBytes() {
+        java.lang.Object ref = account_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          name_ = b;
+          account_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>string name = 1;</code>
-       * @param value The name to set.
+       * <code>string account = 1;</code>
+       * @param value The account to set.
        * @return This builder for chaining.
        */
-      public Builder setName(
+      public Builder setAccount(
           java.lang.String value) {
         if (value == null) { throw new NullPointerException(); }
-        name_ = value;
+        account_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <code>string name = 1;</code>
+       * <code>string account = 1;</code>
        * @return This builder for chaining.
        */
-      public Builder clearName() {
-        name_ = getDefaultInstance().getName();
+      public Builder clearAccount() {
+        account_ = getDefaultInstance().getAccount();
         bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
       /**
-       * <code>string name = 1;</code>
-       * @param value The bytes for name to set.
+       * <code>string account = 1;</code>
+       * @param value The bytes for account to set.
        * @return This builder for chaining.
        */
-      public Builder setNameBytes(
+      public Builder setAccountBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) { throw new NullPointerException(); }
         checkByteStringIsUtf8(value);
-        name_ = value;
+        account_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
 
-      private boolean male_ ;
+      private long playerId_ ;
       /**
-       * <code>bool male = 2;</code>
-       * @return The male.
+       * <code>int64 playerId = 2;</code>
+       * @return The playerId.
        */
       @java.lang.Override
-      public boolean getMale() {
-        return male_;
+      public long getPlayerId() {
+        return playerId_;
       }
       /**
-       * <code>bool male = 2;</code>
-       * @param value The male to set.
+       * <code>int64 playerId = 2;</code>
+       * @param value The playerId to set.
        * @return This builder for chaining.
        */
-      public Builder setMale(boolean value) {
+      public Builder setPlayerId(long value) {
 
-        male_ = value;
+        playerId_ = value;
         bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
       /**
-       * <code>bool male = 2;</code>
+       * <code>int64 playerId = 2;</code>
        * @return This builder for chaining.
        */
-      public Builder clearMale() {
+      public Builder clearPlayerId() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        male_ = false;
+        playerId_ = 0L;
         onChanged();
         return this;
       }
 
-      private com.google.protobuf.Internal.IntList scores_ = emptyIntList();
-      private void ensureScoresIsMutable() {
-        if (!scores_.isModifiable()) {
-          scores_ = makeMutableCopy(scores_);
+      private java.lang.Object token_ = "";
+      /**
+       * <code>string token = 3;</code>
+       * @return The token.
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
         }
-        bitField0_ |= 0x00000004;
       }
       /**
-       * <code>repeated int32 scores = 3;</code>
-       * @return A list containing the scores.
+       * <code>string token = 3;</code>
+       * @return The bytes for token.
        */
-      public java.util.List<java.lang.Integer>
-          getScoresList() {
-        scores_.makeImmutable();
-        return scores_;
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
       }
       /**
-       * <code>repeated int32 scores = 3;</code>
-       * @return The count of scores.
-       */
-      public int getScoresCount() {
-        return scores_.size();
-      }
-      /**
-       * <code>repeated int32 scores = 3;</code>
-       * @param index The index of the element to return.
-       * @return The scores at the given index.
-       */
-      public int getScores(int index) {
-        return scores_.getInt(index);
-      }
-      /**
-       * <code>repeated int32 scores = 3;</code>
-       * @param index The index to set the value at.
-       * @param value The scores to set.
+       * <code>string token = 3;</code>
+       * @param value The token to set.
        * @return This builder for chaining.
        */
-      public Builder setScores(
-          int index, int value) {
-
-        ensureScoresIsMutable();
-        scores_.setInt(index, value);
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        token_ = value;
         bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 scores = 3;</code>
-       * @param value The scores to add.
+       * <code>string token = 3;</code>
        * @return This builder for chaining.
        */
-      public Builder addScores(int value) {
-
-        ensureScoresIsMutable();
-        scores_.addInt(value);
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 scores = 3;</code>
-       * @param values The scores to add.
-       * @return This builder for chaining.
-       */
-      public Builder addAllScores(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureScoresIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, scores_);
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 scores = 3;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearScores() {
-        scores_ = emptyIntList();
+      public Builder clearToken() {
+        token_ = getDefaultInstance().getToken();
         bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
         return this;
+      }
+      /**
+       * <code>string token = 3;</code>
+       * @param value The bytes for token to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        token_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object gameServerId_ = "";
+      /**
+       * <code>string gameServerId = 4;</code>
+       * @return The gameServerId.
+       */
+      public java.lang.String getGameServerId() {
+        java.lang.Object ref = gameServerId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          gameServerId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string gameServerId = 4;</code>
+       * @return The bytes for gameServerId.
+       */
+      public com.google.protobuf.ByteString
+          getGameServerIdBytes() {
+        java.lang.Object ref = gameServerId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          gameServerId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string gameServerId = 4;</code>
+       * @param value The gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        gameServerId_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string gameServerId = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearGameServerId() {
+        gameServerId_ = getDefaultInstance().getGameServerId();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string gameServerId = 4;</code>
+       * @param value The bytes for gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        gameServerId_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+
+      private ly.proto.Login.PlayerInfo playerInfo_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          ly.proto.Login.PlayerInfo, ly.proto.Login.PlayerInfo.Builder, ly.proto.Login.PlayerInfoOrBuilder> playerInfoBuilder_;
+      /**
+       * <code>.PlayerInfo playerInfo = 5;</code>
+       * @return Whether the playerInfo field is set.
+       */
+      public boolean hasPlayerInfo() {
+        return ((bitField0_ & 0x00000010) != 0);
+      }
+      /**
+       * <code>.PlayerInfo playerInfo = 5;</code>
+       * @return The playerInfo.
+       */
+      public ly.proto.Login.PlayerInfo getPlayerInfo() {
+        if (playerInfoBuilder_ == null) {
+          return playerInfo_ == null ? ly.proto.Login.PlayerInfo.getDefaultInstance() : playerInfo_;
+        } else {
+          return playerInfoBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.PlayerInfo playerInfo = 5;</code>
+       */
+      public Builder setPlayerInfo(ly.proto.Login.PlayerInfo value) {
+        if (playerInfoBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          playerInfo_ = value;
+        } else {
+          playerInfoBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.PlayerInfo playerInfo = 5;</code>
+       */
+      public Builder setPlayerInfo(
+          ly.proto.Login.PlayerInfo.Builder builderForValue) {
+        if (playerInfoBuilder_ == null) {
+          playerInfo_ = builderForValue.build();
+        } else {
+          playerInfoBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.PlayerInfo playerInfo = 5;</code>
+       */
+      public Builder mergePlayerInfo(ly.proto.Login.PlayerInfo value) {
+        if (playerInfoBuilder_ == null) {
+          if (((bitField0_ & 0x00000010) != 0) &&
+            playerInfo_ != null &&
+            playerInfo_ != ly.proto.Login.PlayerInfo.getDefaultInstance()) {
+            getPlayerInfoBuilder().mergeFrom(value);
+          } else {
+            playerInfo_ = value;
+          }
+        } else {
+          playerInfoBuilder_.mergeFrom(value);
+        }
+        if (playerInfo_ != null) {
+          bitField0_ |= 0x00000010;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.PlayerInfo playerInfo = 5;</code>
+       */
+      public Builder clearPlayerInfo() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        playerInfo_ = null;
+        if (playerInfoBuilder_ != null) {
+          playerInfoBuilder_.dispose();
+          playerInfoBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.PlayerInfo playerInfo = 5;</code>
+       */
+      public ly.proto.Login.PlayerInfo.Builder getPlayerInfoBuilder() {
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return getPlayerInfoFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.PlayerInfo playerInfo = 5;</code>
+       */
+      public ly.proto.Login.PlayerInfoOrBuilder getPlayerInfoOrBuilder() {
+        if (playerInfoBuilder_ != null) {
+          return playerInfoBuilder_.getMessageOrBuilder();
+        } else {
+          return playerInfo_ == null ?
+              ly.proto.Login.PlayerInfo.getDefaultInstance() : playerInfo_;
+        }
+      }
+      /**
+       * <code>.PlayerInfo playerInfo = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          ly.proto.Login.PlayerInfo, ly.proto.Login.PlayerInfo.Builder, ly.proto.Login.PlayerInfoOrBuilder> 
+          getPlayerInfoFieldBuilder() {
+        if (playerInfoBuilder_ == null) {
+          playerInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              ly.proto.Login.PlayerInfo, ly.proto.Login.PlayerInfo.Builder, ly.proto.Login.PlayerInfoOrBuilder>(
+                  getPlayerInfo(),
+                  getParentForChildren(),
+                  isClean());
+          playerInfo_ = null;
+        }
+        return playerInfoBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -1665,6 +3658,1925 @@ public final class Login {
 
   }
 
+  public interface csLogoutOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:csLogout)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string account = 1;</code>
+     * @return The account.
+     */
+    java.lang.String getAccount();
+    /**
+     * <code>string account = 1;</code>
+     * @return The bytes for account.
+     */
+    com.google.protobuf.ByteString
+        getAccountBytes();
+
+    /**
+     * <code>int64 accountId = 2;</code>
+     * @return The accountId.
+     */
+    long getAccountId();
+
+    /**
+     * <code>string gameServerId = 3;</code>
+     * @return The gameServerId.
+     */
+    java.lang.String getGameServerId();
+    /**
+     * <code>string gameServerId = 3;</code>
+     * @return The bytes for gameServerId.
+     */
+    com.google.protobuf.ByteString
+        getGameServerIdBytes();
+
+    /**
+     * <pre>
+     *退出原因
+     * </pre>
+     *
+     * <code>string logoutReason = 4;</code>
+     * @return The logoutReason.
+     */
+    java.lang.String getLogoutReason();
+    /**
+     * <pre>
+     *退出原因
+     * </pre>
+     *
+     * <code>string logoutReason = 4;</code>
+     * @return The bytes for logoutReason.
+     */
+    com.google.protobuf.ByteString
+        getLogoutReasonBytes();
+  }
+  /**
+   * Protobuf type {@code csLogout}
+   */
+  public static final class csLogout extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:csLogout)
+      csLogoutOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use csLogout.newBuilder() to construct.
+    private csLogout(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private csLogout() {
+      account_ = "";
+      gameServerId_ = "";
+      logoutReason_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new csLogout();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return ly.proto.Login.internal_static_csLogout_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return ly.proto.Login.internal_static_csLogout_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              ly.proto.Login.csLogout.class, ly.proto.Login.csLogout.Builder.class);
+    }
+
+    public static final int ACCOUNT_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object account_ = "";
+    /**
+     * <code>string account = 1;</code>
+     * @return The account.
+     */
+    @java.lang.Override
+    public java.lang.String getAccount() {
+      java.lang.Object ref = account_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        account_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string account = 1;</code>
+     * @return The bytes for account.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getAccountBytes() {
+      java.lang.Object ref = account_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        account_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int ACCOUNTID_FIELD_NUMBER = 2;
+    private long accountId_ = 0L;
+    /**
+     * <code>int64 accountId = 2;</code>
+     * @return The accountId.
+     */
+    @java.lang.Override
+    public long getAccountId() {
+      return accountId_;
+    }
+
+    public static final int GAMESERVERID_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object gameServerId_ = "";
+    /**
+     * <code>string gameServerId = 3;</code>
+     * @return The gameServerId.
+     */
+    @java.lang.Override
+    public java.lang.String getGameServerId() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        gameServerId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string gameServerId = 3;</code>
+     * @return The bytes for gameServerId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getGameServerIdBytes() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        gameServerId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LOGOUTREASON_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object logoutReason_ = "";
+    /**
+     * <pre>
+     *退出原因
+     * </pre>
+     *
+     * <code>string logoutReason = 4;</code>
+     * @return The logoutReason.
+     */
+    @java.lang.Override
+    public java.lang.String getLogoutReason() {
+      java.lang.Object ref = logoutReason_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        logoutReason_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     *退出原因
+     * </pre>
+     *
+     * <code>string logoutReason = 4;</code>
+     * @return The bytes for logoutReason.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getLogoutReasonBytes() {
+      java.lang.Object ref = logoutReason_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        logoutReason_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(account_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, account_);
+      }
+      if (accountId_ != 0L) {
+        output.writeInt64(2, accountId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, gameServerId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(logoutReason_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, logoutReason_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(account_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, account_);
+      }
+      if (accountId_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, accountId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, gameServerId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(logoutReason_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, logoutReason_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof ly.proto.Login.csLogout)) {
+        return super.equals(obj);
+      }
+      ly.proto.Login.csLogout other = (ly.proto.Login.csLogout) obj;
+
+      if (!getAccount()
+          .equals(other.getAccount())) return false;
+      if (getAccountId()
+          != other.getAccountId()) return false;
+      if (!getGameServerId()
+          .equals(other.getGameServerId())) return false;
+      if (!getLogoutReason()
+          .equals(other.getLogoutReason())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ACCOUNT_FIELD_NUMBER;
+      hash = (53 * hash) + getAccount().hashCode();
+      hash = (37 * hash) + ACCOUNTID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getAccountId());
+      hash = (37 * hash) + GAMESERVERID_FIELD_NUMBER;
+      hash = (53 * hash) + getGameServerId().hashCode();
+      hash = (37 * hash) + LOGOUTREASON_FIELD_NUMBER;
+      hash = (53 * hash) + getLogoutReason().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static ly.proto.Login.csLogout parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Login.csLogout parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Login.csLogout parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Login.csLogout parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Login.csLogout parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Login.csLogout parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Login.csLogout parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Login.csLogout parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static ly.proto.Login.csLogout parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static ly.proto.Login.csLogout parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static ly.proto.Login.csLogout parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Login.csLogout parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(ly.proto.Login.csLogout prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code csLogout}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:csLogout)
+        ly.proto.Login.csLogoutOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return ly.proto.Login.internal_static_csLogout_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return ly.proto.Login.internal_static_csLogout_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                ly.proto.Login.csLogout.class, ly.proto.Login.csLogout.Builder.class);
+      }
+
+      // Construct using ly.proto.Login.csLogout.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        account_ = "";
+        accountId_ = 0L;
+        gameServerId_ = "";
+        logoutReason_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return ly.proto.Login.internal_static_csLogout_descriptor;
+      }
+
+      @java.lang.Override
+      public ly.proto.Login.csLogout getDefaultInstanceForType() {
+        return ly.proto.Login.csLogout.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public ly.proto.Login.csLogout build() {
+        ly.proto.Login.csLogout result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public ly.proto.Login.csLogout buildPartial() {
+        ly.proto.Login.csLogout result = new ly.proto.Login.csLogout(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(ly.proto.Login.csLogout result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.account_ = account_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.accountId_ = accountId_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.gameServerId_ = gameServerId_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.logoutReason_ = logoutReason_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof ly.proto.Login.csLogout) {
+          return mergeFrom((ly.proto.Login.csLogout)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(ly.proto.Login.csLogout other) {
+        if (other == ly.proto.Login.csLogout.getDefaultInstance()) return this;
+        if (!other.getAccount().isEmpty()) {
+          account_ = other.account_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (other.getAccountId() != 0L) {
+          setAccountId(other.getAccountId());
+        }
+        if (!other.getGameServerId().isEmpty()) {
+          gameServerId_ = other.gameServerId_;
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        if (!other.getLogoutReason().isEmpty()) {
+          logoutReason_ = other.logoutReason_;
+          bitField0_ |= 0x00000008;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                account_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 16: {
+                accountId_ = input.readInt64();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 26: {
+                gameServerId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              case 34: {
+                logoutReason_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object account_ = "";
+      /**
+       * <code>string account = 1;</code>
+       * @return The account.
+       */
+      public java.lang.String getAccount() {
+        java.lang.Object ref = account_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          account_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string account = 1;</code>
+       * @return The bytes for account.
+       */
+      public com.google.protobuf.ByteString
+          getAccountBytes() {
+        java.lang.Object ref = account_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          account_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string account = 1;</code>
+       * @param value The account to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAccount(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        account_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string account = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAccount() {
+        account_ = getDefaultInstance().getAccount();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string account = 1;</code>
+       * @param value The bytes for account to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAccountBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        account_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private long accountId_ ;
+      /**
+       * <code>int64 accountId = 2;</code>
+       * @return The accountId.
+       */
+      @java.lang.Override
+      public long getAccountId() {
+        return accountId_;
+      }
+      /**
+       * <code>int64 accountId = 2;</code>
+       * @param value The accountId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAccountId(long value) {
+
+        accountId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 accountId = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAccountId() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        accountId_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object gameServerId_ = "";
+      /**
+       * <code>string gameServerId = 3;</code>
+       * @return The gameServerId.
+       */
+      public java.lang.String getGameServerId() {
+        java.lang.Object ref = gameServerId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          gameServerId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string gameServerId = 3;</code>
+       * @return The bytes for gameServerId.
+       */
+      public com.google.protobuf.ByteString
+          getGameServerIdBytes() {
+        java.lang.Object ref = gameServerId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          gameServerId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string gameServerId = 3;</code>
+       * @param value The gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        gameServerId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string gameServerId = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearGameServerId() {
+        gameServerId_ = getDefaultInstance().getGameServerId();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string gameServerId = 3;</code>
+       * @param value The bytes for gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        gameServerId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object logoutReason_ = "";
+      /**
+       * <pre>
+       *退出原因
+       * </pre>
+       *
+       * <code>string logoutReason = 4;</code>
+       * @return The logoutReason.
+       */
+      public java.lang.String getLogoutReason() {
+        java.lang.Object ref = logoutReason_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          logoutReason_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *退出原因
+       * </pre>
+       *
+       * <code>string logoutReason = 4;</code>
+       * @return The bytes for logoutReason.
+       */
+      public com.google.protobuf.ByteString
+          getLogoutReasonBytes() {
+        java.lang.Object ref = logoutReason_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          logoutReason_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *退出原因
+       * </pre>
+       *
+       * <code>string logoutReason = 4;</code>
+       * @param value The logoutReason to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLogoutReason(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        logoutReason_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *退出原因
+       * </pre>
+       *
+       * <code>string logoutReason = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLogoutReason() {
+        logoutReason_ = getDefaultInstance().getLogoutReason();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *退出原因
+       * </pre>
+       *
+       * <code>string logoutReason = 4;</code>
+       * @param value The bytes for logoutReason to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLogoutReasonBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        logoutReason_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:csLogout)
+    }
+
+    // @@protoc_insertion_point(class_scope:csLogout)
+    private static final ly.proto.Login.csLogout DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new ly.proto.Login.csLogout();
+    }
+
+    public static ly.proto.Login.csLogout getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<csLogout>
+        PARSER = new com.google.protobuf.AbstractParser<csLogout>() {
+      @java.lang.Override
+      public csLogout parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<csLogout> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<csLogout> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public ly.proto.Login.csLogout getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface scLogoutOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:scLogout)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string account = 1;</code>
+     * @return The account.
+     */
+    java.lang.String getAccount();
+    /**
+     * <code>string account = 1;</code>
+     * @return The bytes for account.
+     */
+    com.google.protobuf.ByteString
+        getAccountBytes();
+
+    /**
+     * <code>int64 accountId = 2;</code>
+     * @return The accountId.
+     */
+    long getAccountId();
+
+    /**
+     * <code>string gameServerId = 3;</code>
+     * @return The gameServerId.
+     */
+    java.lang.String getGameServerId();
+    /**
+     * <code>string gameServerId = 3;</code>
+     * @return The bytes for gameServerId.
+     */
+    com.google.protobuf.ByteString
+        getGameServerIdBytes();
+
+    /**
+     * <pre>
+     *退出原因
+     * </pre>
+     *
+     * <code>string logoutReason = 4;</code>
+     * @return The logoutReason.
+     */
+    java.lang.String getLogoutReason();
+    /**
+     * <pre>
+     *退出原因
+     * </pre>
+     *
+     * <code>string logoutReason = 4;</code>
+     * @return The bytes for logoutReason.
+     */
+    com.google.protobuf.ByteString
+        getLogoutReasonBytes();
+  }
+  /**
+   * Protobuf type {@code scLogout}
+   */
+  public static final class scLogout extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:scLogout)
+      scLogoutOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use scLogout.newBuilder() to construct.
+    private scLogout(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private scLogout() {
+      account_ = "";
+      gameServerId_ = "";
+      logoutReason_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new scLogout();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return ly.proto.Login.internal_static_scLogout_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return ly.proto.Login.internal_static_scLogout_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              ly.proto.Login.scLogout.class, ly.proto.Login.scLogout.Builder.class);
+    }
+
+    public static final int ACCOUNT_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object account_ = "";
+    /**
+     * <code>string account = 1;</code>
+     * @return The account.
+     */
+    @java.lang.Override
+    public java.lang.String getAccount() {
+      java.lang.Object ref = account_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        account_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string account = 1;</code>
+     * @return The bytes for account.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getAccountBytes() {
+      java.lang.Object ref = account_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        account_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int ACCOUNTID_FIELD_NUMBER = 2;
+    private long accountId_ = 0L;
+    /**
+     * <code>int64 accountId = 2;</code>
+     * @return The accountId.
+     */
+    @java.lang.Override
+    public long getAccountId() {
+      return accountId_;
+    }
+
+    public static final int GAMESERVERID_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object gameServerId_ = "";
+    /**
+     * <code>string gameServerId = 3;</code>
+     * @return The gameServerId.
+     */
+    @java.lang.Override
+    public java.lang.String getGameServerId() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        gameServerId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string gameServerId = 3;</code>
+     * @return The bytes for gameServerId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getGameServerIdBytes() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        gameServerId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LOGOUTREASON_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object logoutReason_ = "";
+    /**
+     * <pre>
+     *退出原因
+     * </pre>
+     *
+     * <code>string logoutReason = 4;</code>
+     * @return The logoutReason.
+     */
+    @java.lang.Override
+    public java.lang.String getLogoutReason() {
+      java.lang.Object ref = logoutReason_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        logoutReason_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     *退出原因
+     * </pre>
+     *
+     * <code>string logoutReason = 4;</code>
+     * @return The bytes for logoutReason.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getLogoutReasonBytes() {
+      java.lang.Object ref = logoutReason_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        logoutReason_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(account_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, account_);
+      }
+      if (accountId_ != 0L) {
+        output.writeInt64(2, accountId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, gameServerId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(logoutReason_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, logoutReason_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(account_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, account_);
+      }
+      if (accountId_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, accountId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, gameServerId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(logoutReason_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, logoutReason_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof ly.proto.Login.scLogout)) {
+        return super.equals(obj);
+      }
+      ly.proto.Login.scLogout other = (ly.proto.Login.scLogout) obj;
+
+      if (!getAccount()
+          .equals(other.getAccount())) return false;
+      if (getAccountId()
+          != other.getAccountId()) return false;
+      if (!getGameServerId()
+          .equals(other.getGameServerId())) return false;
+      if (!getLogoutReason()
+          .equals(other.getLogoutReason())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ACCOUNT_FIELD_NUMBER;
+      hash = (53 * hash) + getAccount().hashCode();
+      hash = (37 * hash) + ACCOUNTID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getAccountId());
+      hash = (37 * hash) + GAMESERVERID_FIELD_NUMBER;
+      hash = (53 * hash) + getGameServerId().hashCode();
+      hash = (37 * hash) + LOGOUTREASON_FIELD_NUMBER;
+      hash = (53 * hash) + getLogoutReason().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static ly.proto.Login.scLogout parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Login.scLogout parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Login.scLogout parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Login.scLogout parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Login.scLogout parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Login.scLogout parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Login.scLogout parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Login.scLogout parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static ly.proto.Login.scLogout parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static ly.proto.Login.scLogout parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static ly.proto.Login.scLogout parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Login.scLogout parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(ly.proto.Login.scLogout prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code scLogout}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:scLogout)
+        ly.proto.Login.scLogoutOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return ly.proto.Login.internal_static_scLogout_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return ly.proto.Login.internal_static_scLogout_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                ly.proto.Login.scLogout.class, ly.proto.Login.scLogout.Builder.class);
+      }
+
+      // Construct using ly.proto.Login.scLogout.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        account_ = "";
+        accountId_ = 0L;
+        gameServerId_ = "";
+        logoutReason_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return ly.proto.Login.internal_static_scLogout_descriptor;
+      }
+
+      @java.lang.Override
+      public ly.proto.Login.scLogout getDefaultInstanceForType() {
+        return ly.proto.Login.scLogout.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public ly.proto.Login.scLogout build() {
+        ly.proto.Login.scLogout result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public ly.proto.Login.scLogout buildPartial() {
+        ly.proto.Login.scLogout result = new ly.proto.Login.scLogout(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(ly.proto.Login.scLogout result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.account_ = account_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.accountId_ = accountId_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.gameServerId_ = gameServerId_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.logoutReason_ = logoutReason_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof ly.proto.Login.scLogout) {
+          return mergeFrom((ly.proto.Login.scLogout)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(ly.proto.Login.scLogout other) {
+        if (other == ly.proto.Login.scLogout.getDefaultInstance()) return this;
+        if (!other.getAccount().isEmpty()) {
+          account_ = other.account_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (other.getAccountId() != 0L) {
+          setAccountId(other.getAccountId());
+        }
+        if (!other.getGameServerId().isEmpty()) {
+          gameServerId_ = other.gameServerId_;
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        if (!other.getLogoutReason().isEmpty()) {
+          logoutReason_ = other.logoutReason_;
+          bitField0_ |= 0x00000008;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                account_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 16: {
+                accountId_ = input.readInt64();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 26: {
+                gameServerId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              case 34: {
+                logoutReason_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object account_ = "";
+      /**
+       * <code>string account = 1;</code>
+       * @return The account.
+       */
+      public java.lang.String getAccount() {
+        java.lang.Object ref = account_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          account_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string account = 1;</code>
+       * @return The bytes for account.
+       */
+      public com.google.protobuf.ByteString
+          getAccountBytes() {
+        java.lang.Object ref = account_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          account_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string account = 1;</code>
+       * @param value The account to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAccount(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        account_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string account = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAccount() {
+        account_ = getDefaultInstance().getAccount();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string account = 1;</code>
+       * @param value The bytes for account to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAccountBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        account_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private long accountId_ ;
+      /**
+       * <code>int64 accountId = 2;</code>
+       * @return The accountId.
+       */
+      @java.lang.Override
+      public long getAccountId() {
+        return accountId_;
+      }
+      /**
+       * <code>int64 accountId = 2;</code>
+       * @param value The accountId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAccountId(long value) {
+
+        accountId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 accountId = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAccountId() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        accountId_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object gameServerId_ = "";
+      /**
+       * <code>string gameServerId = 3;</code>
+       * @return The gameServerId.
+       */
+      public java.lang.String getGameServerId() {
+        java.lang.Object ref = gameServerId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          gameServerId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string gameServerId = 3;</code>
+       * @return The bytes for gameServerId.
+       */
+      public com.google.protobuf.ByteString
+          getGameServerIdBytes() {
+        java.lang.Object ref = gameServerId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          gameServerId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string gameServerId = 3;</code>
+       * @param value The gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        gameServerId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string gameServerId = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearGameServerId() {
+        gameServerId_ = getDefaultInstance().getGameServerId();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string gameServerId = 3;</code>
+       * @param value The bytes for gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        gameServerId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object logoutReason_ = "";
+      /**
+       * <pre>
+       *退出原因
+       * </pre>
+       *
+       * <code>string logoutReason = 4;</code>
+       * @return The logoutReason.
+       */
+      public java.lang.String getLogoutReason() {
+        java.lang.Object ref = logoutReason_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          logoutReason_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *退出原因
+       * </pre>
+       *
+       * <code>string logoutReason = 4;</code>
+       * @return The bytes for logoutReason.
+       */
+      public com.google.protobuf.ByteString
+          getLogoutReasonBytes() {
+        java.lang.Object ref = logoutReason_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          logoutReason_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *退出原因
+       * </pre>
+       *
+       * <code>string logoutReason = 4;</code>
+       * @param value The logoutReason to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLogoutReason(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        logoutReason_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *退出原因
+       * </pre>
+       *
+       * <code>string logoutReason = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLogoutReason() {
+        logoutReason_ = getDefaultInstance().getLogoutReason();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *退出原因
+       * </pre>
+       *
+       * <code>string logoutReason = 4;</code>
+       * @param value The bytes for logoutReason to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLogoutReasonBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        logoutReason_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:scLogout)
+    }
+
+    // @@protoc_insertion_point(class_scope:scLogout)
+    private static final ly.proto.Login.scLogout DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new ly.proto.Login.scLogout();
+    }
+
+    public static ly.proto.Login.scLogout getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<scLogout>
+        PARSER = new com.google.protobuf.AbstractParser<scLogout>() {
+      @java.lang.Override
+      public scLogout parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<scLogout> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<scLogout> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public ly.proto.Login.scLogout getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_PlayerInfo_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_PlayerInfo_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_csLogin_descriptor;
   private static final 
@@ -1675,6 +5587,16 @@ public final class Login {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_scLogin_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_csLogout_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_csLogout_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_scLogout_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_scLogout_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1684,27 +5606,57 @@ public final class Login {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\013Login.proto\"5\n\007csLogin\022\014\n\004name\030\001 \001(\t\022\014" +
-      "\n\004male\030\002 \001(\010\022\016\n\006scores\030\003 \003(\005\"5\n\007scLogin\022" +
-      "\014\n\004name\030\001 \001(\t\022\014\n\004male\030\002 \001(\010\022\016\n\006scores\030\003 " +
-      "\003(\005B\n\n\010ly.protob\006proto3"
+      "\n\013Login.proto\"\222\001\n\nPlayerInfo\022\020\n\010playerId" +
+      "\030\001 \001(\003\022\022\n\nplayerName\030\002 \001(\t\022\r\n\005level\030\003 \001(" +
+      "\005\022\020\n\010vipLevel\030\004 \001(\005\022\022\n\ncreateTime\030\005 \001(\003\022" +
+      "\021\n\tloginTime\030\006 \001(\003\022\026\n\016lastLogoutTime\030\007 \001" +
+      "(\003\"\207\001\n\007csLogin\022\017\n\007account\030\001 \001(\t\022\021\n\taccou" +
+      "ntId\030\002 \001(\003\022\020\n\010playerId\030\003 \001(\003\022\017\n\007channel\030" +
+      "\004 \001(\t\022\024\n\014gameServerId\030\005 \001(\t\022\r\n\005token\030\006 \001" +
+      "(\t\022\020\n\010deviceId\030\007 \001(\t\"r\n\007scLogin\022\017\n\007accou" +
+      "nt\030\001 \001(\t\022\020\n\010playerId\030\002 \001(\003\022\r\n\005token\030\003 \001(" +
+      "\t\022\024\n\014gameServerId\030\004 \001(\t\022\037\n\nplayerInfo\030\005 " +
+      "\001(\0132\013.PlayerInfo\"Z\n\010csLogout\022\017\n\007account\030" +
+      "\001 \001(\t\022\021\n\taccountId\030\002 \001(\003\022\024\n\014gameServerId" +
+      "\030\003 \001(\t\022\024\n\014logoutReason\030\004 \001(\t\"Z\n\010scLogout" +
+      "\022\017\n\007account\030\001 \001(\t\022\021\n\taccountId\030\002 \001(\003\022\024\n\014" +
+      "gameServerId\030\003 \001(\t\022\024\n\014logoutReason\030\004 \001(\t" +
+      "B\n\n\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         });
-    internal_static_csLogin_descriptor =
+    internal_static_PlayerInfo_descriptor =
       getDescriptor().getMessageTypes().get(0);
+    internal_static_PlayerInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_PlayerInfo_descriptor,
+        new java.lang.String[] { "PlayerId", "PlayerName", "Level", "VipLevel", "CreateTime", "LoginTime", "LastLogoutTime", });
+    internal_static_csLogin_descriptor =
+      getDescriptor().getMessageTypes().get(1);
     internal_static_csLogin_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csLogin_descriptor,
-        new java.lang.String[] { "Name", "Male", "Scores", });
+        new java.lang.String[] { "Account", "AccountId", "PlayerId", "Channel", "GameServerId", "Token", "DeviceId", });
     internal_static_scLogin_descriptor =
-      getDescriptor().getMessageTypes().get(1);
+      getDescriptor().getMessageTypes().get(2);
     internal_static_scLogin_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scLogin_descriptor,
-        new java.lang.String[] { "Name", "Male", "Scores", });
+        new java.lang.String[] { "Account", "PlayerId", "Token", "GameServerId", "PlayerInfo", });
+    internal_static_csLogout_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_csLogout_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_csLogout_descriptor,
+        new java.lang.String[] { "Account", "AccountId", "GameServerId", "LogoutReason", });
+    internal_static_scLogout_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_scLogout_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_scLogout_descriptor,
+        new java.lang.String[] { "Account", "AccountId", "GameServerId", "LogoutReason", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -19,18 +19,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePa
     static AtomicInteger sessionCreator = new AtomicInteger(1);
 
     @Override
-    protected void channelRead0(
-            ChannelHandlerContext channelHandlerContext, AbstractMessagePacket abstractMessagePacket)
-            throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, AbstractMessagePacket abstractMessagePacket) throws Exception {
         //    收到消息
         if (LoggerDef.NetLogger.isDebugEnabled()) {
             LoggerDef.NetLogger.debug("receive packet[{}]", abstractMessagePacket.toString());
         }
         // 收到请求 session 消息，直接返回 sessionID
         if (abstractMessagePacket instanceof ConnectionAckPacket) {
-            channelHandlerContext
-                    .channel()
-                    .writeAndFlush(new ConnectionAckPacket(sessionCreator.getAndIncrement()));
+            channelHandlerContext.channel().writeAndFlush(new ConnectionAckPacket(sessionCreator.getAndIncrement()));
             return;
         }
         ConnectSession gameObject = NetService.getInstance().getGameObject(channelHandlerContext);
@@ -52,19 +48,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePa
         } else {
             closeStr = "连接是对端关闭的";
         }
-        log.info(
-                String.format(
-                        "连接断开 :[%s], sid:%s,  原因: %s",
-                        ctx.channel().remoteAddress(), ctx.channel().id(), closeStr));
+        log.info(String.format("连接断开 :[%s], sid:%s,  原因: %s", ctx.channel().remoteAddress(), ctx.channel().id(), closeStr));
         NetService.getInstance().delChannel(ctx);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
-        log.error(
-                String.format("连接[sid: %s, %s]异常", ctx.channel().id(), ctx.channel().remoteAddress()),
-                cause);
+        log.error(String.format("连接[sid: %s, %s]异常", ctx.channel().id(), ctx.channel().remoteAddress()), cause);
         NetService.getInstance().delChannel(ctx);
     }
 
@@ -72,10 +63,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePa
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         ConnectSession object = NetService.getInstance().addChannel(ctx);
-        log.info(
-                String.format(
-                        "收到新连接sid:%s, GameObjectSid:%d :[%s]",
-                        ctx.channel().id(), object.connector.sessionId, ctx.channel().remoteAddress()));
+        log.info(String.format("收到新连接sid:%s, GameObjectSid:%d :[%s]", ctx.channel().id(), object.connector.sessionId, ctx.channel().remoteAddress()));
         object.getConnector().setStatus(Connector.CONNECT_STATUS_OPEN);
     }
 }

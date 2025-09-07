@@ -48,4 +48,11 @@ public class MessagePacketFactory {
     }
 
 
+    public static S2CMessagePacket createS2CMessagePacket(int cmd, byte[] data) {
+        S2CMessagePacket messagePacket = (S2CMessagePacket) createMessagePacket(AbstractMessagePacket.MESSAGE_PACKET_TYPE_SERVER_TO_CLIENT);
+        messagePacket.setCmd(cmd);
+        messagePacket.setData(data);
+        return messagePacket;
+    }
+
 }

@@ -1,17 +1,51 @@
 syntax = "proto3";
 option java_package = "ly.proto";
 
+
+message  PlayerInfo{
+  int64 playerId = 1;
+  string playerName = 2;
+  int32 level = 3;
+  int32 vipLevel = 4;
+  int64 createTime = 5;
+  int64 loginTime = 6;
+  int64 lastLogoutTime = 7;
+}
+
 // 登录协议请求
 message csLogin
 {
-  string name = 1;
-  bool male = 2;
-  repeated int32 scores = 3;
+  string account = 1; //账号
+  int64 accountId = 2;//账号id
+  int64 playerId = 3;//角色id
+  string channel = 4; //渠道
+  string gameServerId = 5; //游戏服务器id
+  string token = 6; //token
+  string deviceId = 7; //设备id
 }
+
+
 // 登录协议响应
 message scLogin
 {
-  string name = 1;
-  bool male = 2;
-  repeated int32 scores = 3;
+  string account = 1;
+  int64  playerId = 2;
+  string token = 3;
+  string gameServerId = 4;
+  PlayerInfo playerInfo = 5;
+}
+
+
+message csLogout{
+  string account = 1;
+  int64 accountId = 2;
+  string gameServerId = 3;
+  string logoutReason = 4;//退出原因
+}
+
+message scLogout{
+  string account = 1;
+  int64 accountId = 2;
+  string gameServerId = 3;
+  string logoutReason = 4;//退出原因
 }

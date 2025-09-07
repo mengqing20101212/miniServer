@@ -1,6 +1,7 @@
 package ly.net;
 
 import ly.net.packet.C2SMessagePacket;
+import ly.net.packet.S2SMessagePacket;
 import ly.rpc.RpcNodeConnector;
 import ly.rpc.RpcUtils;
 
@@ -9,6 +10,7 @@ public class GateClient {
     private RpcNodeConnector gameRpcNodeConnector;
     private String account;
     private long playerId;
+    private long accountId;
     private String token;
     private String gameServerId;
 
@@ -21,9 +23,16 @@ public class GateClient {
     }
 
     public long getSessionGuid() {
-        return session.getGuid();
+        return getAccountId();
     }
 
+    public long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
+    }
 
     public String getAccount() {
         return account;
@@ -54,4 +63,7 @@ public class GateClient {
     }
 
 
+    public void sendPacketToClient(S2SMessagePacket s2sPacket) {
+        
+    }
 }

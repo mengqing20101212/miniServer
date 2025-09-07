@@ -108,6 +108,22 @@ public class S2CMessagePacket extends AbstractMessagePacket {
         return true;
     }
 
+    public int getTime() {
+        return time;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
+    public void setCmd(int cmd) {
+        this.cmd = cmd;
+    }
+
     @Override
     public int getSeq() {
         return seq;
@@ -133,6 +149,7 @@ public class S2CMessagePacket extends AbstractMessagePacket {
                 + Arrays.toString(data)
                 + '}';
     }
+
 
     @Override
     public String toSimpleString() {

@@ -46,6 +46,38 @@ public final class Cmd {
     SC_Login(101),
     /**
      * <pre>
+     *退出协议请求
+     * </pre>
+     *
+     * <code>CS_Logout = 102;</code>
+     */
+    CS_Logout(102),
+    /**
+     * <pre>
+     *退出协议响应
+     * </pre>
+     *
+     * <code>SC_Logout = 103;</code>
+     */
+    SC_Logout(103),
+    /**
+     * <pre>
+     *错误码协议请求
+     * </pre>
+     *
+     * <code>CS_ErrorCode = 201;</code>
+     */
+    CS_ErrorCode(201),
+    /**
+     * <pre>
+     *错误码协议响应
+     * </pre>
+     *
+     * <code>SC_ErrorCode = 202;</code>
+     */
+    SC_ErrorCode(202),
+    /**
+     * <pre>
      *&#47;/////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用///////////////////////////////////////
      * </pre>
      *
@@ -107,6 +139,38 @@ public final class Cmd {
      * <code>SC_Login = 101;</code>
      */
     public static final int SC_Login_VALUE = 101;
+    /**
+     * <pre>
+     *退出协议请求
+     * </pre>
+     *
+     * <code>CS_Logout = 102;</code>
+     */
+    public static final int CS_Logout_VALUE = 102;
+    /**
+     * <pre>
+     *退出协议响应
+     * </pre>
+     *
+     * <code>SC_Logout = 103;</code>
+     */
+    public static final int SC_Logout_VALUE = 103;
+    /**
+     * <pre>
+     *错误码协议请求
+     * </pre>
+     *
+     * <code>CS_ErrorCode = 201;</code>
+     */
+    public static final int CS_ErrorCode_VALUE = 201;
+    /**
+     * <pre>
+     *错误码协议响应
+     * </pre>
+     *
+     * <code>SC_ErrorCode = 202;</code>
+     */
+    public static final int SC_ErrorCode_VALUE = 202;
     /**
      * <pre>
      *&#47;/////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用///////////////////////////////////////
@@ -176,6 +240,10 @@ public final class Cmd {
         case 0: return CMD_null;
         case 100: return CS_Login;
         case 101: return SC_Login;
+        case 102: return CS_Logout;
+        case 103: return SC_Logout;
+        case 201: return CS_ErrorCode;
+        case 202: return SC_ErrorCode;
         case 10000: return CS_Server2Server;
         case 10001: return SC_Server2Server;
         case 10002: return CS_RpcPing;
@@ -246,11 +314,13 @@ public final class Cmd {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\tCmd.proto*\224\001\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_" +
-      "Login\020d\022\014\n\010SC_Login\020e\022\025\n\020CS_Server2Serve" +
-      "r\020\220N\022\025\n\020SC_Server2Server\020\221N\022\017\n\nCS_RpcPin" +
-      "g\020\222N\022\017\n\nSC_RpcPing\020\223N\022\023\n\rMaxServeMsgId\020\240" +
-      "\234\001B\n\n\010ly.protob\006proto3"
+      "\n\tCmd.proto*\330\001\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_" +
+      "Login\020d\022\014\n\010SC_Login\020e\022\r\n\tCS_Logout\020f\022\r\n\t" +
+      "SC_Logout\020g\022\021\n\014CS_ErrorCode\020\311\001\022\021\n\014SC_Err" +
+      "orCode\020\312\001\022\025\n\020CS_Server2Server\020\220N\022\025\n\020SC_S" +
+      "erver2Server\020\221N\022\017\n\nCS_RpcPing\020\222N\022\017\n\nSC_R" +
+      "pcPing\020\223N\022\023\n\rMaxServeMsgId\020\240\234\001B\n\n\010ly.pro" +
+      "tob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

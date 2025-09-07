@@ -109,9 +109,9 @@ public class LoginService {
         return serverNodeList;
     }
 
-    public int createNewAccountId() {
-
-        return (int) RandomUtils.RandomInt(1000);
+    public long createNewAccountId() {
+        long max = 1000000000000000000L;
+        return RandomUtils.RandomLong(max);
     }
 
     public String createToken(String account) {

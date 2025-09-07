@@ -6,6 +6,10 @@ enum CMD{
   CMD_null = 0;
   CS_Login = 100;                                                                   //登录协议请求
   SC_Login = 101;                                                                   //登录协议响应
+  CS_Logout = 102;                                                                 //退出协议请求
+  SC_Logout = 103;                                                                 //退出协议响应
+  CS_ErrorCode = 201;                                                               //错误码协议请求
+  SC_ErrorCode = 202;                                                               //错误码协议响应
 
   ////////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用///////////////////////////////////////
   CS_Server2Server = 10000;                                                         //server2server 服务器之间通信的消息号 请求
