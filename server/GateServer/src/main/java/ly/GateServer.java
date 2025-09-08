@@ -15,10 +15,10 @@ public class GateServer {
             return;
         }
         String nacosUrl = args[0];
-        String serverId = args[1];
-        String env = args[2];
+        String env = args[1];
+        String serverId = args[2];
         ServerContext.addController(new GateLoginController());
-        ServerContext.startUp(nacosUrl, ServerTypeEnum.LOGIN.getType(), serverId, env, new GateConnectSessionProvider());
-        
+        ServerContext.startUp(nacosUrl, ServerTypeEnum.GATE.getType(), serverId, env, new GateConnectSessionProvider());
+
     }
 }

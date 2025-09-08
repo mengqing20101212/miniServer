@@ -64,7 +64,7 @@ public class GateLoginController implements IGateController {
 
 
                     //bind game server node
-                    RedisUtils.set(RedisKeys.LOCK_LOGIN_ACCOUNT_ID_KEY.getKey(request.getAccount()), request.getGameServerId());
+                    RedisUtils.set(RedisKeys.ACCOUNT_GAME_SERVER_ID_KEY.getKey(request.getAccount()), request.getGameServerId());
 
                     //登录成功
                     GateClient client = new GateClient(session);

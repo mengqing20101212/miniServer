@@ -1,6 +1,8 @@
 package ly.net;
 
 import ly.net.packet.C2SMessagePacket;
+import ly.net.packet.MessagePacketFactory;
+import ly.net.packet.S2CMessagePacket;
 import ly.net.packet.S2SMessagePacket;
 import ly.rpc.RpcNodeConnector;
 import ly.rpc.RpcUtils;
@@ -64,6 +66,11 @@ public class GateClient {
 
 
     public void sendPacketToClient(S2SMessagePacket s2sPacket) {
-        
+        S2CMessagePacket s2cPacket = MessagePacketFactory.createS2CMessagePacket(s2sPacket.getCmd(), s2sPacket.getSeq(), s2sPacket.getData());
+        session.sendPacket(s2cPacket);
+    }
+
+    public void closeConnection() {
+        session.closeChannel();
     }
 }

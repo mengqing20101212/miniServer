@@ -30,7 +30,6 @@ public class Connector {
     ChannelHandlerContext socketChannel;
     int status = CONNECT_STATUS_INIT;
     int sessionId;
-    int seq;
 
     public Connector(ChannelHandlerContext socketChannel, int sessionId) {
         this.sessionId = sessionId;
@@ -62,8 +61,10 @@ public class Connector {
     }*/
 
     public synchronized boolean write(AbstractMessagePacket packet) {
-        packet.setSid(sessionId);
-        packet.setSeq(++seq);
+        if (packet.getSid() == 0) {
+            packet.setSid(sessionId);
+        }
+
         if (isConnected()) {
             if (NetLogger.isDebugEnabled()) {
                 NetLogger.debug("send packet:{}", packet);

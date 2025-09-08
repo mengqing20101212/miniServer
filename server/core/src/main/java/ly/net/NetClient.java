@@ -170,7 +170,9 @@ public class NetClient {
     }
 
     private synchronized boolean sendPacket(AbstractMessagePacket packet) {
-        packet.setSid(sid);
+        if (packet.getSid() == 0) {
+            packet.setSid(sid);
+        }
         if (LoggerDef.NetLogger.isDebugEnabled()) {
             LoggerDef.NetLogger.debug(String.format("sid:%d send packet:%s", sid, packet));
         }
