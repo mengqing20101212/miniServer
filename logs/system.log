@@ -1,4 +1,154 @@
-2025-08-10 22:04:40.111 INFO  - addHandlerRouter cmd=100 router=GateLoginController$$Lambda/0x000001bfe5197458
-2025-08-10 22:06:13.644 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000022e59197458
-2025-08-10 22:13:16.330 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000002ae50196f60
-2025-08-10 22:14:07.772 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000019a01196f60
+2025-09-08 15:58:42.027 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000026a11185fb0
+2025-09-08 15:59:07.437 INFO  - 服务器开始启动
+2025-09-08 15:59:20.261 INFO  - 开始启动 Nacos 
+2025-09-08 16:00:19.210 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000015dab185bd0
+2025-09-08 16:00:19.212 INFO  - 服务器开始启动
+2025-09-08 16:00:19.216 INFO  - 开始启动 Nacos 
+2025-09-08 16:00:46.131 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001d9e6185bd0
+2025-09-08 16:00:46.134 INFO  - 服务器开始启动
+2025-09-08 16:00:46.137 INFO  - 开始启动 Nacos 
+2025-09-08 16:00:58.929 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000020c20185bd0
+2025-09-08 16:00:58.932 INFO  - 服务器开始启动
+2025-09-08 16:00:58.936 INFO  - 开始启动 Nacos 
+2025-09-08 16:02:45.541 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000240e5185fb0
+2025-09-08 16:02:45.544 INFO  - 服务器开始启动
+2025-09-08 16:02:45.547 INFO  - 开始启动 Nacos 
+2025-09-08 16:05:01.210 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001a321185bd0
+2025-09-08 16:05:01.211 INFO  - 服务器开始启动
+2025-09-08 16:05:01.212 INFO  - 开始启动 Nacos 
+2025-09-08 16:05:06.907 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000019627185bd0
+2025-09-08 16:05:06.910 INFO  - 服务器开始启动
+2025-09-08 16:05:06.924 INFO  - 开始启动 Nacos 
+2025-09-08 16:07:32.767 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001f4a7185bd0
+2025-09-08 16:07:32.769 INFO  - 服务器开始启动
+2025-09-08 16:07:32.774 INFO  - 开始启动 Nacos 
+2025-09-08 16:13:07.822 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001e691185bd0
+2025-09-08 16:13:07.825 INFO  - 服务器开始启动
+2025-09-08 16:13:07.838 INFO  - 开始启动 Nacos 
+2025-09-08 16:18:30.682 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001c201185bd0
+2025-09-08 16:18:30.685 INFO  - 服务器开始启动
+2025-09-08 16:18:30.697 INFO  - 开始启动 Nacos 
+2025-09-08 16:19:47.393 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000020ab2185bd0
+2025-09-08 16:19:47.394 INFO  - 服务器开始启动
+2025-09-08 16:19:47.408 INFO  - 开始启动 Nacos 
+2025-09-08 16:44:48.551 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000218a7180288
+2025-09-08 16:44:48.554 INFO  - 服务器开始启动
+2025-09-08 16:44:48.564 INFO  - 开始启动 Nacos 
+2025-09-08 16:45:55.065 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001adda180288
+2025-09-08 16:45:55.067 INFO  - 服务器开始启动
+2025-09-08 16:45:55.071 INFO  - 开始启动 Nacos 
+2025-09-08 16:46:02.285 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000024e91180288
+2025-09-08 16:46:02.287 INFO  - 服务器开始启动
+2025-09-08 16:46:02.289 INFO  - 开始启动 Nacos 
+2025-09-08 16:46:11.995 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000244201804f0
+2025-09-08 16:46:11.998 INFO  - 服务器开始启动
+2025-09-08 16:46:12.009 INFO  - 开始启动 Nacos 
+2025-09-08 16:47:12.404 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000265c51804f0
+2025-09-08 16:47:12.407 INFO  - 服务器开始启动
+2025-09-08 16:47:12.411 INFO  - 开始启动 Nacos 
+2025-09-08 16:53:43.430 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000019b4d1804f0
+2025-09-08 16:53:43.434 INFO  - 服务器开始启动
+2025-09-08 16:53:43.438 INFO  - 开始启动 Nacos 
+2025-09-08 16:53:56.618 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001de2b1804f0
+2025-09-08 16:53:56.621 INFO  - 服务器开始启动
+2025-09-08 16:53:56.623 INFO  - 开始启动 Nacos 
+2025-09-08 16:54:14.649 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000020a721804f0
+2025-09-08 16:54:14.652 INFO  - 服务器开始启动
+2025-09-08 16:54:14.655 INFO  - 开始启动 Nacos 
+2025-09-08 16:54:23.338 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000002dd48184000
+2025-09-08 16:54:23.340 INFO  - 服务器开始启动
+2025-09-08 16:54:23.343 INFO  - 开始启动 Nacos 
+2025-09-08 16:54:47.440 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001ea28137dc8
+2025-09-08 16:54:47.443 INFO  - 服务器开始启动
+2025-09-08 16:54:47.445 INFO  - 开始启动 Nacos 
+2025-09-08 20:28:48.782 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001605d1804f0
+2025-09-08 20:28:48.785 INFO  - 服务器开始启动
+2025-09-08 20:28:48.795 INFO  - 开始启动 Nacos 
+2025-09-08 20:36:09.000 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000029b14184000
+2025-09-08 20:36:09.003 INFO  - 服务器开始启动
+2025-09-08 20:36:09.007 INFO  - 开始启动 Nacos 
+2025-09-08 20:37:56.800 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000022e14185fb0
+2025-09-08 20:37:56.809 INFO  - 服务器开始启动
+2025-09-08 20:37:56.820 INFO  - 开始启动 Nacos 
+2025-09-08 20:41:13.402 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001b8811804f0
+2025-09-08 20:41:13.406 INFO  - 服务器开始启动
+2025-09-08 20:41:13.418 INFO  - 开始启动 Nacos 
+2025-09-08 20:49:46.088 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000002373c137dc8
+2025-09-08 20:49:46.092 INFO  - 服务器开始启动
+2025-09-08 20:49:46.096 INFO  - 开始启动 Nacos 
+2025-09-08 20:51:05.099 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000250911804f0
+2025-09-08 20:51:05.102 INFO  - 服务器开始启动
+2025-09-08 20:51:05.105 INFO  - 开始启动 Nacos 
+2025-09-08 20:52:47.871 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001f701187680
+2025-09-08 20:52:47.874 INFO  - 服务器开始启动
+2025-09-08 20:52:47.878 INFO  - 开始启动 Nacos 
+2025-09-08 20:52:55.978 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000208011804f0
+2025-09-08 20:52:55.980 INFO  - 服务器开始启动
+2025-09-08 20:52:55.984 INFO  - 开始启动 Nacos 
+2025-09-08 20:54:32.894 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000002d850180288
+2025-09-08 20:54:32.897 INFO  - 服务器开始启动
+2025-09-08 20:54:32.901 INFO  - 开始启动 Nacos 
+2025-09-08 20:56:41.617 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000027c131804f0
+2025-09-08 20:56:41.621 INFO  - 服务器开始启动
+2025-09-08 20:56:41.625 INFO  - 开始启动 Nacos 
+2025-09-08 20:57:21.204 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001ede0137dc8
+2025-09-08 20:57:21.207 INFO  - 服务器开始启动
+2025-09-08 20:57:21.211 INFO  - 开始启动 Nacos 
+2025-09-08 21:00:27.461 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000002bcdd1804f0
+2025-09-08 21:00:27.463 INFO  - 服务器开始启动
+2025-09-08 21:00:27.474 INFO  - 开始启动 Nacos 
+2025-09-08 21:01:25.121 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001b5811804f0
+2025-09-08 21:01:25.123 INFO  - 服务器开始启动
+2025-09-08 21:01:25.124 INFO  - 开始启动 Nacos 
+2025-09-08 21:06:07.790 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001b724180288
+2025-09-08 21:06:07.792 INFO  - 服务器开始启动
+2025-09-08 21:06:07.792 INFO  - 开始启动 Nacos 
+2025-09-08 21:15:03.849 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001b001184000
+2025-09-08 21:15:03.850 INFO  - 服务器开始启动
+2025-09-08 21:15:03.852 INFO  - 开始启动 Nacos 
+2025-09-08 21:17:55.536 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001dc32180288
+2025-09-08 21:17:55.539 INFO  - 服务器开始启动
+2025-09-08 21:17:55.542 INFO  - 开始启动 Nacos 
+2025-09-08 21:19:23.514 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000019f5b137dc8
+2025-09-08 21:19:23.517 INFO  - 服务器开始启动
+2025-09-08 21:19:23.521 INFO  - 开始启动 Nacos 
+2025-09-08 21:19:34.685 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000218ae184000
+2025-09-08 21:19:34.688 INFO  - 服务器开始启动
+2025-09-08 21:19:34.693 INFO  - 开始启动 Nacos 
+2025-09-08 21:24:47.626 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000017193180288
+2025-09-08 21:24:47.629 INFO  - 服务器开始启动
+2025-09-08 21:24:47.637 INFO  - 开始启动 Nacos 
+2025-09-08 21:26:23.419 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000252041804f0
+2025-09-08 21:26:23.422 INFO  - 服务器开始启动
+2025-09-08 21:26:23.423 INFO  - 开始启动 Nacos 
+2025-09-08 21:27:55.962 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001dcc7137dc8
+2025-09-08 21:27:55.965 INFO  - 服务器开始启动
+2025-09-08 21:27:55.973 INFO  - 开始启动 Nacos 
+2025-09-08 21:28:38.370 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='gate1001', ip='127.0.0.1', port=12002, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GATE', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=gate1001, serverType=GATE}}
+2025-09-08 21:28:38.372 INFO  -  Nacos 启动成功,耗时: 42399ms 
+2025-09-08 21:28:38.375 INFO  - 开始加载配置表
+2025-09-08 21:28:38.386 INFO  - 加载策划表 HeroInfoConfigManager  耗时 11 (毫秒)
+2025-09-08 21:28:38.386 INFO  - 加载配置表完成, 耗时:11 (毫秒)
+2025-09-08 21:28:47.198 INFO  - 服务器启动成功:[NetServer-12002], port:12002
+2025-09-08 21:28:47.200 INFO  - 服务器 启动成功 耗时: 51234ms
+2025-09-08 21:33:12.960 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001d85c1804f0
+2025-09-08 21:33:12.962 INFO  - 服务器开始启动
+2025-09-08 21:33:12.971 INFO  - 开始启动 Nacos 
+2025-09-08 21:33:13.779 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='gate1001', ip='127.0.0.1', port=12002, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GATE', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=gate1001, serverType=GATE}}
+2025-09-08 21:33:13.780 INFO  -  Nacos 启动成功,耗时: 809ms 
+2025-09-08 21:33:13.783 INFO  - 开始加载配置表
+2025-09-08 21:33:13.787 INFO  - 加载策划表 HeroInfoConfigManager  耗时 4 (毫秒)
+2025-09-08 21:33:13.787 INFO  - 加载配置表完成, 耗时:4 (毫秒)
+2025-09-08 21:33:22.961 INFO  - 服务器启动成功:[NetServer-12002], port:12002
+2025-09-08 21:33:22.963 INFO  - 服务器 启动成功 耗时: 9999ms
+2025-09-08 21:36:19.666 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000218a21ae220
+2025-09-08 21:36:19.668 INFO  - 服务器开始启动
+2025-09-08 21:36:19.669 INFO  - 开始启动 Nacos 
+2025-09-08 21:36:20.410 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='login', ip='127.0.0.1', port=12003, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='LOGIN', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=login, serverType=LOGIN}}
+2025-09-08 21:36:20.417 INFO  -  Nacos 启动成功,耗时: 748ms 
+2025-09-08 21:36:20.419 INFO  - 开始加载配置表
+2025-09-08 21:36:20.423 INFO  - 加载策划表 HeroInfoConfigManager  耗时 4 (毫秒)
+2025-09-08 21:36:20.423 INFO  - 加载配置表完成, 耗时:4 (毫秒)
+2025-09-08 21:36:20.978 INFO  - 当前节点数量:1, 新增服务器节点: Instance{instanceId='gate1001', ip='127.0.0.1', port=12002, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GATE', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=gate1001, serverType=GATE}}
+2025-09-08 21:36:29.036 INFO  - 服务器启动成功:[NetServer-12002], port:12002
+2025-09-08 21:36:29.038 INFO  - 服务器 启动成功 耗时: 9370ms
