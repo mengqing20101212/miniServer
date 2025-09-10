@@ -15,7 +15,7 @@ public class HandlerRouterManager {
 
     private final Map<Integer, RouterHolder<?, ?, ?>> handlerRouterMap = new HashMap<>();
 
-    private static class RouterHolder<S extends ConnectSession,
+    protected static class RouterHolder<S extends ConnectSession,
             P extends AbstractMessagePacket,
             R extends AbstractMessage> {
         final Class<S> sessionType;
@@ -38,7 +38,7 @@ public class HandlerRouterManager {
         return instance;
     }
 
-    private HandlerRouterManager() {
+    protected HandlerRouterManager() {
     }
 
     /**
@@ -59,7 +59,7 @@ public class HandlerRouterManager {
         handlerRouterMap.put(cmdNum, new RouterHolder<>(sessionType, packetType, requestType, router));
     }
 
-    private RouterHolder<?, ?, ?> getHandlerRouter(int cmd) {
+    protected RouterHolder<?, ?, ?> getHandlerRouter(int cmd) {
         return handlerRouterMap.get(cmd);
     }
 

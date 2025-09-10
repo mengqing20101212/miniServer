@@ -2,12 +2,11 @@ package ly.logic.login;
 
 import ly.GameClientManager;
 import ly.LoggerDef;
-import ly.net.GameClient;
 import ly.net.GameConnectSession;
+import ly.net.GamePlayer;
 import ly.net.IGameController;
-import ly.net.packet.C2SMessagePacket;
+import ly.net.packet.S2SMessagePacket;
 import ly.proto.Cmd;
-import ly.proto.ErrorMsg;
 import ly.proto.Login;
 import ly.redis.RedisKeys;
 import ly.redis.RedisUtils;
@@ -26,13 +25,13 @@ public class GameLoginController implements IGameController {
     }
 
 
-    private void handleLogin(GameConnectSession session, C2SMessagePacket packet, Login.csLogin request) {
+    private void handleLogin(GameConnectSession session, S2SMessagePacket packet, Login.csLogin request) {
         Thread.ofVirtual().name("loginThread_" + request.getAccount()).start(() -> {
             try {
                 //校验 token
                 if (!checkToken(request.getToken(), request.getAccount())) {
                     LoggerDef.SystemLogger.error(String.format("GateLoginController Invalid token %s for account %s", request.getToken(), request.getAccount()));
-                    sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.param_error);
+//                    sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.param_error);
                     return;
                 }
 
@@ -44,7 +43,7 @@ public class GameLoginController implements IGameController {
                     RpcNodeConnector targetGameServer = RpcService.getInstance().getRpcNodeConnector(request.getGameServerId());
                     if (targetGameServer == null) {
                         LoggerDef.SystemLogger.error("GateLoginController getRpcNodeConnector failed, serverId={}", request.getGameServerId());
-                        sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.system_error);
+//                        sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.system_error);
                         return;
                     }
 
@@ -67,23 +66,22 @@ public class GameLoginController implements IGameController {
                     RedisUtils.set(RedisKeys.ACCOUNT_GAME_SERVER_ID_KEY.getKey(request.getAccount()), request.getGameServerId());
 
                     //登录成功
-                    GameClient client = new GameClient(session);
+                    GamePlayer client = new GamePlayer(session);
                     client.setAccount(request.getAccount());
-                    client.setAccountId(request.getAccountId());
                     client.setToken(request.getToken());
                     client.setPlayerId(request.getPlayerId());
                     GameClientManager.getInstance().addClient(client);
                     //通知游戏服务器继续处理登录相关
                     Login.scLogin scLogin = RpcUtils.syncRequest(request.getGameServerId(), session.getGuid(), packet.getCmd(), request);
                     assert scLogin != null;
-                    session.sendClientMsg(Cmd.CMD.SC_Login_VALUE, scLogin);
+//                    session.sendClientMsg(Cmd.CMD.SC_Login_VALUE, scLogin);
 
                 } finally {
                     RedisUtils.unlock(RedisKeys.LOCK_LOGIN_ACCOUNT_ID_KEY.getKey(request.getAccount()));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.system_error);
+//                sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.system_error);
             }
         });
     }
