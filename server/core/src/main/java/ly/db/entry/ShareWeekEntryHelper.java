@@ -13,16 +13,16 @@ public class ShareWeekEntryHelper {
         .selectOnce(ShareWeekEntry.class, new String[] {"id"}, id);
   }
 
-  public static void save(ShareWeekEntry ShareWeekEntry) {
-    MysqlService.getInstance().save(ShareWeekEntry);
+  public static boolean save(ShareWeekEntry ShareWeekEntry) {
+    return MysqlService.getInstance().save(ShareWeekEntry);
   }
 
-  public static void update(ShareWeekEntry ShareWeekEntry, String... fileds) {
-    MysqlService.getInstance().update(ShareWeekEntry, fileds);
+  public static boolean update(ShareWeekEntry ShareWeekEntry, String... fileds) {
+    return MysqlService.getInstance().update(ShareWeekEntry, fileds);
   }
 
-  public static void delete(ShareWeekEntry ShareWeekEntry) {
-    MysqlService.getInstance().delete(ShareWeekEntry);
+  public static boolean delete(ShareWeekEntry ShareWeekEntry) {
+    return MysqlService.getInstance().delete(ShareWeekEntry);
   }
 
   public static void asyncSave(ShareWeekEntry ShareWeekEntry) {

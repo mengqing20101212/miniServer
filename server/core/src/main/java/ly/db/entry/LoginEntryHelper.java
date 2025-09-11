@@ -9,7 +9,8 @@ import ly.db.MysqlService;
  */
 public class LoginEntryHelper {
   public static LoginEntry getLoginEntryById(Integer id) {
-    return MysqlService.getInstance().selectOnce(LoginEntry.class, new String[] {"id"}, id);
+    return MysqlService.getInstance()
+        .selectOnce(LoginEntry.class, new String[] {"id"}, id);
   }
 
   public static boolean save(LoginEntry LoginEntry) {
@@ -20,8 +21,8 @@ public class LoginEntryHelper {
     return MysqlService.getInstance().update(LoginEntry, fileds);
   }
 
-  public static void delete(LoginEntry LoginEntry) {
-    MysqlService.getInstance().delete(LoginEntry);
+  public static boolean delete(LoginEntry LoginEntry) {
+    return MysqlService.getInstance().delete(LoginEntry);
   }
 
   public static void asyncSave(LoginEntry LoginEntry) {
@@ -38,10 +39,6 @@ public class LoginEntryHelper {
       return MysqlService.getInstance().selectAll(LoginEntry.class, fields, params);
     }
     return new ArrayList<>();
-  }
-
-  public static int count() {
-    return 0;
   }
 
   // @@@@@自定义方法开始区@@@@@

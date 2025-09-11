@@ -13,16 +13,16 @@ public class ShareEnumConfigEntryHelper {
         .selectOnce(ShareEnumConfigEntry.class, new String[] {"id"}, id);
   }
 
-  public static void save(ShareEnumConfigEntry ShareEnumConfigEntry) {
-    MysqlService.getInstance().save(ShareEnumConfigEntry);
+  public static boolean save(ShareEnumConfigEntry ShareEnumConfigEntry) {
+    return MysqlService.getInstance().save(ShareEnumConfigEntry);
   }
 
-  public static void update(ShareEnumConfigEntry ShareEnumConfigEntry, String... fileds) {
-    MysqlService.getInstance().update(ShareEnumConfigEntry, fileds);
+  public static boolean update(ShareEnumConfigEntry ShareEnumConfigEntry, String... fileds) {
+    return MysqlService.getInstance().update(ShareEnumConfigEntry, fileds);
   }
 
-  public static void delete(ShareEnumConfigEntry ShareEnumConfigEntry) {
-    MysqlService.getInstance().delete(ShareEnumConfigEntry);
+  public static boolean delete(ShareEnumConfigEntry ShareEnumConfigEntry) {
+    return MysqlService.getInstance().delete(ShareEnumConfigEntry);
   }
 
   public static void asyncSave(ShareEnumConfigEntry ShareEnumConfigEntry) {

@@ -1,0 +1,140 @@
+package ly.db.entry;
+
+import ly.db.AbstractEntry;
+import ly.db.DbMeta;
+
+/*
+ * 自动生成的代码, 如需改动需要在 @@@@@自定义区修改@@@@@
+ */
+@DbMeta.DbTable(name = "player")
+public class PlayerEntry extends AbstractEntry {
+
+
+  /**player id */
+  @DbMeta.DbMasterKey(name="id", autoIncrement=true)
+  @DbMeta.DbField(name="id")
+  private Long id;
+
+  /**玩家名称*/
+  @DbMeta.DbField(name="name")
+  private String name;
+
+  /**创建时间*/
+  @DbMeta.DbField(name="createTime")
+  private java.time.LocalDateTime createTime;
+
+  /**登录时间*/
+  @DbMeta.DbField(name="loginTime")
+  private java.time.LocalDateTime loginTime;
+
+  /**登出时间*/
+  @DbMeta.DbField(name="logoutTime")
+  private java.time.LocalDateTime logoutTime;
+
+  /**等级*/
+  @DbMeta.DbField(name="level")
+  private Integer level;
+
+  /**vip Level*/
+  @DbMeta.DbField(name="vipLevel")
+  private Integer vipLevel;
+
+  /**各个模块的养成数据*/
+  @DbMeta.DbField(name="modules")
+  private byte[] modules;
+  public void save() {
+    PlayerEntryHelper.save(this);
+  }
+
+  public void update() {
+    PlayerEntryHelper.update(this);
+  }
+
+  public void delete() {
+    PlayerEntryHelper.delete(this);
+  }
+
+  public void asyncSave() {
+    PlayerEntryHelper.asyncSave(this);
+  }
+
+  public void asyncUpdate() {
+    PlayerEntryHelper.asyncUpdate(this);
+  }
+
+ public void setId(Long Id) {
+    this.id = Id;
+    autoAddCurVersion();
+  }
+  public Long getId() {
+    return id;
+  }
+ public void setName(String Name) {
+    this.name = Name;
+    autoAddCurVersion();
+  }
+  public String getName() {
+    return name;
+  }
+ public void setCreatetime(java.time.LocalDateTime Createtime) {
+    this.createTime = Createtime;
+    autoAddCurVersion();
+  }
+  public java.time.LocalDateTime getCreatetime() {
+    return createTime;
+  }
+ public void setLogintime(java.time.LocalDateTime Logintime) {
+    this.loginTime = Logintime;
+    autoAddCurVersion();
+  }
+  public java.time.LocalDateTime getLogintime() {
+    return loginTime;
+  }
+ public void setLogouttime(java.time.LocalDateTime Logouttime) {
+    this.logoutTime = Logouttime;
+    autoAddCurVersion();
+  }
+  public java.time.LocalDateTime getLogouttime() {
+    return logoutTime;
+  }
+ public void setLevel(Integer Level) {
+    this.level = Level;
+    autoAddCurVersion();
+  }
+  public Integer getLevel() {
+    return level;
+  }
+ public void setViplevel(Integer Viplevel) {
+    this.vipLevel = Viplevel;
+    autoAddCurVersion();
+  }
+  public Integer getViplevel() {
+    return vipLevel;
+  }
+ public void setModules(byte[] Modules) {
+    this.modules = Modules;
+    autoAddCurVersion();
+  }
+  public byte[] getModules() {
+    return modules;
+  }
+
+  // @@@@@自定义方法开始区@@@@@
+
+  // @@@@@自定义方法结束区@@@@@
+
+  @Override
+  public String toString() {
+    return "PlayerEntry{"
++
+        ", id="+id+
+        ", name="+name+
+        ", createTime="+createTime+
+        ", loginTime="+loginTime+
+        ", logoutTime="+logoutTime+
+        ", level="+level+
+        ", vipLevel="+vipLevel+
+        ", modules="+modules
+        + '}';
+  }
+}
