@@ -119,7 +119,7 @@ public class LoginService {
     }
 
     public LoginEntry createNewAccount(String account, String channel) {
-        String createAccountLockKey = RedisKeys.CREATE_ACCOUNT_LOCK_KEY.getKey(account);
+        String createAccountLockKey = RedisKeys.LOCK_CREATE_ACCOUNT_KEY.getKey(account);
         try {
             if (RedisUtils.exists(RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account))) {
                 logger.warn(String.format("account %s already exists", account));

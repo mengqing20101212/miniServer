@@ -1,24 +1,16 @@
 @startuml
 'https://plantuml.com/state-diagram
 
-scale 350 width
-[*] --> NotShooting
-
-state NotShooting {
-  [*] --> Idle
-  Idle --> Configuring : EvConfig
-  Configuring --> Idle : EvConfig
-}
-
-state Configuring {
-  [*] --> NewValueSelection
-  NewValueSelection --> NewValuePreview : EvNewValue
-  NewValuePreview --> NewValueSelection : EvNewValueRejected
-  NewValuePreview --> NewValueSelection : EvNewValueSaved
-
-  state NewValuePreview {
-     State1 -> State2
-  }
-
-}
+start
+:login check;
+ if (has oldGateClient) is (yes) then
+    :check oldGameServerId;
+    if (oldGameServerId == loginGameServerId) is (yes) then
+        :notify oldGateClient logout;
+    else (no)
+        :notify OtherGameServer logout;
+    endif
+ endif
+ :notify GameServer login;
+end
 @enduml

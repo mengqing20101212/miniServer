@@ -18,7 +18,7 @@ public class GameLoginController implements IGameController {
     public void handleLogin(GameConnectSession session, S2SMessagePacket packet, Login.csLogin request) {
         LoginTask task = new LoginTask(session, packet, request);
         LoginManager.getInstance().addLoginTask(task);
-        }
+    }
 
 
 }

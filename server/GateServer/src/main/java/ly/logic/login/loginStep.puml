@@ -3,13 +3,15 @@
 
 autonumber
 
-== Initialization ==
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
 
-== Repetition ==
+client -> GateServer: csLogin Request
+GateServer -> GateServer : 检查是否已经在其他节点登录
+GateServer -> OtherGameServer : 通知其他gameServer  csLogout 登出
+OtherGameServer -> OtherGateServer : 通知其他GateServer  scLogout 登出,断开socket
+OtherGameServer -> GateServer : 通知GateServer 其他gameServer scLogout  已登出
+GateServer -> GameServer : 玩家登录 csLogin
+GameServer -> GateServer : 玩家登录成功 scLogin
+GateServer -> client : 玩家登录成功 scLogin
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
 @enduml

@@ -92,6 +92,22 @@ public final class ErrorMsg {
      * <code>account_not_register = 8;</code>
      */
     account_not_register(8),
+    /**
+     * <pre>
+     *玩家名已存在
+     * </pre>
+     *
+     * <code>player_name_exists = 9;</code>
+     */
+    player_name_exists(9),
+    /**
+     * <pre>
+     *token错误
+     * </pre>
+     *
+     * <code>token_error = 10;</code>
+     */
+    token_error(10),
     UNRECOGNIZED(-1),
     ;
 
@@ -167,6 +183,22 @@ public final class ErrorMsg {
      * <code>account_not_register = 8;</code>
      */
     public static final int account_not_register_VALUE = 8;
+    /**
+     * <pre>
+     *玩家名已存在
+     * </pre>
+     *
+     * <code>player_name_exists = 9;</code>
+     */
+    public static final int player_name_exists_VALUE = 9;
+    /**
+     * <pre>
+     *token错误
+     * </pre>
+     *
+     * <code>token_error = 10;</code>
+     */
+    public static final int token_error_VALUE = 10;
 
 
     public final int getNumber() {
@@ -202,6 +234,8 @@ public final class ErrorMsg {
         case 6: return account_forbidden;
         case 7: return account_online;
         case 8: return account_not_register;
+        case 9: return player_name_exists;
+        case 10: return token_error;
         default: return null;
       }
     }
@@ -1257,12 +1291,13 @@ public final class ErrorMsg {
     java.lang.String[] descriptorData = {
       "\n\016ErrorMsg.proto\";\n\013csErrorCode\022\r\n\005msgId" +
       "\030\001 \001(\005\022\035\n\terrorCode\030\002 \001(\0162\n.ErrorCode\"\r\n" +
-      "\013scErrorCode*\256\001\n\tErrorCode\022\006\n\002Ok\020\000\022\n\n\006Fa" +
+      "\013scErrorCode*\327\001\n\tErrorCode\022\006\n\002Ok\020\000\022\n\n\006Fa" +
       "iled\020\001\022\020\n\014system_error\020\002\022\017\n\013param_error\020" +
       "\003\022\021\n\raccount_error\020\004\022\022\n\016password_error\020\005" +
       "\022\025\n\021account_forbidden\020\006\022\022\n\016account_onlin" +
-      "e\020\007\022\030\n\024account_not_register\020\010B\n\n\010ly.prot" +
-      "ob\006proto3"
+      "e\020\007\022\030\n\024account_not_register\020\010\022\026\n\022player_" +
+      "name_exists\020\t\022\017\n\013token_error\020\nB\n\n\010ly.pro" +
+      "tob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
