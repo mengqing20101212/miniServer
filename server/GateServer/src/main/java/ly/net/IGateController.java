@@ -11,7 +11,7 @@ public interface IGateController extends IController {
     }
 
     default void sendClientErrorCode(GateConnectSession session, int msgId, ErrorMsg.ErrorCode errorCode) {
-        ErrorMsg.csErrorCode.Builder resp = ErrorMsg.csErrorCode.newBuilder();
+        ErrorMsg.scErrorCode.Builder resp = ErrorMsg.scErrorCode.newBuilder();
         resp.setMsgId(msgId);
         resp.setErrorCode(errorCode);
         session.sendClientMsg(Cmd.CMD.CS_ErrorCode_VALUE, resp.build());

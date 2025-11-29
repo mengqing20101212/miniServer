@@ -44,5 +44,7 @@ message csGate2GameRpcGameCall{
   int32 seq = 4;// client 发送给gate 请求 序列id
   bytes data = 5;// client 发送给gate 请求 数据
 }
-
-
+// 网关调用游戏服务器Rpc方法响应
+message scGate2GameRpcGameCall{
+  bytes data = 1;// game 发送给gate 响应 数据
+}

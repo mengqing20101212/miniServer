@@ -213,11 +213,11 @@ public class NetClient {
         return isConnected() && sid != 0;
     }
 
-    public AbstractMessagePacket getReceiveMsgBySeq(int sendSeq) {
+    public AbstractMessagePacket getReceiveMsgBySeq(int sendSeq, int cmd) {
         Iterator<AbstractMessagePacket> iterator = receivePacketQueue.iterator();
         while (iterator.hasNext()) {
             AbstractMessagePacket packet = iterator.next();
-            if (packet.getSeq() == sendSeq) {
+            if (packet.getSeq() == sendSeq && packet.getCmd() == cmd) {
                 iterator.remove();
                 return packet;
             }

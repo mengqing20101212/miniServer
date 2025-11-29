@@ -13,6 +13,7 @@ enum ErrorCode{
   ACCOUNT_NOT_REGISTER = 8; //账号未注册
   PLAYER_NAME_EXISTS = 9; //玩家名已存在
   TOKEN_ERROR = 10; //token错误
+  PLAYER_NOT_EXIST = 11; //玩家不存在
 }
 
 

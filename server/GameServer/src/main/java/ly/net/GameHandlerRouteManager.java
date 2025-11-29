@@ -5,6 +5,8 @@ import ly.LoggerDef;
 import ly.ProtoMessageFactory;
 import ly.logic.player.Player;
 import ly.logic.player.PlayerManager;
+import ly.net.packet.C2SMessagePacket;
+import ly.net.packet.MessagePacketFactory;
 import ly.net.packet.S2SMessagePacket;
 import ly.proto.Cmd;
 
@@ -68,6 +70,31 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
         LoggerDef.SystemLogger.info(String.format("GameHandlerRouteManager register handler cmd:%s( %d ),handler:%s", cmd.toString(), cmd.getNumber(), handler.getClass().getSimpleName()));
     }
 
+
+    public static boolean execute(Player player, int cmd, int seq, int sid, AbstractMessage req) {
+        // 检查请求类型是否匹配
+//        Class<? extends AbstractMessage> expectedType = instance.protoClassMap.get(cmd);
+//        if (expectedType == null || !expectedType.isInstance(request)) {
+//            LoggerDef.SystemLogger.error("execute cmd={} fail, request type mismatch: expected={}, actual={}",
+//                    cmd, expectedType == null ? "unknown" : expectedType.getName(), request.getClass().getName());
+//            return false;
+//        }
+        GameHandlerRouter<?> router = instance.gameHandlerRouterMap.get(cmd);
+        C2SMessagePacket packet = MessagePacketFactory.createC2SMessagePacket(player.getPlayerId(), cmd, req, seq, sid);
+        try {
+            // 创建游戏处理器上下文并执行路由处理
+            GameHandlerContext context = new GameHandlerContext(player, packet);
+            // 进行安全的类型转换和调用
+            @SuppressWarnings("unchecked")
+            GameHandlerRouter<AbstractMessage> typedRouter = (GameHandlerRouter<AbstractMessage>) router;
+            typedRouter.execute(context, req);
+            return true;
+        } catch (Throwable e) {
+            LoggerDef.SystemLogger.error("execute cmd={} error", cmd, e);
+            return false;
+        }
+    }
+
     /**
      * 执行路由
      */
@@ -92,26 +119,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
             return false;
         }
 
-        // 检查请求类型是否匹配
-//        Class<? extends AbstractMessage> expectedType = instance.protoClassMap.get(cmd);
-//        if (expectedType == null || !expectedType.isInstance(request)) {
-//            LoggerDef.SystemLogger.error("execute cmd={} fail, request type mismatch: expected={}, actual={}",
-//                    cmd, expectedType == null ? "unknown" : expectedType.getName(), request.getClass().getName());
-//            return false;
-//        }
-
-        try {
-            // 创建游戏处理器上下文并执行路由处理
-            GameHandlerContext context = new GameHandlerContext(player, packet);
-            // 进行安全的类型转换和调用
-            @SuppressWarnings("unchecked")
-            GameHandlerRouter<AbstractMessage> typedRouter = (GameHandlerRouter<AbstractMessage>) router;
-            typedRouter.execute(context, request);
-            return true;
-        } catch (Throwable e) {
-            LoggerDef.SystemLogger.error("execute cmd={} error", cmd, e);
-            return false;
-        }
+        return execute(player, cmd, packet.getSeq(), packet.getSid(), request);
     }
 
     public void processPacket(Player player, S2SMessagePacket packet) {

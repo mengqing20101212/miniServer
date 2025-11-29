@@ -33,33 +33,33 @@ public final class Cmd {
      *登录协议请求
      * </pre>
      *
-     * <code>CS_Login = 100;</code>
+     * <code>CS_Login = 101;</code>
      */
-    CS_Login(100),
+    CS_Login(101),
     /**
      * <pre>
      *登录协议响应
      * </pre>
      *
-     * <code>SC_Login = 101;</code>
+     * <code>SC_Login = 102;</code>
      */
-    SC_Login(101),
+    SC_Login(102),
     /**
      * <pre>
      *退出协议请求
      * </pre>
      *
-     * <code>CS_Logout = 102;</code>
+     * <code>CS_Logout = 103;</code>
      */
-    CS_Logout(102),
+    CS_Logout(103),
     /**
      * <pre>
      *退出协议响应
      * </pre>
      *
-     * <code>SC_Logout = 103;</code>
+     * <code>SC_Logout = 104;</code>
      */
-    SC_Logout(103),
+    SC_Logout(104),
     /**
      * <pre>
      *错误码协议请求
@@ -81,49 +81,49 @@ public final class Cmd {
      *&#47;/////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用///////////////////////////////////////
      * </pre>
      *
-     * <code>CS_Server2Server = 10000;</code>
+     * <code>CS_Server2Server = 10001;</code>
      */
-    CS_Server2Server(10000),
+    CS_Server2Server(10001),
     /**
      * <pre>
      *server2server 服务器之间通信的消息号 响应
      * </pre>
      *
-     * <code>SC_Server2Server = 10001;</code>
+     * <code>SC_Server2Server = 10002;</code>
      */
-    SC_Server2Server(10001),
+    SC_Server2Server(10002),
     /**
      * <pre>
-     *rpcPing 心跳包
+     *rpcPing 心跳包 请求
      * </pre>
      *
-     * <code>CS_RpcPing = 10002;</code>
+     * <code>CS_RpcPing = 10003;</code>
      */
-    CS_RpcPing(10002),
+    CS_RpcPing(10003),
     /**
      * <pre>
      *rpcPing 心跳包响应
      * </pre>
      *
-     * <code>SC_RpcPing = 10003;</code>
+     * <code>SC_RpcPing = 10004;</code>
      */
-    SC_RpcPing(10003),
+    SC_RpcPing(10004),
     /**
      * <pre>
      * 网关调用游戏服务器Rpc方法 请求
      * </pre>
      *
-     * <code>CS_Gate2GameRpcGameCall = 10004;</code>
+     * <code>CS_Gate2GameRpcGameCall = 10005;</code>
      */
-    CS_Gate2GameRpcGameCall(10004),
+    CS_Gate2GameRpcGameCall(10005),
     /**
      * <pre>
      * 网关调用游戏服务器Rpc方法 响应
      * </pre>
      *
-     * <code>SC_Gate2GameRpcGameCall = 10005;</code>
+     * <code>SC_Gate2GameRpcGameCall = 10006;</code>
      */
-    SC_Gate2GameRpcGameCall(10005),
+    SC_Gate2GameRpcGameCall(10006),
     /**
      * <pre>
      *maxServeMsgId 服务器之间通信消息号最大值
@@ -144,33 +144,33 @@ public final class Cmd {
      *登录协议请求
      * </pre>
      *
-     * <code>CS_Login = 100;</code>
+     * <code>CS_Login = 101;</code>
      */
-    public static final int CS_Login_VALUE = 100;
+    public static final int CS_Login_VALUE = 101;
     /**
      * <pre>
      *登录协议响应
      * </pre>
      *
-     * <code>SC_Login = 101;</code>
+     * <code>SC_Login = 102;</code>
      */
-    public static final int SC_Login_VALUE = 101;
+    public static final int SC_Login_VALUE = 102;
     /**
      * <pre>
      *退出协议请求
      * </pre>
      *
-     * <code>CS_Logout = 102;</code>
+     * <code>CS_Logout = 103;</code>
      */
-    public static final int CS_Logout_VALUE = 102;
+    public static final int CS_Logout_VALUE = 103;
     /**
      * <pre>
      *退出协议响应
      * </pre>
      *
-     * <code>SC_Logout = 103;</code>
+     * <code>SC_Logout = 104;</code>
      */
-    public static final int SC_Logout_VALUE = 103;
+    public static final int SC_Logout_VALUE = 104;
     /**
      * <pre>
      *错误码协议请求
@@ -192,49 +192,49 @@ public final class Cmd {
      *&#47;/////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用///////////////////////////////////////
      * </pre>
      *
-     * <code>CS_Server2Server = 10000;</code>
+     * <code>CS_Server2Server = 10001;</code>
      */
-    public static final int CS_Server2Server_VALUE = 10000;
+    public static final int CS_Server2Server_VALUE = 10001;
     /**
      * <pre>
      *server2server 服务器之间通信的消息号 响应
      * </pre>
      *
-     * <code>SC_Server2Server = 10001;</code>
+     * <code>SC_Server2Server = 10002;</code>
      */
-    public static final int SC_Server2Server_VALUE = 10001;
+    public static final int SC_Server2Server_VALUE = 10002;
     /**
      * <pre>
-     *rpcPing 心跳包
+     *rpcPing 心跳包 请求
      * </pre>
      *
-     * <code>CS_RpcPing = 10002;</code>
+     * <code>CS_RpcPing = 10003;</code>
      */
-    public static final int CS_RpcPing_VALUE = 10002;
+    public static final int CS_RpcPing_VALUE = 10003;
     /**
      * <pre>
      *rpcPing 心跳包响应
      * </pre>
      *
-     * <code>SC_RpcPing = 10003;</code>
+     * <code>SC_RpcPing = 10004;</code>
      */
-    public static final int SC_RpcPing_VALUE = 10003;
+    public static final int SC_RpcPing_VALUE = 10004;
     /**
      * <pre>
      * 网关调用游戏服务器Rpc方法 请求
      * </pre>
      *
-     * <code>CS_Gate2GameRpcGameCall = 10004;</code>
+     * <code>CS_Gate2GameRpcGameCall = 10005;</code>
      */
-    public static final int CS_Gate2GameRpcGameCall_VALUE = 10004;
+    public static final int CS_Gate2GameRpcGameCall_VALUE = 10005;
     /**
      * <pre>
      * 网关调用游戏服务器Rpc方法 响应
      * </pre>
      *
-     * <code>SC_Gate2GameRpcGameCall = 10005;</code>
+     * <code>SC_Gate2GameRpcGameCall = 10006;</code>
      */
-    public static final int SC_Gate2GameRpcGameCall_VALUE = 10005;
+    public static final int SC_Gate2GameRpcGameCall_VALUE = 10006;
     /**
      * <pre>
      *maxServeMsgId 服务器之间通信消息号最大值
@@ -270,18 +270,18 @@ public final class Cmd {
     public static CMD forNumber(int value) {
       switch (value) {
         case 0: return CMD_null;
-        case 100: return CS_Login;
-        case 101: return SC_Login;
-        case 102: return CS_Logout;
-        case 103: return SC_Logout;
+        case 101: return CS_Login;
+        case 102: return SC_Login;
+        case 103: return CS_Logout;
+        case 104: return SC_Logout;
         case 201: return CS_ErrorCode;
         case 202: return SC_ErrorCode;
-        case 10000: return CS_Server2Server;
-        case 10001: return SC_Server2Server;
-        case 10002: return CS_RpcPing;
-        case 10003: return SC_RpcPing;
-        case 10004: return CS_Gate2GameRpcGameCall;
-        case 10005: return SC_Gate2GameRpcGameCall;
+        case 10001: return CS_Server2Server;
+        case 10002: return SC_Server2Server;
+        case 10003: return CS_RpcPing;
+        case 10004: return SC_RpcPing;
+        case 10005: return CS_Gate2GameRpcGameCall;
+        case 10006: return SC_Gate2GameRpcGameCall;
         case 20000: return MaxServeMsgId;
         default: return null;
       }
@@ -349,12 +349,12 @@ public final class Cmd {
   static {
     java.lang.String[] descriptorData = {
       "\n\tCmd.proto*\224\002\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_" +
-      "Login\020d\022\014\n\010SC_Login\020e\022\r\n\tCS_Logout\020f\022\r\n\t" +
-      "SC_Logout\020g\022\021\n\014CS_ErrorCode\020\311\001\022\021\n\014SC_Err" +
-      "orCode\020\312\001\022\025\n\020CS_Server2Server\020\220N\022\025\n\020SC_S" +
-      "erver2Server\020\221N\022\017\n\nCS_RpcPing\020\222N\022\017\n\nSC_R" +
-      "pcPing\020\223N\022\034\n\027CS_Gate2GameRpcGameCall\020\224N\022" +
-      "\034\n\027SC_Gate2GameRpcGameCall\020\225N\022\023\n\rMaxServ" +
+      "Login\020e\022\014\n\010SC_Login\020f\022\r\n\tCS_Logout\020g\022\r\n\t" +
+      "SC_Logout\020h\022\021\n\014CS_ErrorCode\020\311\001\022\021\n\014SC_Err" +
+      "orCode\020\312\001\022\025\n\020CS_Server2Server\020\221N\022\025\n\020SC_S" +
+      "erver2Server\020\222N\022\017\n\nCS_RpcPing\020\223N\022\017\n\nSC_R" +
+      "pcPing\020\224N\022\034\n\027CS_Gate2GameRpcGameCall\020\225N\022" +
+      "\034\n\027SC_Gate2GameRpcGameCall\020\226N\022\023\n\rMaxServ" +
       "eMsgId\020\240\234\001B\n\n\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor

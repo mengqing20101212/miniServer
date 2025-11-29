@@ -1,14 +1,14 @@
 package ly.net;
 
 import ly.logic.player.Player;
-import ly.net.packet.S2SMessagePacket;
+import ly.net.packet.AbstractMessagePacket;
 
 /**
  * 游戏处理器上下文，封装玩家和S2S数据包
  */
 public record GameHandlerContext(
         Player player,
-        S2SMessagePacket packet
+        AbstractMessagePacket packet
 ) {
     /**
      * 获取玩家对象
@@ -22,7 +22,7 @@ public record GameHandlerContext(
      * 获取数据包对象
      */
     @Override
-    public S2SMessagePacket packet() {
+    public AbstractMessagePacket packet() {
         return packet;
     }
 

@@ -12,7 +12,7 @@ public class LoginTask {
 
     public LoginTask(GameHandlerContext context, Login.csLogin request) {
         this.session = context.getGameConnectSession();
-        this.packet = context.packet();
+        this.packet = (S2SMessagePacket) context.packet();
         this.request = request;
     }
 }

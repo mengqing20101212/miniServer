@@ -5,6 +5,8 @@ import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.net.packet.S2SMessagePacket;
+import ly.proto.Cmd;
+import ly.proto.ErrorMsg;
 
 public class GameConnectSession extends ConnectSession {
     public GameConnectSession(long guid) {
@@ -29,5 +31,10 @@ public class GameConnectSession extends ConnectSession {
     public void sendClientMsg(int cmd, int seq, long playerId, AbstractMessage msg) {
         S2SMessagePacket s2cPacket = MessagePacketFactory.createS2SMessagePacket(playerId, cmd, msg, seq, (int) getGuid());
         addSendPacket(s2cPacket);
+    }
+
+    public void sendErrorMsg(long playerId, ErrorMsg.ErrorCode errorCode, int req, int cmd) {
+        ErrorMsg.scErrorCode errorMsg = ErrorMsg.scErrorCode.newBuilder().setErrorCode(errorCode).setMsgId(cmd).build();
+        sendClientMsg(Cmd.CMD.SC_ErrorCode_VALUE, req, playerId, errorMsg);
     }
 }

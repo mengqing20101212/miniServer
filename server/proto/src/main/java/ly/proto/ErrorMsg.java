@@ -108,6 +108,14 @@ public final class ErrorMsg {
      * <code>TOKEN_ERROR = 10;</code>
      */
     TOKEN_ERROR(10),
+    /**
+     * <pre>
+     *玩家不存在
+     * </pre>
+     *
+     * <code>PLAYER_NOT_EXIST = 11;</code>
+     */
+    PLAYER_NOT_EXIST(11),
     UNRECOGNIZED(-1),
     ;
 
@@ -199,6 +207,14 @@ public final class ErrorMsg {
      * <code>TOKEN_ERROR = 10;</code>
      */
     public static final int TOKEN_ERROR_VALUE = 10;
+    /**
+     * <pre>
+     *玩家不存在
+     * </pre>
+     *
+     * <code>PLAYER_NOT_EXIST = 11;</code>
+     */
+    public static final int PLAYER_NOT_EXIST_VALUE = 11;
 
 
     public final int getNumber() {
@@ -236,6 +252,7 @@ public final class ErrorMsg {
         case 8: return ACCOUNT_NOT_REGISTER;
         case 9: return PLAYER_NAME_EXISTS;
         case 10: return TOKEN_ERROR;
+        case 11: return PLAYER_NOT_EXIST;
         default: return null;
       }
     }
@@ -1347,13 +1364,13 @@ public final class ErrorMsg {
     java.lang.String[] descriptorData = {
       "\n\016ErrorMsg.proto\"\r\n\013csErrorCode\";\n\013scErr" +
       "orCode\022\r\n\005msgId\030\001 \001(\005\022\035\n\terrorCode\030\002 \001(\016" +
-      "2\n.ErrorCode*\327\001\n\tErrorCode\022\006\n\002Ok\020\000\022\n\n\006FA" +
+      "2\n.ErrorCode*\355\001\n\tErrorCode\022\006\n\002Ok\020\000\022\n\n\006FA" +
       "ILED\020\001\022\020\n\014SYSTEM_ERROR\020\002\022\017\n\013PARAM_ERROR\020" +
       "\003\022\021\n\rACCOUNT_ERROR\020\004\022\022\n\016PASSWORD_ERROR\020\005" +
       "\022\025\n\021ACCOUNT_FORBIDDEN\020\006\022\022\n\016ACCOUNT_ONLIN" +
       "E\020\007\022\030\n\024ACCOUNT_NOT_REGISTER\020\010\022\026\n\022PLAYER_" +
-      "NAME_EXISTS\020\t\022\017\n\013TOKEN_ERROR\020\nB\n\n\010ly.pro" +
-      "tob\006proto3"
+      "NAME_EXISTS\020\t\022\017\n\013TOKEN_ERROR\020\n\022\024\n\020PLAYER" +
+      "_NOT_EXIST\020\013B\n\n\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

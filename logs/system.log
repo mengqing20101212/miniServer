@@ -188,3 +188,12 @@ redis:
 2025-11-29 21:41:41.477 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
 2025-11-29 21:41:48.866 INFO  - 服务器启动成功:[NetServer-8001], port:8001
 2025-11-29 21:41:48.867 INFO  - 服务器 启动成功 耗时: 8713ms
+2025-11-29 22:13:00.805 INFO  - 服务器开始启动
+2025-11-29 22:13:00.809 INFO  - 开始启动 Nacos 
+2025-11-29 22:13:01.637 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='gate1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GATE', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=gate1001, serverType=GATE}}
+2025-11-29 22:13:01.645 INFO  -  Nacos 启动成功,耗时: 836ms 
+2025-11-29 22:13:01.647 INFO  - 开始加载配置表
+2025-11-29 22:13:01.650 INFO  - 加载策划表 HeroInfoConfigManager  耗时 3 (毫秒)
+2025-11-29 22:13:01.650 INFO  - 加载配置表完成, 耗时:3 (毫秒)
+2025-11-29 22:13:09.684 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 22:13:09.687 INFO  - 服务器 启动成功 耗时: 8881ms
