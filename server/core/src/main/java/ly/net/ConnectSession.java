@@ -57,7 +57,8 @@ public class ConnectSession {
      * 添加收到的包
      */
     public void addReceivePacket(AbstractMessagePacket packet) {
-        if (!canAddReceivePacket(packet)) return;
+        if (!canAddReceivePacket(packet))
+            return;
         if (!receivePacketQueue.offer(packet)) {
             logger.warn("Too many receive packets, dropping packet. size: {}", receivePacketQueue.size());
         }
@@ -87,7 +88,8 @@ public class ConnectSession {
     }
 
     /***
-     *  该消息不会立即发送，会缓存在sendPacketQueue 由另外一个task  定时刷新 发送
+     * 该消息不会立即发送，会缓存在sendPacketQueue 由另外一个task 定时刷新 发送
+     * 
      * @param packet 待发送的消息
      * @return 是否添加成功
      */
@@ -110,7 +112,8 @@ public class ConnectSession {
 
     public void sendAllPackets() {
         if (connector != null) {
-            AbstractMessagePacket sendPacket = sendPacketQueue.poll();
+            AbstractMessagePacket sendPacket;
+            // 修复逻辑错误，避免跳过第一个包
             while ((sendPacket = sendPacketQueue.poll()) != null) {
                 if (!sendPacket(sendPacket)) {
                     break;

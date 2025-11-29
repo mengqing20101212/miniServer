@@ -37,7 +37,7 @@ public class RandomUtils {
         return random.nextInt(max - min) + min;
     }
 
-    public static double RandomInt(int max) {
+    public static int RandomInt(int max) {
         return RandomInt(0, max);
     }
 

@@ -31,6 +31,25 @@ public class Player {
     }
 
     public void initAllModules() {
+        // 确保玩家数据已加载
+        if (playerData == null) {
+            System.err.println("Player data is null when initializing modules for player: " + getPlayerId());
+            return;
+        }
+
+        try {
+            // 初始化玩家各个功能模块
+            // 这里可以初始化装备、技能、任务等系统
+
+            // 设置玩家状态为已初始化
+//            setStatus(PlayerStatusEnum.INITIALIZED);
+
+            // 分发玩家初始化完成事件
+//            dispatchEvent(PlayerEventType.PLAYER_INIT_COMPLETE);
+        } catch (Exception e) {
+            System.err.println("Error initializing modules for player " + getPlayerId() + ": " + e.getMessage());
+//            setStatus(PlayerStatusEnum.INIT_FAILED);
+        }
 
     }
 

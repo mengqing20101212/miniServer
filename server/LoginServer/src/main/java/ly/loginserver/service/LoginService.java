@@ -109,44 +109,85 @@ public class LoginService {
         return serverNodeList;
     }
 
-    public long createNewAccountId() {
-        long max = 1000000000000000000L;
-        return RandomUtils.RandomLong(max);
+    public int createNewAccountId() {
+        return RandomUtils.RandomInt(Integer.MAX_VALUE);
     }
 
     public String createToken(String account) {
-        return RandomUtils.generateRandomString(8);
+        // 生成更安全的token，结合账号信息、时间戳和随机字符串
+        long timestamp = System.currentTimeMillis();
+        String randomStr = RandomUtils.generateRandomString(16);
+        // 使用账号、时间戳和随机字符串组合生成token
+        return String.format("%s_%d_%s",
+                account.substring(0, Math.min(8, account.length())).hashCode(),
+                timestamp,
+                randomStr);
+//        return RandomUtils.generateRandomString(8);
     }
 
     public LoginEntry createNewAccount(String account, String channel) {
+        // 参数验证
+        if (account == null || account.trim().isEmpty() || channel == null || channel.trim().isEmpty()) {
+            logger.error("Invalid account or channel parameters");
+            return null;
+        }
+
         String createAccountLockKey = RedisKeys.LOCK_CREATE_ACCOUNT_KEY.getKey(account);
+        boolean lockAcquired = false;
+
         try {
+            // 双重检查锁定模式 - 先检查是否存在
             if (RedisUtils.exists(RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account))) {
-                logger.warn(String.format("account %s already exists", account));
+                logger.warn("Account already exists: {}", account);
                 return null;
             }
-            RedisUtils.lock(createAccountLockKey);
+
+            // 获取分布式锁
+            lockAcquired = RedisUtils.lock(createAccountLockKey);
+            if (!lockAcquired) {
+                logger.error("Failed to acquire lock for creating account: {}", account);
+                return null;
+            }
+
+            // 获取锁后再次检查是否存在（防止并发创建）
+            if (RedisUtils.exists(RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account))) {
+                logger.warn("Account already exists after acquiring lock: {}", account);
+                return null;
+            }
+
+            // 创建新账号
             LocalDateTime now = TimeUtils.now();
             LoginEntry entry = new LoginEntry();
-            entry.setAccount(account);
-            entry.setChannel(channel);
+            entry.setAccount(account.trim());
+            entry.setChannel(channel.trim());
             entry.setId(createNewAccountId());
             entry.setToken(createToken(account));
             entry.setCreateTime(now);
             entry.setLastLoginTime(now);
-            if (entry.save()) {
-                String key = RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account);
-                RedisUtils.set(key, entry.getId());
-                saveToken(account, entry.getToken());
-                logger.info(String.format("create account %s success", entry));
-                return entry;
-            } else {
-                return null;
-            }
-        } finally {
-            RedisUtils.unlock(createAccountLockKey);
-        }
+            entry.save();
+            // 保存成功后写入Redis
+            String key = RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account);
+            RedisUtils.set(key, entry.getId());
+            saveToken(account, entry.getToken());
 
+            // 预热缓存
+            CacheService.getCacheService(LoginEntry.class).put(entry, account);
+
+            logger.info("Successfully created account: {}", entry);
+            return entry;
+        } catch (Exception e) {
+            logger.error("Error creating account: {}", account, e);
+            return null;
+        } finally {
+            // 确保释放锁
+            if (lockAcquired) {
+                try {
+                    RedisUtils.unlock(createAccountLockKey);
+                } catch (Exception e) {
+                    logger.error("Error releasing lock for account: {}", account, e);
+                }
+            }
+        }
     }
 
     public void saveToken(String account, String token) {

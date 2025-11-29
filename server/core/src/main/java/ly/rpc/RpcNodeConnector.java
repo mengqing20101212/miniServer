@@ -5,6 +5,7 @@ import ly.LoggerDef;
 import ly.ProtoMessageFactory;
 import ly.ServerContext;
 import ly.config.ServerTypeEnum;
+import ly.nacos.NacosServerNode;
 import ly.nacos.NacosService;
 import ly.net.NetClient;
 import ly.net.NetClientManager;
@@ -12,6 +13,7 @@ import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.S2SMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Server;
+import java.util.Map;
 
 public class RpcNodeConnector {
     NetClient client;
@@ -22,7 +24,10 @@ public class RpcNodeConnector {
      * 默认超时时间
      */
     private final int DEFAULT_TIMEOUT = 1000;
+    
 
+    
+    
     public RpcNodeConnector(String serverId, String ip, int port) {
         this.serverId = serverId;
         this.ip = ip;
@@ -71,30 +76,44 @@ public class RpcNodeConnector {
         if (isConnect()) {
             boolean success = client.send(packet);
             if (!success) {
-                LoggerDef.NetLogger.error("send packet failed, serverId={}, packet={}", serverId, packet);
+                // 使用warn级别替代error级别，避免日志风暴
+                LoggerDef.NetLogger.warn("send packet failed, serverId={}", serverId);
                 return false;
-            } else {
-                LoggerDef.ProtoLogger.info("send packet  {}|{}", serverId, packet.toSimpleString());
-                return true;
             }
+            // 避免重复创建字符串对象，仅在调试级别记录
+            if (LoggerDef.ProtoLogger.isDebugEnabled()) {
+                LoggerDef.ProtoLogger.debug("send packet {}", packet.toSimpleString());
+            }
+            return true;
         }
         return false;
     }
 
-    public synchronized AbstractMessagePacket syncSendPacket(AbstractMessagePacket packet, int timeout) {
+    public AbstractMessagePacket syncSendPacket(AbstractMessagePacket packet, int timeout) {
         final int sendSeq = packet.getSeq();
-        if (sendPacket(packet)) {
-            long timeoutTime = System.currentTimeMillis() + timeout;
-            AbstractMessagePacket receivedPacket = client.getReceiveMsgBySeq(sendSeq);
-            while (System.currentTimeMillis() < timeoutTime && (receivedPacket = client.getReceiveMsgBySeq(sendSeq)) == null) {
-                try {
+        
+        try {
+            if (sendPacket(packet)) {
+                long startTime = System.currentTimeMillis();
+                long endTime = startTime + timeout;
+                
+                // 使用简单的轮询方式等待响应，适合虚拟线程环境
+                while (System.currentTimeMillis() < endTime) {
+                    AbstractMessagePacket response = client.getReceiveMsgBySeq(sendSeq);
+                    if (response != null) {
+                        return response;
+                    }
+                    
+                    // 短暂睡眠，让出CPU时间片
                     Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
+                
+                // 超时返回null
+                return null;
             }
-            return receivedPacket;
-        }
+        } catch (Exception e) {
+            LoggerDef.NetLogger.warn("RPC call failed, serverId={}, seq={}, error={}", serverId, sendSeq, e.getMessage());
+        } 
         return null;
     }
 
@@ -109,42 +128,68 @@ public class RpcNodeConnector {
     public AbstractMessage syncSendProtoMessage(long guid, int cmd, AbstractMessage protoData, int timeout) {
         int sendReq = sendProtoMessage(guid, cmd, protoData);
         if (sendReq == -1) {
-            LoggerDef.NetLogger.error("send proto message failed, serverId={}, guid={}, cmd={}", serverId, guid, cmd);
+            LoggerDef.NetLogger.warn("send proto message failed, serverId={}, guid={}, cmd={}", serverId, guid, cmd);
             return null;
         }
-        AbstractMessagePacket receivedPacket = client.getReceiveMsgBySeq(sendReq);
-        if (receivedPacket == null) {
-            long timeoutTime = System.currentTimeMillis() + timeout;
-
-            while (System.currentTimeMillis() < timeoutTime && (receivedPacket = client.getReceiveMsgBySeq(sendReq)) == null) {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        
+        try {
+            
+            long startTime = System.currentTimeMillis();
+            long endTime = startTime + timeout;
+            
+            // 使用简单的轮询方式等待响应
+            while (System.currentTimeMillis() < endTime) {
+                AbstractMessagePacket response = client.getReceiveMsgBySeq(sendReq);
+                if (response != null) {
+                    return unpackPacket(response);
                 }
+                
+                // 短暂睡眠，让出CPU时间片
+                Thread.sleep(10);
             }
-        }
-
-        if (receivedPacket != null) {
-            return unpackPacket(receivedPacket);
-        }
-
+            
+            // 超时返回null
+            return null;
+        } catch (Exception e) {
+            LoggerDef.NetLogger.warn("RPC proto call failed, serverId={}, cmd={}, error={}", serverId, cmd, e.getMessage());
+        } 
         return null;
     }
 
     private AbstractMessage unpackPacket(AbstractMessagePacket receivedPacket) {
         if (receivedPacket instanceof S2SMessagePacket s2sMessagePacket) {
-            return ProtoMessageFactory.createProtoMessage(s2sMessagePacket.getCmd(), s2sMessagePacket.getData());
+            try {
+                return ProtoMessageFactory.createProtoMessage(s2sMessagePacket.getCmd(), s2sMessagePacket.getData());
+            } catch (Exception e) {
+                LoggerDef.NetLogger.error("Failed to unpack packet, serverId={}, cmd={}, error={}", 
+                    serverId, s2sMessagePacket.getCmd(), e.getMessage());
+            }
         }
         return null;
     }
 
     public ServerTypeEnum getServerType() {
-        if (NacosService.getInstance().getNodeMap().get(serverId) == null) {
-            LoggerDef.NetLogger.error("get server type failed, serverId={}", serverId);
+        Map<String, ?> nodeMap = NacosService.getInstance().getNodeMap();
+        if (nodeMap == null || nodeMap.get(serverId) == null) {
+            LoggerDef.NetLogger.warn("get server type failed, serverId={}", serverId);
             return ServerTypeEnum.UNKNOWN;
         }
-        return NacosService.getInstance().getNodeMap().get(serverId).getServerType();
+        Object nodeInfo = nodeMap.get(serverId);
+        if (nodeInfo instanceof NacosServerNode serverNode) {
+            return serverNode.getServerType();
+        }
+        LoggerDef.NetLogger.warn("node info type mismatch, serverId={}", serverId);
+        return ServerTypeEnum.UNKNOWN;
+    }
+    
+    /**
+     * 清理资源，避免内存泄漏
+     */
+    public void cleanup() {
+        if (isConnect()) {
+            NetClientManager.getInstance().delNetClient(client);
+            LoggerDef.NetLogger.info("cleanup rpc node connector, serverId={}", serverId);
+        }
     }
 
 }
