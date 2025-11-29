@@ -42,6 +42,14 @@ public class PlayerEntry extends AbstractEntry {
   /**各个模块的养成数据*/
   @DbMeta.DbField(name="modules")
   private byte[] modules;
+
+  /**工会id*/
+  @DbMeta.DbField(name="guidId")
+  private Long guidId;
+
+  /**账户id*/
+  @DbMeta.DbField(name="account")
+  private String account;
   public void save() {
     PlayerEntryHelper.save(this);
   }
@@ -118,6 +126,20 @@ public class PlayerEntry extends AbstractEntry {
   public byte[] getModules() {
     return modules;
   }
+ public void setGuidid(Long Guidid) {
+    this.guidId = Guidid;
+    autoAddCurVersion();
+  }
+  public Long getGuidid() {
+    return guidId;
+  }
+ public void setAccount(String Account) {
+    this.account = Account;
+    autoAddCurVersion();
+  }
+  public String getAccount() {
+    return account;
+  }
 
   // @@@@@自定义方法开始区@@@@@
 
@@ -134,7 +156,9 @@ public class PlayerEntry extends AbstractEntry {
         ", logoutTime="+logoutTime+
         ", level="+level+
         ", vipLevel="+vipLevel+
-        ", modules="+modules
+        ", modules="+modules+
+        ", guidId="+guidId+
+        ", account="+account
         + '}';
   }
 }

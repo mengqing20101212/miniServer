@@ -11,6 +11,8 @@ enum ErrorCode{
   account_forbidden = 6; //账号被禁用
   account_online = 7; //账号已登录
   account_not_register = 8; //账号未注册
+  player_name_exists = 9; //玩家名已存在
+  token_error = 10; //token错误
 }
 
 

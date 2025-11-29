@@ -1126,6 +1126,28 @@ public final class Login {
      */
     com.google.protobuf.ByteString
         getDeviceIdBytes();
+
+    /**
+     * <code>string playerName = 8;</code>
+     * @return The playerName.
+     */
+    java.lang.String getPlayerName();
+    /**
+     * <code>string playerName = 8;</code>
+     * @return The bytes for playerName.
+     */
+    com.google.protobuf.ByteString
+        getPlayerNameBytes();
+
+    /**
+     * <pre>
+     *是否重连 true  本次登录是重连，false 本次登录不是重连
+     * </pre>
+     *
+     * <code>bool isReconnect = 9;</code>
+     * @return The isReconnect.
+     */
+    boolean getIsReconnect();
   }
   /**
    * <pre>
@@ -1149,6 +1171,7 @@ public final class Login {
       gameServerId_ = "";
       token_ = "";
       deviceId_ = "";
+      playerName_ = "";
     }
 
     @java.lang.Override
@@ -1436,6 +1459,60 @@ public final class Login {
       }
     }
 
+    public static final int PLAYERNAME_FIELD_NUMBER = 8;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object playerName_ = "";
+    /**
+     * <code>string playerName = 8;</code>
+     * @return The playerName.
+     */
+    @java.lang.Override
+    public java.lang.String getPlayerName() {
+      java.lang.Object ref = playerName_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        playerName_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string playerName = 8;</code>
+     * @return The bytes for playerName.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getPlayerNameBytes() {
+      java.lang.Object ref = playerName_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        playerName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int ISRECONNECT_FIELD_NUMBER = 9;
+    private boolean isReconnect_ = false;
+    /**
+     * <pre>
+     *是否重连 true  本次登录是重连，false 本次登录不是重连
+     * </pre>
+     *
+     * <code>bool isReconnect = 9;</code>
+     * @return The isReconnect.
+     */
+    @java.lang.Override
+    public boolean getIsReconnect() {
+      return isReconnect_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1471,6 +1548,12 @@ public final class Login {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(deviceId_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 7, deviceId_);
       }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(playerName_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 8, playerName_);
+      }
+      if (isReconnect_ != false) {
+        output.writeBool(9, isReconnect_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -1503,6 +1586,13 @@ public final class Login {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(deviceId_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, deviceId_);
       }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(playerName_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, playerName_);
+      }
+      if (isReconnect_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(9, isReconnect_);
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -1532,6 +1622,10 @@ public final class Login {
           .equals(other.getToken())) return false;
       if (!getDeviceId()
           .equals(other.getDeviceId())) return false;
+      if (!getPlayerName()
+          .equals(other.getPlayerName())) return false;
+      if (getIsReconnect()
+          != other.getIsReconnect()) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -1559,6 +1653,11 @@ public final class Login {
       hash = (53 * hash) + getToken().hashCode();
       hash = (37 * hash) + DEVICEID_FIELD_NUMBER;
       hash = (53 * hash) + getDeviceId().hashCode();
+      hash = (37 * hash) + PLAYERNAME_FIELD_NUMBER;
+      hash = (53 * hash) + getPlayerName().hashCode();
+      hash = (37 * hash) + ISRECONNECT_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getIsReconnect());
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1701,6 +1800,8 @@ public final class Login {
         gameServerId_ = "";
         token_ = "";
         deviceId_ = "";
+        playerName_ = "";
+        isReconnect_ = false;
         return this;
       }
 
@@ -1754,6 +1855,12 @@ public final class Login {
         }
         if (((from_bitField0_ & 0x00000040) != 0)) {
           result.deviceId_ = deviceId_;
+        }
+        if (((from_bitField0_ & 0x00000080) != 0)) {
+          result.playerName_ = playerName_;
+        }
+        if (((from_bitField0_ & 0x00000100) != 0)) {
+          result.isReconnect_ = isReconnect_;
         }
       }
 
@@ -1832,6 +1939,14 @@ public final class Login {
           bitField0_ |= 0x00000040;
           onChanged();
         }
+        if (!other.getPlayerName().isEmpty()) {
+          playerName_ = other.playerName_;
+          bitField0_ |= 0x00000080;
+          onChanged();
+        }
+        if (other.getIsReconnect() != false) {
+          setIsReconnect(other.getIsReconnect());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -1893,6 +2008,16 @@ public final class Login {
                 bitField0_ |= 0x00000040;
                 break;
               } // case 58
+              case 66: {
+                playerName_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000080;
+                break;
+              } // case 66
+              case 72: {
+                isReconnect_ = input.readBool();
+                bitField0_ |= 0x00000100;
+                break;
+              } // case 72
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -2454,6 +2579,122 @@ public final class Login {
         checkByteStringIsUtf8(value);
         deviceId_ = value;
         bitField0_ |= 0x00000040;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object playerName_ = "";
+      /**
+       * <code>string playerName = 8;</code>
+       * @return The playerName.
+       */
+      public java.lang.String getPlayerName() {
+        java.lang.Object ref = playerName_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          playerName_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string playerName = 8;</code>
+       * @return The bytes for playerName.
+       */
+      public com.google.protobuf.ByteString
+          getPlayerNameBytes() {
+        java.lang.Object ref = playerName_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          playerName_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string playerName = 8;</code>
+       * @param value The playerName to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPlayerName(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        playerName_ = value;
+        bitField0_ |= 0x00000080;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string playerName = 8;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPlayerName() {
+        playerName_ = getDefaultInstance().getPlayerName();
+        bitField0_ = (bitField0_ & ~0x00000080);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string playerName = 8;</code>
+       * @param value The bytes for playerName to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPlayerNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        playerName_ = value;
+        bitField0_ |= 0x00000080;
+        onChanged();
+        return this;
+      }
+
+      private boolean isReconnect_ ;
+      /**
+       * <pre>
+       *是否重连 true  本次登录是重连，false 本次登录不是重连
+       * </pre>
+       *
+       * <code>bool isReconnect = 9;</code>
+       * @return The isReconnect.
+       */
+      @java.lang.Override
+      public boolean getIsReconnect() {
+        return isReconnect_;
+      }
+      /**
+       * <pre>
+       *是否重连 true  本次登录是重连，false 本次登录不是重连
+       * </pre>
+       *
+       * <code>bool isReconnect = 9;</code>
+       * @param value The isReconnect to set.
+       * @return This builder for chaining.
+       */
+      public Builder setIsReconnect(boolean value) {
+
+        isReconnect_ = value;
+        bitField0_ |= 0x00000100;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *是否重连 true  本次登录是重连，false 本次登录不是重连
+       * </pre>
+       *
+       * <code>bool isReconnect = 9;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearIsReconnect() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        isReconnect_ = false;
         onChanged();
         return this;
       }
@@ -5610,18 +5851,19 @@ public final class Login {
       "\030\001 \001(\003\022\022\n\nplayerName\030\002 \001(\t\022\r\n\005level\030\003 \001(" +
       "\005\022\020\n\010vipLevel\030\004 \001(\005\022\022\n\ncreateTime\030\005 \001(\003\022" +
       "\021\n\tloginTime\030\006 \001(\003\022\026\n\016lastLogoutTime\030\007 \001" +
-      "(\003\"\207\001\n\007csLogin\022\017\n\007account\030\001 \001(\t\022\021\n\taccou" +
+      "(\003\"\260\001\n\007csLogin\022\017\n\007account\030\001 \001(\t\022\021\n\taccou" +
       "ntId\030\002 \001(\003\022\020\n\010playerId\030\003 \001(\003\022\017\n\007channel\030" +
       "\004 \001(\t\022\024\n\014gameServerId\030\005 \001(\t\022\r\n\005token\030\006 \001" +
-      "(\t\022\020\n\010deviceId\030\007 \001(\t\"r\n\007scLogin\022\017\n\007accou" +
-      "nt\030\001 \001(\t\022\020\n\010playerId\030\002 \001(\003\022\r\n\005token\030\003 \001(" +
-      "\t\022\024\n\014gameServerId\030\004 \001(\t\022\037\n\nplayerInfo\030\005 " +
-      "\001(\0132\013.PlayerInfo\"Z\n\010csLogout\022\017\n\007account\030" +
-      "\001 \001(\t\022\021\n\taccountId\030\002 \001(\003\022\024\n\014gameServerId" +
-      "\030\003 \001(\t\022\024\n\014logoutReason\030\004 \001(\t\"Z\n\010scLogout" +
-      "\022\017\n\007account\030\001 \001(\t\022\021\n\taccountId\030\002 \001(\003\022\024\n\014" +
-      "gameServerId\030\003 \001(\t\022\024\n\014logoutReason\030\004 \001(\t" +
-      "B\n\n\010ly.protob\006proto3"
+      "(\t\022\020\n\010deviceId\030\007 \001(\t\022\022\n\nplayerName\030\010 \001(\t" +
+      "\022\023\n\013isReconnect\030\t \001(\010\"r\n\007scLogin\022\017\n\007acco" +
+      "unt\030\001 \001(\t\022\020\n\010playerId\030\002 \001(\003\022\r\n\005token\030\003 \001" +
+      "(\t\022\024\n\014gameServerId\030\004 \001(\t\022\037\n\nplayerInfo\030\005" +
+      " \001(\0132\013.PlayerInfo\"Z\n\010csLogout\022\017\n\007account" +
+      "\030\001 \001(\t\022\021\n\taccountId\030\002 \001(\003\022\024\n\014gameServerI" +
+      "d\030\003 \001(\t\022\024\n\014logoutReason\030\004 \001(\t\"Z\n\010scLogou" +
+      "t\022\017\n\007account\030\001 \001(\t\022\021\n\taccountId\030\002 \001(\003\022\024\n" +
+      "\014gameServerId\030\003 \001(\t\022\024\n\014logoutReason\030\004 \001(" +
+      "\tB\n\n\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -5638,7 +5880,7 @@ public final class Login {
     internal_static_csLogin_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csLogin_descriptor,
-        new java.lang.String[] { "Account", "AccountId", "PlayerId", "Channel", "GameServerId", "Token", "DeviceId", });
+        new java.lang.String[] { "Account", "AccountId", "PlayerId", "Channel", "GameServerId", "Token", "DeviceId", "PlayerName", "IsReconnect", });
     internal_static_scLogin_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_scLogin_fieldAccessorTable = new
