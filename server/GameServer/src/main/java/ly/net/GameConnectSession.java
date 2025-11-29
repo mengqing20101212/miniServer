@@ -20,7 +20,8 @@ public class GameConnectSession extends ConnectSession {
         super.addReceivePacket(packet);
         LoggerDef.LogProto("receive {}|{}|{}|{}|{}", getGuid(), packet.getSid(), packet.getType(), packet.getCmd(), packet.getLength());
         if (packet instanceof S2SMessagePacket s2sPacket) {
-            GameHandlerRouteManager.getInstance().execute(this, s2sPacket);
+            // 使用新的execute方法处理消息
+            GameHandlerRouteManager.execute(this, s2sPacket);
         }
     }
 

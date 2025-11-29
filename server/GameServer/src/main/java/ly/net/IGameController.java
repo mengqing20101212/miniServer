@@ -9,8 +9,8 @@ public interface IGameController extends IController {
         register(cmd, GameConnectSession.class, S2SMessagePacket.class, requestType, (IHandlerRouter) handler);
     }
 
-    default <R extends AbstractMessage> void gameHandlerRegister(Cmd.CMD cmd, Class<R> protoCLass, GameHandlerRouter<R> handler) {
-        GameHandlerRouteManager.getInstance().register(cmd, protoCLass, handler);
+    default <R extends AbstractMessage> void gameHandlerRegister(Cmd.CMD cmd, GameHandlerRouter<R> handler) {
+        GameHandlerRouteManager.getInstance().register(cmd, handler);
     }
 
 

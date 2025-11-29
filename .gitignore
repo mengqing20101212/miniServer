@@ -4,3 +4,5 @@ logs/
 .idea
 /server/core/.idea/
 /.idea/
+*.class
+*.vscode

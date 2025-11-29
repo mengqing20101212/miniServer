@@ -19,6 +19,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePa
         NetClient netClient = ctx.channel().attr(NetClient.SELF_ATTR_KEY).get();
         if (netClient == null) {
             ctx.channel().close();
+            LoggerDef.NetLogger.info("客户端(sid:{}, remote:{}), 连接异常, 关闭连接", ctx.channel().id(), ctx.channel().remoteAddress());
         } else {
             netClient.addReceivePacket(msg);
         }

@@ -1,10 +1,17 @@
 package ly.net;
 
 import com.google.protobuf.AbstractMessage;
-import ly.logic.player.Player;
-import ly.net.packet.S2SMessagePacket;
 
+/**
+ * 游戏处理器路由接口
+ */
 @FunctionalInterface
 public interface GameHandlerRouter<R extends AbstractMessage> {
-    void execute(Player player, S2SMessagePacket packet, R request);
+    /**
+     * 处理路由
+     *
+     * @param context 游戏处理器上下文（包含玩家和数据包）
+     * @param request 请求
+     */
+    public abstract void execute(GameHandlerContext context, R request);
 }
