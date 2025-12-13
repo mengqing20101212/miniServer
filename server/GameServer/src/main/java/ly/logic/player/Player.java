@@ -6,7 +6,11 @@ import com.google.protobuf.AbstractMessage;
 import ly.logic.player.event.PlayerEventManager;
 import ly.logic.player.event.PlayerEventType;
 import ly.net.GamePlayer;
+import ly.net.packet.MessagePacketFactory;
+import ly.net.packet.S2SMessagePacket;
 import ly.proto.Cmd;
+import ly.proto.ErrorMsg;
+import ly.proto.Server;
 import ly.utils.TimeStatisticsUtils;
 import ly.utils.TimeUtils;
 
@@ -135,14 +139,47 @@ public class Player {
     }
 
     private void tick() {
-        gamePlayer.tickPacket();
+        try {
+            while (true) {
+                try {
+                    eventManager.tickEvent();
+                    gamePlayer.tickPacket();
+                    if (gamePlayer.isEmpty()) {
+                        Thread.sleep(100);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendErrorCode(Cmd.CMD cmd, ErrorMsg.ErrorCode errorCode) {
+        ErrorMsg.scErrorCode.Builder res = ErrorMsg.scErrorCode.newBuilder();
+        res.setMsgId(cmd.getNumber());
+        res.setErrorCode(errorCode);
+        sendMsg(Cmd.CMD.SC_ErrorCode, res.build());
     }
 
     public void sendMsg(Cmd.CMD cmd, AbstractMessage message) {
-        if (cmd.getNumber() == getGamePlayer().getLastClientCmd() + 1) {
-            getGamePlayer().setLastClientCmd(0);
-            getGamePlayer().setLastSeq(0);
+        if (getGamePlayer().getLastClientCmd() == 0) {
+            S2SMessagePacket sendPacket = MessagePacketFactory.createS2SMessagePacket(getPlayerId(), cmd.getNumber(), message, 0, 0);
+            getGamePlayer().getSession().addSendPacket(sendPacket);
+        } else {
+            if (cmd.getNumber() == getGamePlayer().getLastClientCmd() + 1) {
+                Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
+                builder.setData(message.toByteString());
+                S2SMessagePacket sendPacket = MessagePacketFactory.createS2SMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), getGamePlayer().getLastSeq(), gamePlayer.getLastSid());
+                getGamePlayer().getSession().addSendPacket(sendPacket);
+                getGamePlayer().setLastClientCmd(0);
+                getGamePlayer().setLastSeq(0);
+                getGamePlayer().setLastSid(0);
+            } else {
+                S2SMessagePacket sendPacket = MessagePacketFactory.createS2SMessagePacket(getPlayerId(), cmd.getNumber(), message, gamePlayer.getLastSeq(), gamePlayer.getLastSid());
+                getGamePlayer().getSession().addSendPacket(sendPacket);
+            }
         }
-
     }
 }

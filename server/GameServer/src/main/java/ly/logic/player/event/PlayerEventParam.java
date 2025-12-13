@@ -11,4 +11,16 @@ public record PlayerEventParam(Player player, PlayerEventType eventType, Object.
                 "args=" + Arrays.toString(args) +
                 '}';
     }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public PlayerEventType getEventType() {
+        return eventType;
+    }
+
+    public Object[] getArgs() {
+        return args;
+    }
 }

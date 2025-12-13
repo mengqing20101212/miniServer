@@ -125,6 +125,7 @@ public class LoginManager {
             onlinePlayer.setGamePlayer(new GamePlayer(task.session));
             onlinePlayer.getGamePlayer().setLastSeq(task.packet.getSeq());
             onlinePlayer.getGamePlayer().setLastClientCmd(task.packet.getCmd());
+            onlinePlayer.getGamePlayer().setLastSid(task.packet.getSid());
         }
 
 
@@ -153,15 +154,6 @@ public class LoginManager {
         onlinePlayer.statPlay();
 
 
-// 登录协议响应
-//        message scLogin
-//        {
-//            string account = 1;
-//            int64  playerId = 2;
-//            string token = 3;
-//            string gameServerId = 4;
-//            PlayerInfo playerInfo = 5;
-//        }
     }
 
     /**
