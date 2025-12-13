@@ -18,6 +18,7 @@ public class GamePlayer {
     private Player player;
 
     private int lastSeq;
+    private int lastClientCmd;
 
     ArrayBlockingQueue<S2SMessagePacket> packetQueue = new ArrayBlockingQueue<>(100);
 
@@ -63,7 +64,19 @@ public class GamePlayer {
         session.closeChannel();
     }
 
+    public int getLastClientCmd() {
+        return lastClientCmd;
+    }
+
+    public void setLastClientCmd(int lastClientCmd) {
+        this.lastClientCmd = lastClientCmd;
+    }
+
     public void addPacket(S2SMessagePacket packet) {
+        if (packet.getCmd() == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) {// gate 转发来之客户端的Rpc调用 非登录包 请求
+            setLastSeq(packet.getSeq());
+            setLastClientCmd(packet.getCmd());
+        }
         packetQueue.add(packet);
     }
 
@@ -78,7 +91,7 @@ public class GamePlayer {
     public void setPlayer(Player player) {
     }
 
-    void tickPacket() {
+    public void tickPacket() {
         S2SMessagePacket packet = packetQueue.poll();
         if (packet == null) {
             return;

@@ -1,12 +1,16 @@
 package ly.logic.login;
 
 import ly.LoggerDef;
+import ly.ServerContext;
 import ly.logic.player.Player;
 import ly.logic.player.PlayerManager;
 import ly.logic.player.PlayerStatusEnum;
+import ly.logic.player.PlayerUtils;
 import ly.logic.player.event.PlayerEventType;
+import ly.net.GamePlayer;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
+import ly.proto.Login;
 import ly.redis.RedisKeys;
 import ly.redis.RedisUtils;
 
@@ -26,7 +30,7 @@ public class LoginManager {
 
     /**
      * 获取登录管理器单例
-     * 
+     *
      * @return LoginManager 单例实例
      */
     public static LoginManager getInstance() {
@@ -63,7 +67,7 @@ public class LoginManager {
 
     /**
      * 添加登录任务到队列
-     * 
+     *
      * @param task 登录任务对象
      */
     public void addLoginTask(LoginTask task) {
@@ -77,20 +81,20 @@ public class LoginManager {
      * 处理登录任务的核心方法
      * <p>
      * 执行令牌验证、玩家加载/创建、状态更新等登录流程
-     * 
+     *
      * @param task 登录任务对象
      */
     private void handleLogin(LoginTask task) {
         // 获取玩家ID
         final long playerId = task.request.getPlayerId();
-        
+
         // 1. 验证令牌
         if (!checkToken(task.request.getToken(), task.request.getAccount())) {
             LoggerDef.SystemLogger.error(String.format("LoginManager handle login token error %s account:%s", task.request.getToken(), task.request.getAccount()));
             sendErrorMsg(task, ErrorMsg.ErrorCode.SYSTEM_ERROR);
             return;
         }
-        
+
         // 2. 查找在线玩家
         Player onlinePlayer = PlayerManager.getInstance().getOnlinePlayer(playerId);
         if (onlinePlayer == null) {
@@ -117,28 +121,54 @@ public class LoginManager {
             }
             // 将玩家添加到在线玩家管理器
             PlayerManager.getInstance().addOnlinePlayer(onlinePlayer);
+
+            onlinePlayer.setGamePlayer(new GamePlayer(task.session));
+            onlinePlayer.getGamePlayer().setLastSeq(task.packet.getSeq());
+            onlinePlayer.getGamePlayer().setLastClientCmd(task.packet.getCmd());
         }
-        
+
+
         // 5. 更新玩家状态
         if (!task.request.getIsReconnect()) { // 不是重连
             onlinePlayer.setStatus(PlayerStatusEnum.LOGGING);
         }
         // 设置玩家为游戏中状态
         onlinePlayer.setStatus(PlayerStatusEnum.PLAYING);
-        
+
         // 6. 派发登录完成事件
         onlinePlayer.dispatchEvent(PlayerEventType.PLAYER_LOGIN_COMPLETE);
         //TODO: 首次登录逻辑待实现
-        
+
         // 7. 派发重连状态事件
         onlinePlayer.dispatchEvent(PlayerEventType.PLAYER_LOGIN_IS_RECONNECT, task.request.getIsReconnect());
+
+
+        Login.scLogin.Builder res = Login.scLogin.newBuilder();
+        res.setAccount(onlinePlayer.getAccount());
+        res.setPlayerId(onlinePlayer.getPlayerId());
+        res.setToken(onlinePlayer.getToken());
+        res.setGameServerId(ServerContext.getServerId());
+        res.setPlayerInfo(PlayerUtils.genPlayerInfo(onlinePlayer));
+        onlinePlayer.sendMsg(Cmd.CMD.SC_Logout, res.build());
+        onlinePlayer.statPlay();
+
+
+// 登录协议响应
+//        message scLogin
+//        {
+//            string account = 1;
+//            int64  playerId = 2;
+//            string token = 3;
+//            string gameServerId = 4;
+//            PlayerInfo playerInfo = 5;
+//        }
     }
 
     /**
      * 发送错误消息给客户端
-     * 
-     * @param task       登录任务对象
-     * @param errorCode  错误码
+     *
+     * @param task      登录任务对象
+     * @param errorCode 错误码
      */
     private void sendErrorMsg(LoginTask task, ErrorMsg.ErrorCode errorCode) {
         // 创建错误响应消息构建器
@@ -153,7 +183,7 @@ public class LoginManager {
 
     /**
      * 验证令牌的有效性
-     * 
+     *
      * @param token   待验证的令牌
      * @param account 账号名
      * @return boolean 令牌是否有效

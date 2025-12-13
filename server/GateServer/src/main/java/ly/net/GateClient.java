@@ -70,6 +70,14 @@ public class GateClient {
 
     }
 
+    // 网关调用游戏服务器Rpc方法
+//    message csGate2GameRpcGameCall{
+//        int32 cmd = 1;// client 发送给gate 请求 cmd
+//        int32 sid = 2;// client 发送给gate 请求 会话id
+//        int64 guid = 3;// client 发送给gate 请求 玩家id
+//        int32 seq = 4;// client 发送给gate 请求 序列id
+//        bytes data = 5;// client 发送给gate 请求 数据
+//    }
     public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(C2SMessagePacket csPacket) {
         // 发送给游戏服务器
         Server.csGate2GameRpcGameCall.Builder req = Server.csGate2GameRpcGameCall.newBuilder();

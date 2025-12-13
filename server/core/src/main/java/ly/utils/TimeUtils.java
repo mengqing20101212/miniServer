@@ -14,6 +14,10 @@ public class TimeUtils {
         return LocalDateTime.now();
     }
 
+    public static long nowMillis() {
+        return now().toInstant(ZoneId.systemDefault().getRules().getOffset(now())).toEpochMilli();
+    }
+
     static int getCurWeekByMoth() {
         ZonedDateTime now = ZonedDateTime.now();
         // 指定每周的第一天为周一

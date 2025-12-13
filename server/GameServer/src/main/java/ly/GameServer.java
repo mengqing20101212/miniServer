@@ -1,7 +1,7 @@
 package ly;
 
 import ly.config.ServerTypeEnum;
-import ly.logic.login.GameLoginController;
+import ly.logic.login.GamePlayerLoginController;
 import ly.net.GameConnectSessionProvider;
 
 /**
@@ -17,7 +17,7 @@ public class GameServer {
         String nacosUrl = args[0];
         String env = args[1];
         String serverId = args[2];
-        ServerContext.addController(new GameLoginController());
+        ServerContext.addController(new GamePlayerLoginController());
         ServerContext.startUp(nacosUrl, ServerTypeEnum.GAME.getType(), serverId, env, new GameConnectSessionProvider());
 
     }

@@ -40,10 +40,10 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
                 }
                 if (player != null) {
                     player.getGamePlayer().addPacket(packet);
-                } else {
-                    LoggerDef.SystemLogger.error(" GameHandlerRouteManager execute error, player is null, cmd:{}, playerId:{}, seq:{}", cmd, packet.getGuid(), packet.getSeq());
+                } else {//login packet 处理
+                    HandlerRouterManager.execute(session, packet);
                 }
-            } else {
+            } else {//其他途径的消息由逻辑处理
                 HandlerRouterManager.execute(session, packet);
             }
         } catch (Exception e) {

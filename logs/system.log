@@ -129,7 +129,7 @@ redis:
 2025-11-29 18:09:55.331 INFO  - 加载配置表完成, 耗时:4 (毫秒)
 2025-11-29 18:10:03.037 INFO  - 服务器启动成功:[NetServer-8001], port:8001
 2025-11-29 18:10:03.037 INFO  - 服务器 启动成功 耗时: 8518ms
-2025-11-29 21:34:22.607 INFO  - GameHandlerRouteManager register handler cmd:100( 100 ),handler:ly.logic.login.GameLoginController$$Lambda/0x00000202911974e0
+2025-11-29 21:34:22.607 INFO  - GameHandlerRouteManager register handler cmd:100( 100 ),handler:ly.logic.login.GamePlayerLoginController$$Lambda/0x00000202911974e0
 2025-11-29 21:34:22.613 INFO  - 服务器开始启动
 2025-11-29 21:34:22.616 INFO  - 开始启动 Nacos 
 2025-11-29 21:34:23.351 INFO  - 服务器配置: 
@@ -158,7 +158,7 @@ redis:
 2025-11-29 21:34:23.474 INFO  - 加载配置表完成, 耗时:3 (毫秒)
 2025-11-29 21:34:31.508 INFO  - 服务器启动成功:[NetServer-9001], port:9001
 2025-11-29 21:34:31.509 INFO  - 服务器 启动成功 耗时: 8895ms
-2025-11-29 21:40:06.425 INFO  - GameHandlerRouteManager register handler cmd:CS_Login( 100 ),handler:ly.logic.login.GameLoginController$$Lambda/0x000002badb1974e0
+2025-11-29 21:40:06.425 INFO  - GameHandlerRouteManager register handler cmd:CS_Login( 100 ),handler:ly.logic.login.GamePlayerLoginController$$Lambda/0x000002badb1974e0
 2025-11-29 21:40:06.425 INFO  - 服务器开始启动
 2025-11-29 21:40:06.429 INFO  - 开始启动 Nacos 
 2025-11-29 21:40:07.260 INFO  -  Nacos 启动成功,耗时: 830ms 
@@ -168,7 +168,7 @@ redis:
 2025-11-29 21:40:07.814 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
 2025-11-29 21:40:15.231 INFO  - 服务器启动成功:[NetServer-8001], port:8001
 2025-11-29 21:40:15.233 INFO  - 服务器 启动成功 耗时: 8806ms
-2025-11-29 21:41:15.743 INFO  - GameHandlerRouteManager register handler cmd:CS_Login( 100 ),handler:ly.logic.login.GameLoginController$$Lambda/0x00000205a71974e0
+2025-11-29 21:41:15.743 INFO  - GameHandlerRouteManager register handler cmd:CS_Login( 100 ),handler:ly.logic.login.GamePlayerLoginController$$Lambda/0x00000205a71974e0
 2025-11-29 21:41:15.743 INFO  - 服务器开始启动
 2025-11-29 21:41:15.746 INFO  - 开始启动 Nacos 
 2025-11-29 21:41:16.567 INFO  -  Nacos 启动成功,耗时: 820ms 
