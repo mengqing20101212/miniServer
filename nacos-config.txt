@@ -1,0 +1,35 @@
+# Nacos 服务器配置信息
+
+## Nacos 服务器地址
+Nacos 服务器已成功部署在本机：
+- 地址: localhost
+- 端口: 8848
+- 访问地址: http://localhost:8848/nacos
+- 默认用户名: nacos
+- 默认密码: nacos
+
+## 项目配置更新
+为了使您的微服务项目能够使用此 Nacos 服务器，请更新以下配置：
+
+1. 在项目配置文件中设置 Nacos 服务器地址：
+   - serverAddr: localhost:8848
+   - namespace: （默认命名空间为空）
+
+2. 配置示例 (application.properties):
+   ```
+   spring.cloud.nacos.discovery.server-addr=localhost:8848
+   spring.cloud.nacos.config.server-addr=localhost:8848
+   ```
+
+## 内存优化说明
+- Nacos 已配置为单机模式
+- JVM 堆内存限制为最大 1GB
+- 已添加 Java 21 兼容性参数
+- 使用嵌入式存储
+
+## 服务注册与发现
+现在您的 GateServer、GameServer 和 LoginServer 可以连接到此 Nacos 服务器进行：
+- 服务注册
+- 服务发现
+- 配置管理
+- 健康检查

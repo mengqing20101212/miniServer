@@ -24,7 +24,7 @@ import org.slf4j.Logger;
  */
 public class RedisUtils {
   static Logger logger = LoggerDef.DbLogger;
-  static RedissonClient redissonClient;
+  public static RedissonClient redissonClient;
 
   /** 初始化 Redis 客户端连接 */
   public static void init() {
