@@ -1,14 +1,27 @@
+package ly;
+
+import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 
-public class test_db_connection {
-    public static void main(String[] args) {
-        String url = "jdbc:mysql://localhost:3306/pick_money";
+/**
+ * Database connection test for GameServer
+ */
+public class DatabaseConnectionTest 
+{
+    /**
+     * Test database connection
+     */
+    @Test
+    public void testDatabaseConnection()
+    {
+        String url = "jdbc:mysql://139.224.80.204:3306/pick_money";
         String username = "root";
-        String password = "Ly.1006897725@MySQL";
+        String password = "ly.1006897725";
 
         try {
             Connection conn = DriverManager.getConnection(url, username, password);
@@ -33,9 +46,12 @@ public class test_db_connection {
             
             conn.close();
             System.out.println("Connection closed.");
+            
+            assertTrue("Database connection test passed", true);
         } catch (SQLException e) {
             System.out.println("Connection failed!");
             e.printStackTrace();
+            assertTrue("Database connection test failed", false);
         }
     }
 }
