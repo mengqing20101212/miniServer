@@ -3,7 +3,9 @@ package ly;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -435,6 +437,10 @@ public class ParserExcelConfig {
             new StringBuffer(
                 "package ly.config;\n"
                     + "\n"
+                    + "import java.util.List;\n"
+                    + "import ly.utils.KV;\n"
+                    + "import ly.utils.ExcelKVParser;\n"
+                    + "\n"
                     + "/***\n"
                     + " * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@\n"
                     + " */\n"
@@ -477,6 +483,12 @@ public class ParserExcelConfig {
               sb.append("  /**").append(descStr).append("*/ \n");
             }
             sb.append("   public float " + title + ";\n\n");
+          } else if (type.equalsIgnoreCase("INT2")) {
+            // INT2 类型对应 List<KV<String, String>> 用于存储键值对
+            if (!StringUtil.isBlank(descStr)) {
+              sb.append("  /**").append(descStr).append("*/ \n");
+            }
+            sb.append("   public List<KV<String, String>> " + title + ";\n\n");
           } else {
             if (!StringUtil.isBlank(descStr)) {
               sb.append("  /**").append(descStr).append("*/ \n");
@@ -780,8 +792,12 @@ public class ParserExcelConfig {
         return " Boolean.parseBoolean(arr[" + i + "].trim())";
       } else if (type.equalsIgnoreCase("FLOAT")) {
         return " Float.parseFloat(arr[" + i + "].trim())";
-      } else if (type.equalsIgnoreCase("LIST<INT>")) return "arr[" + i + "].trim()";
-      else {
+      } else if (type.equalsIgnoreCase("INT2")) {
+        // INT2 类型解析为 List<KV>，用于处理 Excel 中的键值对数据
+        return " new ArrayList<>(ExcelKVParser.parseSimpleKV(arr[" + i + "].trim()))";
+      } else if (type.equalsIgnoreCase("LIST<INT>")) {
+        return "arr[" + i + "].trim()";
+      } else {
         return null;
       }
     }
