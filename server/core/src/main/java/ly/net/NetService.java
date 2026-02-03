@@ -133,15 +133,36 @@ public class NetService {
     }
 
     public ConnectSession addChannel(ChannelHandlerContext ctx) {
+        if (ctx == null) {
+            log.error("Failed to add channel: ChannelHandlerContext is null");
+            return null;
+        }
+        
+        if (gameObjectProvider == null) {
+            log.error("Failed to add channel: GameObjectProvider is null");
+            return null;
+        }
+        
         try {
             ConnectSession object = gameObjectProvider.createGameObject(ctx);
+            if (object == null) {
+                log.error("Failed to add channel: GameObjectProvider returned null");
+                return null;
+            }
+            
             Connector connector = new Connector(ctx, createSid());
             object.setConnector(connector);
             
             // 使用computeIfAbsent避免重复检查
-            ConnectSession existingObject = gameObjectMaps.computeIfAbsent(object.getGuid(), k -> object);
+            Long guid = object.getGuid();
+            if (guid == null) {
+                log.error("Failed to add channel: ConnectSession GUID is null");
+                return null;
+            }
+            
+            ConnectSession existingObject = gameObjectMaps.computeIfAbsent(guid, k -> object);
             if (existingObject != object) {
-                log.warn("Duplicate session GUID detected: {}", object.getGuid());
+                log.warn("Duplicate session GUID detected: {}", guid);
                 return existingObject;
             }
             
@@ -149,7 +170,7 @@ public class NetService {
             return object;
         } catch (Exception e) {
             log.error("Failed to add channel", e);
-            throw e;
+            return null;
         }
     }
 

@@ -29,6 +29,21 @@ public class RedisUtils {
   /** 初始化 Redis 客户端连接 */
   public static void init() {
     try {
+      if (ServerContext.serverConfig == null) {
+        logger.error("[Redis] 初始化失败: ServerContext.serverConfig 为 null");
+        return;
+      }
+      
+      if (ServerContext.serverConfig.redis == null) {
+        logger.error("[Redis] 初始化失败: ServerContext.serverConfig.redis 为 null");
+        return;
+      }
+      
+      if (ServerContext.serverConfig.redis.host == null || ServerContext.serverConfig.redis.host.trim().isEmpty()) {
+        logger.error("[Redis] 初始化失败: Redis 主机地址为空");
+        return;
+      }
+      
       Config config = new Config();
       config
           .useSingleServer()
@@ -50,6 +65,16 @@ public class RedisUtils {
 
   /** 设置一个 key 的值（无过期时间） */
   public static void set(String key, Object value) {
+    if (redissonClient == null) {
+      logger.error("[Redis] SET 操作失败: RedissonClient 未初始化");
+      return;
+    }
+    
+    if (key == null || key.trim().isEmpty()) {
+      logger.error("[Redis] SET 操作失败: key 不能为空");
+      return;
+    }
+    
     long start = System.nanoTime();
     try {
       redissonClient.getBucket(key).set(value);
@@ -63,6 +88,21 @@ public class RedisUtils {
   }
 
   public static void setWithExpire(String key, Object value, long expire, TimeUnit timeUnit) {
+    if (redissonClient == null) {
+      logger.error("[Redis] setWithExpire SET 操作失败: RedissonClient 未初始化");
+      return;
+    }
+    
+    if (key == null || key.trim().isEmpty()) {
+      logger.error("[Redis] setWithExpire SET 操作失败: key 不能为空");
+      return;
+    }
+    
+    if (timeUnit == null) {
+      logger.error("[Redis] setWithExpire SET 操作失败: timeUnit 不能为空");
+      return;
+    }
+    
     long start = System.nanoTime();
     try {
       RBucket<Object> bucket = redissonClient.getBucket(key);
@@ -79,6 +119,16 @@ public class RedisUtils {
   /** 获取 key 对应的值 */
   @SuppressWarnings("unchecked")
   public static <T> T get(String key) {
+    if (redissonClient == null) {
+      logger.error("[Redis] GET 操作失败: RedissonClient 未初始化");
+      return null;
+    }
+    
+    if (key == null || key.trim().isEmpty()) {
+      logger.error("[Redis] GET 操作失败: key 不能为空");
+      return null;
+    }
+    
     long start = System.nanoTime();
     try {
       RBucket<Object> bucket = redissonClient.getBucket(key);
@@ -96,6 +146,16 @@ public class RedisUtils {
 
   /** 删除 key */
   public static boolean del(String key) {
+    if (redissonClient == null) {
+      logger.error("[Redis] DEL 操作失败: RedissonClient 未初始化");
+      return false;
+    }
+    
+    if (key == null || key.trim().isEmpty()) {
+      logger.error("[Redis] DEL 操作失败: key 不能为空");
+      return false;
+    }
+    
     long start = System.nanoTime();
     try {
       RBucket<Object> bucket = redissonClient.getBucket(key);
@@ -113,6 +173,11 @@ public class RedisUtils {
 
   /** 判断 key 是否存在 */
   public static boolean exists(String key) {
+    if (key == null || key.trim().isEmpty()) {
+      logger.error("[Redis] exists 操作失败: key 不能为空");
+      return false;
+    }
+    
     long start = System.nanoTime();
     try {
       boolean result = get(key) != null;

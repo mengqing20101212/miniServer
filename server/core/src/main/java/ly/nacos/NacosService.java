@@ -184,6 +184,16 @@ public class NacosService {
 
     private void getServerConfig(
             ConfigService configService, ServerTypeEnum serverType, String serverId) throws Exception {
+        if (configService == null) {
+            throw new RuntimeException("ConfigService 不能为 null");
+        }
+        if (serverType == null) {
+            throw new RuntimeException("ServerType 不能为 null");
+        }
+        if (serverId == null || serverId.trim().isEmpty()) {
+            throw new RuntimeException("ServerId 不能为 null 或空字符串");
+        }
+        
         String configStr = configService.getConfig(serverId, serverType.getType(), MAX_TIME_OUT);
         if (configStr != null) {
             parserServerConfig(configStr);
@@ -193,7 +203,7 @@ public class NacosService {
             if (configStr != null) {
                 parserServerConfig(configStr);
             } else {
-                throw new RuntimeException("获取nacos 配置失败");
+                throw new RuntimeException("获取nacos 配置失败，serverId=" + serverId + ", serverType=" + serverType.getType());
             }
         }
 
@@ -208,8 +218,12 @@ public class NacosService {
 
                     @Override
                     public void receiveConfigInfo(String s) {
-                        logger.info("服务器配置: \n" + s);
-                        parserServerConfig(s);
+                        if (s != null) {
+                            logger.info("服务器配置: \n" + s);
+                            parserServerConfig(s);
+                        } else {
+                            logger.warn("收到的配置信息为 null，忽略处理");
+                        }
                     }
                 });
     }

@@ -78,33 +78,53 @@ public class MysqlService {
    * @return true 保存成功， false 保存失败
    */
   public boolean save(AbstractEntry entry) {
+    if (entry == null) {
+      logger.error("保存数据失败: entry 不能为 null");
+      return false;
+    }
     if (!entry.canSave()) { // 该对象不需要保存
       return true;
     }
     List<Object> params = new ArrayList<>();
     try {
       String saveSql = getInsertSql(entry, params);
+      if (mysqlConnector == null) {
+        logger.error("MysqlConnector 未初始化，无法保存数据");
+        return false;
+      }
       return mysqlConnector.execute(saveSql, params.toArray());
     } catch (IllegalAccessException e) {
       e.printStackTrace();
       logger.error(" 保存数据[%s] 报错 ", entry.toString(), e);
+    } catch (Exception e) {
+      logger.error(" 保存数据时发生未知错误 [%s]", entry.toString(), e);
     }
-    return true;
+    return false;
   }
 
   public boolean update(AbstractEntry entry, String... updateFileds) {
+    if (entry == null) {
+      logger.error("更新数据失败: entry 不能为 null");
+      return false;
+    }
     if (!entry.canSave()) {
       return true;
     }
     List<Object> params = new ArrayList<>();
     try {
       String saveSql = getUpdateSql(entry, params, updateFileds);
+      if (mysqlConnector == null) {
+        logger.error("MysqlConnector 未初始化，无法更新数据");
+        return false;
+      }
       return mysqlConnector.execute(saveSql, params.toArray());
     } catch (IllegalAccessException e) {
       e.printStackTrace();
-      logger.error(" 保存数据[%s] 报错 ", entry.toString(), e);
+      logger.error(" 更新数据[%s] 报错 ", entry.toString(), e);
+    } catch (Exception e) {
+      logger.error(" 更新数据时发生未知错误 [%s]", entry.toString(), e);
     }
-    return true;
+    return false;
   }
 
   public MysqlConnector getMysqlConnector() {
@@ -128,30 +148,69 @@ public class MysqlService {
   }
 
   public <T extends AbstractEntry> T selectOnce(Class<T> clazz, String[] fileds, Object... params) {
-    String sql = getSelectSql(clazz, fileds);
-    List<Map<String, Object>> resultList = mysqlConnector.select(sql, params);
-    if (resultList.isEmpty()) {
+    if (clazz == null) {
+      logger.error("查询单条记录失败: clazz 不能为 null");
       return null;
     }
-    return packetEntry(resultList.getFirst(), clazz);
+    if (mysqlConnector == null) {
+      logger.error("MysqlConnector 未初始化，无法查询数据");
+      return null;
+    }
+    try {
+      String sql = getSelectSql(clazz, fileds);
+      List<Map<String, Object>> resultList = mysqlConnector.select(sql, params);
+      if (resultList == null || resultList.isEmpty()) {
+        return null;
+      }
+      return packetEntry(resultList.getFirst(), clazz);
+    } catch (Exception e) {
+      logger.error("查询单条记录时发生错误", e);
+      return null;
+    }
   }
 
   public <T extends AbstractEntry> List<T> selectAll(
       Class<T> clazz, String[] fileds, Object... params) {
-    List<T> list = new ArrayList<>();
-    String sql = getSelectSql(clazz, fileds);
-    List<Map<String, Object>> resultList = mysqlConnector.select(sql, params);
-    if (resultList.isEmpty()) {
-      return list;
+    if (clazz == null) {
+      logger.error("查询多条记录失败: clazz 不能为 null");
+      return new ArrayList<>();
     }
-    for (Map<String, Object> map : resultList) {
-      list.add(packetEntry(map, clazz));
+    if (mysqlConnector == null) {
+      logger.error("MysqlConnector 未初始化，无法查询数据");
+      return new ArrayList<>();
+    }
+    List<T> list = new ArrayList<>();
+    try {
+      String sql = getSelectSql(clazz, fileds);
+      List<Map<String, Object>> resultList = mysqlConnector.select(sql, params);
+      if (resultList == null || resultList.isEmpty()) {
+        return list;
+      }
+      for (Map<String, Object> map : resultList) {
+        if (map != null) {
+          T entry = packetEntry(map, clazz);
+          if (entry != null) {
+            list.add(entry);
+          }
+        }
+      }
+    } catch (Exception e) {
+      logger.error("查询多条记录时发生错误", e);
     }
     return list;
   }
 
   public static <T extends AbstractEntry> T packetEntry(
       Map<String, Object> resultMap, Class<T> clazz) {
+    if (resultMap == null) {
+      LoggerDef.DbLogger.error("packetEntry: resultMap 不能为 null");
+      return null;
+    }
+    if (clazz == null) {
+      LoggerDef.DbLogger.error("packetEntry: clazz 不能为 null");
+      return null;
+    }
+    
     try {
       // 1. 反射创建对象实例
       T instance = clazz.getDeclaredConstructor().newInstance();
@@ -176,16 +235,24 @@ public class MysqlService {
 
       return instance;
     } catch (Exception e) {
-      e.printStackTrace();
+      LoggerDef.DbLogger.error("packetEntry: 封装对象时发生错误，resultMap={}, clazz={}", resultMap, clazz.getSimpleName(), e);
     }
     return null;
   }
 
   private <T extends AbstractEntry> String getSelectSql(Class<T> clazz, String[] fields) {
-    StringBuilder sql = new StringBuilder();
+    if (clazz == null) {
+      throw new IllegalArgumentException("Class 不能为 null");
+    }
+    
     // 获取 @DbTable 注解
     if (clazz.isAnnotationPresent(DbMeta.DbTable.class)) {
       DbMeta.DbTable tableAnnotation = clazz.getAnnotation(DbMeta.DbTable.class);
+      if (tableAnnotation == null) {
+        throw new IllegalArgumentException(
+            "Class " + clazz.getSimpleName() + " 的 @DbTable 注解信息无效。");
+      }
+      
       String tableName = tableAnnotation.name();
 
       // 如果注解未提供表名，则返回空字符串
@@ -193,12 +260,15 @@ public class MysqlService {
         throw new IllegalArgumentException(
             "Class " + clazz.getSimpleName() + " does not have a valid @DbTable name.");
       }
+      StringBuilder sql = new StringBuilder();
       sql.append("SELECT * ");
       sql.append(" FROM ").append(tableName);
       if (fields != null && fields.length > 0) {
         sql.append(" WHERE 1=1 ");
         for (String field : fields) {
-          sql.append(" AND ").append("`" + field + "`=?");
+          if (field != null) {
+            sql.append(" AND ").append("`" + field + "`=?");
+          }
         }
       }
       return sql.toString();
@@ -219,11 +289,23 @@ public class MysqlService {
    */
   private <T extends AbstractEntry> String getUpdateSql(
       T data, List<Object> paramsList, String[] fileds) throws IllegalAccessException {
+    if (data == null) {
+      throw new IllegalArgumentException("data 不能为 null");
+    }
+    if (paramsList == null) {
+      throw new IllegalArgumentException("paramsList 不能为 null");
+    }
+    
     Class<?> clazz = data.getClass();
     StringBuilder sql = new StringBuilder();
     // 获取 @DbTable 注解
     if (clazz.isAnnotationPresent(DbMeta.DbTable.class)) {
       DbMeta.DbTable tableAnnotation = clazz.getAnnotation(DbMeta.DbTable.class);
+      if (tableAnnotation == null) {
+        throw new IllegalArgumentException(
+            "Class " + clazz.getSimpleName() + " 的 @DbTable 注解信息无效。");
+      }
+      
       String tableName = tableAnnotation.name();
 
       String keyName = "";
@@ -233,10 +315,16 @@ public class MysqlService {
       for (Field field : clazz.getDeclaredFields()) {
         field.setAccessible(true);
         if (field.isAnnotationPresent(DbMeta.DbMasterKey.class)) {
-          keyName = field.getAnnotation(DbMeta.DbMasterKey.class).name();
+          DbMeta.DbMasterKey masterKey = field.getAnnotation(DbMeta.DbMasterKey.class);
+          if (masterKey != null) {
+            keyName = masterKey.name();
+          }
           keyValue = field.get(data);
         } else if (field.isAnnotationPresent(DbMeta.DbField.class)) {
-          allFields.add(field.getAnnotation(DbMeta.DbField.class).name());
+          DbMeta.DbField dbField = field.getAnnotation(DbMeta.DbField.class);
+          if (dbField != null) {
+            allFields.add(dbField.name());
+          }
           paramsList.add(field.get(data));
         }
       }
@@ -252,12 +340,20 @@ public class MysqlService {
       sql.append("UPDATE ").append(tableName).append(" SET ");
       if (fileds != null && fileds.length > 0) {
         for (String field : fileds) {
-          sql.append(" " + field + "=?,");
+          if (field != null) {
+            sql.append(" " + field + "=?,");
+          }
         }
       } else {
-        allFields.forEach(field -> sql.append(" " + field + "=?,"));
+        allFields.forEach(field -> {
+          if (field != null) {
+            sql.append(" " + field + "=?,");
+          }
+        });
       }
-      sql.deleteCharAt(sql.length() - 1);
+      if (sql.charAt(sql.length() - 1) == ',') {
+        sql.deleteCharAt(sql.length() - 1);
+      }
       sql.append(" WHERE  " + keyName + "=?");
       return sql.toString();
     } else {
@@ -268,11 +364,23 @@ public class MysqlService {
 
   private <T extends AbstractEntry> String getInsertSql(T data, List<Object> paramList)
       throws IllegalAccessException {
+    if (data == null) {
+      throw new IllegalArgumentException("data 不能为 null");
+    }
+    if (paramList == null) {
+      throw new IllegalArgumentException("paramList 不能为 null");
+    }
+    
     StringBuilder sql = new StringBuilder();
     // 获取 @DbTable 注解
     Class<?> clazz = data.getClass();
     if (clazz.isAnnotationPresent(DbMeta.DbTable.class)) {
       DbMeta.DbTable tableAnnotation = clazz.getAnnotation(DbMeta.DbTable.class);
+      if (tableAnnotation == null) {
+        throw new IllegalArgumentException(
+            "Class " + clazz.getSimpleName() + " 的 @DbTable 注解信息无效。");
+      }
+      
       String tableName = tableAnnotation.name();
       // 未指定更新的字段 则更新所有的字段
       List<String> allFields = new ArrayList<>();
@@ -280,15 +388,19 @@ public class MysqlService {
       for (Field field : clazz.getDeclaredFields()) {
         field.setAccessible(true); // 允许访问私有字段
         if (field.isAnnotationPresent(DbMeta.DbMasterKey.class)) {
-          if (!field.getAnnotation(DbMeta.DbMasterKey.class).autoIncrement()) {
-            allFields.add(field.getAnnotation(DbMeta.DbMasterKey.class).name());
+          DbMeta.DbMasterKey masterKey = field.getAnnotation(DbMeta.DbMasterKey.class);
+          if (masterKey != null && !masterKey.autoIncrement()) {
+            allFields.add(masterKey.name());
             paramList.add(field.get(data));
           }
         } else if (field.isAnnotationPresent(DbMeta.DbField.class)) {
-          Object value = field.get(data);
-          if (value != null) {
-            allFields.add(field.getAnnotation(DbMeta.DbField.class).name());
-            paramList.add(field.get(data));
+          DbMeta.DbField dbField = field.getAnnotation(DbMeta.DbField.class);
+          if (dbField != null) {
+            Object value = field.get(data);
+            if (value != null) {
+              allFields.add(dbField.name());
+              paramList.add(field.get(data));
+            }
           }
         }
       }
@@ -301,14 +413,22 @@ public class MysqlService {
                 + " does not have a valid @DbTable @DbMasterKey name.");
       }
       sql.append("INSERT INTO ").append(tableName);
+      if (allFields.isEmpty()) {
+        logger.warn("尝试插入数据时没有找到有效的字段: {}", clazz.getSimpleName());
+        return ""; // 返回空SQL，表示无有效字段可插入
+      }
       String fieldStr = "(";
       String valStr = "(";
       for (String field : allFields) {
-        fieldStr += field + ",";
-        valStr += " ?,";
+        if (field != null) {
+          fieldStr += field + ",";
+          valStr += " ?,";
+        }
       }
-      fieldStr = fieldStr.substring(0, fieldStr.length() - 1);
-      valStr = valStr.substring(0, valStr.length() - 1);
+      if (fieldStr.length() > 1) {
+        fieldStr = fieldStr.substring(0, fieldStr.length() - 1);
+        valStr = valStr.substring(0, valStr.length() - 1);
+      }
       fieldStr += ")";
       valStr += ");";
       sql.append(fieldStr);
@@ -341,6 +461,16 @@ public class MysqlService {
   private static final int UPDATE_TYPE = 2;
 
   public boolean delete(AbstractEntry data) {
+    if (data == null) {
+      logger.error("删除数据失败: data 不能为 null");
+      return false;
+    }
+    
+    if (mysqlConnector == null) {
+      logger.error("MysqlConnector 未初始化，无法删除数据");
+      return false;
+    }
+    
     // 获取 @DbTable 注解
     Class<?> clazz = data.getClass();
     String tableName = "";
@@ -348,16 +478,21 @@ public class MysqlService {
     Object keyValue = null;
     if (clazz.isAnnotationPresent(DbMeta.DbTable.class)) {
       DbMeta.DbTable tableAnnotation = clazz.getAnnotation(DbMeta.DbTable.class);
-      tableName = tableAnnotation.name();
-      for (Field field : clazz.getDeclaredFields()) {
-        field.setAccessible(true); // 允许访问私有字段
-        if (field.isAnnotationPresent(DbMeta.DbMasterKey.class)) {
-          try {
-            keyValue = field.get(data);
-            keyName = field.getAnnotation(DbMeta.DbMasterKey.class).name();
-          } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return false;
+      if (tableAnnotation != null) {
+        tableName = tableAnnotation.name();
+        for (Field field : clazz.getDeclaredFields()) {
+          field.setAccessible(true); // 允许访问私有字段
+          if (field.isAnnotationPresent(DbMeta.DbMasterKey.class)) {
+            try {
+              keyValue = field.get(data);
+              DbMeta.DbMasterKey masterKey = field.getAnnotation(DbMeta.DbMasterKey.class);
+              if (masterKey != null) {
+                keyName = masterKey.name();
+              }
+            } catch (IllegalAccessException e) {
+              logger.error("删除数据时获取主键值失败: {}", data.getClass().getSimpleName(), e);
+              return false;
+            }
           }
         }
       }
@@ -365,6 +500,7 @@ public class MysqlService {
     if (StringUtil.isNullOrEmpty(tableName)
         || StringUtil.isNullOrEmpty(keyName)
         || keyValue == null) {
+      logger.error("删除数据失败: 表名、主键名或主键值为空，tableName={}, keyName={}, keyValue={}", tableName, keyName, keyValue);
       return false;
     }
     String sql = String.format("DELETE  FROM %s WHERE %s=?", tableName, keyName);
