@@ -438,6 +438,8 @@ public class ParserExcelConfig {
                 "package ly.config;\n"
                     + "\n"
                     + "import java.util.List;\n"
+                    + "import java.util.ArrayList;\n"
+                    + "import java.util.Arrays;\n"
                     + "import ly.utils.KV;\n"
                     + "import ly.utils.ExcelKVParser;\n"
                     + "\n"
@@ -483,6 +485,12 @@ public class ParserExcelConfig {
               sb.append("  /**").append(descStr).append("*/ \n");
             }
             sb.append("   public float " + title + ";\n\n");
+          } else if (type.equalsIgnoreCase("INT1")) {
+            // INT1 类型对应 List<Integer> 用于存储整数列表
+            if (!StringUtil.isBlank(descStr)) {
+              sb.append("  /**").append(descStr).append("*/ \n");
+            }
+            sb.append("   public List<Integer> " + title + ";\n\n");
           } else if (type.equalsIgnoreCase("INT2")) {
             // INT2 类型对应 List<KV<String, String>> 用于存储键值对
             if (!StringUtil.isBlank(descStr)) {
@@ -756,6 +764,21 @@ public class ParserExcelConfig {
               + "      // @@@@@自定义clear方法结束区@@@@@\n"
               + "    }\n"
               + "\n"
+              + "    private List<Integer> parseIntList(String value) {\n"
+              + "      if (value == null || value.trim().isEmpty()) {\n"
+              + "        return new ArrayList<>();\n"
+              + "      }\n"
+              + "      String[] parts = value.split(\",\");\n"
+              + "      List<Integer> result = new ArrayList<>();\n"
+              + "      for (String part : parts) {\n"
+              + "        try {\n"
+              + "          result.add(Integer.parseInt(part.trim()));\n"
+              + "        } catch (NumberFormatException e) {\n"
+              + "          // 如果不是数字，则跳过\n"
+              + "        }\n"
+              + "      }\n"
+              + "      return result;\n"
+              + "    }\n\n"
               + "    public List<{javaFileSimpleName}Config> getConfigList() {\n"
               + "      return configList;\n"
               + "    }\n"
@@ -792,6 +815,9 @@ public class ParserExcelConfig {
         return " Boolean.parseBoolean(arr[" + i + "].trim())";
       } else if (type.equalsIgnoreCase("FLOAT")) {
         return " Float.parseFloat(arr[" + i + "].trim())";
+      } else if (type.equalsIgnoreCase("INT1")) {
+        // INT1 类型解析为 List<Integer>，用于处理 Excel 中的整数列表数据
+        return " parseIntList(arr[" + i + "].trim())";
       } else if (type.equalsIgnoreCase("INT2")) {
         // INT2 类型解析为 List<KV>，用于处理 Excel 中的键值对数据
         return " new ArrayList<>(ExcelKVParser.parseSimpleKV(arr[" + i + "].trim()))";
@@ -802,6 +828,7 @@ public class ParserExcelConfig {
       }
     }
   }
+
 
   private String extractClearStr(String source) {
     StringBuilder methodStr = new StringBuilder();
