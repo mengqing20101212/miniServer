@@ -492,7 +492,13 @@ public class ParserExcelConfig {
             }
             sb.append("   public List<Integer> " + title + ";\n\n");
           } else if (type.equalsIgnoreCase("INT2")) {
-            // INT2 类型对应 List<KV<String, String>> 用于存储键值对
+            // INT2 类型对应 List<KV<Integer, Integer>> 用于存储整数键值对
+            if (!StringUtil.isBlank(descStr)) {
+              sb.append("  /**").append(descStr).append("*/ \n");
+            }
+            sb.append("   public List<KV<Integer, Integer>> " + title + ";\n\n");
+          } else if (type.equalsIgnoreCase("STRING2")) {
+            // STRING2 类型对应 List<KV<String, String>> 用于存储字符串键值对
             if (!StringUtil.isBlank(descStr)) {
               sb.append("  /**").append(descStr).append("*/ \n");
             }
@@ -779,6 +785,50 @@ public class ParserExcelConfig {
               + "      }\n"
               + "      return result;\n"
               + "    }\n\n"
+              + "    private List<KV<Integer, Integer>> parseIntKVList(String value) {\n"
+              + "      if (value == null || value.trim().isEmpty()) {\n"
+              + "        return new ArrayList<>();\n"
+              + "      }\n"
+              + "      List<KV<Integer, Integer>> result = new ArrayList<>();\n"
+              + "      String[] pairs = value.split(\",\");\n"
+              + "      for (String pair : pairs) {\n"
+              + "        pair = pair.trim();\n"
+              + "        if (!pair.isEmpty()) {\n"
+              + "          int idx = pair.indexOf(\":\");\n"
+              + "          if (idx > 0) {\n"
+              + "            String keyStr = pair.substring(0, idx).trim();\n"
+              + "            String valueStr = pair.substring(idx + 1).trim();\n"
+              + "            try {\n"
+              + "              Integer key = Integer.parseInt(keyStr);\n"
+              + "              Integer val = Integer.parseInt(valueStr);\n"
+              + "              result.add(new KV<>(key, val));\n"
+              + "            } catch (NumberFormatException e) {\n"
+              + "              // 如果不是数字，则跳过\n"
+              + "            }\n"
+              + "          }\n"
+              + "        }\n"
+              + "      }\n"
+              + "      return result;\n"
+              + "    }\n\n"
+              + "    private List<KV<String, String>> parseStringKVList(String value) {\n"
+              + "      if (value == null || value.trim().isEmpty()) {\n"
+              + "        return new ArrayList<>();\n"
+              + "      }\n"
+              + "      List<KV<String, String>> result = new ArrayList<>();\n"
+              + "      String[] pairs = value.split(\",\");\n"
+              + "      for (String pair : pairs) {\n"
+              + "        pair = pair.trim();\n"
+              + "        if (!pair.isEmpty()) {\n"
+              + "          int idx = pair.indexOf(\":\");\n"
+              + "          if (idx > 0) {\n"
+              + "            String keyStr = pair.substring(0, idx).trim();\n"
+              + "            String valueStr = pair.substring(idx + 1).trim();\n"
+              + "            result.add(new KV<>(keyStr, valueStr));\n"
+              + "          }\n"
+              + "        }\n"
+              + "      }\n"
+              + "      return result;\n"
+              + "    }\n\n"
               + "    public List<{javaFileSimpleName}Config> getConfigList() {\n"
               + "      return configList;\n"
               + "    }\n"
@@ -819,8 +869,11 @@ public class ParserExcelConfig {
         // INT1 类型解析为 List<Integer>，用于处理 Excel 中的整数列表数据
         return " parseIntList(arr[" + i + "].trim())";
       } else if (type.equalsIgnoreCase("INT2")) {
-        // INT2 类型解析为 List<KV>，用于处理 Excel 中的键值对数据
-        return " new ArrayList<>(ExcelKVParser.parseSimpleKV(arr[" + i + "].trim()))";
+        // INT2 类型解析为 List<KV<Integer, Integer>>，用于处理 Excel 中的整数键值对数据
+        return " parseIntKVList(arr[" + i + "].trim())";
+      } else if (type.equalsIgnoreCase("STRING2")) {
+        // STRING2 类型解析为 List<KV<String, String>>，用于处理 Excel 中的字符串键值对数据
+        return " parseStringKVList(arr[" + i + "].trim())";
       } else if (type.equalsIgnoreCase("LIST<INT>")) {
         return "arr[" + i + "].trim()";
       } else {
