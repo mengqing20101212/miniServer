@@ -6,11 +6,14 @@
 /data/work/miniServer/server/BotServer/src/main/java/ly/BotServer.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/command/impl/HeartbeatCommand.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/RobotManager.java
+/data/work/miniServer/server/BotServer/src/main/java/ly/bot/module/RobotModule.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/observer/RobotObserver.java
+/data/work/miniServer/server/BotServer/src/main/java/ly/bot/module/impl/LoginModule.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/state/RobotContext.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/state/impl/ConnectingState.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/strategy/RobotBehaviorStrategy.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/strategy/impl/AggressiveBehaviorStrategy.java
+/data/work/miniServer/server/BotServer/src/main/java/ly/bot/module/ModuleManager.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/observer/impl/LoggingObserver.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/session/RobotSession.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/http/HttpServerListClient.java

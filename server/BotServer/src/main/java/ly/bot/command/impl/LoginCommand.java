@@ -84,6 +84,19 @@ public class LoginCommand implements RobotCommand {
     }
     
     @Override
+    public void onResponse(ly.net.packet.AbstractMessagePacket response, ly.net.NetClient client, ly.bot.session.RobotSession session) {
+        // 处理登录响应
+        if (response.getCmd() == ly.proto.Cmd.CMD.SC_Login_VALUE) {
+            // 登录成功的响应处理
+            System.out.println("收到登录成功响应: " + response);
+            // 设置登录成功状态
+            session.setLoginSuccess(true);
+        } else {
+            System.out.println("收到其他响应: " + response.getCmd());
+        }
+    }
+
+    @Override
     public String getName() {
         return "LoginCommand";
     }

@@ -19,6 +19,12 @@ public class HeartbeatCommand implements RobotCommand {
     }
     
     @Override
+    public void onResponse(ly.net.packet.AbstractMessagePacket response, ly.net.NetClient client, ly.bot.session.RobotSession session) {
+        // 处理心跳相关的响应
+        logger.debug("收到心跳响应: " + response.getCmd());
+    }
+    
+    @Override
     public String getName() {
         return "HeartbeatCommand";
     }

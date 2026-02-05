@@ -42,6 +42,9 @@ public class RobotSession {
     private NetClient gateClient;
     private static ly.bot.http.HttpServerListClient globalHttpClient;
     
+    // 消息队列，用于处理服务器响应
+    private final java.util.concurrent.BlockingQueue<ly.net.packet.AbstractMessagePacket> messageQueue = new java.util.concurrent.LinkedBlockingQueue<>();
+    
     private volatile boolean isLoginSuccess = false;
     private volatile boolean isGateConnected = false;
     
@@ -72,6 +75,9 @@ public class RobotSession {
         
         // 添加默认观察者
         addObserver(new LoggingObserver());
+        
+        // 启动响应处理线程
+        startResponseHandlingThread();
     }
     
     /**
@@ -228,24 +234,17 @@ public class RobotSession {
     private void waitForLoginResponse() {
         logger.info("机器人 #{} 等待登录响应", botId);
         
-        // 设置一个线程来监听响应
-        Thread.ofVirtual().name("Robot-" + botId + "-Response").start(() -> {
+        // 登录响应现在由响应处理线程统一处理
+        // 这里只需要等待登录成功标志
+        Thread.ofVirtual().name("Robot-" + botId + "-LoginWaiter").start(() -> {
             int attempts = 50; // 尝试5秒
             
             while (attempts > 0 && !isLoginSuccess) {
                 try {
-                    // 尝试从GateServer接收响应
-                    AbstractMessagePacket response = gateClient.readPacket();
-                    if (response != null) {
-                        // 处理响应
-                        handleLoginResponse(response);
-                        break;
-                    }
-                    
                     Thread.sleep(100);
                     attempts--;
                 } catch (Exception e) {
-                    logger.error("机器人 #{} 接收登录响应失败", botId, e);
+                    logger.error("等待登录响应异常", botId, e);
                     break;
                 }
             }
@@ -377,6 +376,87 @@ public class RobotSession {
     
     public int getBotId() {
         return botId;
+    }
+    
+    /**
+     * 启动响应处理线程
+     */
+    private void startResponseHandlingThread() {
+        Thread.ofVirtual().name("Robot-" + botId + "-ResponseHandler").start(() -> {
+            while (running.get()) {
+                try {
+                    // 从NetClient获取响应包并放入队列
+                    AbstractMessagePacket response = gateClient != null ? gateClient.readPacket() : null;
+                    if (response != null) {
+                        // 将响应包放入消息队列
+                        messageQueue.offer(response);
+                    }
+                    
+                    // 处理队列中的消息
+                    processMessageQueue();
+                    
+                    Thread.sleep(50); // 每50ms检查一次
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (Exception e) {
+                    logger.error("响应处理线程异常", e);
+                }
+            }
+        });
+    }
+    
+    /**
+     * 处理消息队列中的响应
+     */
+    private void processMessageQueue() {
+        try {
+            // 处理队列中的所有消息
+            while (!messageQueue.isEmpty()) {
+                AbstractMessagePacket response = messageQueue.poll();
+                if (response != null) {
+                    handleResponse(response);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("处理消息队列异常", e);
+        }
+    }
+    
+    /**
+     * 处理服务器响应
+     */
+    private void handleResponse(AbstractMessagePacket response) {
+        try {
+            // 根据命令类型创建相应的命令对象并处理响应
+            ly.bot.command.RobotCommand command = null;
+            switch (response.getCmd()) {
+                case ly.proto.Cmd.CMD.SC_Login_VALUE:
+                    command = ly.bot.factory.RobotCommandFactory.createCommand(ly.bot.factory.RobotCommandFactory.CommandType.LOGIN,
+                        account, token, accountId, "robot_channel", "robot_device_" + botId);
+                    break;
+                case ly.proto.Cmd.CMD.SC_RpcPing_VALUE: // RPC心跳响应
+                    command = ly.bot.factory.RobotCommandFactory.createCommand(ly.bot.factory.RobotCommandFactory.CommandType.HEARTBEAT);
+                    break;
+                default:
+                    // 对于未知响应，可以根据需要创建通用处理命令
+                    logger.debug("收到未知命令响应: {}", response.getCmd());
+                    return;
+            }
+            
+            if (command != null) {
+                command.onResponse(response, gateClient, this); // 传递this作为RobotSession实例
+            }
+        } catch (Exception e) {
+            logger.error("处理响应异常", e);
+        }
+    }
+    
+    /**
+     * 设置登录成功状态
+     */
+    public void setLoginSuccess(boolean success) {
+        this.isLoginSuccess = success;
     }
     
     public void shutdown() {
