@@ -98,10 +98,6 @@ public class C2SMessagePacket extends AbstractMessagePacket {
         return String.format("%d|%d|%d|%d|%d|%d", cmd, sid, guid, seq, data.length, getPacketLen());
     }
 
-    public long getGuid() {
-        return guid;
-    }
-
     @Override
     public String toString() {
         return "C2SMessagePacket{" +

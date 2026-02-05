@@ -2,6 +2,7 @@ ly/bot/session/RobotSession.class
 ly/bot/strategy/RobotBehaviorStrategy.class
 ly/bot/command/impl/HeartbeatCommand.class
 ly/bot/command/impl/MoveCommand.class
+ly/bot/util/ProtocolTester.class
 ly/bot/factory/RobotCommandFactory.class
 ly/bot/factory/RobotCommandFactory$CommandType.class
 ly/bot/RobotManager$RobotStats.class

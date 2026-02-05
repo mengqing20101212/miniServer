@@ -43,12 +43,14 @@ public class LoginCommand implements RobotCommand {
             Login.csLogin loginRequest = loginBuilder.build();
             
             // 发送登录请求到GateServer
+            int seq = client.getSendSeq(); // 获取并增加序列号
+            int sid = client.isReady() ? client.getSid() : 0; // 使用正确的SID
             ly.net.packet.C2SMessagePacket packet = MessagePacketFactory.createC2SMessagePacket(
                 accountId, // guid
                 Cmd.CMD.CS_Login_VALUE, // 登录命令
                 loginRequest, // protobuf数据
-                client.getSendSeq(), // 序列号
-                client.isReady() ? client.getSid() : 0 // sid
+                seq, // 序列号
+                sid // sid
             );
             
             boolean sent = client.send(packet);
