@@ -18,6 +18,13 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import ly.bot.module.ModuleManager;
+import ly.bot.module.RobotModule;
+import ly.bot.module.impl.HeartbeatModule;
+import ly.bot.module.impl.MovementModule;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -54,6 +61,9 @@ public class RobotSession {
     // 使用观察者模式
     private final List<RobotObserver> observers = new CopyOnWriteArrayList<>();
     
+    // 模块管理器
+    private ModuleManager moduleManager;
+    
     private final Random random = new Random();
     private final AtomicBoolean running = new AtomicBoolean(true);
     
@@ -78,6 +88,9 @@ public class RobotSession {
         
         // 启动响应处理线程
         startResponseHandlingThread();
+        
+        // 初始化模块管理器
+        initializeModuleManager();
     }
     
     /**
@@ -279,6 +292,20 @@ public class RobotSession {
     }
     
     /**
+     * 初始化模块管理器
+     */
+    private void initializeModuleManager() {
+        // 创建模块列表
+        List<RobotModule> modules = List.of(
+            new HeartbeatModule(),
+            new MovementModule()
+        );
+        
+        // 初始化模块管理器
+        this.moduleManager = new ModuleManager(modules, this, gateClient);
+    }
+    
+    /**
      * 开始游戏行为
      */
     private void startGameActions() {
@@ -291,8 +318,10 @@ public class RobotSession {
                     // 随机延迟，模拟真实用户行为
                     Thread.sleep(2000 + random.nextInt(3000)); // 2-5秒
                     
-                    // 执行一些游戏行为
-                    performRandomAction();
+                    // 使用模块管理器执行行为
+                    if (moduleManager != null) {
+                        moduleManager.executeStep();
+                    }
                 }
             } catch (InterruptedException e) {
                 // 线程被中断，正常退出

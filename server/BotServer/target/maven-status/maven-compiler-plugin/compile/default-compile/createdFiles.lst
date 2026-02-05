@@ -1,5 +1,7 @@
 ly/bot/strategy/RobotBehaviorStrategy.class
 ly/bot/module/RobotModule.class
+ly/bot/module/impl/HeartbeatModule.class
+ly/bot/module/impl/MovementModule.class
 ly/bot/command/impl/HeartbeatCommand.class
 ly/bot/util/ProtocolTester.class
 ly/bot/factory/RobotCommandFactory.class
