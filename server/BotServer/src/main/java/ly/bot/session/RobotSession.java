@@ -62,6 +62,11 @@ public class RobotSession {
         this.loginServerHost = loginServerHost;
         this.loginServerPort = loginServerPort;
         
+        // 初始化全局HTTP客户端
+        if (globalHttpClient == null) {
+            globalHttpClient = new ly.bot.http.HttpServerListClient(loginServerHost, loginServerPort);
+        }
+        
         // 初始化状态模式上下文
         this.robotContext = new RobotContext(botId, null); // 初始时没有NetClient
         
@@ -96,10 +101,9 @@ public class RobotSession {
         logger.info("机器人 #{} 正在通过HTTP获取服务器列表", botId);
         
         try {
-            // 通过HTTP请求获取服务器列表
-            ly.bot.http.HttpServerListClient httpClient = new ly.bot.http.HttpServerListClient(loginServerHost, loginServerPort);
+            // 通过HTTP请求获取服务器列表，使用全局HTTP客户端
             ly.bot.http.HttpServerListClient.ServerListResult serverListResult = 
-                httpClient.getServerList(account);
+                globalHttpClient.getServerList(account);
             
             if (serverListResult != null) {
                 logger.info("机器人 #{} 成功获取服务器列表", botId);
