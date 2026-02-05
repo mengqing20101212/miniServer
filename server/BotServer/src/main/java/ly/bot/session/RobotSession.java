@@ -39,7 +39,6 @@ public class RobotSession {
     
     private String loginServerHost;
     private int loginServerPort;
-    private NetClient loginClient;
     private NetClient gateClient;
     
     private volatile boolean isLoginSuccess = false;
@@ -75,43 +74,18 @@ public class RobotSession {
     public void startLoginProcess() {
         logger.info("机器人 #{} 开始登录流程", botId);
         
-        // 第一步：连接LoginServer
+        // 直接通过HTTP获取服务器列表，然后连接GateServer
         connectToLoginServer();
     }
     
     /**
-     * 连接LoginServer
+     * 获取服务器列表（LoginServer使用HTTP协议，不需要NetClient连接）
      */
     private void connectToLoginServer() {
-        logger.info("机器人 #{} 正在连接LoginServer {}:{}", botId, loginServerHost, loginServerPort);
+        logger.info("机器人 #{} 通过HTTP获取服务器列表 {}:{}", botId, loginServerHost, loginServerPort);
         
-        try {
-            loginClient = new NetClient(loginServerHost, loginServerPort, false);
-            EventLoopGroup workerGroup = NetService.getInstance().getWorkerGroup();
-            loginClient.start(workerGroup);
-            
-            // 更新上下文
-            robotContext.setState(new ly.bot.state.impl.ConnectingState());
-            notifyStateChanged(robotContext);
-            
-            // 等待连接就绪
-            int maxWait = 50; // 最多等待5秒
-            while (!loginClient.isReady() && maxWait > 0) {
-                Thread.sleep(100);
-                maxWait--;
-            }
-            
-            if (loginClient.isReady()) {
-                logger.info("机器人 #{} 成功连接到LoginServer", botId);
-                
-                // 获取服务器列表
-                getServerList();
-            } else {
-                logger.error("机器人 #{} 连接LoginServer超时", botId);
-            }
-        } catch (Exception e) {
-            logger.error("机器人 #{} 连接LoginServer失败", botId, e);
-        }
+        // 直接通过HTTP请求获取服务器列表，不需要NetClient连接
+        getServerList();
     }
     
     /**
@@ -385,9 +359,7 @@ public class RobotSession {
     
     public void shutdown() {
         running.set(false);
-        if (loginClient != null) {
-            loginClient.stop();
-        }
+        // loginClient不再使用，因为LoginServer通过HTTP访问
         if (gateClient != null) {
             gateClient.stop();
         }
