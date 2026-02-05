@@ -1,5 +1,6 @@
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/factory/RobotCommandFactory.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/state/RobotState.java
+/data/work/miniServer/server/BotServer/src/main/java/ly/bot/module/impl/CurrencyModule.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/module/impl/LoginModule.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/state/impl/ConnectingState.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/module/impl/HeartbeatModule.java
@@ -15,6 +16,7 @@
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/command/RobotCommand.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/stats/PacketLatencyStats.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/strategy/impl/NormalBehaviorStrategy.java
+/data/work/miniServer/server/BotServer/src/main/java/ly/bot/data/RobotSessionDataStore.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/state/impl/LoggedInState.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/BotServer.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/command/impl/HeartbeatCommand.java
@@ -27,4 +29,5 @@
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/module/impl/CombatModule.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/state/impl/ConnectedState.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/data/ModuleDataStore.java
+/data/work/miniServer/server/BotServer/src/main/java/ly/bot/module/impl/GachaModule.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/command/impl/LoginCommand.java

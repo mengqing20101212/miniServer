@@ -1,8 +1,6 @@
 package ly.bot.module.impl;
 
 import ly.bot.command.RobotCommand;
-import ly.bot.data.ModuleDataStore;
-import ly.bot.data.impl.ConcurrentModuleDataStore;
 import ly.bot.factory.RobotCommandFactory;
 import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
@@ -20,9 +18,6 @@ public class HeartbeatModule implements RobotModule {
     private int step = 0;
     private static final int MAX_STEPS = 5; // 心跳模块执行5次心跳
     
-    // 模块专属数据存储
-    private final ModuleDataStore<Object> dataStore = new ConcurrentModuleDataStore<>();
-    
     @Override
     public boolean executeStep(NetClient client, RobotSession session) {
         // 发送心跳包
@@ -31,9 +26,9 @@ public class HeartbeatModule implements RobotModule {
         );
         heartbeatCommand.execute(client, session);
         
-        // 存储心跳相关的数据
-        dataStore.put("lastHeartbeatTime", System.currentTimeMillis());
-        dataStore.put("heartbeatCount", step + 1);
+        // 存储心跳相关的数据到会话级别存储
+        session.getDataStore().put("heartbeat", "lastHeartbeatTime", System.currentTimeMillis());
+        session.getDataStore().put("heartbeat", "heartbeatCount", step + 1);
         
         step++;
         if (step >= MAX_STEPS) {
@@ -47,8 +42,7 @@ public class HeartbeatModule implements RobotModule {
     public void reset() {
         completed = false;
         step = 0;
-        // 清除模块数据
-        dataStore.clear();
+        // 注意：不再清除会话级别的数据，因为其他模块可能需要这些数据
     }
     
     @Override
@@ -59,10 +53,5 @@ public class HeartbeatModule implements RobotModule {
     @Override
     public String getName() {
         return "HeartbeatModule";
-    }
-    
-    @Override
-    public ModuleDataStore<Object> getDataStore() {
-        return dataStore;
     }
 }

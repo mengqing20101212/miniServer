@@ -89,26 +89,4 @@ public class ModuleManager {
     public List<RobotModule> getModules() {
         return modules;
     }
-    
-    /**
-     * 获取指定模块的数据存储
-     * @param moduleName 模块名称
-     * @return 模块数据存储，如果找不到则返回null
-     */
-    public ly.bot.data.ModuleDataStore<Object> getModuleDataStore(String moduleName) {
-        for (RobotModule module : modules) {
-            if (module.getName().equals(moduleName)) {
-                return module.getDataStore();
-            }
-        }
-        return null;
-    }
-    
-    /**
-     * 获取当前模块的数据存储
-     * @return 当前模块的数据存储
-     */
-    public ly.bot.data.ModuleDataStore<Object> getCurrentModuleDataStore() {
-        return currentModule != null ? currentModule.getDataStore() : null;
-    }
 }

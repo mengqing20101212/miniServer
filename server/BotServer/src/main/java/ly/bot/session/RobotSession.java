@@ -27,6 +27,7 @@ import ly.bot.module.impl.HeartbeatModule;
 import ly.bot.module.impl.MovementModule;
 import ly.bot.entity.PlayerInfo;
 import ly.bot.stats.PacketLatencyStats;
+import ly.bot.data.RobotSessionDataStore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -71,6 +72,9 @@ public class RobotSession {
     
     // 网络延迟统计
     private final PacketLatencyStats latencyStats = new PacketLatencyStats();
+    
+    // 机器人会话数据存储
+    private final RobotSessionDataStore dataStore = new RobotSessionDataStore();
     
     private final Random random = new Random();
     private final AtomicBoolean running = new AtomicBoolean(true);
@@ -323,7 +327,9 @@ public class RobotSession {
         List<RobotModule> modules = List.of(
             new HeartbeatModule(),
             new MovementModule(),
-            new ly.bot.module.impl.CombatModule()
+            new ly.bot.module.impl.CombatModule(),
+            new ly.bot.module.impl.CurrencyModule(),
+            new ly.bot.module.impl.GachaModule()
         );
         
         // 初始化模块管理器
@@ -550,6 +556,13 @@ public class RobotSession {
      */
     public ly.bot.entity.PlayerInfo getPlayerInfo() {
         return playerInfo;
+    }
+    
+    /**
+     * 获取机器人会话数据存储
+     */
+    public ly.bot.data.RobotSessionDataStore getDataStore() {
+        return dataStore;
     }
     
     public void shutdown() {

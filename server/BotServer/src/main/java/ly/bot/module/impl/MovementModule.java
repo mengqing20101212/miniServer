@@ -1,8 +1,6 @@
 package ly.bot.module.impl;
 
 import ly.bot.command.RobotCommand;
-import ly.bot.data.ModuleDataStore;
-import ly.bot.data.impl.ConcurrentModuleDataStore;
 import ly.bot.factory.RobotCommandFactory;
 import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
@@ -20,9 +18,6 @@ public class MovementModule implements RobotModule {
     private int step = 0;
     private static final int MAX_MOVEMENTS = 3; // 移动模块执行3次移动
     
-    // 模块专属数据存储
-    private final ModuleDataStore<Object> dataStore = new ConcurrentModuleDataStore<>();
-    
     @Override
     public boolean executeStep(NetClient client, RobotSession session) {
         // 发送移动命令
@@ -31,10 +26,10 @@ public class MovementModule implements RobotModule {
         );
         moveCommand.execute(client, session);
         
-        // 存储移动相关的数据
-        dataStore.put("lastMoveTime", System.currentTimeMillis());
-        dataStore.put("moveCount", step + 1);
-        dataStore.put("currentPosition", "x:" + (step * 10) + ", y:" + (step * 5));
+        // 存储移动相关的数据到会话级别存储
+        session.getDataStore().put("movement", "lastMoveTime", System.currentTimeMillis());
+        session.getDataStore().put("movement", "moveCount", step + 1);
+        session.getDataStore().put("movement", "currentPosition", "x:" + (step * 10) + ", y:" + (step * 5));
         
         step++;
         if (step >= MAX_MOVEMENTS) {
@@ -48,8 +43,7 @@ public class MovementModule implements RobotModule {
     public void reset() {
         completed = false;
         step = 0;
-        // 清除模块数据
-        dataStore.clear();
+        // 注意：不再清除会话级别的数据，因为其他模块可能需要这些数据
     }
     
     @Override
@@ -60,10 +54,5 @@ public class MovementModule implements RobotModule {
     @Override
     public String getName() {
         return "MovementModule";
-    }
-    
-    @Override
-    public ModuleDataStore<Object> getDataStore() {
-        return dataStore;
     }
 }
