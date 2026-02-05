@@ -19,7 +19,9 @@ ly/bot/http/HttpServerListClient.class
 ly/BotServer.class
 ly/bot/module/ModuleManager.class
 ly/bot/session/RobotSession.class
+ly/bot/stats/PacketLatencyStats.class
 ly/bot/command/impl/MoveCommand.class
+ly/bot/entity/PlayerInfo.class
 ly/bot/command/impl/LoginCommand.class
 ly/bot/state/impl/LoggedInState.class
 ly/bot/strategy/impl/NormalBehaviorStrategy.class

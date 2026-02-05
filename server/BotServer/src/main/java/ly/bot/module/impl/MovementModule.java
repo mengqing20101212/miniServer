@@ -24,7 +24,7 @@ public class MovementModule implements RobotModule {
         RobotCommand moveCommand = RobotCommandFactory.createCommand(
             RobotCommandFactory.CommandType.MOVE
         );
-        moveCommand.execute(client);
+        moveCommand.execute(client, session);
         
         step++;
         if (step >= MAX_MOVEMENTS) {

@@ -24,7 +24,7 @@ public class HeartbeatModule implements RobotModule {
         RobotCommand heartbeatCommand = RobotCommandFactory.createCommand(
             RobotCommandFactory.CommandType.HEARTBEAT
         );
-        heartbeatCommand.execute(client);
+        heartbeatCommand.execute(client, session);
         
         step++;
         if (step >= MAX_STEPS) {

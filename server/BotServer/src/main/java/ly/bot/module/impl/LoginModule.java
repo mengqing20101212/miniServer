@@ -27,7 +27,7 @@ public class LoginModule implements RobotModule {
                 RobotCommand loginCommand = RobotCommandFactory.createCommand(
                     RobotCommandFactory.CommandType.LOGIN
                 );
-                loginCommand.execute(client);
+                loginCommand.execute(client, session);
             }
             step++;
         } else if (step == 1) {

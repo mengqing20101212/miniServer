@@ -1,6 +1,7 @@
 package ly.bot.state;
 
 import ly.net.NetClient;
+import ly.bot.session.RobotSession;
 import ly.bot.strategy.RobotBehaviorStrategy;
 import org.slf4j.Logger;
 import ly.LoggerDef;
@@ -14,11 +15,20 @@ public class RobotContext {
     private RobotState currentState;
     private final int robotId;
     private final NetClient netClient;
+    private final RobotSession robotSession;
     private RobotBehaviorStrategy strategy;
     
     public RobotContext(int robotId, NetClient netClient) {
         this.robotId = robotId;
         this.netClient = netClient;
+        this.robotSession = null;
+        this.currentState = null; // 初始状态为空
+    }
+    
+    public RobotContext(int robotId, NetClient netClient, RobotSession robotSession) {
+        this.robotId = robotId;
+        this.netClient = netClient;
+        this.robotSession = robotSession;
         this.currentState = null; // 初始状态为空
     }
     
@@ -36,8 +46,12 @@ public class RobotContext {
     }
     
     public void performPostLoginActions() {
-        if (strategy != null) {
-            strategy.execute(netClient);
+        if (strategy != null && netClient != null) {
+            if (robotSession != null) {
+                strategy.execute(netClient, robotSession);
+            } else {
+                strategy.execute(netClient, null);
+            }
         }
     }
     

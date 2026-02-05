@@ -39,9 +39,17 @@ public class LoginCommand implements RobotCommand {
         this.gameServerId = gameServerId;
     }
     
+    private String commandId; // 用于延迟统计的命令ID
+    
     @Override
-    public void execute(NetClient client) {
+    public void execute(NetClient client, ly.bot.session.RobotSession session) {
         try {
+            // 创建命令ID用于延迟统计
+            this.commandId = "login_" + System.currentTimeMillis() + "_" + account.hashCode();
+            
+            // 记录请求发送时间
+            session.getLatencyStats().recordRequestSent(commandId, Cmd.CMD.CS_Login_VALUE);
+            
             // 创建登录请求消息
             Login.csLogin.Builder loginBuilder = Login.csLogin.newBuilder();
             loginBuilder.setAccount(account);
@@ -84,6 +92,11 @@ public class LoginCommand implements RobotCommand {
     }
     
     @Override
+    public String getCommandId() {
+        return commandId != null ? commandId : "login_" + System.currentTimeMillis();
+    }
+
+    @Override
     public void onResponse(ly.net.packet.AbstractMessagePacket response, ly.net.NetClient client, ly.bot.session.RobotSession session) {
         // 处理登录响应
         if (response.getCmd() == ly.proto.Cmd.CMD.SC_Login_VALUE) {
@@ -93,6 +106,11 @@ public class LoginCommand implements RobotCommand {
             session.setLoginSuccess(true);
         } else {
             System.out.println("收到其他响应: " + response.getCmd());
+        }
+        
+        // 记录响应接收时间
+        if (commandId != null) {
+            session.getLatencyStats().recordResponseReceived(commandId, response.getCmd());
         }
     }
 

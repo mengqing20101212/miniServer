@@ -25,6 +25,8 @@ import ly.bot.module.ModuleManager;
 import ly.bot.module.RobotModule;
 import ly.bot.module.impl.HeartbeatModule;
 import ly.bot.module.impl.MovementModule;
+import ly.bot.entity.PlayerInfo;
+import ly.bot.stats.PacketLatencyStats;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -64,6 +66,12 @@ public class RobotSession {
     // 模块管理器
     private ModuleManager moduleManager;
     
+    // 玩家信息
+    private PlayerInfo playerInfo;
+    
+    // 网络延迟统计
+    private final PacketLatencyStats latencyStats = new PacketLatencyStats();
+    
     private final Random random = new Random();
     private final AtomicBoolean running = new AtomicBoolean(true);
     
@@ -81,7 +89,7 @@ public class RobotSession {
         }
         
         // 初始化状态模式上下文
-        this.robotContext = new RobotContext(botId, null); // 初始时没有NetClient
+        this.robotContext = new RobotContext(botId, null, this); // 初始时没有NetClient
         
         // 添加默认观察者
         addObserver(new LoggingObserver());
@@ -174,7 +182,7 @@ public class RobotSession {
                 isGateConnected = true;
                 
                 // 更新机器人上下文的客户端
-                robotContext = new RobotContext(botId, gateClient);
+                robotContext = new RobotContext(botId, gateClient, this);
                 
                 // 发送登录请求到GateServer，使用从服务器获取的所有必要信息
                 sendLoginToGateServer(accountId, token, gameServerId);
@@ -215,7 +223,7 @@ public class RobotSession {
                 account, token, accountId, "robot_channel", "robot_device_" + botId, gameServerId
             );
             
-            loginCommand.execute(gateClient);
+            loginCommand.execute(gateClient, this);
             
             logger.info("机器人 #{} 登录请求已发送", botId);
             
@@ -279,12 +287,28 @@ public class RobotSession {
         if (response.getCmd() == Cmd.CMD.SC_Login_VALUE) {
             isLoginSuccess = true;
             
+            // 创建玩家信息对象（这里需要从响应数据中提取实际的玩家信息）
+            // 暂时使用默认值，实际应用中应从响应包中解析
+            this.playerInfo = new PlayerInfo(
+                1000000L + botId,  // playerId
+                accountId,         // accountId
+                account,           // account
+                "RobotPlayer" + botId, // nickname
+                1,                 // level
+                token              // token
+            );
+            
+            logger.info("机器人 #{} 玩家信息已保存: {}", botId, playerInfo);
+            
             // 使用状态模式更新状态
             robotContext.setState(new LoggedInState());
             robotContext.request(); // 触发状态处理
             
             logger.info("机器人 #{} 登录成功", botId);
             notifyLoginSuccess(robotContext);
+            
+            // 启动延迟统计报告线程
+            startLatencyStatsReporter();
             
             // 登录成功后，可以开始执行其他游戏行为
             startGameActions();
@@ -303,6 +327,31 @@ public class RobotSession {
         
         // 初始化模块管理器
         this.moduleManager = new ModuleManager(modules, this, gateClient);
+    }
+    
+    /**
+     * 启动延迟统计报告线程
+     */
+    private void startLatencyStatsReporter() {
+        logger.info("机器人 #{} 启动延迟统计报告线程", botId);
+        
+        // 启动一个虚拟线程来定期输出延迟统计
+        Thread.ofVirtual().name("Robot-" + botId + "-LatencyStats").start(() -> {
+            try {
+                while (running.get()) {
+                    // 每30秒输出一次统计报告
+                    Thread.sleep(30000);
+                    
+                    if (isLoginSuccess) {
+                        logger.info("机器人 #{} 延迟统计:", botId);
+                        latencyStats.printStats();
+                    }
+                }
+            } catch (InterruptedException e) {
+                // 线程被中断，正常退出
+                logger.info("机器人 #{} 延迟统计报告虚拟线程结束", botId);
+            }
+        });
     }
     
     /**
@@ -348,14 +397,14 @@ public class RobotSession {
                     RobotCommand heartbeatCmd = RobotCommandFactory.createCommand(
                         RobotCommandFactory.CommandType.HEARTBEAT
                     );
-                    heartbeatCmd.execute(gateClient);
+                    heartbeatCmd.execute(gateClient, this);
                     break;
                 case 1:
                     // 发送移动
                     RobotCommand moveCmd = RobotCommandFactory.createCommand(
                         RobotCommandFactory.CommandType.MOVE
                     );
-                    moveCmd.execute(gateClient);
+                    moveCmd.execute(gateClient, this);
                     break;
                 case 2:
                     // 其他行为
@@ -486,6 +535,20 @@ public class RobotSession {
      */
     public void setLoginSuccess(boolean success) {
         this.isLoginSuccess = success;
+    }
+    
+    /**
+     * 获取延迟统计对象
+     */
+    public ly.bot.stats.PacketLatencyStats getLatencyStats() {
+        return latencyStats;
+    }
+    
+    /**
+     * 获取玩家信息
+     */
+    public ly.bot.entity.PlayerInfo getPlayerInfo() {
+        return playerInfo;
     }
     
     public void shutdown() {
