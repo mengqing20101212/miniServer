@@ -181,12 +181,4 @@ public class NetService {
     public Map<Long, ConnectSession> getGameObjectMaps() {
         return gameObjectMaps;
     }
-
-    public EventLoopGroup getWorkerGroup() {
-        return worker;
-    }
-
-    public EventLoopGroup getBossGroup() {
-        return boss;
-    }
 }

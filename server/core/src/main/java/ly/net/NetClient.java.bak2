@@ -134,7 +134,7 @@ public class NetClient {
         }
     }
 
-    public boolean isConnected() {
+    protected boolean isConnected() {
         return channel != null && channel.isActive();
     }
 
@@ -211,10 +211,6 @@ public class NetClient {
 
     public boolean isReady() {
         return isConnected() && sid != 0;
-    }
-
-    public int getSid() {
-        return sid;
     }
 
     public AbstractMessagePacket getReceiveMsgBySeq(int sendSeq, int cmd) {

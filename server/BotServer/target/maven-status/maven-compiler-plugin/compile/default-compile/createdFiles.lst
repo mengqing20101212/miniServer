@@ -1,3 +1,4 @@
+ly/bot/RobotManager.class
+ly/bot/RobotManager$RobotStats.class
 ly/BotServer.class
-ly/BotServer$1.class
-ly/BotClientHandler.class
+ly/bot/RobotManager$RobotSession.class
