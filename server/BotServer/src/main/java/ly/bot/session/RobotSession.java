@@ -322,7 +322,8 @@ public class RobotSession {
         // 创建模块列表
         List<RobotModule> modules = List.of(
             new HeartbeatModule(),
-            new MovementModule()
+            new MovementModule(),
+            new ly.bot.module.impl.CombatModule()
         );
         
         // 初始化模块管理器

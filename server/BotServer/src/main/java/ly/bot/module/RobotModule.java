@@ -1,5 +1,6 @@
 package ly.bot.module;
 
+import ly.bot.data.ModuleDataStore;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
 
@@ -38,4 +39,10 @@ public interface RobotModule {
      * @return 模块名称
      */
     String getName();
+    
+    /**
+     * 获取模块专属数据存储
+     * @return 模块数据存储
+     */
+    ModuleDataStore<Object> getDataStore();
 }

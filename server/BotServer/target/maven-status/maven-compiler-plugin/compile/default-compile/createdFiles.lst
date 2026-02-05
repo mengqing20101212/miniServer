@@ -1,4 +1,5 @@
 ly/bot/strategy/RobotBehaviorStrategy.class
+ly/bot/data/ModuleDataStore.class
 ly/bot/module/RobotModule.class
 ly/bot/module/impl/HeartbeatModule.class
 ly/bot/module/impl/MovementModule.class
@@ -20,6 +21,8 @@ ly/BotServer.class
 ly/bot/module/ModuleManager.class
 ly/bot/session/RobotSession.class
 ly/bot/stats/PacketLatencyStats.class
+ly/bot/data/impl/ConcurrentModuleDataStore.class
+ly/bot/module/impl/CombatModule.class
 ly/bot/command/impl/MoveCommand.class
 ly/bot/entity/PlayerInfo.class
 ly/bot/command/impl/LoginCommand.class

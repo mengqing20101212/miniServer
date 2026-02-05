@@ -9,6 +9,7 @@
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/session/RobotSession.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/http/HttpServerListClient.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/util/ProtocolTester.java
+/data/work/miniServer/server/BotServer/src/main/java/ly/bot/data/impl/ConcurrentModuleDataStore.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/command/impl/MoveCommand.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/module/impl/MovementModule.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/command/RobotCommand.java
@@ -23,5 +24,7 @@
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/state/RobotContext.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/strategy/RobotBehaviorStrategy.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/observer/impl/LoggingObserver.java
+/data/work/miniServer/server/BotServer/src/main/java/ly/bot/module/impl/CombatModule.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/state/impl/ConnectedState.java
+/data/work/miniServer/server/BotServer/src/main/java/ly/bot/data/ModuleDataStore.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/command/impl/LoginCommand.java
