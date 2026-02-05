@@ -14,5 +14,6 @@
         <module>tool</module>
         <module>core</module>
         <module>GameServer</module>
+        <module>BotServer</module>
     </modules>
 </project>
