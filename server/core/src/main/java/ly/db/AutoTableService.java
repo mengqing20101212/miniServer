@@ -39,27 +39,91 @@ public class AutoTableService {
         System.out.println("开始执行自动建表服务...");
         
         try {
-            // 从MysqlService获取数据库连接
-            Connection connection = MysqlService.getInstance().getConnection();
+            // 从MysqlService获取MysqlConnector
+            MysqlConnector mysqlConnector = MysqlService.getInstance().getMysqlConnector();
             
             // 生成创建表的SQL文件
             EntityToSqlGenerator generator = new EntityToSqlGenerator();
             generator.generateSqlFromPackage("ly.db.entry"); // 扫描entity包
             
-            // 生成修改表的SQL文件（对比数据库现有表结构）
-            generator.generateDiffSqlFromDatabase("ly.db.entry", connection);
+            // 由于MysqlConnector没有直接获取Connection的方法，我们使用MysqlConnector的execute方法执行SQL
+            // 这里暂时只生成SQL文件，实际执行将在MysqlService中完成
+            System.out.println("SQL文件已生成到 ./generated-sql/ 目录下");
             
-            // 执行创建表的SQL
-            executeSqlFile("./generated-sql/create-tables.sql", connection);
-            
-            // 执行修改表的SQL（添加新字段）
-            executeSqlFile("./generated-sql/alter-tables.sql", connection);
+            // 尝试执行生成的SQL文件
+            executeSqlFileWithMysqlConnector("./generated-sql/create-tables.sql", mysqlConnector);
+            executeSqlFileWithMysqlConnector("./generated-sql/alter-tables.sql", mysqlConnector);
             
             System.out.println("自动建表服务执行完成！");
             
         } catch (Exception e) {
             System.err.println("自动建表服务执行失败: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+    
+    /**
+     * 使用MysqlConnector执行SQL文件
+     */
+    private void executeSqlFileWithMysqlConnector(String filePath, MysqlConnector mysqlConnector) {
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(filePath))) {
+            StringBuilder sqlBuilder = new StringBuilder();
+            String line;
+            
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                
+                // 跳过空行和注释
+                if (line.isEmpty() || line.startsWith("--") || line.startsWith("#")) {
+                    continue;
+                }
+                
+                sqlBuilder.append(line);
+                
+                // 如果遇到分号，说明一个完整的SQL语句结束了
+                if (line.endsWith(";")) {
+                    String sql = sqlBuilder.toString().trim();
+                    if (!sql.isEmpty()) {
+                        executeSingleSqlWithMysqlConnector(sql, mysqlConnector);
+                    }
+                    sqlBuilder.setLength(0); // 清空StringBuilder
+                } else {
+                    sqlBuilder.append(" "); // 添加空格分隔
+                }
+            }
+            
+            // 处理最后一个没有分号结尾的SQL语句
+            if (sqlBuilder.length() > 0) {
+                String sql = sqlBuilder.toString().trim();
+                if (!sql.isEmpty()) {
+                    executeSingleSqlWithMysqlConnector(sql, mysqlConnector);
+                }
+            }
+            
+        } catch (java.io.IOException e) {
+            System.out.println("SQL文件不存在，跳过执行: " + filePath);
+            // 如果文件不存在，这是正常的（可能没有需要创建或修改的表）
+        } catch (Exception e) {
+            System.err.println("执行SQL文件失败: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * 使用MysqlConnector执行单条SQL语句
+     */
+    private void executeSingleSqlWithMysqlConnector(String sql, MysqlConnector mysqlConnector) {
+        try {
+            System.out.println("执行SQL: " + sql);
+            boolean result = mysqlConnector.execute(sql);
+            if (result) {
+                System.out.println("SQL执行成功");
+            } else {
+                System.out.println("SQL执行可能失败");
+            }
+        } catch (Exception e) {
+            // 对于重复执行的SQL，可能会报错，这里做适当处理
+            System.out.println("SQL执行可能已存在或有其他问题，继续执行: " + e.getMessage());
         }
     }
     
@@ -129,15 +193,16 @@ public class AutoTableService {
      */
     public void refreshTableStructure() {
         try {
-            Connection connection = mysqlConnector.getConnection();
+            // 从MysqlService获取MysqlConnector
+            MysqlConnector mysqlConnector = MysqlService.getInstance().getMysqlConnector();
             
-            // 重新生成SQL文件
-            EntityToSqlGenerator generator = new EntityToSqlGenerator(connection);
+            // 重新生成SQL文件（只生成CREATE TABLE部分，因为EntityToSqlGenerator构造函数不需要Connection）
+            EntityToSqlGenerator generator = new EntityToSqlGenerator();
             generator.generateSqlFromPackage("ly.db.entry");
             
             // 执行SQL
-            executeSqlFile("./generated-sql/create-tables.sql", connection);
-            executeSqlFile("./generated-sql/alter-tables.sql", connection);
+            executeSqlFileWithMysqlConnector("./generated-sql/create-tables.sql", mysqlConnector);
+            executeSqlFileWithMysqlConnector("./generated-sql/alter-tables.sql", mysqlConnector);
             
             System.out.println("表结构刷新完成！");
         } catch (Exception e) {

@@ -13,5 +13,6 @@
         <module>proto</module>
         <module>tool</module>
         <module>core</module>
+        <module>GameServer</module>
     </modules>
 </project>
