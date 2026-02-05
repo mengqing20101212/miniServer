@@ -118,48 +118,44 @@ public class RobotSession {
      * 获取服务器列表
      */
     private void getServerList() {
-        logger.info("机器人 #{} 正在获取服务器列表", botId);
+        logger.info("机器人 #{} 正在通过HTTP获取服务器列表", botId);
         
         try {
-            // 构造获取服务器列表的请求
-            // 这里需要根据实际的协议格式构造请求
-            // 模拟一个简单的请求，实际可能需要使用特定的protobuf消息
-            String requestJson = String.format("{\"account\":\"%s\",\"token\":\"%s\"}", account, token);
+            // 通过HTTP请求获取服务器列表
+            ly.bot.http.HttpServerListClient.ServerListResult serverListResult = 
+                ly.bot.http.HttpServerListClient.getServerList(loginServerHost, loginServerPort, account);
             
-            // 发送获取服务器列表请求
-            // 由于不知道具体的protobuf消息类型，暂时模拟
-            logger.info("机器人 #{} 已获取服务器列表信息", botId);
-            
-            // 模拟获取到GateServer信息
-            simulateGateServerInfo();
-            
+            if (serverListResult != null) {
+                logger.info("机器人 #{} 成功获取服务器列表", botId);
+                
+                // 更新账户ID和令牌（从服务器返回的信息）
+                // 注意：这里不能直接修改final字段accountId和token，所以我们需要在连接时使用服务器返回的值
+                long returnedAccountId = serverListResult.getAccountId();
+                String returnedToken = serverListResult.getToken();
+                
+                // 获取GateServer信息
+                ly.bot.http.HttpServerListClient.ServerNode gateServer = serverListResult.getGate();
+                if (gateServer != null) {
+                    logger.info("机器人 #{} 获取到GateServer信息: {}:{}", botId, gateServer.getServerIp(), gateServer.getServerPort());
+                    
+                    // 连接到GateServer
+                    connectToGateServer(gateServer.getServerIp(), gateServer.getServerPort(), returnedAccountId, returnedToken);
+                } else {
+                    logger.error("机器人 #{} 未获取到GateServer信息", botId);
+                }
+            } else {
+                logger.error("机器人 #{} 获取服务器列表失败", botId);
+            }
         } catch (Exception e) {
             logger.error("机器人 #{} 获取服务器列表失败", botId, e);
         }
     }
     
     /**
-     * 模拟获取GateServer信息
-     */
-    private void simulateGateServerInfo() {
-        // 模拟从服务器列表中获取GateServer信息
-        // 在实际实现中，这里应该解析服务器返回的GateServer信息
-        logger.info("机器人 #{} 模拟获取GateServer信息", botId);
-        
-        // 假设GateServer和LoginServer在同一主机和端口（实际情况可能不同）
-        connectToGateServer();
-    }
-    
-    /**
      * 连接到GateServer
      */
-    private void connectToGateServer() {
-        logger.info("机器人 #{} 正在连接GateServer", botId);
-        
-        // 这里应该使用从LoginServer获取的实际GateServer地址
-        // 暂时使用模拟的地址
-        String gateHost = loginServerHost; // 实际中应该使用从服务器列表获取的地址
-        int gatePort = loginServerPort + 1000; // 假设GateServer在另一个端口
+    private void connectToGateServer(String gateHost, int gatePort, long accountId, String token) {
+        logger.info("机器人 #{} 正在连接GateServer {}:{}", botId, gateHost, gatePort);
         
         try {
             gateClient = new NetClient(gateHost, gatePort, false);
@@ -180,8 +176,8 @@ public class RobotSession {
                 // 更新机器人上下文的客户端
                 robotContext = new RobotContext(botId, gateClient);
                 
-                // 发送登录请求到GateServer
-                sendLoginToGateServer();
+                // 发送登录请求到GateServer，使用从服务器获取的账号ID和令牌
+                sendLoginToGateServer(accountId, token);
             } else {
                 logger.error("机器人 #{} 连接GateServer超时", botId);
             }
@@ -191,13 +187,21 @@ public class RobotSession {
     }
     
     /**
+     * 连接到GateServer（使用默认参数）
+     */
+    private void connectToGateServer() {
+        // 默认实现，使用原始参数
+        connectToGateServer(loginServerHost, loginServerPort + 1000, this.accountId, this.token);
+    }
+    
+    /**
      * 向GateServer发送登录请求
      */
-    private void sendLoginToGateServer() {
+    private void sendLoginToGateServer(long accountId, String token) {
         logger.info("机器人 #{} 正在向GateServer发送登录请求", botId);
         
         try {
-            // 使用命令模式创建登录命令
+            // 使用命令模式创建登录命令，使用从服务器获取的账号ID和令牌
             RobotCommand loginCommand = RobotCommandFactory.createCommand(
                 RobotCommandFactory.CommandType.LOGIN,
                 account, token, accountId, "robot_channel", "robot_device_" + botId
@@ -213,6 +217,13 @@ public class RobotSession {
         } catch (Exception e) {
             logger.error("机器人 #{} 发送登录请求失败", botId, e);
         }
+    }
+    
+    /**
+     * 向GateServer发送登录请求（使用默认参数）
+     */
+    private void sendLoginToGateServer() {
+        sendLoginToGateServer(this.accountId, this.token);
     }
     
     /**

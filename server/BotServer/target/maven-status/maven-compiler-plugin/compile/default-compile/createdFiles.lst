@@ -14,8 +14,11 @@ ly/bot/strategy/impl/AggressiveBehaviorStrategy.class
 ly/bot/strategy/impl/NormalBehaviorStrategy.class
 ly/bot/RobotManager.class
 ly/bot/state/impl/ConnectedState.class
+ly/bot/http/HttpServerListClient$ServerListResult.class
+ly/bot/http/HttpServerListClient$ServerNode.class
 ly/bot/command/RobotCommand.class
 ly/bot/observer/impl/LoggingObserver.class
 ly/bot/observer/RobotObserver.class
 ly/bot/state/impl/ConnectingState.class
+ly/bot/http/HttpServerListClient.class
 ly/BotServer.class

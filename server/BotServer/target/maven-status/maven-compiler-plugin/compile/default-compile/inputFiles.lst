@@ -13,6 +13,7 @@
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/strategy/impl/AggressiveBehaviorStrategy.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/observer/impl/LoggingObserver.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/session/RobotSession.java
+/data/work/miniServer/server/BotServer/src/main/java/ly/bot/http/HttpServerListClient.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/state/impl/ConnectedState.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/util/ProtocolTester.java
 /data/work/miniServer/server/BotServer/src/main/java/ly/bot/command/impl/LoginCommand.java
