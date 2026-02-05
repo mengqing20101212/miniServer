@@ -11,6 +11,7 @@ import ly.net.GameObjectProvider;
 import ly.net.IController;
 import ly.net.NetService;
 import ly.redis.RedisUtils;
+import ly.db.AutoTableService;
 import org.slf4j.Logger;
 
 public class ServerContext {
@@ -61,6 +62,10 @@ public class ServerContext {
         ConfigService.getInstance().loadAllConfig(logger, serverConfig.configPath);
         RedisUtils.init();
         MysqlService.getInstance().init(serverConfig.db.jdbcUrl, serverConfig.db.userName, serverConfig.db.passWord, 0, 0, 0, 0);
+        
+        // 启动自动建表服务
+        AutoTableService.getInstance().startAutoTableService();
+        
         NetService.getInstance().startUp(gameObjectProvider, serverConfig.serverPort);
         logger.info("服务器 启动成功 耗时: " + (System.currentTimeMillis() - startTime) + "ms");
     }

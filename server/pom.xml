@@ -11,6 +11,7 @@
     <modules>
         <module>config</module>
         <module>proto</module>
+        <module>tool</module>
         <module>core</module>
     </modules>
 </project>

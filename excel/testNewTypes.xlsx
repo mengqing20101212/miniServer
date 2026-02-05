@@ -1,0 +1,10 @@
+PK	类型	描述
+id	INT	唯一标识
+numbers	INT1	整数列表
+intPairs	INT2	整数键值对
+strPairs	STRING2	字符串键值对
+name	STRING	名称
+
+#	#	#	#	#	#
+1	1	1,2,3,4	1:10,2:20,3:30	name:value,age:25,test:hello	测试1
+2	2	5,6,7	2:15,4:25	city:NYC,power:100	测试2
