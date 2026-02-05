@@ -19,11 +19,10 @@ import java.sql.Statement;
  */
 public class AutoTableService {
     
-    private MysqlConnector mysqlConnector;
     private static AutoTableService instance;
     
     private AutoTableService() {
-        this.mysqlConnector = MysqlConnector.getInstance();
+        // 私有构造函数
     }
     
     public static synchronized AutoTableService getInstance() {
@@ -40,8 +39,8 @@ public class AutoTableService {
         System.out.println("开始执行自动建表服务...");
         
         try {
-            // 连接到数据库
-            Connection connection = mysqlConnector.getConnection();
+            // 从MysqlService获取数据库连接
+            Connection connection = MysqlService.getInstance().getConnection();
             
             // 生成创建表的SQL文件
             EntityToSqlGenerator generator = new EntityToSqlGenerator();
