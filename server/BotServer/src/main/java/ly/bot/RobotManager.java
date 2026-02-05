@@ -49,17 +49,25 @@ public class RobotManager {
     public void start() {
         logger.info("开始启动 {} 个机器人", numBots);
         
+        // 使用虚拟线程来管理每个机器人，节省线程资源
         for (int i = 0; i < numBots; i++) {
             final int botId = i + 1;
             try {
                 RobotSession robot = new RobotSession(botId, loginServerHost, loginServerPort);
                 robotSessions.add(robot);
                 
-                // 延迟启动，避免瞬间连接过多
-                Thread.sleep(100);
+                // 为每个机器人创建一个虚拟线程进行管理
+                Thread.ofVirtual().name("Robot-" + botId).start(() -> {
+                    try {
+                        // 启动登录流程
+                        robot.startLoginProcess();
+                    } catch (Exception e) {
+                        logger.error("机器人 {} 登录流程异常", botId, e);
+                    }
+                });
                 
-                // 启动登录流程
-                robot.startLoginProcess();
+                // 延迟启动，避免瞬间连接过多
+                Thread.sleep(50); // 减少延迟时间，因为使用虚拟线程
                 
             } catch (Exception e) {
                 logger.error("创建机器人 {} 失败", botId, e);
@@ -316,8 +324,8 @@ public class RobotManager {
         private void startGameActions() {
             logger.info("机器人 #{} 开始执行游戏行为", botId);
             
-            // 启动一个线程来定期执行游戏行为
-            Thread gameActionThread = new Thread(() -> {
+            // 使用虚拟线程来定期执行游戏行为
+            Thread.ofVirtual().name("Robot-" + botId + "-GameActions").start(() -> {
                 try {
                     while (isLoginSuccess) {
                         // 随机延迟，模拟真实用户行为
@@ -328,12 +336,9 @@ public class RobotManager {
                     }
                 } catch (InterruptedException e) {
                     // 线程被中断，正常退出
-                    logger.info("机器人 #{} 游戏行为线程结束", botId);
+                    logger.info("机器人 #{} 游戏行为虚拟线程结束", botId);
                 }
             });
-            
-            gameActionThread.setName("Robot-" + botId + "-GameActions");
-            gameActionThread.start();
         }
         
         /**

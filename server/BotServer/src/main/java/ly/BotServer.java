@@ -42,8 +42,8 @@ public class BotServer {
             // 启动机器人
             robotManager.start();
             
-            // 启动一个监控线程，定期输出统计信息
-            Thread monitorThread = new Thread(() -> {
+            // 启动一个监控虚拟线程，定期输出统计信息
+            Thread.ofVirtual().name("RobotMonitorThread").start(() -> {
                 while (!Thread.currentThread().isInterrupted()) {
                     try {
                         RobotManager.RobotStats stats = robotManager.getStats();
@@ -55,13 +55,10 @@ public class BotServer {
                         Thread.currentThread().interrupt();
                         break;
                     } catch (Exception e) {
-                        System.err.println("监控线程出错: " + e.getMessage());
+                        System.err.println("监控虚拟线程出错: " + e.getMessage());
                     }
                 }
             });
-            
-            monitorThread.setName("RobotMonitorThread");
-            monitorThread.start();
             
             // 保持主线程运行
             Thread.currentThread().join();
