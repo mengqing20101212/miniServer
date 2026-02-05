@@ -19,6 +19,7 @@ public class LoginCommand implements RobotCommand {
     private final long accountId;
     private final String channel;
     private final String deviceId;
+    private final String gameServerId;
     
     public LoginCommand(String account, String token, long accountId, String channel, String deviceId) {
         this.account = account;
@@ -26,6 +27,16 @@ public class LoginCommand implements RobotCommand {
         this.accountId = accountId;
         this.channel = channel;
         this.deviceId = deviceId;
+        this.gameServerId = null; // 默认为空
+    }
+    
+    public LoginCommand(String account, String token, long accountId, String channel, String deviceId, String gameServerId) {
+        this.account = account;
+        this.token = token;
+        this.accountId = accountId;
+        this.channel = channel;
+        this.deviceId = deviceId;
+        this.gameServerId = gameServerId;
     }
     
     @Override
@@ -39,6 +50,14 @@ public class LoginCommand implements RobotCommand {
             loginBuilder.setToken(token);
             loginBuilder.setDeviceId(deviceId);
             loginBuilder.setIsReconnect(false);
+            
+            // 设置游戏服务器ID，如果提供了的话
+            if (gameServerId != null && !gameServerId.isEmpty()) {
+                loginBuilder.setGameServerId(gameServerId);
+            } else {
+                // 如果没有提供gameServerId，可以设置一个默认值或从其他地方获取
+                loginBuilder.setGameServerId("game_1"); // 使用默认游戏服务器ID
+            }
             
             Login.csLogin loginRequest = loginBuilder.build();
             

@@ -79,6 +79,16 @@ public class HttpServerListClient {
         public java.util.List<Object> getPlayers() { return players; }
         public long getAccountId() { return accountId; }
         public String getToken() { return token; }
+        
+        /**
+         * 获取第一个游戏服务器ID，如果存在的话
+         */
+        public String getFirstGameServerId() {
+            if (gameServerList != null && !gameServerList.isEmpty()) {
+                return gameServerList.get(0).getServerId();
+            }
+            return null;
+        }
 
         @Override
         public String toString() {

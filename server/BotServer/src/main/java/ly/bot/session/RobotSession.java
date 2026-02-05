@@ -40,6 +40,7 @@ public class RobotSession {
     private String loginServerHost;
     private int loginServerPort;
     private NetClient gateClient;
+    private static ly.bot.http.HttpServerListClient globalHttpClient;
     
     private volatile boolean isLoginSuccess = false;
     private volatile boolean isGateConnected = false;
@@ -107,6 +108,7 @@ public class RobotSession {
                 // 注意：这里不能直接修改final字段accountId和token，所以我们需要在连接时使用服务器返回的值
                 long returnedAccountId = serverListResult.getAccountId();
                 String returnedToken = serverListResult.getToken();
+                String gameServerId = serverListResult.getFirstGameServerId(); // 获取游戏服务器ID
                 
                 // 获取GateServer信息
                 ly.bot.http.HttpServerListClient.ServerNode gateServer = serverListResult.getGate();
@@ -114,7 +116,7 @@ public class RobotSession {
                     logger.info("机器人 #{} 获取到GateServer信息: {}:{}", botId, gateServer.getServerIp(), gateServer.getServerPort());
                     
                     // 连接到GateServer
-                    connectToGateServer(gateServer.getServerIp(), gateServer.getServerPort(), returnedAccountId, returnedToken);
+                    connectToGateServer(gateServer.getServerIp(), gateServer.getServerPort(), returnedAccountId, returnedToken, gameServerId);
                 } else {
                     logger.error("机器人 #{} 未获取到GateServer信息", botId);
                 }
@@ -129,7 +131,7 @@ public class RobotSession {
     /**
      * 连接到GateServer
      */
-    private void connectToGateServer(String gateHost, int gatePort, long accountId, String token) {
+    private void connectToGateServer(String gateHost, int gatePort, long accountId, String token, String gameServerId) {
         logger.info("机器人 #{} 正在连接GateServer {}:{}", botId, gateHost, gatePort);
         
         try {
@@ -151,8 +153,8 @@ public class RobotSession {
                 // 更新机器人上下文的客户端
                 robotContext = new RobotContext(botId, gateClient);
                 
-                // 发送登录请求到GateServer，使用从服务器获取的账号ID和令牌
-                sendLoginToGateServer(accountId, token);
+                // 发送登录请求到GateServer，使用从服务器获取的所有必要信息
+                sendLoginToGateServer(accountId, token, gameServerId);
             } else {
                 logger.error("机器人 #{} 连接GateServer超时", botId);
             }
@@ -162,24 +164,32 @@ public class RobotSession {
     }
     
     /**
+     * 连接到GateServer
+     */
+    private void connectToGateServer(String gateHost, int gatePort, long accountId, String token) {
+        // 默认调用带gameServerId的版本，如果没有gameServerId则传入null
+        connectToGateServer(gateHost, gatePort, accountId, token, null);
+    }
+    
+    /**
      * 连接到GateServer（使用默认参数）
      */
     private void connectToGateServer() {
         // 默认实现，使用原始参数
-        connectToGateServer(loginServerHost, loginServerPort + 1000, this.accountId, this.token);
+        connectToGateServer(loginServerHost, loginServerPort + 1000, this.accountId, this.token, null);
     }
     
     /**
      * 向GateServer发送登录请求
      */
-    private void sendLoginToGateServer(long accountId, String token) {
+    private void sendLoginToGateServer(long accountId, String token, String gameServerId) {
         logger.info("机器人 #{} 正在向GateServer发送登录请求", botId);
         
         try {
             // 使用命令模式创建登录命令，使用从服务器获取的账号ID和令牌
             RobotCommand loginCommand = RobotCommandFactory.createCommand(
                 RobotCommandFactory.CommandType.LOGIN,
-                account, token, accountId, "robot_channel", "robot_device_" + botId
+                account, token, accountId, "robot_channel", "robot_device_" + botId, gameServerId
             );
             
             loginCommand.execute(gateClient);
@@ -195,10 +205,17 @@ public class RobotSession {
     }
     
     /**
+     * 向GateServer发送登录请求
+     */
+    private void sendLoginToGateServer(long accountId, String token) {
+        sendLoginToGateServer(accountId, token, null);
+    }
+    
+    /**
      * 向GateServer发送登录请求（使用默认参数）
      */
     private void sendLoginToGateServer() {
-        sendLoginToGateServer(this.accountId, this.token);
+        sendLoginToGateServer(this.accountId, this.token, null);
     }
     
     /**
