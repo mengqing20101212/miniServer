@@ -96,8 +96,9 @@ public class RobotSession {
         
         try {
             // 通过HTTP请求获取服务器列表
+            ly.bot.http.HttpServerListClient httpClient = new ly.bot.http.HttpServerListClient(loginServerHost, loginServerPort);
             ly.bot.http.HttpServerListClient.ServerListResult serverListResult = 
-                ly.bot.http.HttpServerListClient.getServerList(loginServerHost, loginServerPort, account);
+                httpClient.getServerList(account);
             
             if (serverListResult != null) {
                 logger.info("机器人 #{} 成功获取服务器列表", botId);

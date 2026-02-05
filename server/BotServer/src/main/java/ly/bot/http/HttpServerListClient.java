@@ -21,6 +21,18 @@ import java.net.URL;
 public class HttpServerListClient {
     private static final Logger logger = LoggerDef.SystemLogger;
     private static final Gson gson = new Gson();
+    
+    private final String baseUrl;
+
+    /**
+     * 构造函数
+     * 
+     * @param host LoginServer主机地址
+     * @param port LoginServer端口
+     */
+    public HttpServerListClient(String host, int port) {
+        this.baseUrl = String.format("http://%s:%d", host, port);
+    }
 
     /**
      * 服务器节点信息
@@ -83,16 +95,13 @@ public class HttpServerListClient {
     /**
      * 从LoginServer获取服务器列表
      * 
-     * @param loginServerHost LoginServer主机地址
-     * @param loginServerPort LoginServer端口
      * @param account 账号
      * @return 服务器列表结果
      */
-    public static ServerListResult getServerList(String loginServerHost, int loginServerPort, String account) {
+    public ServerListResult getServerList(String account) {
         try {
             // 构建请求URL
-            String urlString = String.format("http://%s:%d/serverList?account=%s", 
-                loginServerHost, loginServerPort, account);
+            String urlString = String.format("%s/serverList?account=%s", baseUrl, account);
             
             logger.debug("正在请求服务器列表: {}", urlString);
             
