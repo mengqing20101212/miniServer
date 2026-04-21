@@ -1,0 +1,7 @@
+syntax="proto3";
+package ly.logic.player;
+option java_outer_classname = "PlayerModuleData$$ByJProtobuf";
+//
+message PlayerModuleData {  
+ map<string, bytes> moduleData=1;
+}
