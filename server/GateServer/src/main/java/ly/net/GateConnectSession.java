@@ -102,10 +102,7 @@ public class GateConnectSession extends ConnectSession {
      */
     public void sendClientMsg(int cmd, Message msg) {
         // 创建服务器到客户端的数据包
-        AbstractMessagePacket s2cPacket = new AbstractMessagePacket();
-        s2cPacket.setGuid(getGuid());
-        s2cPacket.setCmd(cmd);
-        s2cPacket.setData(msg.toByteArray());
+        AbstractMessagePacket s2cPacket = MessagePacketFactory.createS2CMessagePacket(cmd, msg.toByteArray());
         // 添加到发送队列
         addSendPacket(s2cPacket);
     }

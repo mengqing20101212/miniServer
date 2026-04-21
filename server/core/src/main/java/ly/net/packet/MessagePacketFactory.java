@@ -33,4 +33,13 @@ public class MessagePacketFactory {
   public static AbstractMessagePacket createAbstractMessagePacket(int cmd, byte[] data) {
     return createAbstractMessagePacket(cmd, 0, data);
   }
+
+  // compatibility with legacy GateServer callsites
+  public static AbstractMessagePacket createS2CMessagePacket(int cmd, int seq, byte[] data) {
+    return createAbstractMessagePacket(cmd, seq, data);
+  }
+
+  public static AbstractMessagePacket createS2CMessagePacket(int cmd, byte[] data) {
+    return createAbstractMessagePacket(cmd, 0, data);
+  }
 }
