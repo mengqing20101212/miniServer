@@ -1,56 +1,41 @@
-# Net 模块 Packet 收敛方案（去掉 type 字段，统一包头）
+# Net 模块 Packet 收敛方案（去掉 type，去掉 flags，统一包头）
 
-> 目标：将 `ly.net.packet` 多实现类收敛为**一个包类**，并且移除 `type` 字段；所有消息使用同一套固定包头。
+> 目标：`ly.net.packet` 收敛为一个包类；协议头只保留最核心字段，降低认知负担。
 
-## 1. 约束与结论
+## 1. 约束（按你的要求）
 
-根据你的要求，新的协议约束是：
-
-1. 不再使用 `type`（不区分 S2C/S2S/C2S/ACK 的头部类型字节）。
-2. 所有包头字段、顺序、长度完全一致。
-3. 语义（请求/响应/ACK/跨服）由 `cmd` 语义和路由上下文判断，而不是由 `type` 判断。
+1. 去掉 `type` 字段。
+2. 去掉 `flags` 字段。
+3. 所有消息使用同一套固定包头。
+4. 语义由 `cmd` + 连接上下文决定。
 
 ---
 
-## 2. 统一包模型（建议）
+## 2. 统一包模型
 
-统一类：`MessagePacket`（或 `UnifiedMessagePacket`）。
+统一类：`MessagePacket`。
 
-### 2.1 固定包头（所有报文一致）
+### 2.1 固定包头（所有包一致）
 
-建议固定头如下（总长 26 字节）：
+建议固定头（22 字节）：
 
 - `short length`：整包长度（头 + body）
-- `int cmd`：消息号（唯一语义入口）
+- `int cmd`：消息号
 - `int sid`：会话ID
 - `int seq`：序列号
-- `long guid`：玩家/实体唯一ID
-- `int time`：秒级时间戳
-- `int flags`：扩展位（ACK、压缩、加密、重传标记等）
+- `long guid`：玩家/实体ID
+- `int time`：时间戳（秒）
 
 包体：
 - `byte[] data`
 
-> 注：ACK 不再是独立包类型，改为 `cmd = CMD_ACK`（预留命令号）+ `flags` 标记（可选）+ `data` 可空。
-
-### 2.2 为什么需要 `flags`
-
-去掉 `type` 后，仍需低成本携带控制语义，`flags` 用于承载：
-
-- `ACK` 位
-- `ERROR` 位
-- `COMPRESS` 位
-- `ENCRYPT` 位
-
-这样可避免再次引入“多包类分支”。
+> ACK 也走普通包：`cmd = CMD_ACK`，`data` 可为空。
 
 ---
 
-## 3. 编解码规则（统一）
+## 3. 编解码规则
 
-## 3.1 统一编码
-
-`encode` 永远按固定顺序写：
+## 3.1 encode 顺序
 
 1. `length`
 2. `cmd`
@@ -58,75 +43,68 @@
 4. `seq`
 5. `guid`
 6. `time`
-7. `flags`
-8. `data`
+7. `data`
 
-## 3.2 统一解码
+## 3.2 decode 顺序
 
-`decode` 永远按相同顺序读，不再 `switch(type)`。
+与 encode 完全一致，不再 `switch(type)`。
 
-## 3.3 路由判定
+## 3.3 路由语义
 
-- 业务路由主要依赖 `cmd`。
-- 通道/连接上下文决定方向（客户端连接、服务器连接）。
-- ACK 通过 `cmd` 或 `flags` 识别。
+- 业务分发：按 `cmd`。
+- 方向识别：按连接上下文（client channel / server channel）。
+- ACK 识别：按 `cmd == CMD_ACK`。
 
 ---
 
-## 4. 与现网兼容（重点）
+## 4. 迁移方案（兼容优先）
 
-由于旧协议有 `type` 且各类型头部不同，不能直接硬切。建议两阶段：
+由于旧协议包含 `type`，建议两阶段：
 
-### 阶段 A：双协议解码 + 新协议编码开关
+### 阶段 A：兼容期
 
-- `CommonDecoder` 支持识别旧格式与新格式（通过魔数/version 或连接级协商）。
-- 编码默认仍发旧协议；灰度环境开启新协议发送。
+- `CommonDecoder` 同时支持旧协议和新协议（通过版本/握手协商区分）。
+- 编码默认发旧协议；灰度逐步切新协议。
 
-### 阶段 B：全量切换
+### 阶段 B：收口期
 
-- 所有节点升级并验证后，统一切换为新协议头。
-- 删除旧的 `C2S/S2C/S2S/ConnectionAck` 与旧解码分支。
-
-> 如果你们允许短暂不兼容发布（全服停机切换），可以省略双协议阶段。
+- 全节点升级后切到新协议。
+- 删除旧包类：`C2S/S2C/S2S/ConnectionAck`。
+- 删除旧解码分支。
 
 ---
 
 ## 5. 代码改造清单
 
-1. 新增 `ly.net.packet.MessagePacket`（唯一包实现）。
-2. 新增 `MessagePacketFlag`（bit 位常量）。
-3. `MessagePacketFactory` 改为只创建统一包。
-4. `CommonEncoder/CommonDecoder` 改为固定头编解码。
-5. `HandlerContext`/路由泛型逐步改为 `MessagePacket`。
-6. `ConnectionAckPacket` 删除，ACK 改为普通 `cmd`。
+1. 新增 `ly.net.packet.MessagePacket`（唯一实现类）。
+2. `MessagePacketFactory` 收敛为统一构造。
+3. `CommonEncoder/CommonDecoder` 改为固定头编解码。
+4. `HandlerContext` / 各 Router 泛型改用 `MessagePacket`。
+5. `ConnectionAckPacket` 下线，改 `CMD_ACK`。
 
 ---
 
-## 6. 测试要求（必须）
+## 6. 测试要求
 
-1. **编码解码闭环测试**：固定头字段全覆盖（含空 body / 大 body）。
-2. **互通测试**：
-   - 新协议客户端 -> 新协议服务端
-   - 新协议服务端 -> 新协议客户端
-3. **迁移期兼容测试**（若采用双协议）：
-   - 旧发新收、新发旧收
-4. **核心链路回归**：Login/Gate/Game、RPC 同步调用、Bot 压测。
+1. 编解码闭环测试（含空包体/大包体）。
+2. 新协议双向互通测试。
+3. 兼容期新旧互通测试（若保留灰度）。
+4. Login/Gate/Game + RPC + Bot 回归压测。
 
 ---
 
-## 7. 推进顺序（最小风险）
+## 7. 推进顺序
 
-1. 先落地统一 `MessagePacket` + 编解码器（保留旧协议兼容）。
-2. 再改 Gate/Game/Bot/RPC 的包类型引用。
-3. 最后删旧类和旧协议分支。
+1. 落地 `MessagePacket` + 编解码器（兼容旧协议）。
+2. 逐模块替换引用（Gate -> Game -> Bot -> RPC）。
+3. 删除旧类与兼容逻辑。
 
 ---
 
-## 8. 建议的下一步实现
+## 8. 下一步可执行项
 
-我可以下一步直接提交一版最小可运行补丁，包含：
+如你确认，我下一步直接给你提交代码补丁：
 
-- `MessagePacket` 新类（无 type，固定头）
+- `MessagePacket` 新类（22字节统一头）
 - `CommonEncoder/CommonDecoder` 最小改造
-- ACK 从 `ConnectionAckPacket` 切到 `CMD_ACK`
-- 保留兼容开关（可配）以支持灰度
+- `CMD_ACK` 替代 `ConnectionAckPacket`
