@@ -11,7 +11,7 @@ import java.util.Map;
 @ProtobufClass
 @EnableZigZap
 public class PlayerModuleData {
-    @Protobuf(fieldType = FieldType.BYTES, order = 1, required = true)
+    @Protobuf(fieldType = FieldType.MAP, order = 1, required = true)
     Map<String, byte[]> moduleData = new HashMap<>();
 
     public Map<String, byte[]> getModuleData() {

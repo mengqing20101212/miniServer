@@ -9,6 +9,7 @@
         <module name="core" />
         <module name="proto" />
         <module name="LoginServer" />
+        <module name="BotServer" />
         <module name="GameServer" />
         <module name="config" />
         <module name="tool" />
