@@ -86,6 +86,10 @@ public class GateConnectSession extends ConnectSession {
             } else {
                 // 查找对应的客户端并转发消息
                 GateClient client = GateClientManager.getInstance().getClient(getGuid());
+                if (client == null) {
+                    // 兼容部分链路通过 sid 关联客户端的情况
+                    client = GateClientManager.getInstance().getClient((long) s2sPacket.getSid());
+                }
                 if (client != null) {
                     client.sendPacketToClient(s2sPacket);
                 }
