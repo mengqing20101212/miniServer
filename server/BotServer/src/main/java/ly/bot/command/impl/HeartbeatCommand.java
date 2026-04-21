@@ -29,7 +29,7 @@ public class HeartbeatCommand implements RobotCommand {
             int sid = client.isReady() ? client.getSid() : 0; // 使用正确的SID
             
             // 创建空的RPC Ping请求（心跳包）
-            ly.net.packet.C2SMessagePacket packet = MessagePacketFactory.createC2SMessagePacket(
+            ly.net.packet.AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
                 0, // guid - 心跳包可能不需要特定guid
                 Cmd.CMD.CS_RpcPing_VALUE, // RPC心跳命令
                 null, // protobuf数据 - 心跳可能不需要数据

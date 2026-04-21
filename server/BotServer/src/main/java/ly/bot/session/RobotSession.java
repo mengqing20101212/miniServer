@@ -28,7 +28,6 @@ import ly.bot.module.impl.MovementModule;
 import ly.bot.entity.PlayerInfo;
 import ly.bot.stats.PacketLatencyStats;
 import ly.bot.data.RobotSessionDataStore;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 机器人会话类 - 使用多种设计模式重构

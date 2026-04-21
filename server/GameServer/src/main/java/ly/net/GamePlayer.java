@@ -3,7 +3,7 @@ package ly.net;
 import com.google.protobuf.AbstractMessage;
 import ly.LoggerDef;
 import ly.logic.player.Player;
-import ly.net.packet.S2SMessagePacket;
+import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -21,7 +21,7 @@ public class GamePlayer {
     private int lastClientCmd;
     private int lastSid;
 
-    ArrayBlockingQueue<S2SMessagePacket> packetQueue = new ArrayBlockingQueue<>(100);
+    ArrayBlockingQueue<AbstractMessagePacket> packetQueue = new ArrayBlockingQueue<>(100);
 
     public GamePlayer(GameConnectSession session) {
         this.session = session;
@@ -80,7 +80,7 @@ public class GamePlayer {
         this.lastClientCmd = lastClientCmd;
     }
 
-    public void addPacket(S2SMessagePacket packet) {
+    public void addPacket(AbstractMessagePacket packet) {
         if (packet.getCmd() == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) {// gate 转发来之客户端的Rpc调用 非登录包 请求
             setLastSeq(packet.getSeq());
             setLastClientCmd(packet.getCmd());
@@ -106,7 +106,7 @@ public class GamePlayer {
     }
 
     public void tickPacket() {
-        S2SMessagePacket packet = packetQueue.poll();
+        AbstractMessagePacket packet = packetQueue.poll();
         if (packet == null) {
             return;
         }
@@ -132,7 +132,7 @@ public class GamePlayer {
      * @param message 消息
      */
     public void sendMsg(Cmd.CMD cmd, AbstractMessage message) {
-        S2SMessagePacket packet = new S2SMessagePacket(getPlayerId(), cmd.getNumber(), lastSeq, message.toByteArray());
+        AbstractMessagePacket packet = new AbstractMessagePacket(getPlayerId(), cmd.getNumber(), lastSeq, message.toByteArray());
         session.addSendPacket(packet);
     }
 

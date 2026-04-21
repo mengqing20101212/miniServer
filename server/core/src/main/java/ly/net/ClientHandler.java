@@ -4,7 +4,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
-import ly.net.packet.ConnectionAckPacket;
 import org.slf4j.Logger;
 
 public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePacket> {
@@ -54,6 +53,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePa
 
         logger.info("ClientHandler channelActive 客户端连接成功 {}, remote: {}", ctx.channel().id().asLongText(), ctx.channel().remoteAddress());
         // 连接成功 请求 sessionId
-        ctx.channel().writeAndFlush(new ConnectionAckPacket());
+        ctx.channel().writeAndFlush(new AbstractMessagePacket(0));
     }
 }

@@ -1,6 +1,6 @@
 import ly.net.NetClient;
 import ly.net.NetClientManager;
-import ly.net.packet.S2SMessagePacket;
+import ly.net.packet.AbstractMessagePacket;
 
 /*
  * Author: liuYang
@@ -32,8 +32,8 @@ public class TestClient {
         .start(
             () -> {
               for (int i = 0; i < 1000; i++) {
-                S2SMessagePacket packet =
-                    new S2SMessagePacket(guid, 1, 0, client.getSendSeq(), new byte[] {1, 2, 3, 4});
+                AbstractMessagePacket packet =
+                    new AbstractMessagePacket(guid, 1, 0, client.getSendSeq(), new byte[] {1, 2, 3, 4});
                 client.send(packet);
               }
             });

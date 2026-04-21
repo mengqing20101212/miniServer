@@ -29,7 +29,7 @@ public class MoveCommand implements RobotCommand {
             int sid = client.isReady() ? client.getSid() : 0; // 使用正确的SID
             
             // 创建移动请求包（这里我们使用一个占位符命令，实际游戏中应使用真实的移动协议）
-            ly.net.packet.C2SMessagePacket packet = MessagePacketFactory.createC2SMessagePacket(
+            ly.net.packet.AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
                 0, // guid
                 1000, // 假设的移动命令ID
                 null, // protobuf数据
