@@ -64,6 +64,7 @@ public class GateClient {
             AbstractMessagePacket s2cPacket = new AbstractMessagePacket();
             s2cPacket.setGuid(getSessionGuid());
             s2cPacket.setCmd(csPacket.getCmd());
+            s2cPacket.setSid(csPacket.getSid());
             s2cPacket.setSeq(csPacket.getSeq());
             s2cPacket.setData(resp.getData().toByteArray());
             sendPacketToClient(s2cPacket);
@@ -83,6 +84,7 @@ public class GateClient {
         // 发送给游戏服务器
         Server.csGate2GameRpcGameCall.Builder req = Server.csGate2GameRpcGameCall.newBuilder();
         req.setCmd(csPacket.getCmd());
+        req.setSid(csPacket.getSid());
         req.setGuid(getSessionGuid());
         req.setSeq(csPacket.getSeq());
         req.setData(ByteString.copyFrom(csPacket.getData()));
