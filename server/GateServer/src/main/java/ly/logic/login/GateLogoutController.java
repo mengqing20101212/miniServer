@@ -7,7 +7,7 @@ import ly.net.GateClient;
 import ly.net.GateConnectSession;
 import ly.net.HandlerContext;
 import ly.net.IGateController;
-import ly.net.packet.S2SMessagePacket;
+import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Login;
 import ly.redis.RedisKeys;
@@ -21,10 +21,10 @@ public class GateLogoutController implements IGateController {
 
     @Override
     public void registerHandlerRouter() {
-        register(Cmd.CMD.SC_Logout, GateConnectSession.class, S2SMessagePacket.class, Login.scLogout.class, this::logout);
+        register(Cmd.CMD.SC_Logout, GateConnectSession.class, AbstractMessagePacket.class, Login.scLogout.class, this::logout);
     }
 
-    public void logout(HandlerContext<GateConnectSession, S2SMessagePacket> context, Login.scLogout request) {
+    public void logout(HandlerContext<GateConnectSession, AbstractMessagePacket> context, Login.scLogout request) {
         long guid = request.getAccountId();
         GateClient gateClient = GateClientManager.getInstance().getClient(guid);
         if (gateClient != null) {

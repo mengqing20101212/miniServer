@@ -4,7 +4,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
-import ly.net.packet.ConnectionAckPacket;
 import org.slf4j.Logger;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,8 +20,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePa
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, AbstractMessagePacket packet) throws Exception {
         // 连接确认包特殊处理
-        if (packet instanceof ConnectionAckPacket) {
-            ctx.channel().writeAndFlush(new ConnectionAckPacket(sessionCreator.getAndIncrement()));
+        if (packet.getCmd() == AbstractMessagePacket.CMD_ACK) {
+            ctx.channel().writeAndFlush(new AbstractMessagePacket(sessionCreator.getAndIncrement()));
             return;
         }
 

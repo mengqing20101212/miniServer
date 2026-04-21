@@ -36,8 +36,8 @@ public class GateConnectSession extends ConnectSession {
      * 处理接收到的数据包
      * <p>
      * 根据数据包类型进行不同的处理：
-     * 1. 客户端到服务器的数据包(C2SMessagePacket)
-     * 2. 服务器到服务器的数据包(S2SMessagePacket)
+     * 1. 客户端到服务器的数据包(AbstractMessagePacket)
+     * 2. 服务器到服务器的数据包(AbstractMessagePacket)
      *
      * @param packet 接收到的数据包
      */
@@ -47,10 +47,16 @@ public class GateConnectSession extends ConnectSession {
         super.addReceivePacket(packet);
 
         // 记录接收到的数据包信息
-        LoggerDef.LogProto("receive {}|{}|{}|{}|{}", getGuid(), packet.getSid(), packet.getType(), packet.getCmd(), packet.getLength());
+        LoggerDef.LogProto("receive {}|{}|{}|{}", getGuid(), packet.getSid(), packet.getCmd(), packet.getLength());
+
+        // 统一包结构后，通过命令区间判定来源类型：
+        // 10000~20000 为服务器间消息；其余视为客户端请求。
+        boolean serverInnerCmd = packet.getCmd() > Cmd.CMD.CS_Server2Server_VALUE
+                && packet.getCmd() <= Cmd.CMD.MaxServeMsgId_VALUE;
 
         // 处理客户端到服务器的数据包
-        if (packet instanceof C2SMessagePacket csPacket) {
+        if (!serverInnerCmd && packet.getCmd() != Cmd.CMD.SC_Logout_VALUE) {
+            AbstractMessagePacket csPacket = packet;
             // 尝试获取对应的客户端对象
             GateClient client = GateClientManager.getInstance().getClient(getGuid());
 
@@ -72,7 +78,8 @@ public class GateConnectSession extends ConnectSession {
             }
         }
         // 处理服务器到服务器的数据包
-        else if (packet instanceof S2SMessagePacket s2sPacket) {
+        else {
+            AbstractMessagePacket s2sPacket = packet;
             // 处理登出命令特殊情况
             if (s2sPacket.getCmd() == Cmd.CMD.SC_Logout_VALUE) {
                 HandlerRouterManager.execute(this, s2sPacket);
@@ -95,7 +102,7 @@ public class GateConnectSession extends ConnectSession {
      */
     public void sendClientMsg(int cmd, Message msg) {
         // 创建服务器到客户端的数据包
-        S2CMessagePacket s2cPacket = MessagePacketFactory.createS2CMessagePacket(cmd, msg.toByteArray());
+        AbstractMessagePacket s2cPacket = MessagePacketFactory.createAbstractMessagePacket(cmd, msg.toByteArray());
         // 添加到发送队列
         addSendPacket(s2cPacket);
     }

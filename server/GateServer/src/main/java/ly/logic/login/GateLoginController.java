@@ -8,7 +8,7 @@ import ly.net.GateClient;
 import ly.net.GateConnectSession;
 import ly.net.HandlerContext;
 import ly.net.IGateController;
-import ly.net.packet.C2SMessagePacket;
+import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 import ly.proto.Login;
@@ -33,9 +33,9 @@ public class GateLoginController implements IGateController {
     }
 
 
-    public void handleLogin(HandlerContext<GateConnectSession, C2SMessagePacket> context, Login.csLogin request) {
+    public void handleLogin(HandlerContext<GateConnectSession, AbstractMessagePacket> context, Login.csLogin request) {
         GateConnectSession session = context.session();
-        C2SMessagePacket packet = context.packet();
+        AbstractMessagePacket packet = context.packet();
 
         Thread.ofVirtual().name("loginThread_" + request.getAccount()).start(() -> {
             try {

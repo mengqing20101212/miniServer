@@ -7,7 +7,7 @@ import ly.logic.player.event.PlayerEventManager;
 import ly.logic.player.event.PlayerEventType;
 import ly.net.GamePlayer;
 import ly.net.packet.MessagePacketFactory;
-import ly.net.packet.S2SMessagePacket;
+import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 import ly.proto.Server;
@@ -165,19 +165,19 @@ public class Player {
 
     public void sendMsg(Cmd.CMD cmd, AbstractMessage message) {
         if (getGamePlayer().getLastClientCmd() == 0) {
-            S2SMessagePacket sendPacket = MessagePacketFactory.createS2SMessagePacket(getPlayerId(), cmd.getNumber(), message, 0, 0);
+            AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), cmd.getNumber(), message, 0, 0);
             getGamePlayer().getSession().addSendPacket(sendPacket);
         } else {
             if (cmd.getNumber() == getGamePlayer().getLastClientCmd() + 1) {
                 Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
                 builder.setData(message.toByteString());
-                S2SMessagePacket sendPacket = MessagePacketFactory.createS2SMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), getGamePlayer().getLastSeq(), gamePlayer.getLastSid());
+                AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), getGamePlayer().getLastSeq(), gamePlayer.getLastSid());
                 getGamePlayer().getSession().addSendPacket(sendPacket);
                 getGamePlayer().setLastClientCmd(0);
                 getGamePlayer().setLastSeq(0);
                 getGamePlayer().setLastSid(0);
             } else {
-                S2SMessagePacket sendPacket = MessagePacketFactory.createS2SMessagePacket(getPlayerId(), cmd.getNumber(), message, gamePlayer.getLastSeq(), gamePlayer.getLastSid());
+                AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), cmd.getNumber(), message, gamePlayer.getLastSeq(), gamePlayer.getLastSid());
                 getGamePlayer().getSession().addSendPacket(sendPacket);
             }
         }

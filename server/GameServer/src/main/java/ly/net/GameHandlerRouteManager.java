@@ -5,9 +5,8 @@ import ly.LoggerDef;
 import ly.ProtoMessageFactory;
 import ly.logic.player.Player;
 import ly.logic.player.PlayerManager;
-import ly.net.packet.C2SMessagePacket;
+import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.MessagePacketFactory;
-import ly.net.packet.S2SMessagePacket;
 import ly.proto.Cmd;
 
 import java.util.HashMap;
@@ -29,7 +28,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
      * 执行（自动类型检查 + 安全强转）
      */
     @SuppressWarnings("unchecked")
-    public static void execute(GameConnectSession session, S2SMessagePacket packet) {
+    public static void execute(GameConnectSession session, AbstractMessagePacket packet) {
         try {
             final int cmd = packet.getCmd();
             GameHandlerRouteManager instance = getInstance();
@@ -52,7 +51,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
         }
     }
 
-    private static boolean checkPacket(S2SMessagePacket packet) {
+    private static boolean checkPacket(AbstractMessagePacket packet) {
         final int cmd = packet.getCmd();
 //        Class<? extends AbstractMessage> protoClass = instance.protoClassMap.get(cmd);
 //        if (protoClass == null) {
@@ -80,7 +79,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
 //            return false;
 //        }
         GameHandlerRouter<?> router = instance.gameHandlerRouterMap.get(cmd);
-        C2SMessagePacket packet = MessagePacketFactory.createC2SMessagePacket(player.getPlayerId(), cmd, req, seq, sid);
+        AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(player.getPlayerId(), cmd, req, seq, sid);
         try {
             // 创建游戏处理器上下文并执行路由处理
             GameHandlerContext context = new GameHandlerContext(player, packet);
@@ -98,7 +97,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
     /**
      * 执行路由
      */
-    public static boolean execute(Player player, S2SMessagePacket packet) {
+    public static boolean execute(Player player, AbstractMessagePacket packet) {
         if (player == null || packet == null) {
             LoggerDef.SystemLogger.error("execute route, param invalid: player={}, packet={}", player == null, packet == null);
             return false;
@@ -122,7 +121,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
         return execute(player, cmd, packet.getSeq(), packet.getSid(), request);
     }
 
-    public void processPacket(Player player, S2SMessagePacket packet) {
+    public void processPacket(Player player, AbstractMessagePacket packet) {
         execute(player, packet);
     }
 }

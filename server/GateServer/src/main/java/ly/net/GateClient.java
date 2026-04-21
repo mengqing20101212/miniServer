@@ -1,10 +1,8 @@
 package ly.net;
 
 import com.google.protobuf.ByteString;
-import ly.net.packet.C2SMessagePacket;
+import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.MessagePacketFactory;
-import ly.net.packet.S2CMessagePacket;
-import ly.net.packet.S2SMessagePacket;
 import ly.proto.Server;
 import ly.rpc.RpcUtils;
 
@@ -60,11 +58,11 @@ public class GateClient {
         this.token = token;
     }
 
-    public void sendPacketToGameServer(C2SMessagePacket csPacket) {
+    public void sendPacketToGameServer(AbstractMessagePacket csPacket) {
         // 发送给游戏服务器
         Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket);
         if (resp != null) {
-            S2CMessagePacket s2cPacket = MessagePacketFactory.createS2CMessagePacket(csPacket.getCmd(), csPacket.getSeq(), resp.getData().toByteArray());
+            AbstractMessagePacket s2cPacket = MessagePacketFactory.createAbstractMessagePacket(csPacket.getCmd(), csPacket.getSeq(), resp.getData().toByteArray());
             sendPacketToClient(s2cPacket);
         }
 
@@ -78,7 +76,7 @@ public class GateClient {
 //        int32 seq = 4;// client 发送给gate 请求 序列id
 //        bytes data = 5;// client 发送给gate 请求 数据
 //    }
-    public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(C2SMessagePacket csPacket) {
+    public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(AbstractMessagePacket csPacket) {
         // 发送给游戏服务器
         Server.csGate2GameRpcGameCall.Builder req = Server.csGate2GameRpcGameCall.newBuilder();
         req.setCmd(csPacket.getCmd());
@@ -89,12 +87,12 @@ public class GateClient {
     }
 
 
-    public void sendPacketToClient(S2SMessagePacket s2sPacket) {
-        S2CMessagePacket s2cPacket = MessagePacketFactory.createS2CMessagePacket(s2sPacket.getCmd(), s2sPacket.getSeq(), s2sPacket.getData());
+    public void sendPacketToClient(AbstractMessagePacket s2sPacket) {
+        AbstractMessagePacket s2cPacket = MessagePacketFactory.createAbstractMessagePacket(s2sPacket.getCmd(), s2sPacket.getSeq(), s2sPacket.getData());
         session.sendPacket(s2cPacket);
     }
 
-    public void sendPacketToClient(S2CMessagePacket s2cPacket) {
+    public void sendPacketToClient(AbstractMessagePacket s2cPacket) {
         session.sendPacket(s2cPacket);
 
     }

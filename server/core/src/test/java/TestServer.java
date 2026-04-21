@@ -5,7 +5,7 @@ import ly.net.ConnectSession;
 import ly.net.GameObjectProvider;
 import ly.net.NetService;
 import ly.net.packet.MessagePacketFactory;
-import ly.net.packet.S2SMessagePacket;
+import ly.net.packet.AbstractMessagePacket;
 
 /*
  * Author: liuYang
@@ -56,8 +56,8 @@ public class TestServer {
             getReceivePacketList()
                     .forEach(
                             packet -> {
-                                S2SMessagePacket msg =
-                                        MessagePacketFactory.copyMessagePacket((S2SMessagePacket) packet);
+                                AbstractMessagePacket msg =
+                                        MessagePacketFactory.copyMessagePacket((AbstractMessagePacket) packet);
                                 AbstractMessage protoMsg =
                                         ProtoMessageFactory.createProtoMessage(packet.getCmd(), packet.getData());
                                 sendPacket(msg);

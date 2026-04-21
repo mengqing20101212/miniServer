@@ -10,7 +10,6 @@ import ly.nacos.NacosService;
 import ly.net.NetClient;
 import ly.net.NetClientManager;
 import ly.net.packet.AbstractMessagePacket;
-import ly.net.packet.S2SMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Server;
 
@@ -273,14 +272,12 @@ public class RpcNodeConnector {
      * @return 解析后的Protobuf消息对象，如果解析失败则返回null
      */
     private AbstractMessage unpackPacket(AbstractMessagePacket receivedPacket) {
-        if (receivedPacket instanceof S2SMessagePacket s2sMessagePacket) {
-            try {
-                // 使用ProtoMessageFactory创建对应的Protobuf消息对象
-                return ProtoMessageFactory.createProtoMessage(s2sMessagePacket.getCmd(), s2sMessagePacket.getData());
-            } catch (Exception e) {
-                LoggerDef.NetLogger.error("Failed to unpack packet, serverId={}, cmd={}, error={}",
-                        serverId, s2sMessagePacket.getCmd(), e.getMessage());
-            }
+        try {
+            // 使用ProtoMessageFactory创建对应的Protobuf消息对象
+            return ProtoMessageFactory.createProtoMessage(receivedPacket.getCmd(), receivedPacket.getData());
+        } catch (Exception e) {
+            LoggerDef.NetLogger.error("Failed to unpack packet, serverId={}, cmd={}, error={}",
+                    serverId, receivedPacket.getCmd(), e.getMessage());
         }
         return null;
     }
