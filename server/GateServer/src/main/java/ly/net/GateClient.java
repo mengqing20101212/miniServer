@@ -61,12 +61,8 @@ public class GateClient {
         // 发送给游戏服务器
         Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket);
         if (resp != null) {
-            AbstractMessagePacket s2cPacket = new AbstractMessagePacket();
-            s2cPacket.setGuid(getSessionGuid());
-            s2cPacket.setCmd(csPacket.getCmd());
-            s2cPacket.setSid(csPacket.getSid());
-            s2cPacket.setSeq(csPacket.getSeq());
-            s2cPacket.setData(resp.getData().toByteArray());
+            AbstractMessagePacket s2cPacket = PacketCompat.createPacket(
+                    getSessionGuid(), csPacket.getCmd(), csPacket.getSid(), csPacket.getSeq(), resp.getData().toByteArray());
             sendPacketToClient(s2cPacket);
         }
 
