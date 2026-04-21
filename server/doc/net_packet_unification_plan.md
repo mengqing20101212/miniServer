@@ -1,171 +1,132 @@
-# Net 模块 Packet 收敛方案（C2S/S2C/S2S/ACK -> 统一 Packet）
+# Net 模块 Packet 收敛方案（去掉 type 字段，统一包头）
 
-> 目标：把 `ly.net.packet` 下多实现类收敛为一个统一实现，降低维护成本，同时保证线上协议兼容、可灰度迁移。
+> 目标：将 `ly.net.packet` 多实现类收敛为**一个包类**，并且移除 `type` 字段；所有消息使用同一套固定包头。
 
-## 1. 现状与痛点
+## 1. 约束与结论
 
-当前 `core` 中存在多个包实现类：
+根据你的要求，新的协议约束是：
 
-- `C2SMessagePacket`
-- `S2CMessagePacket`
-- `S2SMessagePacket`
-- `ConnectionAckPacket`
-- 抽象基类 `AbstractMessagePacket`
-- 工厂 `MessagePacketFactory`
-
-主要问题：
-
-1. **字段高度重复**：`cmd/sid/seq/guid/data` 在多类中重复定义与重复编解码。
-2. **编解码分散**：每个类维护自己的 `getHeadLength/getPacketLen/encode/decode`，改协议时改动面大。
-3. **路由泛型复杂**：大量业务代码绑定具体包类型（如 Gate 绑定 C2S，Game 绑定 S2S），扩展新类型成本高。
-4. **ACK 特例化**：`ConnectionAckPacket` 只多一个 `sessionId`，也走独立类，增加分支。
+1. 不再使用 `type`（不区分 S2C/S2S/C2S/ACK 的头部类型字节）。
+2. 所有包头字段、顺序、长度完全一致。
+3. 语义（请求/响应/ACK/跨服）由 `cmd` 语义和路由上下文判断，而不是由 `type` 判断。
 
 ---
 
-## 2. 目标模型
+## 2. 统一包模型（建议）
 
-新增一个统一包类（示例名：`UnifiedMessagePacket`），保留 `type` 表示语义方向：
+统一类：`MessagePacket`（或 `UnifiedMessagePacket`）。
 
-- `type=0`：S2C
-- `type=1`：S2S
-- `type=2`：C2S
-- `type=3`：ACK
+### 2.1 固定包头（所有报文一致）
 
-### 2.1 统一字段
+建议固定头如下（总长 26 字节）：
 
-统一类固定包含：
+- `short length`：整包长度（头 + body）
+- `int cmd`：消息号（唯一语义入口）
+- `int sid`：会话ID
+- `int seq`：序列号
+- `long guid`：玩家/实体唯一ID
+- `int time`：秒级时间戳
+- `int flags`：扩展位（ACK、压缩、加密、重传标记等）
 
-- `short length`
-- `byte type`
-- `int cmd`
-- `int sid`
-- `int seq`
-- `long guid`
-- `int time`
-- `int ackSessionId`（仅 ACK 使用）
+包体：
 - `byte[] data`
 
-说明：
-- 对某一 `type` 不适用的字段，置默认值（0 或空数组）。
-- 保持二进制协议不变：即各 `type` 在网络上的字段顺序和旧版本一致。
+> 注：ACK 不再是独立包类型，改为 `cmd = CMD_ACK`（预留命令号）+ `flags` 标记（可选）+ `data` 可空。
+
+### 2.2 为什么需要 `flags`
+
+去掉 `type` 后，仍需低成本携带控制语义，`flags` 用于承载：
+
+- `ACK` 位
+- `ERROR` 位
+- `COMPRESS` 位
+- `ENCRYPT` 位
+
+这样可避免再次引入“多包类分支”。
 
 ---
 
-## 3. 编解码设计（关键）
+## 3. 编解码规则（统一）
 
-统一类中以 `switch(type)` 实现 `encode/decode`，但**严格复用旧字节布局**。
+## 3.1 统一编码
 
-### 3.1 头长与包长规则
+`encode` 永远按固定顺序写：
 
-- `COMMON_HEAD = 2(len) + 1(type)`
-- `S2C_HEAD = COMMON_HEAD + cmd(4)+seq(4)+sid(4)+time(4)`
-- `S2S_HEAD = COMMON_HEAD + cmd(4)+seq(4)+sid(4)+guid(8)`
-- `C2S_HEAD = COMMON_HEAD + cmd(4)+sid(4)+guid(8)+seq(4)`（保持当前实现顺序）
-- `ACK_HEAD = COMMON_HEAD`
+1. `length`
+2. `cmd`
+3. `sid`
+4. `seq`
+5. `guid`
+6. `time`
+7. `flags`
+8. `data`
 
-### 3.2 ACK 处理
+## 3.2 统一解码
 
-- `type=ACK` 时，body 仅 `ackSessionId(int)`。
-- 这样可删除独立 `ConnectionAckPacket`。
+`decode` 永远按相同顺序读，不再 `switch(type)`。
 
----
+## 3.3 路由判定
 
-## 4. 迁移策略（建议 4 个阶段）
-
-## Phase 0：加观测（不改行为）
-
-- 给 `CommonDecoder` 增加日志/指标：统计每种 `type` 的 QPS 与异常包。
-- 输出关键指标：decode失败率、未知type数量、包长非法数量。
-
-> 目的：先掌握真实流量，避免盲改。
-
-## Phase 1：引入统一类 + 兼容工厂
-
-- 新增 `UnifiedMessagePacket`。
-- 改造 `MessagePacketFactory`：
-  - `createMessagePacket(type)` 先返回统一类；
-  - 对外保留 `createS2SMessagePacket/createC2SMessagePacket/createS2CMessagePacket`，但内部构造统一类。
-- 暂时保留旧类，作为兼容壳（或适配器）。
-
-> 结果：业务层感知最小，先让编解码统一。
-
-## Phase 2：业务层改泛型与路由
-
-按模块推进（先边缘，后核心）：
-
-1. `BotServer`（风险低）
-2. `GateServer`
-3. `GameServer`
-4. `core.rpc`
-
-改造要点：
-- `HandlerContext<S, P>` 的 `P` 从具体包类迁移到统一包类；
-- 业务代码通过 `packet.getType()` + 访问器判断语义；
-- 删除 `instanceof C2S/S2S/...` 分支。
-
-## Phase 3：删除旧类与收口 API
-
-当全部调用点迁完后：
-
-- 删除 `C2SMessagePacket/S2CMessagePacket/S2SMessagePacket/ConnectionAckPacket`。
-- `MessagePacketFactory` 仅保留统一创建方法（可保留过渡别名 1 个版本）。
-- 清理测试与文档。
+- 业务路由主要依赖 `cmd`。
+- 通道/连接上下文决定方向（客户端连接、服务器连接）。
+- ACK 通过 `cmd` 或 `flags` 识别。
 
 ---
 
-## 5. 风险与规避
+## 4. 与现网兼容（重点）
 
-1. **协议兼容风险（最高）**
-   - 规避：先做“字节级回归测试”，保证同输入下新旧编码字节完全一致。
+由于旧协议有 `type` 且各类型头部不同，不能直接硬切。建议两阶段：
 
-2. **路由泛型改造面大**
-   - 规避：先通过适配器过渡，分模块迁移，不一次性全量替换。
+### 阶段 A：双协议解码 + 新协议编码开关
 
-3. **ACK 链路脆弱（握手失败会导致全链路不可用）**
-   - 规避：先单独压测 ACK + reconnect 场景，再逐步放量。
+- `CommonDecoder` 支持识别旧格式与新格式（通过魔数/version 或连接级协商）。
+- 编码默认仍发旧协议；灰度环境开启新协议发送。
 
----
+### 阶段 B：全量切换
 
-## 6. 测试方案（必须项）
+- 所有节点升级并验证后，统一切换为新协议头。
+- 删除旧的 `C2S/S2C/S2S/ConnectionAck` 与旧解码分支。
 
-### 6.1 单元测试
-
-- `UnifiedMessagePacket` 针对 4 种 `type` 的 encode/decode 循环测试。
-- 边界测试：空 data、超大 data、非法 packetLen、未知 type。
-
-### 6.2 兼容性测试
-
-- 新旧类同字段输入，比较输出字节数组完全一致。
-- 旧端发包 -> 新端解包、新端发包 -> 旧端解包 的双向互通测试。
-
-### 6.3 集成测试
-
-- 登录链路：Login -> Gate -> Game 全流程。
-- RPC 链路：S2S 请求/同步返回。
-- Bot 压测：持续 30 分钟，关注 decode 错误与 seq 校验异常。
+> 如果你们允许短暂不兼容发布（全服停机切换），可以省略双协议阶段。
 
 ---
 
-## 7. 建议的最终代码结构
+## 5. 代码改造清单
 
-建议收敛后 `ly.net.packet` 仅保留：
-
-- `MessagePacket`（统一实现类）
-- `MessagePacketType`（枚举，替代 magic number）
-- `MessagePacketFactory`（可选，主要做构建器/便捷方法）
-
-可选增强：
-- `MessagePacketBuilder`，避免构造参数过长。
+1. 新增 `ly.net.packet.MessagePacket`（唯一包实现）。
+2. 新增 `MessagePacketFlag`（bit 位常量）。
+3. `MessagePacketFactory` 改为只创建统一包。
+4. `CommonEncoder/CommonDecoder` 改为固定头编解码。
+5. `HandlerContext`/路由泛型逐步改为 `MessagePacket`。
+6. `ConnectionAckPacket` 删除，ACK 改为普通 `cmd`。
 
 ---
 
-## 8. 落地优先级建议
+## 6. 测试要求（必须）
 
-1. 先做 **统一编码内核**（Phase 1）
-2. 再改 **Gate/Game 路由泛型**（Phase 2）
-3. 最后清理旧类（Phase 3）
+1. **编码解码闭环测试**：固定头字段全覆盖（含空 body / 大 body）。
+2. **互通测试**：
+   - 新协议客户端 -> 新协议服务端
+   - 新协议服务端 -> 新协议客户端
+3. **迁移期兼容测试**（若采用双协议）：
+   - 旧发新收、新发旧收
+4. **核心链路回归**：Login/Gate/Game、RPC 同步调用、Bot 压测。
 
-如果你希望，我下一步可以直接给出：
+---
 
-- 一版 `UnifiedMessagePacket` 的可编译代码草案；
-- 以及 `CommonDecoder/MessagePacketFactory/GateConnectSession` 的最小改动补丁（先跑通 Gate + Game 主链路）。
+## 7. 推进顺序（最小风险）
+
+1. 先落地统一 `MessagePacket` + 编解码器（保留旧协议兼容）。
+2. 再改 Gate/Game/Bot/RPC 的包类型引用。
+3. 最后删旧类和旧协议分支。
+
+---
+
+## 8. 建议的下一步实现
+
+我可以下一步直接提交一版最小可运行补丁，包含：
+
+- `MessagePacket` 新类（无 type，固定头）
+- `CommonEncoder/CommonDecoder` 最小改造
+- ACK 从 `ConnectionAckPacket` 切到 `CMD_ACK`
+- 保留兼容开关（可配）以支持灰度
