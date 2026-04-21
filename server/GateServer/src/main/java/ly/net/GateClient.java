@@ -1,11 +1,8 @@
 package ly.net;
 
-import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.ByteString;
 
-import ly.ProtoMessageFactory;
 import ly.net.packet.AbstractMessagePacket;
-import ly.net.packet.MessagePacketFactory;
 import ly.proto.Server;
 import ly.rpc.RpcUtils;
 
@@ -62,30 +59,26 @@ public class GateClient {
     }
 
     public void sendPacketToGameServer(AbstractMessagePacket csPacket) {
-        // 发送给游戏服务器
+        // 鍙戦€佺粰娓告垙鏈嶅姟鍣?
         Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket);
         if (resp != null) {
-            AbstractMessage respProto = ProtoMessageFactory.createProtoMessage(csPacket.getCmd(), resp.getData().toByteArray());
-            if (respProto == null) {
-                return;
-            }
-            AbstractMessagePacket s2cPacket = MessagePacketFactory.createAbstractMessagePacket(
-                    getSessionGuid(), csPacket.getCmd(), respProto, csPacket.getSeq(), csPacket.getSid());
+            AbstractMessagePacket s2cPacket = PacketCompat.createPacket(
+                    getSessionGuid(), csPacket.getCmd(), csPacket.getSid(), csPacket.getSeq(), resp.getData().toByteArray());
             sendPacketToClient(s2cPacket);
         }
 
     }
 
-    // 网关调用游戏服务器Rpc方法
+    // 缃戝叧璋冪敤娓告垙鏈嶅姟鍣≧pc鏂规硶
 //    message csGate2GameRpcGameCall{
-//        int32 cmd = 1;// client 发送给gate 请求 cmd
-//        int32 sid = 2;// client 发送给gate 请求 会话id
-//        int64 guid = 3;// client 发送给gate 请求 玩家id
-//        int32 seq = 4;// client 发送给gate 请求 序列id
-//        bytes data = 5;// client 发送给gate 请求 数据
+//        int32 cmd = 1;// client 鍙戦€佺粰gate 璇锋眰 cmd
+//        int32 sid = 2;// client 鍙戦€佺粰gate 璇锋眰 浼氳瘽id
+//        int64 guid = 3;// client 鍙戦€佺粰gate 璇锋眰 鐜╁id
+//        int32 seq = 4;// client 鍙戦€佺粰gate 璇锋眰 搴忓垪id
+//        bytes data = 5;// client 鍙戦€佺粰gate 璇锋眰 鏁版嵁
 //    }
     public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(AbstractMessagePacket csPacket) {
-        // 发送给游戏服务器
+        // 鍙戦€佺粰娓告垙鏈嶅姟鍣?
         Server.csGate2GameRpcGameCall.Builder req = Server.csGate2GameRpcGameCall.newBuilder();
         req.setCmd(csPacket.getCmd());
         req.setSid(csPacket.getSid());
