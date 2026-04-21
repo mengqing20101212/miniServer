@@ -1,5 +1,6 @@
 package ly.net;
 
+import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.Message;
 import ly.GateClientManager;
 import ly.LoggerDef;
@@ -105,11 +106,12 @@ public class GateConnectSession extends ConnectSession {
      * @param msg Protobuf消息对象
      */
     public void sendClientMsg(int cmd, Message msg) {
+        if (!(msg instanceof AbstractMessage abstractMessage)) {
+            throw new IllegalArgumentException("msg must extend AbstractMessage");
+        }
         // 创建服务器到客户端的数据包
-        AbstractMessagePacket s2cPacket = new AbstractMessagePacket();
-        s2cPacket.setGuid(getGuid());
-        s2cPacket.setCmd(cmd);
-        s2cPacket.setData(msg.toByteArray());
+        AbstractMessagePacket s2cPacket = MessagePacketFactory.createAbstractMessagePacket(
+                getGuid(), cmd, abstractMessage, 0, 0);
         // 添加到发送队列
         addSendPacket(s2cPacket);
     }
