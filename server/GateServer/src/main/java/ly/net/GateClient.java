@@ -2,7 +2,6 @@ package ly.net;
 
 import com.google.protobuf.ByteString;
 import ly.net.packet.AbstractMessagePacket;
-import ly.net.packet.MessagePacketFactory;
 import ly.proto.Server;
 import ly.rpc.RpcUtils;
 
@@ -62,7 +61,11 @@ public class GateClient {
         // 发送给游戏服务器
         Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket);
         if (resp != null) {
-            AbstractMessagePacket s2cPacket = MessagePacketFactory.createAbstractMessagePacket(csPacket.getCmd(), csPacket.getSeq(), resp.getData().toByteArray());
+            AbstractMessagePacket s2cPacket = new AbstractMessagePacket();
+            s2cPacket.setGuid(getSessionGuid());
+            s2cPacket.setCmd(csPacket.getCmd());
+            s2cPacket.setSeq(csPacket.getSeq());
+            s2cPacket.setData(resp.getData().toByteArray());
             sendPacketToClient(s2cPacket);
         }
 
@@ -80,17 +83,13 @@ public class GateClient {
         // 发送给游戏服务器
         Server.csGate2GameRpcGameCall.Builder req = Server.csGate2GameRpcGameCall.newBuilder();
         req.setCmd(csPacket.getCmd());
+        req.setGuid(getSessionGuid());
         req.setSeq(csPacket.getSeq());
         req.setData(ByteString.copyFrom(csPacket.getData()));
 
         return RpcUtils.syncRequest(gameServerId, req.getGuid(), csPacket.getCmd(), req.build());
     }
 
-
-    public void sendPacketToClient(AbstractMessagePacket s2sPacket) {
-        AbstractMessagePacket s2cPacket = MessagePacketFactory.createAbstractMessagePacket(s2sPacket.getCmd(), s2sPacket.getSeq(), s2sPacket.getData());
-        session.sendPacket(s2cPacket);
-    }
 
     public void sendPacketToClient(AbstractMessagePacket s2cPacket) {
         session.sendPacket(s2cPacket);
