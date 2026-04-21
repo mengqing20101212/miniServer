@@ -2,13 +2,17 @@ package ly.logic.login;
 
 import ly.GateClientManager;
 import ly.LoggerDef;
+import ly.ProtoMessageFactory;
+import ly.ServerContext;
 import ly.net.GateClient;
 import ly.net.GateConnectSession;
+import ly.net.HandlerContext;
 import ly.net.IGateController;
-import ly.net.packet.C2SMessagePacket;
+import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 import ly.proto.Login;
+import ly.proto.Server;
 import ly.redis.RedisKeys;
 import ly.redis.RedisUtils;
 import ly.rpc.RpcNodeConnector;
@@ -18,6 +22,9 @@ import ly.rpc.RpcUtils;
 import java.util.concurrent.TimeUnit;
 
 public class GateLoginController implements IGateController {
+    static {
+        ServerContext.addController(new GateLoginController());
+    }
 
 
     @Override
@@ -26,13 +33,16 @@ public class GateLoginController implements IGateController {
     }
 
 
-    private void handleLogin(GateConnectSession session, C2SMessagePacket packet, Login.csLogin request) {
+    public void handleLogin(HandlerContext<GateConnectSession, AbstractMessagePacket> context, Login.csLogin request) {
+        GateConnectSession session = context.session();
+        AbstractMessagePacket packet = context.packet();
+
         Thread.ofVirtual().name("loginThread_" + request.getAccount()).start(() -> {
             try {
                 //校验 token
                 if (!checkToken(request.getToken(), request.getAccount())) {
                     LoggerDef.SystemLogger.error(String.format("GateLoginController Invalid token %s for account %s", request.getToken(), request.getAccount()));
-                    sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.param_error);
+                    sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.PARAM_ERROR);
                     return;
                 }
 
@@ -44,7 +54,7 @@ public class GateLoginController implements IGateController {
                     RpcNodeConnector targetGameServer = RpcService.getInstance().getRpcNodeConnector(request.getGameServerId());
                     if (targetGameServer == null) {
                         LoggerDef.SystemLogger.error("GateLoginController getRpcNodeConnector failed, serverId={}", request.getGameServerId());
-                        sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.system_error);
+                        sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.SYSTEM_ERROR);
                         return;
                     }
 
@@ -74,7 +84,9 @@ public class GateLoginController implements IGateController {
                     client.setPlayerId(request.getPlayerId());
                     GateClientManager.getInstance().addClient(client);
                     //通知游戏服务器继续处理登录相关
-                    Login.scLogin scLogin = RpcUtils.syncRequest(request.getGameServerId(), session.getGuid(), packet.getCmd(), request);
+                    Server.scGate2GameRpcGameCall resp = client.sendPacketToGameServerSync(packet);
+                    assert resp != null;
+                    Login.scLogin scLogin = (Login.scLogin) ProtoMessageFactory.createProtoMessage(Cmd.CMD.SC_Login_VALUE, resp.getData().toByteArray());
                     assert scLogin != null;
                     session.sendClientMsg(Cmd.CMD.SC_Login_VALUE, scLogin);
 
@@ -83,7 +95,7 @@ public class GateLoginController implements IGateController {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.system_error);
+                sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.SYSTEM_ERROR);
             }
         });
     }

@@ -4,7 +4,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
-import ly.net.packet.ConnectionAckPacket;
 import org.slf4j.Logger;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,23 +18,23 @@ public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePa
     static AtomicInteger sessionCreator = new AtomicInteger(1);
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, AbstractMessagePacket abstractMessagePacket) throws Exception {
-        //    收到消息
-        if (LoggerDef.NetLogger.isDebugEnabled()) {
-            LoggerDef.NetLogger.debug("receive packet[{}]", abstractMessagePacket.toString());
-        }
-        // 收到请求 session 消息，直接返回 sessionID
-        if (abstractMessagePacket instanceof ConnectionAckPacket) {
-            channelHandlerContext.channel().writeAndFlush(new ConnectionAckPacket(sessionCreator.getAndIncrement()));
+    protected void channelRead0(ChannelHandlerContext ctx, AbstractMessagePacket packet) throws Exception {
+        // 连接确认包特殊处理
+        if (packet.getCmd() == AbstractMessagePacket.CMD_ACK) {
+            ctx.channel().writeAndFlush(new AbstractMessagePacket(sessionCreator.getAndIncrement()));
             return;
         }
-        ConnectSession gameObject = NetService.getInstance().getGameObject(channelHandlerContext);
-        if (gameObject == null) {
-            log.error("Got null gameObject from channel[{}], :{}, packet:{}", channelHandlerContext.channel().id(), channelHandlerContext.channel().remoteAddress(), abstractMessagePacket);
-            channelHandlerContext.close();
+
+        // 获取会话
+        ConnectSession session = NetService.getInstance().getGameObject(ctx);
+        if (session == null) {
+            log.error("Got null gameObject from channel[{}], :{}, packet:{}", ctx.channel().id(), ctx.channel().remoteAddress(), packet);
+            ctx.close();
             return;
         }
-        gameObject.addReceivePacket(abstractMessagePacket);
+
+        // 处理消息分发 - 使用新的HandlerContext机制
+        session.addReceivePacket(packet);
     }
 
     @Override

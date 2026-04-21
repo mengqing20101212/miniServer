@@ -20,16 +20,19 @@ public class CommonDecoder extends ByteToMessageDecoder {
   @Override
   protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> list)
       throws Exception {
-    while (in.readableBytes() > 2) {
+    while (in.readableBytes() >= 2) {
       in.markReaderIndex();
       try {
         short len = in.readShort();
+        if (len < 22) {
+          in.resetReaderIndex();
+          break;
+        }
         if (in.readableBytes() < len - 2) {
           in.resetReaderIndex();
           break;
         }
-        int type = in.readByte();
-        AbstractMessagePacket packet = MessagePacketFactory.createMessagePacket(type);
+        AbstractMessagePacket packet = MessagePacketFactory.createMessagePacket();
         if (packet != null && packet.decode(len, in)) {
           list.add(packet);
         } else {

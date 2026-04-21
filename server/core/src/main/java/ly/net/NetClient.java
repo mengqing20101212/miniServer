@@ -7,9 +7,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
-import ly.net.packet.ConnectionAckPacket;
 import ly.net.packet.MessagePacketFactory;
-import ly.net.packet.S2SMessagePacket;
 import org.slf4j.Logger;
 
 import java.net.InetSocketAddress;
@@ -110,8 +108,8 @@ public class NetClient {
 
     public int sendS2SMessage(long guid, int cmd, AbstractMessage protoData) {
         final int seq = sendSeq.getAndIncrement();
-        S2SMessagePacket messagePacket =
-                MessagePacketFactory.createS2SMessagePacket(
+        AbstractMessagePacket messagePacket =
+                MessagePacketFactory.createAbstractMessagePacket(
                         guid, cmd, protoData, seq, sid);
         return send(messagePacket) ? seq : -1;
     }
@@ -134,7 +132,7 @@ public class NetClient {
         }
     }
 
-    protected boolean isConnected() {
+    public boolean isConnected() {
         return channel != null && channel.isActive();
     }
 
@@ -181,8 +179,8 @@ public class NetClient {
     }
 
     public void addReceivePacket(AbstractMessagePacket packet) {
-        if (packet instanceof ConnectionAckPacket ackPacket) {
-            setSid(ackPacket.getSessionId());
+        if (packet.getCmd() == AbstractMessagePacket.CMD_ACK) {
+            setSid(packet.getSid());
         } else {
             receivePacketQueue.add(packet);
         }
@@ -213,11 +211,15 @@ public class NetClient {
         return isConnected() && sid != 0;
     }
 
-    public AbstractMessagePacket getReceiveMsgBySeq(int sendSeq) {
+    public int getSid() {
+        return sid;
+    }
+
+    public AbstractMessagePacket getReceiveMsgBySeq(int sendSeq, int cmd) {
         Iterator<AbstractMessagePacket> iterator = receivePacketQueue.iterator();
         while (iterator.hasNext()) {
             AbstractMessagePacket packet = iterator.next();
-            if (packet.getSeq() == sendSeq) {
+            if (packet.getSeq() == sendSeq && packet.getCmd() == cmd) {
                 iterator.remove();
                 return packet;
             }

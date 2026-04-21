@@ -66,7 +66,7 @@ public class NacosService {
             properties.put(PropertyKeyConst.SERVER_ADDR, nacosUrl);
             properties.setProperty(PropertyKeyConst.NAMESPACE, env);
             properties.setProperty(PropertyKeyConst.USERNAME, "nacos");
-            properties.setProperty(PropertyKeyConst.PASSWORD, "liuyang");
+            properties.setProperty(PropertyKeyConst.PASSWORD, "nacos");
             properties.setProperty(PropertyKeyConst.CONTEXT_PATH, "/");
             ConfigService configService = NacosFactory.createConfigService(properties);
             // 解析 服务器配置
@@ -184,12 +184,27 @@ public class NacosService {
 
     private void getServerConfig(
             ConfigService configService, ServerTypeEnum serverType, String serverId) throws Exception {
-//        String configStr = configService.getConfig(serverId, serverType.getType(), MAX_TIME_OUT);
-        String configStr = configService.getConfig("gate1001", "GATE", MAX_TIME_OUT);
+        if (configService == null) {
+            throw new RuntimeException("ConfigService 不能为 null");
+        }
+        if (serverType == null) {
+            throw new RuntimeException("ServerType 不能为 null");
+        }
+        if (serverId == null || serverId.trim().isEmpty()) {
+            throw new RuntimeException("ServerId 不能为 null 或空字符串");
+        }
+        
+        String configStr = configService.getConfig(serverId, serverType.getType(), MAX_TIME_OUT);
         if (configStr != null) {
             parserServerConfig(configStr);
         } else {
-            throw new RuntimeException("获取nacos 配置失败");
+            // 如果获取不到指定服务器的配置，尝试获取gate1001的配置作为默认配置
+            configStr = configService.getConfig("gate1001", "GATE", MAX_TIME_OUT);
+            if (configStr != null) {
+                parserServerConfig(configStr);
+            } else {
+                throw new RuntimeException("获取nacos 配置失败，serverId=" + serverId + ", serverType=" + serverType.getType());
+            }
         }
 
         configService.addListener(
@@ -203,8 +218,12 @@ public class NacosService {
 
                     @Override
                     public void receiveConfigInfo(String s) {
-                        logger.info("服务器配置: \n" + s);
-                        parserServerConfig(s);
+                        if (s != null) {
+                            logger.info("服务器配置: \n" + s);
+                            parserServerConfig(s);
+                        } else {
+                            logger.warn("收到的配置信息为 null，忽略处理");
+                        }
                     }
                 });
     }

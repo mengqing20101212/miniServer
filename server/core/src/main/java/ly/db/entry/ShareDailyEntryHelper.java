@@ -13,16 +13,16 @@ public class ShareDailyEntryHelper {
         .selectOnce(ShareDailyEntry.class, new String[] {"id"}, id);
   }
 
-  public static void save(ShareDailyEntry ShareDailyEntry) {
-    MysqlService.getInstance().save(ShareDailyEntry);
+  public static boolean save(ShareDailyEntry ShareDailyEntry) {
+    return MysqlService.getInstance().save(ShareDailyEntry);
   }
 
-  public static void update(ShareDailyEntry ShareDailyEntry, String... fileds) {
-    MysqlService.getInstance().update(ShareDailyEntry, fileds);
+  public static boolean update(ShareDailyEntry ShareDailyEntry, String... fileds) {
+    return MysqlService.getInstance().update(ShareDailyEntry, fileds);
   }
 
-  public static void delete(ShareDailyEntry ShareDailyEntry) {
-    MysqlService.getInstance().delete(ShareDailyEntry);
+  public static boolean delete(ShareDailyEntry ShareDailyEntry) {
+    return MysqlService.getInstance().delete(ShareDailyEntry);
   }
 
   public static void asyncSave(ShareDailyEntry ShareDailyEntry) {

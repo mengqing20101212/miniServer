@@ -6,18 +6,17 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="core" />
+        <module name="proto" />
+        <module name="LoginServer" />
         <module name="GameServer" />
+        <module name="config" />
+        <module name="tool" />
+        <module name="GateServer" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="config" target="21" />
-      <module name="core" target="21" />
-      <module name="GateServer" target="21" />
       <module name="logger" target="21" />
-      <module name="LoginServer" target="21" />
-      <module name="proto" target="21" />
-      <module name="server" target="1.5" />
-      <module name="tool" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

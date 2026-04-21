@@ -1,0 +1,58 @@
+package ly.bot.module.impl;
+
+import ly.bot.command.RobotCommand;
+import ly.bot.factory.RobotCommandFactory;
+import ly.bot.module.RobotModule;
+import ly.bot.session.RobotSession;
+import ly.net.NetClient;
+
+/**
+ * 移动模块 - 处理移动相关行为
+ * 
+ * Author: OpenClaw AI Assistant
+ * Date: 2026/2/5
+ * File: MovementModule
+ */
+public class MovementModule implements RobotModule {
+    private boolean completed = false;
+    private int step = 0;
+    private static final int MAX_MOVEMENTS = 3; // 移动模块执行3次移动
+    
+    @Override
+    public boolean executeStep(NetClient client, RobotSession session) {
+        // 发送移动命令
+        RobotCommand moveCommand = RobotCommandFactory.createCommand(
+            RobotCommandFactory.CommandType.MOVE
+        );
+        moveCommand.execute(client, session);
+        
+        // 存储移动相关的数据到会话级别存储
+        session.getDataStore().put("movement", "lastMoveTime", System.currentTimeMillis());
+        session.getDataStore().put("movement", "moveCount", step + 1);
+        session.getDataStore().put("movement", "currentPosition", "x:" + (step * 10) + ", y:" + (step * 5));
+        
+        step++;
+        if (step >= MAX_MOVEMENTS) {
+            completed = true;
+        }
+        
+        return completed;
+    }
+    
+    @Override
+    public void reset() {
+        completed = false;
+        step = 0;
+        // 注意：不再清除会话级别的数据，因为其他模块可能需要这些数据
+    }
+    
+    @Override
+    public boolean isCompleted() {
+        return completed;
+    }
+    
+    @Override
+    public String getName() {
+        return "MovementModule";
+    }
+}

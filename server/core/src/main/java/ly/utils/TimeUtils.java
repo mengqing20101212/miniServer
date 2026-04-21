@@ -2,6 +2,7 @@ package ly.utils;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -11,6 +12,10 @@ import java.util.Locale;
 public class TimeUtils {
     public static LocalDateTime now() {
         return LocalDateTime.now();
+    }
+
+    public static long nowMillis() {
+        return now().toInstant(ZoneId.systemDefault().getRules().getOffset(now())).toEpochMilli();
     }
 
     static int getCurWeekByMoth() {
@@ -44,5 +49,9 @@ public class TimeUtils {
         System.out.println(week);
         long time = getNextWeekBeginTimer();
         System.out.println(time);
+    }
+
+    public static long getTimer(LocalDateTime time) {
+        return time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 }

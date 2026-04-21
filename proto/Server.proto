@@ -36,3 +36,15 @@ message scRpcPing
   int64 time = 1;
 }
 
+// 网关调用游戏服务器Rpc方法
+message csGate2GameRpcGameCall{
+  int32 cmd = 1;// client 发送给gate 请求 cmd
+  int32 sid = 2;// client 发送给gate 请求 会话id
+  int64 guid = 3;// client 发送给gate 请求 玩家id
+  int32 seq = 4;// client 发送给gate 请求 序列id
+  bytes data = 5;// client 发送给gate 请求 数据
+}
+// 网关调用游戏服务器Rpc方法响应
+message scGate2GameRpcGameCall{
+  bytes data = 1;// game 发送给gate 响应 数据
+}

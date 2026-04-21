@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+start
+:login check;
+ if (has oldGateClient) is (yes) then
+    :check oldGameServerId;
+    if (oldGameServerId == loginGameServerId) is (yes) then
+        :notify oldGateClient logout;
+    else (no)
+        :notify OtherGameServer logout;
+    endif
+ endif
+ :notify GameServer login;
+end
+@enduml

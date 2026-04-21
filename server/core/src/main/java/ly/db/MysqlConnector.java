@@ -206,10 +206,20 @@ public class MysqlConnector {
   }
 
   private String getParamStr(Object[] params) {
+    if (params == null) {
+      return "[]";
+    }
     StringBuffer sb = new StringBuffer("[");
     for (int i = 0; i < params.length; i++) {
-      String value = String.valueOf(params[i]);
-      sb.append(String.format("'%s, '", value));
+      if (params[i] != null) {
+        String value = String.valueOf(params[i]);
+        sb.append(String.format("'%s', ", value));
+      } else {
+        sb.append("'null', ");
+      }
+    }
+    if (params.length > 0) {
+      sb.delete(sb.length() - 2, sb.length()); // 移除最后的 ", "
     }
     sb.append("]");
     return sb.toString();

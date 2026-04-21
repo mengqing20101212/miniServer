@@ -57,9 +57,13 @@ public class RpcService {
         return null;
     }
 
-    //TODO  nacos 节点删除事件
+    // 处理nacos节点删除事件，清理相关资源
     public void onNodeDeleted(String serverId) {
-        rpcNodeConnectorMap.remove(serverId);
+        RpcNodeConnector connector = rpcNodeConnectorMap.remove(serverId);
+        if (connector != null) {
+            connector.cleanup(); // 清理资源避免内存泄漏
+            LoggerDef.NetLogger.info("RpcService cleaned up connector for deleted node: {}", serverId);
+        }
     }
 
 

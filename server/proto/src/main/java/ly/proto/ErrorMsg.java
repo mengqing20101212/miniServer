@@ -33,65 +33,89 @@ public final class ErrorMsg {
      *失败
      * </pre>
      *
-     * <code>Failed = 1;</code>
+     * <code>FAILED = 1;</code>
      */
-    Failed(1),
+    FAILED(1),
     /**
      * <pre>
      *系统错误
      * </pre>
      *
-     * <code>system_error = 2;</code>
+     * <code>SYSTEM_ERROR = 2;</code>
      */
-    system_error(2),
+    SYSTEM_ERROR(2),
     /**
      * <pre>
      *参数错误
      * </pre>
      *
-     * <code>param_error = 3;</code>
+     * <code>PARAM_ERROR = 3;</code>
      */
-    param_error(3),
+    PARAM_ERROR(3),
     /**
      * <pre>
      *账号错误
      * </pre>
      *
-     * <code>account_error = 4;</code>
+     * <code>ACCOUNT_ERROR = 4;</code>
      */
-    account_error(4),
+    ACCOUNT_ERROR(4),
     /**
      * <pre>
      *密码错误
      * </pre>
      *
-     * <code>password_error = 5;</code>
+     * <code>PASSWORD_ERROR = 5;</code>
      */
-    password_error(5),
+    PASSWORD_ERROR(5),
     /**
      * <pre>
      *账号被禁用
      * </pre>
      *
-     * <code>account_forbidden = 6;</code>
+     * <code>ACCOUNT_FORBIDDEN = 6;</code>
      */
-    account_forbidden(6),
+    ACCOUNT_FORBIDDEN(6),
     /**
      * <pre>
      *账号已登录
      * </pre>
      *
-     * <code>account_online = 7;</code>
+     * <code>ACCOUNT_ONLINE = 7;</code>
      */
-    account_online(7),
+    ACCOUNT_ONLINE(7),
     /**
      * <pre>
      *账号未注册
      * </pre>
      *
-     * <code>account_not_register = 8;</code>
+     * <code>ACCOUNT_NOT_REGISTER = 8;</code>
      */
-    account_not_register(8),
+    ACCOUNT_NOT_REGISTER(8),
+    /**
+     * <pre>
+     *玩家名已存在
+     * </pre>
+     *
+     * <code>PLAYER_NAME_EXISTS = 9;</code>
+     */
+    PLAYER_NAME_EXISTS(9),
+    /**
+     * <pre>
+     *token错误
+     * </pre>
+     *
+     * <code>TOKEN_ERROR = 10;</code>
+     */
+    TOKEN_ERROR(10),
+    /**
+     * <pre>
+     *玩家不存在
+     * </pre>
+     *
+     * <code>PLAYER_NOT_EXIST = 11;</code>
+     */
+    PLAYER_NOT_EXIST(11),
     UNRECOGNIZED(-1),
     ;
 
@@ -108,65 +132,89 @@ public final class ErrorMsg {
      *失败
      * </pre>
      *
-     * <code>Failed = 1;</code>
+     * <code>FAILED = 1;</code>
      */
-    public static final int Failed_VALUE = 1;
+    public static final int FAILED_VALUE = 1;
     /**
      * <pre>
      *系统错误
      * </pre>
      *
-     * <code>system_error = 2;</code>
+     * <code>SYSTEM_ERROR = 2;</code>
      */
-    public static final int system_error_VALUE = 2;
+    public static final int SYSTEM_ERROR_VALUE = 2;
     /**
      * <pre>
      *参数错误
      * </pre>
      *
-     * <code>param_error = 3;</code>
+     * <code>PARAM_ERROR = 3;</code>
      */
-    public static final int param_error_VALUE = 3;
+    public static final int PARAM_ERROR_VALUE = 3;
     /**
      * <pre>
      *账号错误
      * </pre>
      *
-     * <code>account_error = 4;</code>
+     * <code>ACCOUNT_ERROR = 4;</code>
      */
-    public static final int account_error_VALUE = 4;
+    public static final int ACCOUNT_ERROR_VALUE = 4;
     /**
      * <pre>
      *密码错误
      * </pre>
      *
-     * <code>password_error = 5;</code>
+     * <code>PASSWORD_ERROR = 5;</code>
      */
-    public static final int password_error_VALUE = 5;
+    public static final int PASSWORD_ERROR_VALUE = 5;
     /**
      * <pre>
      *账号被禁用
      * </pre>
      *
-     * <code>account_forbidden = 6;</code>
+     * <code>ACCOUNT_FORBIDDEN = 6;</code>
      */
-    public static final int account_forbidden_VALUE = 6;
+    public static final int ACCOUNT_FORBIDDEN_VALUE = 6;
     /**
      * <pre>
      *账号已登录
      * </pre>
      *
-     * <code>account_online = 7;</code>
+     * <code>ACCOUNT_ONLINE = 7;</code>
      */
-    public static final int account_online_VALUE = 7;
+    public static final int ACCOUNT_ONLINE_VALUE = 7;
     /**
      * <pre>
      *账号未注册
      * </pre>
      *
-     * <code>account_not_register = 8;</code>
+     * <code>ACCOUNT_NOT_REGISTER = 8;</code>
      */
-    public static final int account_not_register_VALUE = 8;
+    public static final int ACCOUNT_NOT_REGISTER_VALUE = 8;
+    /**
+     * <pre>
+     *玩家名已存在
+     * </pre>
+     *
+     * <code>PLAYER_NAME_EXISTS = 9;</code>
+     */
+    public static final int PLAYER_NAME_EXISTS_VALUE = 9;
+    /**
+     * <pre>
+     *token错误
+     * </pre>
+     *
+     * <code>TOKEN_ERROR = 10;</code>
+     */
+    public static final int TOKEN_ERROR_VALUE = 10;
+    /**
+     * <pre>
+     *玩家不存在
+     * </pre>
+     *
+     * <code>PLAYER_NOT_EXIST = 11;</code>
+     */
+    public static final int PLAYER_NOT_EXIST_VALUE = 11;
 
 
     public final int getNumber() {
@@ -194,14 +242,17 @@ public final class ErrorMsg {
     public static ErrorCode forNumber(int value) {
       switch (value) {
         case 0: return Ok;
-        case 1: return Failed;
-        case 2: return system_error;
-        case 3: return param_error;
-        case 4: return account_error;
-        case 5: return password_error;
-        case 6: return account_forbidden;
-        case 7: return account_online;
-        case 8: return account_not_register;
+        case 1: return FAILED;
+        case 2: return SYSTEM_ERROR;
+        case 3: return PARAM_ERROR;
+        case 4: return ACCOUNT_ERROR;
+        case 5: return PASSWORD_ERROR;
+        case 6: return ACCOUNT_FORBIDDEN;
+        case 7: return ACCOUNT_ONLINE;
+        case 8: return ACCOUNT_NOT_REGISTER;
+        case 9: return PLAYER_NAME_EXISTS;
+        case 10: return TOKEN_ERROR;
+        case 11: return PLAYER_NOT_EXIST;
         default: return null;
       }
     }
@@ -261,23 +312,6 @@ public final class ErrorMsg {
   public interface csErrorCodeOrBuilder extends
       // @@protoc_insertion_point(interface_extends:csErrorCode)
       com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>int32 msgId = 1;</code>
-     * @return The msgId.
-     */
-    int getMsgId();
-
-    /**
-     * <code>.ErrorCode errorCode = 2;</code>
-     * @return The enum numeric value on the wire for errorCode.
-     */
-    int getErrorCodeValue();
-    /**
-     * <code>.ErrorCode errorCode = 2;</code>
-     * @return The errorCode.
-     */
-    ly.proto.ErrorMsg.ErrorCode getErrorCode();
   }
   /**
    * Protobuf type {@code csErrorCode}
@@ -292,7 +326,6 @@ public final class ErrorMsg {
       super(builder);
     }
     private csErrorCode() {
-      errorCode_ = 0;
     }
 
     @java.lang.Override
@@ -315,35 +348,6 @@ public final class ErrorMsg {
               ly.proto.ErrorMsg.csErrorCode.class, ly.proto.ErrorMsg.csErrorCode.Builder.class);
     }
 
-    public static final int MSGID_FIELD_NUMBER = 1;
-    private int msgId_ = 0;
-    /**
-     * <code>int32 msgId = 1;</code>
-     * @return The msgId.
-     */
-    @java.lang.Override
-    public int getMsgId() {
-      return msgId_;
-    }
-
-    public static final int ERRORCODE_FIELD_NUMBER = 2;
-    private int errorCode_ = 0;
-    /**
-     * <code>.ErrorCode errorCode = 2;</code>
-     * @return The enum numeric value on the wire for errorCode.
-     */
-    @java.lang.Override public int getErrorCodeValue() {
-      return errorCode_;
-    }
-    /**
-     * <code>.ErrorCode errorCode = 2;</code>
-     * @return The errorCode.
-     */
-    @java.lang.Override public ly.proto.ErrorMsg.ErrorCode getErrorCode() {
-      ly.proto.ErrorMsg.ErrorCode result = ly.proto.ErrorMsg.ErrorCode.forNumber(errorCode_);
-      return result == null ? ly.proto.ErrorMsg.ErrorCode.UNRECOGNIZED : result;
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -358,12 +362,6 @@ public final class ErrorMsg {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (msgId_ != 0) {
-        output.writeInt32(1, msgId_);
-      }
-      if (errorCode_ != ly.proto.ErrorMsg.ErrorCode.Ok.getNumber()) {
-        output.writeEnum(2, errorCode_);
-      }
       getUnknownFields().writeTo(output);
     }
 
@@ -373,14 +371,6 @@ public final class ErrorMsg {
       if (size != -1) return size;
 
       size = 0;
-      if (msgId_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, msgId_);
-      }
-      if (errorCode_ != ly.proto.ErrorMsg.ErrorCode.Ok.getNumber()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(2, errorCode_);
-      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -396,9 +386,6 @@ public final class ErrorMsg {
       }
       ly.proto.ErrorMsg.csErrorCode other = (ly.proto.ErrorMsg.csErrorCode) obj;
 
-      if (getMsgId()
-          != other.getMsgId()) return false;
-      if (errorCode_ != other.errorCode_) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -410,10 +397,6 @@ public final class ErrorMsg {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + MSGID_FIELD_NUMBER;
-      hash = (53 * hash) + getMsgId();
-      hash = (37 * hash) + ERRORCODE_FIELD_NUMBER;
-      hash = (53 * hash) + errorCode_;
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -544,9 +527,6 @@ public final class ErrorMsg {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        bitField0_ = 0;
-        msgId_ = 0;
-        errorCode_ = 0;
         return this;
       }
 
@@ -573,19 +553,8 @@ public final class ErrorMsg {
       @java.lang.Override
       public ly.proto.ErrorMsg.csErrorCode buildPartial() {
         ly.proto.ErrorMsg.csErrorCode result = new ly.proto.ErrorMsg.csErrorCode(this);
-        if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
-      }
-
-      private void buildPartial0(ly.proto.ErrorMsg.csErrorCode result) {
-        int from_bitField0_ = bitField0_;
-        if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.msgId_ = msgId_;
-        }
-        if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.errorCode_ = errorCode_;
-        }
       }
 
       @java.lang.Override
@@ -632,12 +601,6 @@ public final class ErrorMsg {
 
       public Builder mergeFrom(ly.proto.ErrorMsg.csErrorCode other) {
         if (other == ly.proto.ErrorMsg.csErrorCode.getDefaultInstance()) return this;
-        if (other.getMsgId() != 0) {
-          setMsgId(other.getMsgId());
-        }
-        if (other.errorCode_ != 0) {
-          setErrorCodeValue(other.getErrorCodeValue());
-        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -664,16 +627,6 @@ public final class ErrorMsg {
               case 0:
                 done = true;
                 break;
-              case 8: {
-                msgId_ = input.readInt32();
-                bitField0_ |= 0x00000001;
-                break;
-              } // case 8
-              case 16: {
-                errorCode_ = input.readEnum();
-                bitField0_ |= 0x00000002;
-                break;
-              } // case 16
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -687,92 +640,6 @@ public final class ErrorMsg {
         } finally {
           onChanged();
         } // finally
-        return this;
-      }
-      private int bitField0_;
-
-      private int msgId_ ;
-      /**
-       * <code>int32 msgId = 1;</code>
-       * @return The msgId.
-       */
-      @java.lang.Override
-      public int getMsgId() {
-        return msgId_;
-      }
-      /**
-       * <code>int32 msgId = 1;</code>
-       * @param value The msgId to set.
-       * @return This builder for chaining.
-       */
-      public Builder setMsgId(int value) {
-
-        msgId_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 msgId = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearMsgId() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        msgId_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int errorCode_ = 0;
-      /**
-       * <code>.ErrorCode errorCode = 2;</code>
-       * @return The enum numeric value on the wire for errorCode.
-       */
-      @java.lang.Override public int getErrorCodeValue() {
-        return errorCode_;
-      }
-      /**
-       * <code>.ErrorCode errorCode = 2;</code>
-       * @param value The enum numeric value on the wire for errorCode to set.
-       * @return This builder for chaining.
-       */
-      public Builder setErrorCodeValue(int value) {
-        errorCode_ = value;
-        bitField0_ |= 0x00000002;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.ErrorCode errorCode = 2;</code>
-       * @return The errorCode.
-       */
-      @java.lang.Override
-      public ly.proto.ErrorMsg.ErrorCode getErrorCode() {
-        ly.proto.ErrorMsg.ErrorCode result = ly.proto.ErrorMsg.ErrorCode.forNumber(errorCode_);
-        return result == null ? ly.proto.ErrorMsg.ErrorCode.UNRECOGNIZED : result;
-      }
-      /**
-       * <code>.ErrorCode errorCode = 2;</code>
-       * @param value The errorCode to set.
-       * @return This builder for chaining.
-       */
-      public Builder setErrorCode(ly.proto.ErrorMsg.ErrorCode value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        bitField0_ |= 0x00000002;
-        errorCode_ = value.getNumber();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.ErrorCode errorCode = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearErrorCode() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        errorCode_ = 0;
-        onChanged();
         return this;
       }
       @java.lang.Override
@@ -842,6 +709,35 @@ public final class ErrorMsg {
   public interface scErrorCodeOrBuilder extends
       // @@protoc_insertion_point(interface_extends:scErrorCode)
       com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     *产生错误的消息号
+     * </pre>
+     *
+     * <code>int32 msgId = 1;</code>
+     * @return The msgId.
+     */
+    int getMsgId();
+
+    /**
+     * <pre>
+     *错误码
+     * </pre>
+     *
+     * <code>.ErrorCode errorCode = 2;</code>
+     * @return The enum numeric value on the wire for errorCode.
+     */
+    int getErrorCodeValue();
+    /**
+     * <pre>
+     *错误码
+     * </pre>
+     *
+     * <code>.ErrorCode errorCode = 2;</code>
+     * @return The errorCode.
+     */
+    ly.proto.ErrorMsg.ErrorCode getErrorCode();
   }
   /**
    * Protobuf type {@code scErrorCode}
@@ -856,6 +752,7 @@ public final class ErrorMsg {
       super(builder);
     }
     private scErrorCode() {
+      errorCode_ = 0;
     }
 
     @java.lang.Override
@@ -878,6 +775,47 @@ public final class ErrorMsg {
               ly.proto.ErrorMsg.scErrorCode.class, ly.proto.ErrorMsg.scErrorCode.Builder.class);
     }
 
+    public static final int MSGID_FIELD_NUMBER = 1;
+    private int msgId_ = 0;
+    /**
+     * <pre>
+     *产生错误的消息号
+     * </pre>
+     *
+     * <code>int32 msgId = 1;</code>
+     * @return The msgId.
+     */
+    @java.lang.Override
+    public int getMsgId() {
+      return msgId_;
+    }
+
+    public static final int ERRORCODE_FIELD_NUMBER = 2;
+    private int errorCode_ = 0;
+    /**
+     * <pre>
+     *错误码
+     * </pre>
+     *
+     * <code>.ErrorCode errorCode = 2;</code>
+     * @return The enum numeric value on the wire for errorCode.
+     */
+    @java.lang.Override public int getErrorCodeValue() {
+      return errorCode_;
+    }
+    /**
+     * <pre>
+     *错误码
+     * </pre>
+     *
+     * <code>.ErrorCode errorCode = 2;</code>
+     * @return The errorCode.
+     */
+    @java.lang.Override public ly.proto.ErrorMsg.ErrorCode getErrorCode() {
+      ly.proto.ErrorMsg.ErrorCode result = ly.proto.ErrorMsg.ErrorCode.forNumber(errorCode_);
+      return result == null ? ly.proto.ErrorMsg.ErrorCode.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -892,6 +830,12 @@ public final class ErrorMsg {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (msgId_ != 0) {
+        output.writeInt32(1, msgId_);
+      }
+      if (errorCode_ != ly.proto.ErrorMsg.ErrorCode.Ok.getNumber()) {
+        output.writeEnum(2, errorCode_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -901,6 +845,14 @@ public final class ErrorMsg {
       if (size != -1) return size;
 
       size = 0;
+      if (msgId_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, msgId_);
+      }
+      if (errorCode_ != ly.proto.ErrorMsg.ErrorCode.Ok.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(2, errorCode_);
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -916,6 +868,9 @@ public final class ErrorMsg {
       }
       ly.proto.ErrorMsg.scErrorCode other = (ly.proto.ErrorMsg.scErrorCode) obj;
 
+      if (getMsgId()
+          != other.getMsgId()) return false;
+      if (errorCode_ != other.errorCode_) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -927,6 +882,10 @@ public final class ErrorMsg {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + MSGID_FIELD_NUMBER;
+      hash = (53 * hash) + getMsgId();
+      hash = (37 * hash) + ERRORCODE_FIELD_NUMBER;
+      hash = (53 * hash) + errorCode_;
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1057,6 +1016,9 @@ public final class ErrorMsg {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
+        msgId_ = 0;
+        errorCode_ = 0;
         return this;
       }
 
@@ -1083,8 +1045,19 @@ public final class ErrorMsg {
       @java.lang.Override
       public ly.proto.ErrorMsg.scErrorCode buildPartial() {
         ly.proto.ErrorMsg.scErrorCode result = new ly.proto.ErrorMsg.scErrorCode(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
+      }
+
+      private void buildPartial0(ly.proto.ErrorMsg.scErrorCode result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.msgId_ = msgId_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.errorCode_ = errorCode_;
+        }
       }
 
       @java.lang.Override
@@ -1131,6 +1104,12 @@ public final class ErrorMsg {
 
       public Builder mergeFrom(ly.proto.ErrorMsg.scErrorCode other) {
         if (other == ly.proto.ErrorMsg.scErrorCode.getDefaultInstance()) return this;
+        if (other.getMsgId() != 0) {
+          setMsgId(other.getMsgId());
+        }
+        if (other.errorCode_ != 0) {
+          setErrorCodeValue(other.getErrorCodeValue());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -1157,6 +1136,16 @@ public final class ErrorMsg {
               case 0:
                 done = true;
                 break;
+              case 8: {
+                msgId_ = input.readInt32();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 16: {
+                errorCode_ = input.readEnum();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -1170,6 +1159,124 @@ public final class ErrorMsg {
         } finally {
           onChanged();
         } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private int msgId_ ;
+      /**
+       * <pre>
+       *产生错误的消息号
+       * </pre>
+       *
+       * <code>int32 msgId = 1;</code>
+       * @return The msgId.
+       */
+      @java.lang.Override
+      public int getMsgId() {
+        return msgId_;
+      }
+      /**
+       * <pre>
+       *产生错误的消息号
+       * </pre>
+       *
+       * <code>int32 msgId = 1;</code>
+       * @param value The msgId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMsgId(int value) {
+
+        msgId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *产生错误的消息号
+       * </pre>
+       *
+       * <code>int32 msgId = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMsgId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        msgId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int errorCode_ = 0;
+      /**
+       * <pre>
+       *错误码
+       * </pre>
+       *
+       * <code>.ErrorCode errorCode = 2;</code>
+       * @return The enum numeric value on the wire for errorCode.
+       */
+      @java.lang.Override public int getErrorCodeValue() {
+        return errorCode_;
+      }
+      /**
+       * <pre>
+       *错误码
+       * </pre>
+       *
+       * <code>.ErrorCode errorCode = 2;</code>
+       * @param value The enum numeric value on the wire for errorCode to set.
+       * @return This builder for chaining.
+       */
+      public Builder setErrorCodeValue(int value) {
+        errorCode_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *错误码
+       * </pre>
+       *
+       * <code>.ErrorCode errorCode = 2;</code>
+       * @return The errorCode.
+       */
+      @java.lang.Override
+      public ly.proto.ErrorMsg.ErrorCode getErrorCode() {
+        ly.proto.ErrorMsg.ErrorCode result = ly.proto.ErrorMsg.ErrorCode.forNumber(errorCode_);
+        return result == null ? ly.proto.ErrorMsg.ErrorCode.UNRECOGNIZED : result;
+      }
+      /**
+       * <pre>
+       *错误码
+       * </pre>
+       *
+       * <code>.ErrorCode errorCode = 2;</code>
+       * @param value The errorCode to set.
+       * @return This builder for chaining.
+       */
+      public Builder setErrorCode(ly.proto.ErrorMsg.ErrorCode value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000002;
+        errorCode_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *错误码
+       * </pre>
+       *
+       * <code>.ErrorCode errorCode = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearErrorCode() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        errorCode_ = 0;
+        onChanged();
         return this;
       }
       @java.lang.Override
@@ -1255,14 +1362,15 @@ public final class ErrorMsg {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\016ErrorMsg.proto\";\n\013csErrorCode\022\r\n\005msgId" +
-      "\030\001 \001(\005\022\035\n\terrorCode\030\002 \001(\0162\n.ErrorCode\"\r\n" +
-      "\013scErrorCode*\256\001\n\tErrorCode\022\006\n\002Ok\020\000\022\n\n\006Fa" +
-      "iled\020\001\022\020\n\014system_error\020\002\022\017\n\013param_error\020" +
-      "\003\022\021\n\raccount_error\020\004\022\022\n\016password_error\020\005" +
-      "\022\025\n\021account_forbidden\020\006\022\022\n\016account_onlin" +
-      "e\020\007\022\030\n\024account_not_register\020\010B\n\n\010ly.prot" +
-      "ob\006proto3"
+      "\n\016ErrorMsg.proto\"\r\n\013csErrorCode\";\n\013scErr" +
+      "orCode\022\r\n\005msgId\030\001 \001(\005\022\035\n\terrorCode\030\002 \001(\016" +
+      "2\n.ErrorCode*\355\001\n\tErrorCode\022\006\n\002Ok\020\000\022\n\n\006FA" +
+      "ILED\020\001\022\020\n\014SYSTEM_ERROR\020\002\022\017\n\013PARAM_ERROR\020" +
+      "\003\022\021\n\rACCOUNT_ERROR\020\004\022\022\n\016PASSWORD_ERROR\020\005" +
+      "\022\025\n\021ACCOUNT_FORBIDDEN\020\006\022\022\n\016ACCOUNT_ONLIN" +
+      "E\020\007\022\030\n\024ACCOUNT_NOT_REGISTER\020\010\022\026\n\022PLAYER_" +
+      "NAME_EXISTS\020\t\022\017\n\013TOKEN_ERROR\020\n\022\024\n\020PLAYER" +
+      "_NOT_EXIST\020\013B\n\n\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -1273,13 +1381,13 @@ public final class ErrorMsg {
     internal_static_csErrorCode_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csErrorCode_descriptor,
-        new java.lang.String[] { "MsgId", "ErrorCode", });
+        new java.lang.String[] { });
     internal_static_scErrorCode_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_scErrorCode_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scErrorCode_descriptor,
-        new java.lang.String[] { });
+        new java.lang.String[] { "MsgId", "ErrorCode", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

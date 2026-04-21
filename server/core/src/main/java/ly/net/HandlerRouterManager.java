@@ -15,7 +15,7 @@ public class HandlerRouterManager {
 
     private final Map<Integer, RouterHolder<?, ?, ?>> handlerRouterMap = new HashMap<>();
 
-    private static class RouterHolder<S extends ConnectSession,
+    protected static class RouterHolder<S extends ConnectSession,
             P extends AbstractMessagePacket,
             R extends AbstractMessage> {
         final Class<S> sessionType;
@@ -32,13 +32,24 @@ public class HandlerRouterManager {
             this.requestType = requestType;
             this.router = router;
         }
+        
+        /**
+         * 执行路由处理
+         */
+        @SuppressWarnings("unchecked")
+        public void execute(ConnectSession session, AbstractMessagePacket packet, AbstractMessage request) {
+            if (sessionType.isInstance(session) && packetType.isInstance(packet) && requestType.isInstance(request)) {
+                HandlerContext<S, P> context = new HandlerContext<>((S) session, (P) packet);
+                router.execute(context, (R) request);
+            }
+        }
     }
 
     public static HandlerRouterManager getInstance() {
         return instance;
     }
 
-    private HandlerRouterManager() {
+    protected HandlerRouterManager() {
     }
 
     /**
@@ -59,7 +70,7 @@ public class HandlerRouterManager {
         handlerRouterMap.put(cmdNum, new RouterHolder<>(sessionType, packetType, requestType, router));
     }
 
-    private RouterHolder<?, ?, ?> getHandlerRouter(int cmd) {
+    protected RouterHolder<?, ?, ?> getHandlerRouter(int cmd) {
         return handlerRouterMap.get(cmd);
     }
 
@@ -93,18 +104,24 @@ public class HandlerRouterManager {
 
         // 反序列化 request
         AbstractMessage request = ProtoMessageFactory.createProtoMessage(cmd, packet.getData());
-        if (request == null || !holder.requestType.isInstance(request)) {
-            LoggerDef.SystemLogger.error("execute cmd={} fail, request type mismatch or null: need {}, got {}",
-                    cmd,
-                    holder.requestType.getSimpleName(),
-                    request == null ? "null" : request.getClass().getSimpleName());
+        if (request == null) {
+            LoggerDef.SystemLogger.error("execute cmd={} fail, request is null", cmd);
             return;
         }
-
-        // 安全执行
-        IHandlerRouter<ConnectSession, AbstractMessagePacket, AbstractMessage> safeRouter =
-                (IHandlerRouter<ConnectSession, AbstractMessagePacket, AbstractMessage>) holder.router;
-
-        safeRouter.execute(session, packet, request);
+        
+        if (!holder.requestType.isInstance(request)) {
+            LoggerDef.SystemLogger.error("execute cmd={} fail, request type mismatch: need {}, got {}",
+                    cmd,
+                    holder.requestType.getSimpleName(),
+                    request.getClass().getSimpleName());
+            return;
+        }
+        
+        // 使用RouterHolder的execute方法进行处理
+        try {
+            holder.execute(session, packet, request);
+        } catch (Throwable e) {
+            LoggerDef.SystemLogger.error("execute cmd={} error", cmd, e);
+        }
     }
 }

@@ -22,6 +22,8 @@ message csLogin
   string gameServerId = 5; //游戏服务器id
   string token = 6; //token
   string deviceId = 7; //设备id
+  string playerName = 8;
+  bool isReconnect = 9; //是否重连 true  本次登录是重连，false 本次登录不是重连
 }
 
 

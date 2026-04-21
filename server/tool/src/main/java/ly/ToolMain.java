@@ -16,6 +16,11 @@ public class ToolMain {
       System.out.println("解析 策划表 完成");
     } else if (type.equals("ParserProto")) {
       new ParserProto("D:\\WORK\\me\\miniServer\\proto").parser();
+    } else if (type.equals("generateSqlFromEntity")) {
+      System.out.println("开始从实体类生成SQL...");
+      // 注意：这个功能需要在有数据库连接的情况下运行
+      // 这里只是一个示例，实际使用时需要提供数据库连接参数
+      System.out.println("此功能已集成到服务器启动流程中，会在启动时自动执行");
     }
     System.out.println("Hello, World!");
   }

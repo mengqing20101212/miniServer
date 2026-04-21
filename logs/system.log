@@ -1,154 +1,199 @@
-2025-09-08 15:58:42.027 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000026a11185fb0
-2025-09-08 15:59:07.437 INFO  - 服务器开始启动
-2025-09-08 15:59:20.261 INFO  - 开始启动 Nacos 
-2025-09-08 16:00:19.210 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000015dab185bd0
-2025-09-08 16:00:19.212 INFO  - 服务器开始启动
-2025-09-08 16:00:19.216 INFO  - 开始启动 Nacos 
-2025-09-08 16:00:46.131 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001d9e6185bd0
-2025-09-08 16:00:46.134 INFO  - 服务器开始启动
-2025-09-08 16:00:46.137 INFO  - 开始启动 Nacos 
-2025-09-08 16:00:58.929 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000020c20185bd0
-2025-09-08 16:00:58.932 INFO  - 服务器开始启动
-2025-09-08 16:00:58.936 INFO  - 开始启动 Nacos 
-2025-09-08 16:02:45.541 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000240e5185fb0
-2025-09-08 16:02:45.544 INFO  - 服务器开始启动
-2025-09-08 16:02:45.547 INFO  - 开始启动 Nacos 
-2025-09-08 16:05:01.210 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001a321185bd0
-2025-09-08 16:05:01.211 INFO  - 服务器开始启动
-2025-09-08 16:05:01.212 INFO  - 开始启动 Nacos 
-2025-09-08 16:05:06.907 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000019627185bd0
-2025-09-08 16:05:06.910 INFO  - 服务器开始启动
-2025-09-08 16:05:06.924 INFO  - 开始启动 Nacos 
-2025-09-08 16:07:32.767 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001f4a7185bd0
-2025-09-08 16:07:32.769 INFO  - 服务器开始启动
-2025-09-08 16:07:32.774 INFO  - 开始启动 Nacos 
-2025-09-08 16:13:07.822 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001e691185bd0
-2025-09-08 16:13:07.825 INFO  - 服务器开始启动
-2025-09-08 16:13:07.838 INFO  - 开始启动 Nacos 
-2025-09-08 16:18:30.682 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001c201185bd0
-2025-09-08 16:18:30.685 INFO  - 服务器开始启动
-2025-09-08 16:18:30.697 INFO  - 开始启动 Nacos 
-2025-09-08 16:19:47.393 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000020ab2185bd0
-2025-09-08 16:19:47.394 INFO  - 服务器开始启动
-2025-09-08 16:19:47.408 INFO  - 开始启动 Nacos 
-2025-09-08 16:44:48.551 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000218a7180288
-2025-09-08 16:44:48.554 INFO  - 服务器开始启动
-2025-09-08 16:44:48.564 INFO  - 开始启动 Nacos 
-2025-09-08 16:45:55.065 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001adda180288
-2025-09-08 16:45:55.067 INFO  - 服务器开始启动
-2025-09-08 16:45:55.071 INFO  - 开始启动 Nacos 
-2025-09-08 16:46:02.285 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000024e91180288
-2025-09-08 16:46:02.287 INFO  - 服务器开始启动
-2025-09-08 16:46:02.289 INFO  - 开始启动 Nacos 
-2025-09-08 16:46:11.995 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000244201804f0
-2025-09-08 16:46:11.998 INFO  - 服务器开始启动
-2025-09-08 16:46:12.009 INFO  - 开始启动 Nacos 
-2025-09-08 16:47:12.404 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000265c51804f0
-2025-09-08 16:47:12.407 INFO  - 服务器开始启动
-2025-09-08 16:47:12.411 INFO  - 开始启动 Nacos 
-2025-09-08 16:53:43.430 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000019b4d1804f0
-2025-09-08 16:53:43.434 INFO  - 服务器开始启动
-2025-09-08 16:53:43.438 INFO  - 开始启动 Nacos 
-2025-09-08 16:53:56.618 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001de2b1804f0
-2025-09-08 16:53:56.621 INFO  - 服务器开始启动
-2025-09-08 16:53:56.623 INFO  - 开始启动 Nacos 
-2025-09-08 16:54:14.649 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000020a721804f0
-2025-09-08 16:54:14.652 INFO  - 服务器开始启动
-2025-09-08 16:54:14.655 INFO  - 开始启动 Nacos 
-2025-09-08 16:54:23.338 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000002dd48184000
-2025-09-08 16:54:23.340 INFO  - 服务器开始启动
-2025-09-08 16:54:23.343 INFO  - 开始启动 Nacos 
-2025-09-08 16:54:47.440 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001ea28137dc8
-2025-09-08 16:54:47.443 INFO  - 服务器开始启动
-2025-09-08 16:54:47.445 INFO  - 开始启动 Nacos 
-2025-09-08 20:28:48.782 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001605d1804f0
-2025-09-08 20:28:48.785 INFO  - 服务器开始启动
-2025-09-08 20:28:48.795 INFO  - 开始启动 Nacos 
-2025-09-08 20:36:09.000 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000029b14184000
-2025-09-08 20:36:09.003 INFO  - 服务器开始启动
-2025-09-08 20:36:09.007 INFO  - 开始启动 Nacos 
-2025-09-08 20:37:56.800 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000022e14185fb0
-2025-09-08 20:37:56.809 INFO  - 服务器开始启动
-2025-09-08 20:37:56.820 INFO  - 开始启动 Nacos 
-2025-09-08 20:41:13.402 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001b8811804f0
-2025-09-08 20:41:13.406 INFO  - 服务器开始启动
-2025-09-08 20:41:13.418 INFO  - 开始启动 Nacos 
-2025-09-08 20:49:46.088 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000002373c137dc8
-2025-09-08 20:49:46.092 INFO  - 服务器开始启动
-2025-09-08 20:49:46.096 INFO  - 开始启动 Nacos 
-2025-09-08 20:51:05.099 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000250911804f0
-2025-09-08 20:51:05.102 INFO  - 服务器开始启动
-2025-09-08 20:51:05.105 INFO  - 开始启动 Nacos 
-2025-09-08 20:52:47.871 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001f701187680
-2025-09-08 20:52:47.874 INFO  - 服务器开始启动
-2025-09-08 20:52:47.878 INFO  - 开始启动 Nacos 
-2025-09-08 20:52:55.978 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000208011804f0
-2025-09-08 20:52:55.980 INFO  - 服务器开始启动
-2025-09-08 20:52:55.984 INFO  - 开始启动 Nacos 
-2025-09-08 20:54:32.894 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000002d850180288
-2025-09-08 20:54:32.897 INFO  - 服务器开始启动
-2025-09-08 20:54:32.901 INFO  - 开始启动 Nacos 
-2025-09-08 20:56:41.617 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000027c131804f0
-2025-09-08 20:56:41.621 INFO  - 服务器开始启动
-2025-09-08 20:56:41.625 INFO  - 开始启动 Nacos 
-2025-09-08 20:57:21.204 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001ede0137dc8
-2025-09-08 20:57:21.207 INFO  - 服务器开始启动
-2025-09-08 20:57:21.211 INFO  - 开始启动 Nacos 
-2025-09-08 21:00:27.461 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000002bcdd1804f0
-2025-09-08 21:00:27.463 INFO  - 服务器开始启动
-2025-09-08 21:00:27.474 INFO  - 开始启动 Nacos 
-2025-09-08 21:01:25.121 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001b5811804f0
-2025-09-08 21:01:25.123 INFO  - 服务器开始启动
-2025-09-08 21:01:25.124 INFO  - 开始启动 Nacos 
-2025-09-08 21:06:07.790 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001b724180288
-2025-09-08 21:06:07.792 INFO  - 服务器开始启动
-2025-09-08 21:06:07.792 INFO  - 开始启动 Nacos 
-2025-09-08 21:15:03.849 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001b001184000
-2025-09-08 21:15:03.850 INFO  - 服务器开始启动
-2025-09-08 21:15:03.852 INFO  - 开始启动 Nacos 
-2025-09-08 21:17:55.536 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001dc32180288
-2025-09-08 21:17:55.539 INFO  - 服务器开始启动
-2025-09-08 21:17:55.542 INFO  - 开始启动 Nacos 
-2025-09-08 21:19:23.514 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000019f5b137dc8
-2025-09-08 21:19:23.517 INFO  - 服务器开始启动
-2025-09-08 21:19:23.521 INFO  - 开始启动 Nacos 
-2025-09-08 21:19:34.685 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000218ae184000
-2025-09-08 21:19:34.688 INFO  - 服务器开始启动
-2025-09-08 21:19:34.693 INFO  - 开始启动 Nacos 
-2025-09-08 21:24:47.626 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000017193180288
-2025-09-08 21:24:47.629 INFO  - 服务器开始启动
-2025-09-08 21:24:47.637 INFO  - 开始启动 Nacos 
-2025-09-08 21:26:23.419 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000252041804f0
-2025-09-08 21:26:23.422 INFO  - 服务器开始启动
-2025-09-08 21:26:23.423 INFO  - 开始启动 Nacos 
-2025-09-08 21:27:55.962 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001dcc7137dc8
-2025-09-08 21:27:55.965 INFO  - 服务器开始启动
-2025-09-08 21:27:55.973 INFO  - 开始启动 Nacos 
-2025-09-08 21:28:38.370 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='gate1001', ip='127.0.0.1', port=12002, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GATE', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=gate1001, serverType=GATE}}
-2025-09-08 21:28:38.372 INFO  -  Nacos 启动成功,耗时: 42399ms 
-2025-09-08 21:28:38.375 INFO  - 开始加载配置表
-2025-09-08 21:28:38.386 INFO  - 加载策划表 HeroInfoConfigManager  耗时 11 (毫秒)
-2025-09-08 21:28:38.386 INFO  - 加载配置表完成, 耗时:11 (毫秒)
-2025-09-08 21:28:47.198 INFO  - 服务器启动成功:[NetServer-12002], port:12002
-2025-09-08 21:28:47.200 INFO  - 服务器 启动成功 耗时: 51234ms
-2025-09-08 21:33:12.960 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x000001d85c1804f0
-2025-09-08 21:33:12.962 INFO  - 服务器开始启动
-2025-09-08 21:33:12.971 INFO  - 开始启动 Nacos 
-2025-09-08 21:33:13.779 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='gate1001', ip='127.0.0.1', port=12002, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GATE', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=gate1001, serverType=GATE}}
-2025-09-08 21:33:13.780 INFO  -  Nacos 启动成功,耗时: 809ms 
-2025-09-08 21:33:13.783 INFO  - 开始加载配置表
-2025-09-08 21:33:13.787 INFO  - 加载策划表 HeroInfoConfigManager  耗时 4 (毫秒)
-2025-09-08 21:33:13.787 INFO  - 加载配置表完成, 耗时:4 (毫秒)
-2025-09-08 21:33:22.961 INFO  - 服务器启动成功:[NetServer-12002], port:12002
-2025-09-08 21:33:22.963 INFO  - 服务器 启动成功 耗时: 9999ms
-2025-09-08 21:36:19.666 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000218a21ae220
-2025-09-08 21:36:19.668 INFO  - 服务器开始启动
-2025-09-08 21:36:19.669 INFO  - 开始启动 Nacos 
-2025-09-08 21:36:20.410 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='login', ip='127.0.0.1', port=12003, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='LOGIN', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=login, serverType=LOGIN}}
-2025-09-08 21:36:20.417 INFO  -  Nacos 启动成功,耗时: 748ms 
-2025-09-08 21:36:20.419 INFO  - 开始加载配置表
-2025-09-08 21:36:20.423 INFO  - 加载策划表 HeroInfoConfigManager  耗时 4 (毫秒)
-2025-09-08 21:36:20.423 INFO  - 加载配置表完成, 耗时:4 (毫秒)
-2025-09-08 21:36:20.978 INFO  - 当前节点数量:1, 新增服务器节点: Instance{instanceId='gate1001', ip='127.0.0.1', port=12002, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GATE', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=gate1001, serverType=GATE}}
-2025-09-08 21:36:29.036 INFO  - 服务器启动成功:[NetServer-12002], port:12002
-2025-09-08 21:36:29.038 INFO  - 服务器 启动成功 耗时: 9370ms
+2025-11-29 16:15:40.912 INFO  - 服务器开始启动
+2025-11-29 16:15:40.915 INFO  - 开始启动 Nacos 
+2025-11-29 17:05:14.186 INFO  - 服务器开始启动
+2025-11-29 17:05:14.188 INFO  - 开始启动 Nacos 
+2025-11-29 17:05:15.027 INFO  - 服务器配置: 
+serverPort: 9001
+serverIp: 127.0.0.1
+runModule: TEST
+configPath: D:\WORK\me\miniServer\excel\serverConfig
+db:
+  jdbcUrl: jdbc:mysql://139.224.80.204:3306/pick_money
+  userName: root
+  passWord: ly.1006897725
+  maxPoolSize: 10
+  minIdle: 3
+  idleTimeout: 30000
+  connectionTimeout: 2000
+  
+redis:
+  host: 139.224.80.204
+  port: 6379
+  password: ly.1006897725
+
+2025-11-29 17:05:15.134 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=9001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
+2025-11-29 17:05:15.142 INFO  -  Nacos 启动成功,耗时: 953ms 
+2025-11-29 17:05:15.185 INFO  - 开始加载配置表
+2025-11-29 17:05:15.195 INFO  - 加载策划表 HeroInfoConfigManager  耗时 10 (毫秒)
+2025-11-29 17:05:15.195 INFO  - 加载配置表完成, 耗时:10 (毫秒)
+2025-11-29 17:05:23.326 INFO  - 服务器启动成功:[NetServer-9001], port:9001
+2025-11-29 17:05:23.329 INFO  - 服务器 启动成功 耗时: 9141ms
+2025-11-29 17:06:48.601 INFO  - 服务器开始启动
+2025-11-29 17:06:48.603 INFO  - 开始启动 Nacos 
+2025-11-29 17:06:49.387 INFO  -  Nacos 启动成功,耗时: 784ms 
+2025-11-29 17:06:49.390 INFO  - 开始加载配置表
+2025-11-29 17:06:49.395 INFO  - 加载策划表 HeroInfoConfigManager  耗时 4 (毫秒)
+2025-11-29 17:06:49.395 INFO  - 加载配置表完成, 耗时:5 (毫秒)
+2025-11-29 17:06:49.925 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
+2025-11-29 17:06:57.529 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 17:06:57.530 INFO  - 服务器 启动成功 耗时: 8929ms
+2025-11-29 17:08:36.749 INFO  - 服务器开始启动
+2025-11-29 17:08:36.750 INFO  - 开始启动 Nacos 
+2025-11-29 17:08:37.530 INFO  -  Nacos 启动成功,耗时: 778ms 
+2025-11-29 17:08:37.535 INFO  - 开始加载配置表
+2025-11-29 17:08:37.539 INFO  - 加载策划表 HeroInfoConfigManager  耗时 3 (毫秒)
+2025-11-29 17:08:37.540 INFO  - 加载配置表完成, 耗时:5 (毫秒)
+2025-11-29 17:08:38.069 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
+2025-11-29 17:08:45.397 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 17:08:45.399 INFO  - 服务器 启动成功 耗时: 8649ms
+2025-11-29 17:10:38.063 INFO  - 服务器开始启动
+2025-11-29 17:10:38.064 INFO  - 开始启动 Nacos 
+2025-11-29 17:10:39.141 INFO  -  Nacos 启动成功,耗时: 1076ms 
+2025-11-29 17:10:39.143 INFO  - 开始加载配置表
+2025-11-29 17:10:39.149 INFO  - 加载策划表 HeroInfoConfigManager  耗时 5 (毫秒)
+2025-11-29 17:10:39.149 INFO  - 加载配置表完成, 耗时:6 (毫秒)
+2025-11-29 17:10:39.635 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
+2025-11-29 17:10:47.219 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 17:10:47.222 INFO  - 服务器 启动成功 耗时: 9159ms
+2025-11-29 17:23:01.223 INFO  - 服务器开始启动
+2025-11-29 17:23:01.237 INFO  - 开始启动 Nacos 
+2025-11-29 17:27:24.525 INFO  - 服务器开始启动
+2025-11-29 17:27:24.535 INFO  - 开始启动 Nacos 
+2025-11-29 17:28:26.186 INFO  - 服务器开始启动
+2025-11-29 17:28:26.189 INFO  - 开始启动 Nacos 
+2025-11-29 17:29:00.328 INFO  - 服务器开始启动
+2025-11-29 17:29:00.329 INFO  - 开始启动 Nacos 
+2025-11-29 17:31:53.478 INFO  - 服务器开始启动
+2025-11-29 17:31:53.490 INFO  - 开始启动 Nacos 
+2025-11-29 17:31:54.278 INFO  - 服务器配置: 
+serverPort: 9001
+serverIp: 127.0.0.1
+runModule: TEST
+configPath: D:\WORK\me\miniServer\excel\serverConfig
+db:
+  jdbcUrl: jdbc:mysql://139.224.80.204:3306/pick_money
+  userName: root
+  passWord: ly.1006897725
+  maxPoolSize: 10
+  minIdle: 3
+  idleTimeout: 30000
+  connectionTimeout: 2000
+  
+redis:
+  host: 139.224.80.204
+  port: 6379
+  password: ly.1006897725
+
+2025-11-29 17:31:54.393 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=9001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
+2025-11-29 17:31:54.394 INFO  -  Nacos 启动成功,耗时: 904ms 
+2025-11-29 17:31:54.444 INFO  - 开始加载配置表
+2025-11-29 17:31:54.454 INFO  - 加载策划表 HeroInfoConfigManager  耗时 10 (毫秒)
+2025-11-29 17:31:54.454 INFO  - 加载配置表完成, 耗时:10 (毫秒)
+2025-11-29 17:32:02.567 INFO  - 服务器启动成功:[NetServer-9001], port:9001
+2025-11-29 17:32:02.567 INFO  - 服务器 启动成功 耗时: 9090ms
+2025-11-29 17:33:46.637 INFO  - 服务器开始启动
+2025-11-29 17:33:46.639 INFO  - 开始启动 Nacos 
+2025-11-29 17:33:47.423 INFO  -  Nacos 启动成功,耗时: 784ms 
+2025-11-29 17:33:47.426 INFO  - 开始加载配置表
+2025-11-29 17:33:47.430 INFO  - 加载策划表 HeroInfoConfigManager  耗时 4 (毫秒)
+2025-11-29 17:33:47.430 INFO  - 加载配置表完成, 耗时:4 (毫秒)
+2025-11-29 17:33:47.948 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
+2025-11-29 17:33:55.341 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 17:33:55.341 INFO  - 服务器 启动成功 耗时: 8705ms
+2025-11-29 17:35:47.421 INFO  - 服务器开始启动
+2025-11-29 17:35:47.425 INFO  - 开始启动 Nacos 
+2025-11-29 17:35:48.229 INFO  -  Nacos 启动成功,耗时: 803ms 
+2025-11-29 17:35:48.230 INFO  - 开始加载配置表
+2025-11-29 17:35:48.237 INFO  - 加载策划表 HeroInfoConfigManager  耗时 7 (毫秒)
+2025-11-29 17:35:48.237 INFO  - 加载配置表完成, 耗时:7 (毫秒)
+2025-11-29 17:35:48.818 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
+2025-11-29 17:35:56.439 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 17:35:56.440 INFO  - 服务器 启动成功 耗时: 9018ms
+2025-11-29 17:59:13.965 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x0000015202187680
+2025-11-29 17:59:13.977 INFO  - 服务器开始启动
+2025-11-29 17:59:13.984 INFO  - 开始启动 Nacos 
+2025-11-29 17:59:14.831 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='gate1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GATE', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=gate1001, serverType=GATE}}
+2025-11-29 17:59:14.841 INFO  -  Nacos 启动成功,耗时: 856ms 
+2025-11-29 17:59:14.890 INFO  - 开始加载配置表
+2025-11-29 17:59:14.895 INFO  - 加载策划表 HeroInfoConfigManager  耗时 4 (毫秒)
+2025-11-29 17:59:14.895 INFO  - 加载配置表完成, 耗时:5 (毫秒)
+2025-11-29 17:59:22.882 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 17:59:22.882 INFO  - 服务器 启动成功 耗时: 8906ms
+2025-11-29 18:09:54.516 INFO  - addHandlerRouter cmd=CS_Login router=GateLoginController$$Lambda/0x00000199e2187680
+2025-11-29 18:09:54.519 INFO  - 服务器开始启动
+2025-11-29 18:09:54.519 INFO  - 开始启动 Nacos 
+2025-11-29 18:09:55.315 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='gate1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GATE', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=gate1001, serverType=GATE}}
+2025-11-29 18:09:55.321 INFO  -  Nacos 启动成功,耗时: 802ms 
+2025-11-29 18:09:55.327 INFO  - 开始加载配置表
+2025-11-29 18:09:55.331 INFO  - 加载策划表 HeroInfoConfigManager  耗时 4 (毫秒)
+2025-11-29 18:09:55.331 INFO  - 加载配置表完成, 耗时:4 (毫秒)
+2025-11-29 18:10:03.037 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 18:10:03.037 INFO  - 服务器 启动成功 耗时: 8518ms
+2025-11-29 21:34:22.607 INFO  - GameHandlerRouteManager register handler cmd:100( 100 ),handler:ly.logic.login.GamePlayerLoginController$$Lambda/0x00000202911974e0
+2025-11-29 21:34:22.613 INFO  - 服务器开始启动
+2025-11-29 21:34:22.616 INFO  - 开始启动 Nacos 
+2025-11-29 21:34:23.351 INFO  - 服务器配置: 
+serverPort: 9001
+serverIp: 127.0.0.1
+runModule: TEST
+configPath: D:\WORK\me\miniServer\excel\serverConfig
+db:
+  jdbcUrl: jdbc:mysql://139.224.80.204:3306/pick_money
+  userName: root
+  passWord: ly.1006897725
+  maxPoolSize: 10
+  minIdle: 3
+  idleTimeout: 30000
+  connectionTimeout: 2000
+  
+redis:
+  host: 139.224.80.204
+  port: 6379
+  password: ly.1006897725
+
+2025-11-29 21:34:23.452 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=9001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
+2025-11-29 21:34:23.462 INFO  -  Nacos 启动成功,耗时: 846ms 
+2025-11-29 21:34:23.471 INFO  - 开始加载配置表
+2025-11-29 21:34:23.474 INFO  - 加载策划表 HeroInfoConfigManager  耗时 3 (毫秒)
+2025-11-29 21:34:23.474 INFO  - 加载配置表完成, 耗时:3 (毫秒)
+2025-11-29 21:34:31.508 INFO  - 服务器启动成功:[NetServer-9001], port:9001
+2025-11-29 21:34:31.509 INFO  - 服务器 启动成功 耗时: 8895ms
+2025-11-29 21:40:06.425 INFO  - GameHandlerRouteManager register handler cmd:CS_Login( 100 ),handler:ly.logic.login.GamePlayerLoginController$$Lambda/0x000002badb1974e0
+2025-11-29 21:40:06.425 INFO  - 服务器开始启动
+2025-11-29 21:40:06.429 INFO  - 开始启动 Nacos 
+2025-11-29 21:40:07.260 INFO  -  Nacos 启动成功,耗时: 830ms 
+2025-11-29 21:40:07.265 INFO  - 开始加载配置表
+2025-11-29 21:40:07.271 INFO  - 加载策划表 HeroInfoConfigManager  耗时 6 (毫秒)
+2025-11-29 21:40:07.271 INFO  - 加载配置表完成, 耗时:6 (毫秒)
+2025-11-29 21:40:07.814 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
+2025-11-29 21:40:15.231 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 21:40:15.233 INFO  - 服务器 启动成功 耗时: 8806ms
+2025-11-29 21:41:15.743 INFO  - GameHandlerRouteManager register handler cmd:CS_Login( 100 ),handler:ly.logic.login.GamePlayerLoginController$$Lambda/0x00000205a71974e0
+2025-11-29 21:41:15.743 INFO  - 服务器开始启动
+2025-11-29 21:41:15.746 INFO  - 开始启动 Nacos 
+2025-11-29 21:41:16.567 INFO  -  Nacos 启动成功,耗时: 820ms 
+2025-11-29 21:41:16.570 INFO  - 开始加载配置表
+2025-11-29 21:41:16.573 INFO  - 加载策划表 HeroInfoConfigManager  耗时 3 (毫秒)
+2025-11-29 21:41:16.573 INFO  - 加载配置表完成, 耗时:3 (毫秒)
+2025-11-29 21:41:17.043 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
+2025-11-29 21:41:24.672 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 21:41:24.673 INFO  - 服务器 启动成功 耗时: 8929ms
+2025-11-29 21:41:40.151 INFO  - GameHandlerRouteManager register handler cmd:CS_Login( 100 ),handler:GameLoginController$$Lambda/0x0000013ae71974e0
+2025-11-29 21:41:40.153 INFO  - 服务器开始启动
+2025-11-29 21:41:40.153 INFO  - 开始启动 Nacos 
+2025-11-29 21:41:40.964 INFO  -  Nacos 启动成功,耗时: 811ms 
+2025-11-29 21:41:40.968 INFO  - 开始加载配置表
+2025-11-29 21:41:40.969 INFO  - 加载策划表 HeroInfoConfigManager  耗时 1 (毫秒)
+2025-11-29 21:41:40.969 INFO  - 加载配置表完成, 耗时:1 (毫秒)
+2025-11-29 21:41:41.477 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='game1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GAME', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=game1001, serverType=GAME}}
+2025-11-29 21:41:48.866 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 21:41:48.867 INFO  - 服务器 启动成功 耗时: 8713ms
+2025-11-29 22:13:00.805 INFO  - 服务器开始启动
+2025-11-29 22:13:00.809 INFO  - 开始启动 Nacos 
+2025-11-29 22:13:01.637 INFO  - 当前节点数量:0, 新增服务器节点: Instance{instanceId='gate1001', ip='127.0.0.1', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='GATE', serviceName='ly@@rpc_node_list_service', metadata={loadNum=0, serverId=gate1001, serverType=GATE}}
+2025-11-29 22:13:01.645 INFO  -  Nacos 启动成功,耗时: 836ms 
+2025-11-29 22:13:01.647 INFO  - 开始加载配置表
+2025-11-29 22:13:01.650 INFO  - 加载策划表 HeroInfoConfigManager  耗时 3 (毫秒)
+2025-11-29 22:13:01.650 INFO  - 加载配置表完成, 耗时:3 (毫秒)
+2025-11-29 22:13:09.684 INFO  - 服务器启动成功:[NetServer-8001], port:8001
+2025-11-29 22:13:09.687 INFO  - 服务器 启动成功 耗时: 8881ms

@@ -1,6 +1,6 @@
 package ly;
 
-import ly.net.GameClient;
+import ly.net.GamePlayer;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameClientManager {
     private static GameClientManager gateClientManager = new GameClientManager();
 
-    private final Map<Long, GameClient> clientMap = new ConcurrentHashMap<>();
+    private final Map<Long, GamePlayer> clientMap = new ConcurrentHashMap<>();
 
     private GameClientManager() {
 
@@ -18,11 +18,11 @@ public class GameClientManager {
         return gateClientManager;
     }
 
-    public void addClient(GameClient client) {
+    public void addClient(GamePlayer client) {
         clientMap.put(client.getSessionGuid(), client);
     }
 
-    public GameClient getClient(long guid) {
+    public GamePlayer getClient(long guid) {
         return clientMap.get(guid);
     }
 
