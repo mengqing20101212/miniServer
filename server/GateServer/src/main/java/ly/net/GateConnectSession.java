@@ -85,7 +85,11 @@ public class GateConnectSession extends ConnectSession {
                 HandlerRouterManager.execute(this, s2sPacket);
             } else {
                 // 查找对应的客户端并转发消息
-                GateClient client = GateClientManager.getInstance().getClient(s2sPacket.getGuid());
+                GateClient client = GateClientManager.getInstance().getClient(getGuid());
+                if (client == null) {
+                    // 兼容部分链路通过 sid 关联客户端的情况
+                    client = GateClientManager.getInstance().getClient((long) s2sPacket.getSid());
+                }
                 if (client != null) {
                     client.sendPacketToClient(s2sPacket);
                 }
@@ -102,7 +106,10 @@ public class GateConnectSession extends ConnectSession {
      */
     public void sendClientMsg(int cmd, Message msg) {
         // 创建服务器到客户端的数据包
-        AbstractMessagePacket s2cPacket = MessagePacketFactory.createAbstractMessagePacket(cmd, msg.toByteArray());
+        AbstractMessagePacket s2cPacket = new AbstractMessagePacket();
+        s2cPacket.setGuid(getGuid());
+        s2cPacket.setCmd(cmd);
+        s2cPacket.setData(msg.toByteArray());
         // 添加到发送队列
         addSendPacket(s2cPacket);
     }
