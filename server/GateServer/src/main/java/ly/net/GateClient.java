@@ -1,6 +1,9 @@
 package ly.net;
 
+import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.ByteString;
+
+import ly.ProtoMessageFactory;
 import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Server;
@@ -62,9 +65,12 @@ public class GateClient {
         // 发送给游戏服务器
         Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket);
         if (resp != null) {
+            AbstractMessage respProto = ProtoMessageFactory.createProtoMessage(csPacket.getCmd(), resp.getData().toByteArray());
+            if (respProto == null) {
+                return;
+            }
             AbstractMessagePacket s2cPacket = MessagePacketFactory.createAbstractMessagePacket(
-                    csPacket.getCmd(), csPacket.getSeq(), resp.getData().toByteArray());
-            s2cPacket.setSid(csPacket.getSid());
+                    getSessionGuid(), csPacket.getCmd(), respProto, csPacket.getSeq(), csPacket.getSid());
             sendPacketToClient(s2cPacket);
         }
 
