@@ -7,9 +7,9 @@ public class AutoTableServiceTest {
     public static void main(String[] args) {
         try {
             // 初始化数据库连接
-            String jdbcUrl = "jdbc:mysql://139.224.80.204:3306/pick_money";
+            String jdbcUrl = "jdbc:mysql://118.25.76.117:3306/pick_money";
             String username = "root";
-            String password = "ly.1006897725";
+            String password = "Ly@2026Root!8899";
             
             // 初始化MysqlService
             MysqlService.getInstance().init(jdbcUrl, username, password, 5, 2, 30000, 30000);

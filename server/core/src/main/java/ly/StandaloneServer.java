@@ -20,9 +20,9 @@ public class StandaloneServer {
 
         // 配置数据库
         DbConfig dbConfig = new DbConfig();
-        dbConfig.setJdbcUrl("jdbc:mysql://139.224.80.204:3306/pick_money");
+        dbConfig.setJdbcUrl("jdbc:mysql://118.25.76.117:3306/pick_money");
         dbConfig.setUserName("root");
-        dbConfig.setPassWord("ly.1006897725");
+        dbConfig.setPassWord("Ly@2026Root!8899");
         dbConfig.setMaxPoolSize(20);
         dbConfig.setMinIdle(5);
         dbConfig.setIdleTimeout(30000);

@@ -22,9 +22,9 @@ import org.apache.poi.util.StringUtil;
  * 根据数据库的MySQL表结构 生成 指定的Java entry文件
  */
 public class ParserDbEntry {
-  String jdbcUrl = "jdbc:mysql://139.224.80.204:3306/pick_money";
+  String jdbcUrl = "jdbc:mysql://118.25.76.117:3306/pick_money";
   String username = "root";
-  String password = "ly.1006897725";
+  String password = "Ly@2026Root!8899";
   String targetDir = "D:\\WORK\\me\\miniServer\\server\\core\\src\\main\\java\\ly\\db\\entry";
   HikariDataSource dataSource;
   List<TableInfo> tables = new ArrayList<TableInfo>();

@@ -81,9 +81,9 @@ public class ServerConfig {
     serverConfig.setServerPort(9001);
     serverConfig.setConfigPath("/config");
     DbConfig dbConfig = new DbConfig();
-    dbConfig.setJdbcUrl("jdbc:mysql://139.224.80.204:3306/miniServer");
+    dbConfig.setJdbcUrl("jdbc:mysql://118.25.76.117:3306/pick_money");
     dbConfig.setUserName("root");
-    dbConfig.setPassWord("ly.1006897725");
+    dbConfig.setPassWord("Ly@2026Root!8899");
     serverConfig.setDb(dbConfig);
     RedisConfig redisConfig = new RedisConfig();
     redisConfig.setHost("139.224.80.204");

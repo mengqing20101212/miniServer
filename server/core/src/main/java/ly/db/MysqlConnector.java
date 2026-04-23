@@ -273,9 +273,9 @@ public class MysqlConnector {
   }
 
   public static void main(String[] args) {
-    String jdbcUrl = "jdbc:mysql://139.224.80.204:3306/pick_money";
+    String jdbcUrl = "jdbc:mysql://118.25.76.117:3306/pick_money";
     String username = "root";
-    String password = "ly.1006897725";
+    String password = "Ly@2026Root!8899";
     MysqlConnector mysqlConnector = new MysqlConnector(jdbcUrl, username, password, 0, 0, 0, 0);
     testSelect(mysqlConnector);
     testInster(mysqlConnector);
