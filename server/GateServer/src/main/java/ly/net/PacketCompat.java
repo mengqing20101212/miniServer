@@ -38,8 +38,18 @@ public final class PacketCompat {
             try {
                 Method m = MessagePacketFactory.class.getMethod("createMessagePacket", int.class);
                 return (AbstractMessagePacket) m.invoke(null, 0);
-            } catch (Exception e) {
-                throw new IllegalStateException("cannot create packet from MessagePacketFactory", e);
+            } catch (Exception ignored2) {
+                try {
+                    Method m = MessagePacketFactory.class.getMethod("createAbstractMessagePacket", int.class, byte[].class);
+                    return (AbstractMessagePacket) m.invoke(null, 0, new byte[0]);
+                } catch (Exception ignored3) {
+                    try {
+                        Method m = MessagePacketFactory.class.getMethod("createAbstractMessagePacket", int.class, int.class, byte[].class);
+                        return (AbstractMessagePacket) m.invoke(null, 0, 0, new byte[0]);
+                    } catch (Exception e) {
+                        throw new IllegalStateException("cannot create packet from MessagePacketFactory", e);
+                    }
+                }
             }
         }
     }
