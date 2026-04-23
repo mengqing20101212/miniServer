@@ -8,6 +8,9 @@ import ly.db.DbMeta;
  */
 @DbMeta.DbTable(name = "login")
 public class LoginEntry extends AbstractEntry {
+  private static final String[] DIRTY_FIELDS = {
+      "id", "account", "create_time", "last_login_time", "last_logout_time", "token", "channel", "players"
+  };
 
 
   /**账号id*/
@@ -42,6 +45,14 @@ public class LoginEntry extends AbstractEntry {
   /**该账号下面所有的角色Id信息*/
   @DbMeta.DbField(name="players")
   private String players;
+  public LoginEntry() {
+    initDirtyState(DIRTY_FIELDS.length);
+  }
+
+  @Override
+  protected String[] allDirtyFieldNames() {
+    return DIRTY_FIELDS;
+  }
   public void save() {
     LoginEntryHelper.save(this);
   }
@@ -65,6 +76,7 @@ public class LoginEntry extends AbstractEntry {
  public void setId(Integer Id) {
     this.id = Id;
     autoAddCurVersion();
+    markFieldDirty(0);
   }
   public Integer getId() {
     return id;
@@ -72,6 +84,7 @@ public class LoginEntry extends AbstractEntry {
  public void setAccount(String Account) {
     this.account = Account;
     autoAddCurVersion();
+    markFieldDirty(1);
   }
   public String getAccount() {
     return account;
@@ -79,6 +92,7 @@ public class LoginEntry extends AbstractEntry {
  public void setCreateTime(java.time.LocalDateTime CreateTime) {
     this.create_time = CreateTime;
     autoAddCurVersion();
+    markFieldDirty(2);
   }
   public java.time.LocalDateTime getCreateTime() {
     return create_time;
@@ -86,6 +100,7 @@ public class LoginEntry extends AbstractEntry {
  public void setLastLoginTime(java.time.LocalDateTime LastLoginTime) {
     this.last_login_time = LastLoginTime;
     autoAddCurVersion();
+    markFieldDirty(3);
   }
   public java.time.LocalDateTime getLastLoginTime() {
     return last_login_time;
@@ -93,6 +108,7 @@ public class LoginEntry extends AbstractEntry {
  public void setLastLogoutTime(java.time.LocalDateTime LastLogoutTime) {
     this.last_logout_time = LastLogoutTime;
     autoAddCurVersion();
+    markFieldDirty(4);
   }
   public java.time.LocalDateTime getLastLogoutTime() {
     return last_logout_time;
@@ -100,6 +116,7 @@ public class LoginEntry extends AbstractEntry {
  public void setToken(String Token) {
     this.token = Token;
     autoAddCurVersion();
+    markFieldDirty(5);
   }
   public String getToken() {
     return token;
@@ -107,6 +124,7 @@ public class LoginEntry extends AbstractEntry {
  public void setChannel(String Channel) {
     this.channel = Channel;
     autoAddCurVersion();
+    markFieldDirty(6);
   }
   public String getChannel() {
     return channel;
@@ -114,6 +132,7 @@ public class LoginEntry extends AbstractEntry {
  public void setPlayers(String Players) {
     this.players = Players;
     autoAddCurVersion();
+    markFieldDirty(7);
   }
   public String getPlayers() {
     return players;

@@ -165,7 +165,7 @@ public class ParserDbEntry {
                       + "  }\n"
                       + "\n"
                       + "  public static void asyncUpdate({javaName}Entry {javaName}Entry, String... fileds) {\n"
-                      + "    MysqlService.getInstance().addUpdateEntry({javaName}Entry);\n"
+                      + "    MysqlService.getInstance().addUpdateEntry({javaName}Entry, fileds);\n"
                       + "  }\n"
                       + "\n"
                       + "  public static List<{javaName}Entry> select(String[] fields, Object... params) {\n"
@@ -204,13 +204,15 @@ public class ParserDbEntry {
           String methodStr = "";
           String filedStr = "";
           String toStringStr = "";
+          String dirtyFieldInit = "";
           String extractStr = "";
           if (file.exists()) {
             String score = ParserExcelConfig.ExcelConfig.readFile(file);
             extractStr = ParserExcelConfig.ExcelConfig.extractMethodStr(score);
             file.delete();
           }
-          for (FiledInfo field : table.fields) {
+          for (int fieldIndex = 0; fieldIndex < table.fields.size(); fieldIndex++) {
+            FiledInfo field = table.fields.get(fieldIndex);
             if (StringUtil.isNotBlank(field.desc)) {
               filedStr += "\n\n  /**" + field.desc + "*/";
             }
@@ -223,6 +225,7 @@ public class ParserDbEntry {
             }
             filedStr += "\n  @DbMeta.DbField(name=\"" + field.name + "\")";
             filedStr += "\n  private " + field.javaType + " " + field.name + ";";
+            dirtyFieldInit += "\n        \"" + field.name + "\",";
 
             String filedName = toCamelCase(field.name);
             methodStr +=
@@ -239,6 +242,9 @@ public class ParserDbEntry {
                     + filedName
                     + ";\n"
                     + "    autoAddCurVersion();\n"
+                    + "    markFieldDirty("
+                    + fieldIndex
+                    + ");\n"
                     + "  }\n";
             methodStr +=
                 "  public "
@@ -267,7 +273,20 @@ public class ParserDbEntry {
                       + table.tableName
                       + "\")\n"
                       + "public class {javaName}Entry extends AbstractEntry {\n"
+                      + "  private static final String[] DIRTY_FIELDS = {"
+                      + (dirtyFieldInit.isEmpty()
+                          ? "};\n"
+                          : dirtyFieldInit + "\n  };\n")
                       + filedStr
+                      + "\n"
+                      + "  public {javaName}Entry() {\n"
+                      + "    initDirtyState(DIRTY_FIELDS.length);\n"
+                      + "  }\n"
+                      + "\n"
+                      + "  @Override\n"
+                      + "  protected String[] allDirtyFieldNames() {\n"
+                      + "    return DIRTY_FIELDS;\n"
+                      + "  }\n"
                       + "\n"
                       + "  public void save() {\n"
                       + "    {javaName}EntryHelper.save(this);\n"

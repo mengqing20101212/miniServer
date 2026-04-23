@@ -30,7 +30,7 @@ public class ShareWeekEntryHelper {
   }
 
   public static void asyncUpdate(ShareWeekEntry ShareWeekEntry, String... fileds) {
-    MysqlService.getInstance().addUpdateEntry(ShareWeekEntry);
+    MysqlService.getInstance().addUpdateEntry(ShareWeekEntry, fileds);
   }
 
   public static List<ShareWeekEntry> select(String[] fields, Object... params) {

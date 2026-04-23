@@ -8,6 +8,9 @@ import ly.db.DbMeta;
  */
 @DbMeta.DbTable(name = "player")
 public class PlayerEntry extends AbstractEntry {
+  private static final String[] DIRTY_FIELDS = {
+      "id", "name", "createTime", "loginTime", "logoutTime", "level", "vipLevel", "modules", "guidId", "account"
+  };
 
 
   /**player id */
@@ -50,6 +53,15 @@ public class PlayerEntry extends AbstractEntry {
   /**账户id*/
   @DbMeta.DbField(name="account")
   private String account;
+
+  public PlayerEntry() {
+    initDirtyState(DIRTY_FIELDS.length);
+  }
+
+  @Override
+  protected String[] allDirtyFieldNames() {
+    return DIRTY_FIELDS;
+  }
   public void save() {
     PlayerEntryHelper.save(this);
   }
@@ -73,6 +85,7 @@ public class PlayerEntry extends AbstractEntry {
  public void setId(Long Id) {
     this.id = Id;
     autoAddCurVersion();
+    markFieldDirty(0);
   }
   public Long getId() {
     return id;
@@ -80,6 +93,7 @@ public class PlayerEntry extends AbstractEntry {
  public void setName(String Name) {
     this.name = Name;
     autoAddCurVersion();
+    markFieldDirty(1);
   }
   public String getName() {
     return name;
@@ -87,6 +101,7 @@ public class PlayerEntry extends AbstractEntry {
  public void setCreatetime(java.time.LocalDateTime Createtime) {
     this.createTime = Createtime;
     autoAddCurVersion();
+    markFieldDirty(2);
   }
   public java.time.LocalDateTime getCreatetime() {
     return createTime;
@@ -94,6 +109,7 @@ public class PlayerEntry extends AbstractEntry {
  public void setLogintime(java.time.LocalDateTime Logintime) {
     this.loginTime = Logintime;
     autoAddCurVersion();
+    markFieldDirty(3);
   }
   public java.time.LocalDateTime getLogintime() {
     return loginTime;
@@ -101,6 +117,7 @@ public class PlayerEntry extends AbstractEntry {
  public void setLogouttime(java.time.LocalDateTime Logouttime) {
     this.logoutTime = Logouttime;
     autoAddCurVersion();
+    markFieldDirty(4);
   }
   public java.time.LocalDateTime getLogouttime() {
     return logoutTime;
@@ -108,6 +125,7 @@ public class PlayerEntry extends AbstractEntry {
  public void setLevel(Integer Level) {
     this.level = Level;
     autoAddCurVersion();
+    markFieldDirty(5);
   }
   public Integer getLevel() {
     return level;
@@ -115,6 +133,7 @@ public class PlayerEntry extends AbstractEntry {
  public void setViplevel(Integer Viplevel) {
     this.vipLevel = Viplevel;
     autoAddCurVersion();
+    markFieldDirty(6);
   }
   public Integer getViplevel() {
     return vipLevel;
@@ -122,6 +141,7 @@ public class PlayerEntry extends AbstractEntry {
  public void setModules(byte[] Modules) {
     this.modules = Modules;
     autoAddCurVersion();
+    markFieldDirty(7);
   }
   public byte[] getModules() {
     return modules;
@@ -129,6 +149,7 @@ public class PlayerEntry extends AbstractEntry {
  public void setGuidid(Long Guidid) {
     this.guidId = Guidid;
     autoAddCurVersion();
+    markFieldDirty(8);
   }
   public Long getGuidid() {
     return guidId;
@@ -136,6 +157,7 @@ public class PlayerEntry extends AbstractEntry {
  public void setAccount(String Account) {
     this.account = Account;
     autoAddCurVersion();
+    markFieldDirty(9);
   }
   public String getAccount() {
     return account;

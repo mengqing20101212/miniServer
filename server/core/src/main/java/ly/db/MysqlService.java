@@ -1,15 +1,17 @@
 package ly.db;
 
-import io.netty.util.internal.StringUtil;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import org.slf4j.Logger;
+
+import io.netty.util.internal.StringUtil;
 import ly.LoggerDef;
 import ly.db.entry.ShareEnumConfigEntry;
 import ly.db.entry.ShareEnumConfigEntryHelper;
-import org.slf4j.Logger;
 
 /*
  * Author: liuYang
@@ -92,7 +94,13 @@ public class MysqlService {
         logger.error("MysqlConnector 未初始化，无法保存数据");
         return false;
       }
-      return mysqlConnector.execute(saveSql, params.toArray());
+      Number generatedKey = mysqlConnector.executeInsertReturnKey(saveSql, params.toArray());
+      boolean success = generatedKey != null || hasNonAutoIncrementPrimaryKey(entry);
+      if (success) {
+        applyGeneratedKey(entry, generatedKey);
+        entry.markPersisted();
+      }
+      return success;
     } catch (IllegalAccessException e) {
       e.printStackTrace();
       logger.error(" 保存数据[%s] 报错 ", entry.toString(), e);
@@ -117,7 +125,15 @@ public class MysqlService {
         logger.error("MysqlConnector 未初始化，无法更新数据");
         return false;
       }
-      return mysqlConnector.execute(saveSql, params.toArray());
+      if (saveSql == null || saveSql.isEmpty()) {
+        entry.markPersisted();
+        return true;
+      }
+      boolean success = mysqlConnector.execute(saveSql, params.toArray());
+      if (success) {
+        entry.markPersisted();
+      }
+      return success;
     } catch (IllegalAccessException e) {
       e.printStackTrace();
       logger.error(" 更新数据[%s] 报错 ", entry.toString(), e);
@@ -233,6 +249,7 @@ public class MysqlService {
         }
       }
 
+      instance.markPersisted();
       return instance;
     } catch (Exception e) {
       LoggerDef.DbLogger.error("packetEntry: 封装对象时发生错误，resultMap={}, clazz={}", resultMap, clazz.getSimpleName(), e);
@@ -325,8 +342,19 @@ public class MysqlService {
           if (dbField != null) {
             allFields.add(dbField.name());
           }
-          paramsList.add(field.get(data));
         }
+      }
+      List<String> targetFields = resolveUpdateFields(data, fileds, allFields, keyName);
+      if (targetFields.isEmpty()) {
+        return "";
+      }
+      for (String fieldName : targetFields) {
+        Field field = getFieldByDbName(clazz, fieldName);
+        if (field == null) {
+          throw new IllegalArgumentException("field not found for db column: " + fieldName);
+        }
+        field.setAccessible(true);
+        paramsList.add(field.get(data));
       }
       paramsList.add(keyValue);
 
@@ -338,18 +366,10 @@ public class MysqlService {
                 + " does not have a valid @DbTable @DbMasterKey name.");
       }
       sql.append("UPDATE ").append(tableName).append(" SET ");
-      if (fileds != null && fileds.length > 0) {
-        for (String field : fileds) {
-          if (field != null) {
-            sql.append(" " + field + "=?,");
-          }
+      for (String field : targetFields) {
+        if (field != null) {
+          sql.append(" " + field + "=?,");
         }
-      } else {
-        allFields.forEach(field -> {
-          if (field != null) {
-            sql.append(" " + field + "=?,");
-          }
-        });
       }
       if (sql.charAt(sql.length() - 1) == ',') {
         sql.deleteCharAt(sql.length() - 1);
@@ -523,10 +543,99 @@ public class MysqlService {
     }
   }
 
+  private List<String> resolveUpdateFields(
+      AbstractEntry data, String[] fileds, List<String> allFields, String keyName) {
+    List<String> targetFields = new ArrayList<>();
+    if (fileds != null && fileds.length > 0) {
+      for (String field : fileds) {
+        if (field != null && !field.isEmpty() && !field.equals(keyName)) {
+          targetFields.add(field);
+        }
+      }
+      return targetFields;
+    }
+
+    String[] dirtyFields = data.getDirtyFieldNames();
+    if (dirtyFields.length > 0) {
+      for (String field : dirtyFields) {
+        if (field != null && !field.isEmpty() && !field.equals(keyName)) {
+          targetFields.add(field);
+        }
+      }
+      return targetFields;
+    }
+
+    for (String field : allFields) {
+      if (field != null && !field.equals(keyName)) {
+        targetFields.add(field);
+      }
+    }
+    return targetFields;
+  }
+
+  private Field getFieldByDbName(Class<?> clazz, String dbFieldName) {
+    for (Field field : clazz.getDeclaredFields()) {
+      if (field.isAnnotationPresent(DbMeta.DbField.class)) {
+        DbMeta.DbField dbField = field.getAnnotation(DbMeta.DbField.class);
+        if (dbField != null && dbFieldName.equals(dbField.name())) {
+          return field;
+        }
+      }
+      if (field.isAnnotationPresent(DbMeta.DbMasterKey.class)) {
+        DbMeta.DbMasterKey dbMasterKey = field.getAnnotation(DbMeta.DbMasterKey.class);
+        if (dbMasterKey != null && dbFieldName.equals(dbMasterKey.name())) {
+          return field;
+        }
+      }
+    }
+    return null;
+  }
+
+  private boolean hasNonAutoIncrementPrimaryKey(AbstractEntry entry) {
+    for (Field field : entry.getClass().getDeclaredFields()) {
+      if (!field.isAnnotationPresent(DbMeta.DbMasterKey.class)) {
+        continue;
+      }
+      DbMeta.DbMasterKey dbMasterKey = field.getAnnotation(DbMeta.DbMasterKey.class);
+      return dbMasterKey != null && !dbMasterKey.autoIncrement();
+    }
+    return false;
+  }
+
+  private void applyGeneratedKey(AbstractEntry entry, Number generatedKey)
+      throws IllegalAccessException {
+    if (generatedKey == null) {
+      return;
+    }
+    for (Field field : entry.getClass().getDeclaredFields()) {
+      if (!field.isAnnotationPresent(DbMeta.DbMasterKey.class)) {
+        continue;
+      }
+      DbMeta.DbMasterKey dbMasterKey = field.getAnnotation(DbMeta.DbMasterKey.class);
+      if (dbMasterKey == null || !dbMasterKey.autoIncrement()) {
+        continue;
+      }
+      field.setAccessible(true);
+      Class<?> fieldType = field.getType();
+      if (fieldType == Integer.class || fieldType == int.class) {
+        field.set(entry, generatedKey.intValue());
+      } else if (fieldType == Long.class || fieldType == long.class) {
+        field.set(entry, generatedKey.longValue());
+      } else if (fieldType == Short.class || fieldType == short.class) {
+        field.set(entry, generatedKey.shortValue());
+      } else if (fieldType == Byte.class || fieldType == byte.class) {
+        field.set(entry, generatedKey.byteValue());
+      } else {
+        field.set(entry, generatedKey);
+      }
+      return;
+    }
+  }
+
   public static void main(String[] args) {
-    String jdbcUrl = "jdbc:mysql://139.224.80.204:3306/pick_money";
+    String jdbcUrl = "jdbc:mysql://118.25.76.117:3306/pick_money";
     String username = "root";
-    String password = "ly.1006897725";
+    String password = "Ly@2026Root!8899";
     getInstance().init(jdbcUrl, username, password, 0, 0, 0, 0);
     ShareEnumConfigEntry entry =
         getInstance().selectOnce(ShareEnumConfigEntry.class, new String[] {"name"}, "1231");
@@ -537,9 +646,11 @@ public class MysqlService {
     data.setName("wwwwwwww");
     data.setConfigDesc("ssssssss");
     //    getInstance().save(data);
-    entry = getInstance().selectOnce(ShareEnumConfigEntry.class, new String[] {"code"}, "qqqqq");
-    entry.setConfigDesc("dadaw");
-    getInstance().update(entry);
-    getInstance().delete(entry);
+    // entry = getInstance().selectOnce(ShareEnumConfigEntry.class, new String[] {"code"}, "qqqqq");
+    data.setConfigDesc("dadaw");
+    getInstance().save(data);
+    data.setConfigDesc("43432");
+    getInstance().update(data);
+    getInstance().delete(data);
   }
 }

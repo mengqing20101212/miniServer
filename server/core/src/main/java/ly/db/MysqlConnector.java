@@ -205,6 +205,48 @@ public class MysqlConnector {
     return result;
   }
 
+  public Number executeInsertReturnKey(String sql, Object... params) {
+    long startTime = System.currentTimeMillis();
+    Number generatedKey = null;
+    boolean result = false;
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement st =
+            connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+      addSqlParams(params, st);
+      result = st.executeUpdate() > 0;
+      if (result) {
+        try (ResultSet rs = st.getGeneratedKeys()) {
+          if (rs.next()) {
+            Object key = rs.getObject(1);
+            if (key instanceof Number number) {
+              generatedKey = number;
+            }
+          }
+        }
+      }
+      if (logger.isDebugEnabled()) {
+        logger.debug(
+            String.format(
+                "executeInsertReturnKey 执行sql: %s , params: %s %s, key:%s, 耗时: %d 毫秒",
+                sql,
+                getParamStr(params),
+                result ? "成功" : "失败",
+                generatedKey,
+                System.currentTimeMillis() - startTime));
+      }
+    } catch (Exception e) {
+      logger.error(
+          String.format(
+              "执行SQL(%s) 报错, params:%s, error:%s", sql, getParamStr(params), e.getMessage()));
+      e.printStackTrace();
+    }
+    long endTime = System.currentTimeMillis();
+    if (endTime - startTime >= SQL_MAX_OPT_TIMEOUT) {
+      logger.warn(String.format("执行SQL, 耗时过长, 请检查 %s, %s", sql, getParamStr(params)));
+    }
+    return result ? generatedKey : null;
+  }
+
   private String getParamStr(Object[] params) {
     if (params == null) {
       return "[]";

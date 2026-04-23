@@ -8,6 +8,9 @@ import ly.db.DbMeta;
  */
 @DbMeta.DbTable(name = "user_info")
 public class UserInfoEntry extends AbstractEntry {
+  private static final String[] DIRTY_FIELDS = {
+      "id", "username", "nickname", "email", "phone", "register_time", "last_login_time", "level", "exp", "status"
+  };
 
   /**user id */
   @DbMeta.DbMasterKey(name="id", autoIncrement=true)
@@ -49,6 +52,14 @@ public class UserInfoEntry extends AbstractEntry {
   /**用户状态 0-正常 1-封禁*/
   @DbMeta.DbField(name="status")
   private Integer status;
+  public UserInfoEntry() {
+    initDirtyState(DIRTY_FIELDS.length);
+  }
+
+  @Override
+  protected String[] allDirtyFieldNames() {
+    return DIRTY_FIELDS;
+  }
 
   public void save() {
     UserInfoEntryHelper.save(this);
@@ -73,6 +84,7 @@ public class UserInfoEntry extends AbstractEntry {
  public void setId(Long Id) {
     this.id = Id;
     autoAddCurVersion();
+    markFieldDirty(0);
   }
   public Long getId() {
     return id;
@@ -80,6 +92,7 @@ public class UserInfoEntry extends AbstractEntry {
  public void setUsername(String Username) {
     this.username = Username;
     autoAddCurVersion();
+    markFieldDirty(1);
   }
   public String getUsername() {
     return username;
@@ -87,6 +100,7 @@ public class UserInfoEntry extends AbstractEntry {
  public void setNickname(String Nickname) {
     this.nickname = Nickname;
     autoAddCurVersion();
+    markFieldDirty(2);
   }
   public String getNickname() {
     return nickname;
@@ -94,6 +108,7 @@ public class UserInfoEntry extends AbstractEntry {
  public void setEmail(String Email) {
     this.email = Email;
     autoAddCurVersion();
+    markFieldDirty(3);
   }
   public String getEmail() {
     return email;
@@ -101,6 +116,7 @@ public class UserInfoEntry extends AbstractEntry {
  public void setPhone(String Phone) {
     this.phone = Phone;
     autoAddCurVersion();
+    markFieldDirty(4);
   }
   public String getPhone() {
     return phone;
@@ -108,6 +124,7 @@ public class UserInfoEntry extends AbstractEntry {
  public void setRegistertime(java.time.LocalDateTime Registertime) {
     this.registerTime = Registertime;
     autoAddCurVersion();
+    markFieldDirty(5);
   }
   public java.time.LocalDateTime getRegistertime() {
     return registerTime;
@@ -115,6 +132,7 @@ public class UserInfoEntry extends AbstractEntry {
  public void setLastlogintime(java.time.LocalDateTime Lastlogintime) {
     this.lastLoginTime = Lastlogintime;
     autoAddCurVersion();
+    markFieldDirty(6);
   }
   public java.time.LocalDateTime getLastlogintime() {
     return lastLoginTime;
@@ -122,6 +140,7 @@ public class UserInfoEntry extends AbstractEntry {
  public void setLevel(Integer Level) {
     this.level = Level;
     autoAddCurVersion();
+    markFieldDirty(7);
   }
   public Integer getLevel() {
     return level;
@@ -129,6 +148,7 @@ public class UserInfoEntry extends AbstractEntry {
  public void setExp(Integer Exp) {
     this.exp = Exp;
     autoAddCurVersion();
+    markFieldDirty(8);
   }
   public Integer getExp() {
     return exp;
@@ -136,6 +156,7 @@ public class UserInfoEntry extends AbstractEntry {
  public void setStatus(Integer Status) {
     this.status = Status;
     autoAddCurVersion();
+    markFieldDirty(9);
   }
   public Integer getStatus() {
     return status;
