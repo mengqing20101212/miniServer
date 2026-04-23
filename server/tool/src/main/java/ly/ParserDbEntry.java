@@ -7,6 +7,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -383,11 +384,12 @@ public class ParserDbEntry {
       int sqlType = columns.getInt("DATA_TYPE"); // java.sql.Types
       int columnSize = columns.getInt("COLUMN_SIZE");
       String isAutoIncrement = columns.getString("IS_AUTOINCREMENT");
+      String typeName = columns.getString("TYPE_NAME");
 
       FiledInfo fieldInfo = new FiledInfo();
       fieldInfo.name = columnName;
       fieldInfo.type = columnType;
-      fieldInfo.javaType = mapSqlTypeToJavaType(sqlType, columnType);
+      fieldInfo.javaType = mapSqlTypeToJavaType(sqlType, typeName, columnSize);
       fieldInfo.desc = columns.getString("REMARKS");
       fieldInfo.autoIncrement = isAutoIncrement != null && isAutoIncrement.equals("YES");
       tableInfo.addField(fieldInfo);
@@ -403,43 +405,71 @@ public class ParserDbEntry {
     }
   }
 
-  private Object mapSqlTypeToJavaType(int sqlType, String typeName) {
+  private Object mapSqlTypeToJavaType(int sqlType, String typeName, int columnSize) {
+    String normalizedTypeName = typeName == null ? "" : typeName.toUpperCase();
+    boolean unsigned = normalizedTypeName.contains("UNSIGNED");
+    if (normalizedTypeName.contains("YEAR")) {
+      return "Integer";
+    }
     switch (sqlType) {
+      case Types.BOOLEAN:
+        return "Boolean";
+      case Types.BIT:
+        return columnSize <= 1 ? "Boolean" : "byte[]";
+      case Types.TINYINT:
+        if (normalizedTypeName.contains("BOOL")) {
+          return "Boolean";
+        }
+        return unsigned ? "Short" : "Byte";
+      case Types.SMALLINT:
+        return unsigned ? "Integer" : "Short";
       case Types.INTEGER:
-        return "Integer";
+        if (normalizedTypeName.contains("MEDIUMINT")) {
+          return "Integer";
+        }
+        return unsigned ? "Long" : "Integer";
       case Types.BIGINT:
-        return "Long";
+        return unsigned ? BigInteger.class.getName() : "Long";
+      case Types.REAL:
       case Types.FLOAT:
         return "Float";
       case Types.DOUBLE:
         return "Double";
       case Types.DECIMAL:
       case Types.NUMERIC:
-        return "BigDecimal";
+        return "java.math.BigDecimal";
       case Types.VARCHAR:
       case Types.CHAR:
       case Types.LONGVARCHAR:
       case Types.NVARCHAR:
       case Types.NCHAR:
+      case Types.LONGNVARCHAR:
+      case Types.CLOB:
+      case Types.NCLOB:
+      case Types.SQLXML:
         return "String";
       case Types.DATE:
-        return "java.time.LocalDate"; // or java.time.LocalDate
+        return "java.time.LocalDate";
       case Types.TIME:
-        return "java.time.LocalTime"; // or java.time.LocalTime
+      case Types.TIME_WITH_TIMEZONE:
+        return "java.time.LocalTime";
       case Types.TIMESTAMP:
-        return "java.time.LocalDateTime"; // or java.time.LocalDateTime
-      case Types.BOOLEAN:
-      case Types.BIT:
-      case Types.TINYINT:
-        if ("TINYINT".equalsIgnoreCase(typeName) || "BIT".equalsIgnoreCase(typeName)) {
-          return "Boolean";
-        }
-        return "Byte";
+      case Types.TIMESTAMP_WITH_TIMEZONE:
+        return "java.time.LocalDateTime";
       case Types.BLOB:
+      case Types.BINARY:
       case Types.VARBINARY:
       case Types.LONGVARBINARY:
         return "byte[]";
+      case Types.NULL:
+        return "Object";
       default:
+        if (normalizedTypeName.contains("JSON")
+            || normalizedTypeName.contains("ENUM")
+            || normalizedTypeName.contains("SET")
+            || normalizedTypeName.contains("TEXT")) {
+          return "String";
+        }
         return "Object";
     }
   }

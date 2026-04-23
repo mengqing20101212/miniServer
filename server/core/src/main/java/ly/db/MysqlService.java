@@ -1,6 +1,16 @@
 package ly.db;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -244,7 +254,7 @@ public class MysqlService {
         if (columnName != null && !columnName.isEmpty()) {
           Object value = resultMap.get(columnName); // 从查询结果获取值
           if (value != null) {
-            field.set(instance, value); // 赋值给对象字段
+            field.set(instance, convertFieldValue(field.getType(), value));
           }
         }
       }
@@ -589,6 +599,125 @@ public class MysqlService {
       }
     }
     return null;
+  }
+
+  private static Object convertFieldValue(Class<?> fieldType, Object value) throws Exception {
+    if (value == null) {
+      return null;
+    }
+    if (fieldType.isInstance(value)) {
+      return value;
+    }
+
+    if (fieldType == String.class) {
+      if (value instanceof Clob clob) {
+        return clob.getSubString(1, (int) clob.length());
+      }
+      return String.valueOf(value);
+    }
+
+    if (fieldType == Boolean.class || fieldType == boolean.class) {
+      if (value instanceof Boolean bool) {
+        return bool;
+      }
+      if (value instanceof Number number) {
+        return number.intValue() != 0;
+      }
+      String str = String.valueOf(value);
+      return "1".equals(str) || "true".equalsIgnoreCase(str) || "y".equalsIgnoreCase(str);
+    }
+
+    if (fieldType == Byte.class || fieldType == byte.class) {
+      return toNumber(value).byteValue();
+    }
+    if (fieldType == Short.class || fieldType == short.class) {
+      return toNumber(value).shortValue();
+    }
+    if (fieldType == Integer.class || fieldType == int.class) {
+      return toNumber(value).intValue();
+    }
+    if (fieldType == Long.class || fieldType == long.class) {
+      return toNumber(value).longValue();
+    }
+    if (fieldType == Float.class || fieldType == float.class) {
+      return toNumber(value).floatValue();
+    }
+    if (fieldType == Double.class || fieldType == double.class) {
+      return toNumber(value).doubleValue();
+    }
+    if (fieldType == BigDecimal.class) {
+      if (value instanceof BigDecimal decimal) {
+        return decimal;
+      }
+      if (value instanceof BigInteger integer) {
+        return new BigDecimal(integer);
+      }
+      return new BigDecimal(String.valueOf(value));
+    }
+    if (fieldType == BigInteger.class) {
+      if (value instanceof BigInteger integer) {
+        return integer;
+      }
+      if (value instanceof BigDecimal decimal) {
+        return decimal.toBigInteger();
+      }
+      return new BigInteger(String.valueOf(value));
+    }
+
+    if (fieldType == LocalDate.class) {
+      if (value instanceof LocalDate localDate) {
+        return localDate;
+      }
+      if (value instanceof Date date) {
+        return date.toLocalDate();
+      }
+      if (value instanceof Timestamp timestamp) {
+        return timestamp.toLocalDateTime().toLocalDate();
+      }
+    }
+    if (fieldType == LocalTime.class) {
+      if (value instanceof LocalTime localTime) {
+        return localTime;
+      }
+      if (value instanceof Time time) {
+        return time.toLocalTime();
+      }
+      if (value instanceof Timestamp timestamp) {
+        return timestamp.toLocalDateTime().toLocalTime();
+      }
+    }
+    if (fieldType == LocalDateTime.class) {
+      if (value instanceof LocalDateTime localDateTime) {
+        return localDateTime;
+      }
+      if (value instanceof Timestamp timestamp) {
+        return timestamp.toLocalDateTime();
+      }
+      if (value instanceof Date date) {
+        return date.toLocalDate().atStartOfDay();
+      }
+    }
+
+    if (fieldType == byte[].class) {
+      if (value instanceof byte[] bytes) {
+        return bytes;
+      }
+      if (value instanceof Blob blob) {
+        return blob.getBytes(1, (int) blob.length());
+      }
+    }
+
+    return value;
+  }
+
+  private static Number toNumber(Object value) {
+    if (value instanceof Number number) {
+      return number;
+    }
+    if (value instanceof Boolean bool) {
+      return bool ? 1 : 0;
+    }
+    return new BigDecimal(String.valueOf(value));
   }
 
   private boolean hasNonAutoIncrementPrimaryKey(AbstractEntry entry) {
