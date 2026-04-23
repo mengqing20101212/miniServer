@@ -7,3 +7,6 @@ logs/
 *.class
 *.vscode
 /target/
+**/target/
+*.LCKpom.xml~
+dependency-reduced-pom.xml
