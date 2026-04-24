@@ -150,7 +150,7 @@ public class LoginManager {
         res.setToken(onlinePlayer.getToken());
         res.setGameServerId(ServerContext.getServerId());
         res.setPlayerInfo(PlayerUtils.genPlayerInfo(onlinePlayer));
-        onlinePlayer.sendMsg(Cmd.CMD.SC_Logout, res.build());
+        onlinePlayer.sendMsg(Cmd.CMD.SC_Login, res.build());
         onlinePlayer.statPlay();
 
 

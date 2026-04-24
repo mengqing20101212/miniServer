@@ -9,6 +9,7 @@ public class RedisConfig {
   public String host;
   public int port;
   public String password;
+  public int timeout;
 
   public String getHost() {
     return host;
@@ -32,5 +33,13 @@ public class RedisConfig {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public int getTimeout() {
+    return timeout;
+  }
+
+  public void setTimeout(int timeout) {
+    this.timeout = timeout;
   }
 }

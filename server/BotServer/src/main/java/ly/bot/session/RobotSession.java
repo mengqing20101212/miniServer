@@ -134,6 +134,18 @@ public class RobotSession {
             // 通过HTTP请求获取服务器列表，使用全局HTTP客户端
             ly.bot.http.HttpServerListClient.ServerListResult serverListResult = 
                 globalHttpClient.getServerList(account);
+            String gameServerId =
+                serverListResult != null ? serverListResult.getFirstGameServerId() : null;
+            if (serverListResult != null
+                    && (serverListResult.getAccountId() <= 0 || serverListResult.getToken() == null)) {
+                logger.info("机器人 #{} 账号不存在，先执行注册流程", botId);
+                serverListResult = globalHttpClient.register(account, "bot");
+                ly.bot.http.HttpServerListClient.ServerListResult refreshedServerList =
+                    globalHttpClient.getServerList(account);
+                if (refreshedServerList != null && refreshedServerList.getFirstGameServerId() != null) {
+                    gameServerId = refreshedServerList.getFirstGameServerId();
+                }
+            }
             
             if (serverListResult != null) {
                 logger.info("机器人 #{} 成功获取服务器列表", botId);
@@ -142,7 +154,9 @@ public class RobotSession {
                 // 注意：这里不能直接修改final字段accountId和token，所以我们需要在连接时使用服务器返回的值
                 long returnedAccountId = serverListResult.getAccountId();
                 String returnedToken = serverListResult.getToken();
-                String gameServerId = serverListResult.getFirstGameServerId(); // 获取游戏服务器ID
+                if (gameServerId == null) {
+                    gameServerId = serverListResult.getFirstGameServerId();
+                }
                 
                 // 获取GateServer信息
                 ly.bot.http.HttpServerListClient.ServerNode gateServer = serverListResult.getGate();

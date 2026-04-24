@@ -1,6 +1,7 @@
 package ly.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import ly.ServerContext;
@@ -14,6 +15,7 @@ import ly.config.ServerConfig;
 public class CommonUtils {
     public static <T> T parserYaml(Class<T> clazz, String yamlStr) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper.readValue(yamlStr, clazz);
     }
 

@@ -17,6 +17,12 @@ import ly.config.ServerTypeEnum;
 import ly.utils.CommonUtils;
 import org.slf4j.Logger;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +45,8 @@ public class NacosService {
     private static ExecutorService executorService = Executors.newFixedThreadPool(1);
     private static NamingService namingService;
     int a = 0;
+    private String currentNacosUrl;
+    private String currentNamespace;
 
     /***nacos 请求操作最大超时时间戳*/
     static final long MAX_TIME_OUT = 5000;
@@ -61,6 +69,8 @@ public class NacosService {
         logger.info("开始启动 Nacos ");
         long startTime = System.currentTimeMillis();
         try {
+            currentNacosUrl = nacosUrl;
+            currentNamespace = env;
             // 1 获取nacos 服务器配置
             Properties properties = new Properties();
             properties.put(PropertyKeyConst.SERVER_ADDR, nacosUrl);
@@ -166,7 +176,32 @@ public class NacosService {
                         ServerContext.serverConfig.getServerPort(),
                         new HashMap<>());
         curNode.setLoadNum(0);
-        namingService.registerInstance(RPC_NODE_LIST_SERVICE, ServerContext.ENV, curNode.getInstance());
+        NacosException lastException = null;
+        for (int i = 0; i < 10; i++) {
+            try {
+                namingService.registerInstance(
+                        RPC_NODE_LIST_SERVICE, ServerContext.ENV, curNode.getInstance());
+                logger.info("registerServerNode success, serverId={}, attempt={}", ServerContext.getServerId(), i + 1);
+                return;
+            } catch (NacosException e) {
+                lastException = e;
+                logger.warn(
+                        "registerServerNode retry, serverId={}, attempt={}, errCode={}, errMsg={}",
+                        ServerContext.getServerId(),
+                        i + 1,
+                        e.getErrCode(),
+                        e.getErrMsg());
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException interruptedException) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+        if (lastException != null) {
+            throw lastException;
+        }
     }
 
     public Map<String, NacosServerNode> getNodeMap() {
@@ -195,12 +230,18 @@ public class NacosService {
         }
         
         String configStr = configService.getConfig(serverId, serverType.getType(), MAX_TIME_OUT);
-        if (configStr != null) {
+        if (configStr == null || configStr.isBlank()) {
+            configStr = fetchConfigByHttp(serverId, serverType.getType());
+        }
+        if (configStr != null && !configStr.isBlank()) {
             parserServerConfig(configStr);
         } else {
             // 如果获取不到指定服务器的配置，尝试获取gate1001的配置作为默认配置
             configStr = configService.getConfig("gate1001", "GATE", MAX_TIME_OUT);
-            if (configStr != null) {
+            if (configStr == null || configStr.isBlank()) {
+                configStr = fetchConfigByHttp("gate1001", "GATE");
+            }
+            if (configStr != null && !configStr.isBlank()) {
                 parserServerConfig(configStr);
             } else {
                 throw new RuntimeException("获取nacos 配置失败，serverId=" + serverId + ", serverType=" + serverType.getType());
@@ -235,6 +276,58 @@ public class NacosService {
             logger.error(String.format("解析配置文件报错 \n\n  %s, \n\n%s", str, e.getMessage()));
             e.printStackTrace();
         }
+    }
+
+    private String fetchConfigByHttp(String dataId, String group) {
+        if (currentNacosUrl == null || dataId == null || group == null) {
+            return null;
+        }
+        try {
+            String baseUrl =
+                    currentNacosUrl.startsWith("http://") || currentNacosUrl.startsWith("https://")
+                            ? currentNacosUrl
+                            : "http://" + currentNacosUrl;
+            if (baseUrl.endsWith("/")) {
+                baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+            }
+            String url =
+                    String.format(
+                            "%s/nacos/v1/cs/configs?dataId=%s&group=%s&tenant=%s&username=nacos&password=nacos",
+                            baseUrl,
+                            URLEncoder.encode(dataId, StandardCharsets.UTF_8),
+                            URLEncoder.encode(group, StandardCharsets.UTF_8),
+                            URLEncoder.encode(
+                                    currentNamespace == null ? "" : currentNamespace,
+                                    StandardCharsets.UTF_8));
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+            HttpResponse<String> response =
+                    HttpClient.newHttpClient()
+                            .send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            if (response.statusCode() == 200
+                    && response.body() != null
+                    && !response.body().isBlank()) {
+                logger.info(
+                        "fetchConfigByHttp success, dataId={}, group={}, namespace={}",
+                        dataId,
+                        group,
+                        currentNamespace);
+                return response.body();
+            }
+            logger.warn(
+                    "fetchConfigByHttp failed, status={}, dataId={}, group={}, namespace={}",
+                    response.statusCode(),
+                    dataId,
+                    group,
+                    currentNamespace);
+        } catch (Exception e) {
+            logger.warn(
+                    "fetchConfigByHttp exception, dataId={}, group={}, namespace={}",
+                    dataId,
+                    group,
+                    currentNamespace,
+                    e);
+        }
+        return null;
     }
 
     public void shutdown() throws NacosException {

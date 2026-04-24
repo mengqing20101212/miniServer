@@ -1,6 +1,8 @@
 package ly;
 
 import ly.config.ServerTypeEnum;
+import ly.logic.login.GateLoginController;
+import ly.logic.login.GateLogoutController;
 import ly.net.GateConnectSessionProvider;
 
 /**
@@ -16,6 +18,7 @@ public class GateServer {
         String nacosUrl = args[0];
         String env = args[1];
         String serverId = args[2];
+        ServerContext.addController(new GateLoginController(), new GateLogoutController());
         ServerContext.startUp(nacosUrl, ServerTypeEnum.GATE.getType(), serverId, env, new GateConnectSessionProvider());
 
     }
