@@ -7,6 +7,9 @@ import ly.net.packet.AbstractMessagePacket;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * 服务器间 RPC 组件，维护跨节点连接并提供同步/异步调用工具。
+ */
 public class RpcUtils {
 
     /**

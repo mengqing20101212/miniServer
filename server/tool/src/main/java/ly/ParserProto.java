@@ -5,10 +5,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Author: liuYang
- * Date: 2025/4/11
- * File: ParserProto
+/**
+ * 协议生成辅助工具，扫描 proto 命令定义并生成命令到消息类的工厂代码。
  */
 public class ParserProto {
   String cmdFileName;

@@ -9,12 +9,24 @@ import ly.proto.Cmd;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 公共消息路由表。
+ * <p>
+ * 控制器注册时把 CMD、会话类型、包类型和 protobuf 请求类型绑定在一起。收到消息后，
+ * 这里先根据 CMD 找到路由，再用 {@link ProtoMessageFactory} 反序列化请求，最后做类型
+ * 检查并调用业务处理器。
+ */
 public class HandlerRouterManager {
 
     private static HandlerRouterManager instance = new HandlerRouterManager();
 
     private final Map<Integer, RouterHolder<?, ?, ?>> handlerRouterMap = new HashMap<>();
 
+    /**
+     * 单条路由的运行时类型信息。
+     * <p>
+     * Java 泛型在运行期会擦除，因此这里显式保存 Class，用于派发前检查真实类型。
+     */
     protected static class RouterHolder<S extends ConnectSession,
             P extends AbstractMessagePacket,
             R extends AbstractMessage> {
@@ -33,9 +45,7 @@ public class HandlerRouterManager {
             this.router = router;
         }
         
-        /**
-         * 执行路由处理
-         */
+        /** 在所有类型都匹配后执行真正的业务路由。 */
         @SuppressWarnings("unchecked")
         public void execute(ConnectSession session, AbstractMessagePacket packet, AbstractMessage request) {
             if (sessionType.isInstance(session) && packetType.isInstance(packet) && requestType.isInstance(request)) {
@@ -53,7 +63,10 @@ public class HandlerRouterManager {
     }
 
     /**
-     * 泛型注册（自动类型安全）
+     * 注册一条 CMD 路由。
+     * <p>
+     * 同一个 CMD 只能注册一次。业务服通常在 Controller 的
+     * {@code registerHandlerRouter()} 中调用该方法。
      */
     public <S extends ConnectSession, P extends AbstractMessagePacket, R extends AbstractMessage>
     void addHandlerRouter(Cmd.CMD cmd,
@@ -75,7 +88,10 @@ public class HandlerRouterManager {
     }
 
     /**
-     * 执行（自动类型检查 + 安全强转）
+     * 按 CMD 执行消息处理。
+     * <p>
+     * 这里集中处理路由不存在、会话类型不符、包类型不符、protobuf 反序列化失败等框架层错误，
+     * 业务处理器只需要关心已经解析好的请求对象。
      */
     @SuppressWarnings("unchecked")
     public static void execute(ConnectSession session, AbstractMessagePacket packet) {

@@ -23,10 +23,11 @@ import ly.LoggerDef;
 import ly.db.entry.ShareEnumConfigEntry;
 import ly.db.entry.ShareEnumConfigEntryHelper;
 
-/*
- * Author: liuYang
- * Date: 2025/4/3
- * File: MysqlService
+/**
+ * 数据库访问组件，封装连接、元数据、实体脏标记和增删改查操作。
+ * <p>
+ * 业务层通常通过生成的 EntryHelper 调用这里。同步接口会立即执行 SQL；异步接口先进入
+ * {@code dataQueue}，由后台虚拟线程批量消费。
  */
 public class MysqlService {
   Logger logger = LoggerDef.DbLogger;
@@ -40,6 +41,11 @@ public class MysqlService {
     return instance;
   }
 
+  /**
+   * 初始化 MySQL 连接池并启动异步保存任务。
+   *
+   * <p>连接池大小、空闲连接、空闲超时和连接超时参数传 0 时使用默认值。
+   */
   public void init(
       String jdbcUrl,
       String username,
@@ -56,6 +62,11 @@ public class MysqlService {
     startSaveThread();
   }
 
+  /**
+   * 启动异步保存线程。
+   * <p>
+   * 队列中的任务会按保存/更新类型调用同步接口；同步接口仍负责生成 SQL、执行和标记持久化。
+   */
   private void startSaveThread() {
     Thread.ofVirtual()
         .name("MysqlService-dbSaveVirtual")
@@ -120,6 +131,12 @@ public class MysqlService {
     return false;
   }
 
+  /**
+   * 同步更新实体。
+   * <p>
+   * {@code updateFileds} 为空时优先使用实体脏字段；仍为空则认为没有需要更新的字段，并把对象
+   * 标记为已持久化。
+   */
   public boolean update(AbstractEntry entry, String... updateFileds) {
     if (entry == null) {
       logger.error("更新数据失败: entry 不能为 null");
@@ -160,19 +177,25 @@ public class MysqlService {
     return mysqlConnector;
   }
 
-  /*** 异步保存，添加到保存队列 */
+  /** 异步保存，添加到保存队列；真正执行由保存线程完成。 */
   public void addSaveEntry(AbstractEntry entry) {
     if (entry.canSave()) {
       dataQueue.add(new saveOrUpdateEntry(SAVE_TYPE, entry));
     }
   }
 
+  /** 异步更新，字段参数为空时由实体脏字段决定 UPDATE 列。 */
   public void addUpdateEntry(AbstractEntry entry, String... fileds) {
     if (entry.canSave()) {
       dataQueue.add(new saveOrUpdateEntry(UPDATE_TYPE, entry, fileds));
     }
   }
 
+  /**
+   * 查询单条实体。
+   *
+   * @param fileds WHERE 条件列名数组，按顺序与 {@code params} 一一对应
+   */
   public <T extends AbstractEntry> T selectOnce(Class<T> clazz, String[] fileds, Object... params) {
     if (clazz == null) {
       logger.error("查询单条记录失败: clazz 不能为 null");
@@ -226,6 +249,12 @@ public class MysqlService {
     return list;
   }
 
+  /**
+   * 把 JDBC 查询结果封装为 Entry。
+   * <p>
+   * 只处理带 {@link DbMeta.DbField} 注解的字段；构造完成后会调用
+   * {@link AbstractEntry#markPersisted()}，避免刚从数据库读出的对象被误判为脏数据。
+   */
   public static <T extends AbstractEntry> T packetEntry(
       Map<String, Object> resultMap, Class<T> clazz) {
     if (resultMap == null) {
@@ -314,6 +343,12 @@ public class MysqlService {
    * @return 拼接的字段
    * @param <T> 实例的类型
    */
+  /**
+   * 生成 UPDATE SQL 和参数。
+   * <p>
+   * 主键只用于 WHERE 条件，不会进入 SET。指定字段优先；未指定时使用实体脏字段；脏字段为空时
+   * 回落到全部普通字段。
+   */
   private <T extends AbstractEntry> String getUpdateSql(
       T data, List<Object> paramsList, String[] fileds) throws IllegalAccessException {
     if (data == null) {
@@ -392,6 +427,11 @@ public class MysqlService {
     }
   }
 
+  /**
+   * 生成 INSERT SQL 和参数。
+   * <p>
+   * 自增主键不会插入，非自增主键会作为普通列写入；普通字段为 null 时跳过，交给数据库默认值。
+   */
   private <T extends AbstractEntry> String getInsertSql(T data, List<Object> paramList)
       throws IllegalAccessException {
     if (data == null) {

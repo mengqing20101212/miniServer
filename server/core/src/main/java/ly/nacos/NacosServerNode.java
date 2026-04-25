@@ -5,11 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import ly.config.ServerTypeEnum;
 
-/*
- * 服务器的节点信息
- * Author: liuYang
- * Date: 2025/4/7
- * File: NacosServerNode
+/**
+ * Nacos 服务发现组件，负责节点注册、监听、配置订阅和本节点元数据管理。
  */
 public class NacosServerNode {
   ServerTypeEnum serverType;

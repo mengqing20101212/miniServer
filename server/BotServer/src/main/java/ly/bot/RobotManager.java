@@ -9,19 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 机器人管理器 - 使用多种设计模式重构
- * 
- * 设计模式应用：
- * - 单一职责原则：每个类只负责一个特定功能
- * - 工厂模式：RobotCommandFactory创建命令对象
- * - 状态模式：管理机器人状态
- * - 观察者模式：通知状态变化
- * - 命令模式：封装各种操作
- * - 策略模式：不同的行为策略
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: RobotManager
+ * 机器人管理器，统一创建、保存、启动和停止机器人会话。
  */
 public class RobotManager {
     private static final Logger logger = LoggerDef.SystemLogger;

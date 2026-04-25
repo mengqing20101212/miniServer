@@ -32,11 +32,11 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/*
- * Nacos 服务 用于节点的发现，注册，以及配置文件的监听
- * Author: liuYang
- * Date: 2025/4/7
- * File: NacosService
+/**
+ * Nacos 服务发现组件，负责节点注册、监听、配置订阅和本节点元数据管理。
+ * <p>
+ * 本项目把 Nacos 同时用于两件事：通过配置中心读取当前 serverId 的
+ * {@link ServerConfig}，通过注册中心维护所有可 RPC 的服务器节点列表。
  */
 public class NacosService {
     Logger logger = LoggerDef.SystemLogger;
@@ -65,6 +65,12 @@ public class NacosService {
         return instance;
     }
 
+    /**
+     * 启动 Nacos 客户端。
+     * <p>
+     * 会先读取当前节点配置，再注册当前节点实例，最后订阅同 namespace 下的节点变化。
+     * 读取配置成功后会写入 {@link ServerContext#serverConfig}，供后续服务初始化使用。
+     */
     public void startUp(String nacosUrl, ServerTypeEnum serverType, String serverId, String env) {
         logger.info("开始启动 Nacos ");
         long startTime = System.currentTimeMillis();
@@ -95,6 +101,12 @@ public class NacosService {
         logger.info(String.format(" Nacos 启动成功,耗时: %dms ", endTime - startTime));
     }
 
+    /**
+     * 订阅 RPC 节点列表变化。
+     * <p>
+     * Nacos 的 InstanceId 用于删除事件，ServerId 用于本地 nodeMap 查询；新增和修改事件会
+     * 转换为 {@link NacosServerNode} 后写入本地缓存。
+     */
     private void subscribeServerNode(NamingService namingService) throws NacosException {
         EventListener serviceListener =
                 new AbstractNamingChangeListener() {
@@ -152,6 +164,7 @@ public class NacosService {
         nodeMap.remove(instanceId);
     }
 
+    /** 把 Nacos 原始实例转换为项目内部节点模型并加入本地缓存。 */
     private void addNewNode(Instance instance) {
         logger.info(String.format("当前节点数量:%d, 新增服务器节点: %s", nodeMap.size(), instance));
         NacosServerNode newNode = NacosServerNode.createNacosServerNode(instance);
@@ -165,6 +178,12 @@ public class NacosService {
         return currentNode;
     }
 
+    /**
+     * 注册当前服务器节点。
+     * <p>
+     * 服务名固定为 {@code rpc_node_list_service}，group 使用当前 ENV。注册失败会有限重试，
+     * 让本地 Nacos 刚启动或网络短暂抖动时不至于直接退出。
+     */
     private void registerServerNode(NamingService namingService) throws NacosException {
         NacosServerNode curNode =
                 NacosServerNode.createNacosServerNode(
@@ -215,6 +234,12 @@ public class NacosService {
                 .toList();
     }
 
+    /**
+     * 从 Nacos 配置中心拉取当前节点配置并监听后续变更。
+     * <p>
+     * dataId 使用 serverId，group 使用服务器类型。Nacos SDK 偶发空返回时会降级到 HTTP
+     * 接口；仍失败时使用 gate1001/GATE 作为本地开发兜底配置。
+     */
     private void getServerConfig(
             ConfigService configService, ServerTypeEnum serverType, String serverId) throws Exception {
         if (configService == null) {
@@ -267,6 +292,7 @@ public class NacosService {
                 });
     }
 
+    /** 把 Nacos 中的 YAML 配置解析成 {@link ServerConfig} 并写入 ServerContext。 */
     private void parserServerConfig(String str) {
         try {
             ServerContext.serverConfig = CommonUtils.parserYaml(ServerConfig.class, str);
@@ -276,6 +302,11 @@ public class NacosService {
         }
     }
 
+    /**
+     * 使用 Nacos OpenAPI 兜底拉取配置。
+     * <p>
+     * 该方法只在 SDK 拉取为空时使用，主要解决本地或容器环境中 SDK 首次读配置不稳定的问题。
+     */
     private String fetchConfigByHttp(String dataId, String group) {
         if (currentNacosUrl == null || dataId == null || group == null) {
             return null;

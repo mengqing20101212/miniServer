@@ -9,11 +9,10 @@ import java.sql.*;
 import java.util.*;
 
 /**
- * 根据注解实体类自动生成建表SQL的工具类
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: EntityToSqlGenerator
+ * 数据库实体到建表 SQL 的生成器。
+ * <p>
+ * 扫描带 {@link ly.db.DbMeta.DbTable}、{@link ly.db.DbMeta.DbField} 等注解的 Entry 类，
+ * 生成 CREATE TABLE 或 ALTER TABLE 语句，供本地初始化和表结构补齐使用。
  */
 public class EntityToSqlGenerator {
 

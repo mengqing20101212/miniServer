@@ -3,10 +3,11 @@ package ly.db;
 import java.io.Serializable;
 import ly.utils.BitSwitchState;
 
-/*
- * Author: liuYang
- * Date: 2025/4/3
- * File: AbstractEntry
+/**
+ * 所有数据库实体的基类。
+ * <p>
+ * 生成的 Entry setter 会在字段变化时递增版本号并标记脏字段。{@link MysqlService}
+ * 根据版本号判断是否需要保存，并可根据脏字段列表生成局部 UPDATE。
  */
 public abstract class AbstractEntry implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -28,16 +29,24 @@ public abstract class AbstractEntry implements Serializable {
     return curVersion != saveVersion;
   }
 
+  /** 字段发生业务变更时递增当前版本，生成代码通常在 setter 中调用。 */
   protected void autoAddCurVersion() {
     curVersion++;
   }
 
+  /**
+   * 初始化脏字段位图。
+   *
+   * @param fieldCount 可跟踪的普通数据库字段数量，不包含自增主键
+   */
   protected final void initDirtyState(int fieldCount) {
     this.dirtyState = fieldCount <= 0 ? null : BitSwitchState.of(fieldCount);
   }
 
+  /** 返回字段索引到数据库列名的映射，由生成的 Entry 实现。 */
   protected abstract String[] allDirtyFieldNames();
 
+  /** 标记指定字段索引已变更。 */
   protected final void markFieldDirty(int fieldIndex) {
     if (dirtyState == null) {
       return;
@@ -45,6 +54,7 @@ public abstract class AbstractEntry implements Serializable {
     dirtyState.enable(fieldIndex);
   }
 
+  /** 返回当前变更过的数据库列名，用于生成局部 UPDATE。 */
   public final String[] getDirtyFieldNames() {
     String[] dirtyFieldNames = allDirtyFieldNames();
     if (dirtyState == null || dirtyFieldNames == null || dirtyFieldNames.length == 0) {
@@ -66,6 +76,7 @@ public abstract class AbstractEntry implements Serializable {
     return result;
   }
 
+  /** 标记对象已经和数据库同步，并清空脏字段状态。 */
   public final void markPersisted() {
     saveVersion = curVersion;
     if (dirtyState != null) {

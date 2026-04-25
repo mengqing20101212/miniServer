@@ -8,6 +8,9 @@ import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 游戏服玩家相关模型，承载玩家连接状态、持久化数据或模块数据。
+ */
 @ProtobufClass
 @EnableZigZap
 public class PlayerModuleData {

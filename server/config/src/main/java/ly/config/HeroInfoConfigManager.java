@@ -14,9 +14,8 @@ import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
 import org.slf4j.Logger;
 
-/*
- * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
- * File: HeroInfoConfigManager
+/**
+ * 配置管理器，负责加载指定配置文件并提供按 id 或列表查询的访问入口。
  */
 public class HeroInfoConfigManager implements InterfaceConfigManagerProxy {
   AtomicBoolean switched = new AtomicBoolean(false);

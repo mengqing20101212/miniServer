@@ -13,6 +13,9 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * 启动配置加载器，从 STARTUP.SKILL.md 读取默认参数并校验各服务启动配置。
+ */
 public final class StartupSkillLoader {
     private static final String SKILL_FILE_NAME = "STARTUP.SKILL.md";
     private static final ObjectMapper YAML_MAPPER = new ObjectMapper(new YAMLFactory());

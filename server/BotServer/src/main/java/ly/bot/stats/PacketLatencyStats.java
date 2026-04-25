@@ -9,12 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 包延迟统计类
- * 统计每个上行包和下行包的时间差
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: PacketLatencyStats
+ * 机器人统计组件，用于记录协议延迟、响应分布和压测指标。
  */
 public class PacketLatencyStats {
     private static final Logger logger = LoggerDef.SystemLogger;

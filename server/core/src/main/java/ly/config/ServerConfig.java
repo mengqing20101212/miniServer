@@ -1,9 +1,7 @@
 package ly.config;
 
-/*
- * Author: liuYang
- * Date: 2025/4/3
- * File: ServerConfig
+/**
+ * 公共配置模型或枚举，描述服务器启动、数据库、Redis 和模块开关等基础参数。
  */
 public class ServerConfig {
 

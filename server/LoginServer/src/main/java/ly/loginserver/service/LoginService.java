@@ -24,10 +24,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-/*
- * Author: liuYang
- * Date: 2025/4/14
- * File: LoginService
+/**
+ * 登录服业务服务，封装账号创建、token 维护以及可用网关/游戏服选择逻辑。
  */
 @Service
 public class LoginService {

@@ -3,6 +3,9 @@ package ly;
 import ly.db.AutoTableService;
 import ly.db.MysqlService;
 
+/**
+ * 测试类，用于验证该模块的连接、生成器或工具方法行为。
+ */
 public class AutoTableServiceTest {
     public static void main(String[] args) {
         try {

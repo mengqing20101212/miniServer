@@ -9,6 +9,9 @@ import ly.db.entry.PlayerEntry;
 import ly.utils.BitSwitchState;
 import org.junit.Test;
 
+/**
+ * 测试类，用于验证该模块的连接、生成器或工具方法行为。
+ */
 public class AbstractEntryDirtyStateTest {
   @Test
   public void playerEntryShouldTrackDirtyFields() {

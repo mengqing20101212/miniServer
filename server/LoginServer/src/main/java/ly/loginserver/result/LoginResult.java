@@ -1,9 +1,7 @@
 package ly.loginserver.result;
 
-/*
- * Author: liuYang
- * Date: 2025/4/14
- * File: LoginResult
+/**
+ * 登录服 HTTP 返回结构，统一封装错误码、错误信息和接口数据。
  */
 public class LoginResult<T> {
   int result;
@@ -56,11 +54,11 @@ public class LoginResult<T> {
     this.data = data;
   }
 
-  public static <T> LoginResult success(T data) {
-    return new LoginResult(ErrorCode.OK, data);
+  public static <T> LoginResult<T> success(T data) {
+    return new LoginResult<>(ErrorCode.OK, data);
   }
 
-  public static LoginResult fail(ErrorCode failCode) {
-    return new LoginResult(failCode, null);
+  public static <T> LoginResult<T> fail(ErrorCode failCode) {
+    return new LoginResult<>(failCode, null);
   }
 }

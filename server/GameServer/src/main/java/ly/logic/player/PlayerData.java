@@ -4,6 +4,9 @@ import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import ly.db.entry.PlayerEntry;
 
+/**
+ * 游戏服玩家相关模型，承载玩家连接状态、持久化数据或模块数据。
+ */
 public class PlayerData {
     final PlayerEntry playerEntry;
     PlayerModuleData moduleData;

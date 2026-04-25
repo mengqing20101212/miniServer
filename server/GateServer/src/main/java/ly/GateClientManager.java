@@ -5,6 +5,9 @@ import ly.net.GateClient;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 网关侧客户端管理器，维护会话 id 与网关客户端对象的映射关系。
+ */
 public class GateClientManager {
     private static GateClientManager gateClientManager = new GateClientManager();
 

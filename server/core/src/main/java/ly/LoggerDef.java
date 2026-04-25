@@ -4,6 +4,11 @@ package ly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 项目统一日志入口。
+ * <p>
+ * 按系统、数据库、网络和协议拆分 logger 名称，便于 logback/log4j 按模块落盘和过滤。
+ */
 public class LoggerDef {
 
     public final static Logger SystemLogger = LoggerFactory.getLogger("systemLogger");

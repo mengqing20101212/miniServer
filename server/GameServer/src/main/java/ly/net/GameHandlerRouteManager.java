@@ -12,6 +12,9 @@ import ly.proto.Cmd;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 游戏服管理器，维护对应业务对象的生命周期和查询入口。
+ */
 public class GameHandlerRouteManager extends HandlerRouterManager {
     private static final GameHandlerRouteManager instance = new GameHandlerRouteManager();
     Map<Integer, GameHandlerRouter<? extends AbstractMessage>> gameHandlerRouterMap = new HashMap<>();
@@ -27,7 +30,6 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
     /**
      * 执行（自动类型检查 + 安全强转）
      */
-    @SuppressWarnings("unchecked")
     public static void execute(GameConnectSession session, AbstractMessagePacket packet) {
         try {
             final int cmd = packet.getCmd();

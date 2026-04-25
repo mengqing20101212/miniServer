@@ -4,10 +4,8 @@ import javax.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/*
- * Author: liuYang
- * Date: 2025/4/11
- * File: LoginServerConfig
+/**
+ * 登录服本地配置模型，承载 Spring 与公共启动流程需要读取的登录服参数。
  */
 @Component
 @ConfigurationProperties(prefix = "loginserver")

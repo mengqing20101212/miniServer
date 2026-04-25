@@ -15,6 +15,9 @@ import ly.proto.Server;
 import ly.utils.TimeStatisticsUtils;
 import ly.utils.TimeUtils;
 
+/**
+ * 游戏服玩家相关模型，承载玩家连接状态、持久化数据或模块数据。
+ */
 public class Player {
     private GamePlayer gamePlayer;
     private PlayerData playerData;

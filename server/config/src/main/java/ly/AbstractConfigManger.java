@@ -2,10 +2,8 @@ package ly;
 
 import org.slf4j.Logger;
 
-/*
- * Author: liuYang
- * Date: 2025/3/31
- * File: AbstractConfigManger
+/**
+ * AbstractConfigManger 的核心定义，承载所在包对应的业务模型或辅助逻辑。
  */
 public abstract class AbstractConfigManger {
 

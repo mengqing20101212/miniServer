@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 
+/**
+ * 数据库访问组件，封装连接、元数据、实体脏标记和增删改查操作。
+ */
 public class MysqlServiceTypeConversionTest {
   @Test
   public void packetEntryShouldConvertCommonMysqlTypes() {

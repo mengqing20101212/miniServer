@@ -19,6 +19,9 @@ import ly.rpc.RpcNodeConnector;
 import ly.rpc.RpcService;
 import ly.rpc.RpcUtils;
 
+/**
+ * 网关侧协议控制器，处理客户端登录/登出并转发到后端游戏服。
+ */
 public class GateLoginController implements IGateController {
 
     @Override

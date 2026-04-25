@@ -9,11 +9,15 @@ import org.slf4j.Logger;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * 机器人 HTTP 客户端，负责从登录服获取注册、服务器列表等外部信息。
+ */
 public class HttpServerListClient {
     private static final Logger logger = LoggerDef.SystemLogger;
     @SuppressWarnings("unused")
@@ -102,7 +106,7 @@ public class HttpServerListClient {
         try {
             logger.debug("request login server: {}", urlString);
 
-            URL url = new URL(urlString);
+            URL url = new URI(urlString).toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type", "application/json");

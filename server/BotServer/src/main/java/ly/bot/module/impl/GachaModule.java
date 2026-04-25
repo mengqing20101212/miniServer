@@ -9,11 +9,7 @@ import ly.net.NetClient;
 import java.util.Random;
 
 /**
- * 抽卡模块 - 依赖货币模块进行抽卡操作
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: GachaModule
+ * 机器人行为模块，封装登录、心跳、移动、战斗等可组合行为能力。
  */
 public class GachaModule implements RobotModule {
     private boolean completed = false;

@@ -1,10 +1,7 @@
 package ly.config;
 
-/*
- * 服务器 类型
- * Author: liuYang
- * Date: 2025/4/7
- * File: ServerTypeEnum
+/**
+ * 公共配置模型或枚举，描述服务器启动、数据库、Redis 和模块开关等基础参数。
  */
 public enum ServerTypeEnum {
     GAME("GAME", "游戏服"),

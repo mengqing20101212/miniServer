@@ -18,6 +18,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 到远端服务器节点的 TCP 客户端。
+ * <p>
+ * 主要用于服务器间 RPC，也可用于测试客户端。发送时会自动维护 seq；接收包进入本地队列，
+ * 同步 RPC 通过 seq 和响应 cmd 从队列中匹配结果。
+ */
 public class NetClient {
     static Logger logger = LoggerDef.NetLogger;
 
@@ -57,6 +63,11 @@ public class NetClient {
         return host + ":" + port;
     }
 
+    /**
+     * 在指定 EventLoopGroup 上启动连接。
+     * <p>
+     * 连接本身是异步建立的，调用方应通过 {@link #isReady()} 判断是否已经拿到 sid。
+     */
     public void start(EventLoopGroup group) {
         this.group = group;
         connectOnce();
@@ -106,6 +117,11 @@ public class NetClient {
         }
     }
 
+    /**
+     * 发送服务器间 protobuf 消息。
+     *
+     * @return 本次发送使用的 seq；发送失败返回 -1
+     */
     public int sendS2SMessage(long guid, int cmd, AbstractMessage protoData) {
         final int seq = sendSeq.getAndIncrement();
         AbstractMessagePacket messagePacket =
@@ -136,6 +152,11 @@ public class NetClient {
         return channel != null && channel.isActive();
     }
 
+    /**
+     * 发送已有协议包。
+     * <p>
+     * 若包内 sid 为 0，会填入当前连接握手得到的 sid；若 seq 为 0，则分配新的自增序号。
+     */
     public boolean send(AbstractMessagePacket packet) {
         if (isConnected()) {
             sendPacket(packet);
@@ -215,6 +236,11 @@ public class NetClient {
         return sid;
     }
 
+    /**
+     * 从接收队列中查找指定请求的响应包。
+     * <p>
+     * 当前实现会扫描队列并移除匹配项；非匹配包会保留在队列中，供后续业务继续读取。
+     */
     public AbstractMessagePacket getReceiveMsgBySeq(int sendSeq, int cmd) {
         Iterator<AbstractMessagePacket> iterator = receivePacketQueue.iterator();
         while (iterator.hasNext()) {

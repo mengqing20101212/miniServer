@@ -12,6 +12,9 @@ import ly.utils.TimeUtils;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 游戏服管理器，维护对应业务对象的生命周期和查询入口。
+ */
 public class PlayerManager {
     long createPlayerId = 1;
     private static final PlayerManager instance = new PlayerManager();

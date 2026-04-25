@@ -2,6 +2,12 @@ package ly.utils;
 
 import java.util.Arrays;
 
+/**
+ * 紧凑的位开关集合。
+ * <p>
+ * 根据 bitLength 自动选择 byte、short、int、long 或 long[] 作为底层存储，主要用于
+ * Entry 脏字段跟踪这类“字段数量固定、只关心开关状态”的场景。
+ */
 public abstract class BitSwitchState {
     private final int bitLength;
 
@@ -12,6 +18,7 @@ public abstract class BitSwitchState {
         this.bitLength = bitLength;
     }
 
+    /** 按位数选择占用内存最小的实现。 */
     public static BitSwitchState of(int bitLength) {
         if (bitLength <= Byte.SIZE) {
             return new ByteBitSwitchState(bitLength);
@@ -40,6 +47,7 @@ public abstract class BitSwitchState {
         setEnabled(bitIndex, false);
     }
 
+    /** 统一检查 bit 下标，所有实现读写前都应调用。 */
     protected final void checkBitIndex(int bitIndex) {
         if (bitIndex < 0 || bitIndex >= bitLength) {
             throw new IndexOutOfBoundsException(
@@ -53,6 +61,7 @@ public abstract class BitSwitchState {
 
     public abstract void clear();
 
+    /** 返回底层原始存储值，主要用于调试或序列化。 */
     public abstract Object getRawValue();
 
     private static final class ByteBitSwitchState extends BitSwitchState {

@@ -10,10 +10,11 @@ import ly.LoggerDef;
 import ly.game.MiniPlayer;
 import org.slf4j.Logger;
 
-/*
- * Author: liuYang
- * Date: 2025/4/14
- * File: CacheService
+/**
+ * 进程内轻量缓存服务。
+ * <p>
+ * 每种数据类型共享一个 {@link CacheService} 实例，底层使用 Caffeine。缓存只保证本进程
+ * 内命中，不承担跨服一致性；跨服或可恢复数据应放 Redis/MySQL。
  */
 public class CacheService<T> {
   Logger logger = LoggerDef.SystemLogger;
@@ -28,27 +29,28 @@ public class CacheService<T> {
     this.classType = classType;
   }
 
-  static Map<String, CacheService> cacheServiceMap = new ConcurrentHashMap<>();
+  static Map<String, CacheService<?>> cacheServiceMap = new ConcurrentHashMap<>();
 
-  public static synchronized <T> CacheService getCacheService(Class<T> clazz) {
+  @SuppressWarnings("unchecked")
+  public static synchronized <T> CacheService<T> getCacheService(Class<T> clazz) {
     String className = clazz.getName();
     if (cacheServiceMap.containsKey(className)) {
-      return cacheServiceMap.get(className);
+      return (CacheService<T>) cacheServiceMap.get(className);
     }
     CacheService<T> service = new CacheService<>(clazz);
     cacheServiceMap.put(className, service);
     return service;
   }
 
-  public static CacheService getStringCacheService() {
+  public static CacheService<String> getStringCacheService() {
     return getCacheService(String.class);
   }
 
-  public static CacheService getIntegerCacheService() {
+  public static CacheService<Integer> getIntegerCacheService() {
     return getCacheService(Integer.class);
   }
 
-  public static CacheService getMiniPlayerCacheService() {
+  public static CacheService<MiniPlayer> getMiniPlayerCacheService() {
     return getCacheService(MiniPlayer.class);
   }
 
@@ -63,6 +65,11 @@ public class CacheService<T> {
    * @param supplier 需要加载的地方
    * @param keys key
    * @return
+   */
+  /**
+   * 先读本地缓存，未命中时执行 supplier 加载并写回缓存。
+   * <p>
+   * 适合“读多写少、允许短时间不一致”的对象，例如 MiniPlayer 摘要。
    */
   public T getWithSupplier(Supplier<T> supplier, String... keys) {
     String key = getKey(keys);
@@ -84,6 +91,7 @@ public class CacheService<T> {
     CACHE.put(key, data);
   }
 
+  /** 使用点号拼接多段 key，保持调用方 key 规则一致。 */
   public String getKey(String... params) {
     return String.join(".", params);
   }

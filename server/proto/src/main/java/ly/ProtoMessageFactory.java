@@ -4,10 +4,8 @@ import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import ly.proto.*;
 
-/*
- * Author: liuYang
- * Date: 2025/4/10
- * File: ProtoMessageFactory
+/**
+ * 工厂类，集中创建对应类型对象以隔离调用方和具体实现。
  */
 public class ProtoMessageFactory {
   public static AbstractMessage createProtoMessage(int cmd, byte[] data) {

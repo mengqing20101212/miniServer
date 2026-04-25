@@ -7,6 +7,9 @@ import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 
+/**
+ * 网关连接会话，封装客户端连接、收发队列和网关转发所需状态。
+ */
 public class GateConnectSession extends ConnectSession {
     public GateConnectSession(long guid) {
         super(guid);

@@ -15,10 +15,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.StringUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-/*
- * Author: liuYang
- * Date: 2025/4/1
- * File: ParserExcelConfig
+/**
+ * 配置表数据模型，对应 Excel 导出的单条配置记录。
  */
 public class ParserExcelConfig {
   final String excelFileDir;

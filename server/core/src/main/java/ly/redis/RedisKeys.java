@@ -1,9 +1,7 @@
 package ly.redis;
 
-/*
- * Author: liuYang
- * Date: 2025/4/11
- * File: RedisKeys
+/**
+ * Redis 工具/配置组件，封装缓存键、连接池和常用 Redis 操作。
  */
 public enum RedisKeys {
 

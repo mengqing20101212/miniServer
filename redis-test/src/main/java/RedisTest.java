@@ -1,5 +1,8 @@
 import redis.clients.jedis.Jedis;
 
+/**
+ * 测试类，用于验证该模块的连接、生成器或工具方法行为。
+ */
 public class RedisTest {
     public static void main(String[] args) {
         try {

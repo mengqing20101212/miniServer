@@ -5,11 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/*
- * db entry实体类注解 用于 entry SQL Java bean映射
- * Author: liuYang
- * Date: 2025/4/3
- * File: RandomUtils
+/**
+ * 数据库访问组件，封装连接、元数据、实体脏标记和增删改查操作。
  */
 public class DbMeta {
 

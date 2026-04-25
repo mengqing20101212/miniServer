@@ -10,6 +10,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 import javax.annotation.PostConstruct;
 
+/**
+ * 登录服的 Spring Boot 启动类，负责启动 HTTP 登录服务并接入公共启动配置。
+ */
 @SpringBootApplication
 @EnableConfigurationProperties(LoginServerConfig.class)
 public class LoginServerApplication {

@@ -1,9 +1,7 @@
 package ly.config;
 
-/*
- * Author: liuYang
- * Date: 2025/4/7
- * File: RedisConfig
+/**
+ * Redis 工具/配置组件，封装缓存键、连接池和常用 Redis 操作。
  */
 public class RedisConfig {
   public String host;

@@ -8,6 +8,9 @@ import ly.proto.Cmd;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
+/**
+ * 游戏服玩家相关模型，承载玩家连接状态、持久化数据或模块数据。
+ */
 public class GamePlayer {
     private final GameConnectSession session;
     private String account;

@@ -6,6 +6,12 @@ import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
 import org.slf4j.Logger;
 
+/**
+ * 客户端 Netty 入站处理器。
+ * <p>
+ * 每个 Channel 在连接建立时会绑定一个 {@link NetClient}，收到的包会转入该客户端的
+ * receive 队列，供 RPC 同步等待或调用方批量读取。
+ */
 public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePacket> {
     static Logger logger = LoggerDef.SystemLogger;
 
@@ -52,7 +58,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePa
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
         logger.info("ClientHandler channelActive 客户端连接成功 {}, remote: {}", ctx.channel().id().asLongText(), ctx.channel().remoteAddress());
-        // 连接成功 请求 sessionId
+        // 连接成功后先发送 ACK 握手包，请求服务端分配 sid。
         ctx.channel().writeAndFlush(new AbstractMessagePacket(0));
     }
 }

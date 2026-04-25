@@ -1,9 +1,7 @@
 package ly.config;
 
-/*
- * Author: liuYang
- * Date: 2025/4/7
- * File: DbConfig
+/**
+ * 数据库访问组件，封装连接、元数据、实体脏标记和增删改查操作。
  */
 public class DbConfig {
   // DB 相关

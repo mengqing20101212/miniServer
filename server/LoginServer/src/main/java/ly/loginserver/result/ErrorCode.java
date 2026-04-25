@@ -1,9 +1,7 @@
 package ly.loginserver.result;
 
-/*
- * Author: liuYang
- * Date: 2025/4/14
- * File: ErrorCode
+/**
+ * 登录服 HTTP 返回结构，统一封装错误码、错误信息和接口数据。
  */
 public enum ErrorCode {
   OK(0, "成功"),

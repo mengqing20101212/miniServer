@@ -3,10 +3,8 @@ package ly.utils;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
-/*
- * Author: liuYang
- * Date: 2025/4/3
- * File: RandomUtils
+/**
+ * 公共工具类，提供时间、随机、位图、KV 解析或通用数据结构等辅助能力。
  */
 public class RandomUtils {
     private static final String LETTERS_NUMBERS =

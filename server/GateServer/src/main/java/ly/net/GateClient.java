@@ -9,6 +9,9 @@ import ly.proto.Server;
 import ly.rpc.RpcNodeConnector;
 import ly.rpc.RpcService;
 
+/**
+ * 网关客户端对象，保存账号、token、目标游戏服和长连接上下文。
+ */
 public class GateClient {
     private static final int LOGIN_RPC_TIMEOUT_MS = 10_000;
 

@@ -6,6 +6,9 @@ import ly.config.ServerConfig;
 import ly.db.MysqlService;
 import ly.redis.RedisUtils;
 
+/**
+ * 公共服务器启动示例或独立运行入口，用于本地验证网络框架。
+ */
 public class StandaloneServer {
     public static void main(String[] args) {
         System.out.println("启动独立服务器模式...");

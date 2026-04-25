@@ -15,11 +15,8 @@ import java.util.List;
 import java.util.Map;
 import org.apache.poi.util.StringUtil;
 
-/*
- * Author: liuYang
- * Date: 2025/4/1
- * File: ParserDbEntry
- * 根据数据库的MySQL表结构 生成 指定的Java entry文件
+/**
+ * 数据库实体生成工具，读取表结构并生成 Entry 与 Helper 访问代码。
  */
 public class ParserDbEntry {
   String jdbcUrl = "jdbc:mysql://118.25.76.117:3306/pick_money";

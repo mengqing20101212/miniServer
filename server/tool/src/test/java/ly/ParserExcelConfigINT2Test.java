@@ -2,6 +2,9 @@ package ly;
 
 import org.junit.Test;
 
+/**
+ * Excel 配置生成工具，读取策划表并生成 Java 配置类、管理器和文本配置。
+ */
 public class ParserExcelConfigINT2Test {
 
     // 由于makeStr是内部类的方法，我们无法直接测试

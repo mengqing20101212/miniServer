@@ -2,6 +2,7 @@ package ly.redis;
 
 import java.util.Collections;
 import java.util.List;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -15,12 +16,12 @@ import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.slf4j.Logger;
 
-/*
- * Author: liuYang
- * Date: 2025/4/11
- * File: RedisUtils
- *
- * 说明：Redis 工具类，封装了 Redisson 的常用操作。
+/**
+ * Redis 工具/配置组件，封装缓存键、连接池和常用 Redis 操作。
+ * <p>
+ * 这是面向业务代码的静态门面，底层统一使用 Redisson。调用方需要先在
+ * {@link ly.ServerContext#startUp(String, String, String, String, ly.net.GameObjectProvider)}
+ * 中完成 {@link #init()}，否则所有读写都会失败并记录日志。
  */
 public class RedisUtils {
   static Logger logger = LoggerDef.DbLogger;
@@ -100,6 +101,12 @@ public class RedisUtils {
     }
   }
 
+  /**
+   * 设置带过期时间的 key。
+   * <p>
+   * Redisson 新版本使用 {@link Duration} 表达 TTL，这里把调用方传入的 TimeUnit 统一转换成
+   * 毫秒，保持旧调用方式不变。
+   */
   public static void setWithExpire(String key, Object value, long expire, TimeUnit timeUnit) {
     if (redissonClient == null) {
       logger.error("[Redis] setWithExpire SET 操作失败: RedissonClient 未初始化");
@@ -119,7 +126,7 @@ public class RedisUtils {
     long start = System.nanoTime();
     try {
       RBucket<Object> bucket = redissonClient.getBucket(key);
-      bucket.set(value, expire, timeUnit);
+      bucket.set(value, Duration.ofMillis(timeUnit.toMillis(expire)));
       long cost = System.nanoTime() - start;
       if (logger.isDebugEnabled()) {
         logger.debug("[Redis] setWithExpire SET key='{}' 耗时={}μs", key, cost / 1000);
@@ -184,7 +191,12 @@ public class RedisUtils {
     }
   }
 
-  /** 判断 key 是否存在 */
+  /**
+   * 判断 key 是否存在。
+   * <p>
+   * 当前实现通过 GET 判空完成，适合本项目普通对象缓存；如果将来需要区分“key 存在但值为
+   * null”的场景，应改为 Redisson 的 bucket.isExists()。
+   */
   public static boolean exists(String key) {
     if (key == null || key.trim().isEmpty()) {
       logger.error("[Redis] exists 操作失败: key 不能为空");
@@ -294,7 +306,12 @@ public class RedisUtils {
     }
   }
 
-  /** 获取分布式锁（指定超时时间） */
+  /**
+   * 获取分布式锁。
+   * <p>
+   * waitTime 固定为 0，表示不排队等待；拿不到锁会立刻返回 false。{@code timeout}
+   * 是锁租约时间，超时后 Redisson 会自动释放。
+   */
   public static boolean lock(String key, long timeout, TimeUnit unit) {
     long start = System.nanoTime();
     try {
@@ -335,7 +352,12 @@ public class RedisUtils {
     }
   }
 
-  /** 使用分布式锁执行回调函数（带超时时间） */
+  /**
+   * 使用分布式锁执行回调函数。
+   * <p>
+   * callback 的 Boolean 参数表示是否真正拿到锁。只有拿到锁时才会在 finally 中释放，
+   * 避免误释放其他线程持有的锁。
+   */
   public static void lockWithCallBack(
       String key, long timeout, TimeUnit unit, Function<Boolean, Void> callback) {
     boolean locked = false;

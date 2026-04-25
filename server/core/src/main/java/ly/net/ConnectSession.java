@@ -12,10 +12,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-/*
- * Author: liuYang
- * Date: 2025/4/9
- * File: GameObject
+/**
+ * 单个长连接在业务层的会话对象。
+ * <p>
+ * 它不直接持有 Netty Channel，而是通过 {@link Connector} 间接写包。收到的包进入
+ * receive 队列，由业务线程主动拉取；待发送的包进入 send 队列，由
+ * {@link NetService} 的发送任务批量刷新。
  */
 public class ConnectSession {
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(ConnectSession.class);
@@ -29,12 +31,10 @@ public class ConnectSession {
      */
     int lastReceivedSeq;
 
-    /***
-     * 异步 待发送的消息放在这里面，之后 单独线程统一 10ms 定时发送，时间 间隔可以调整
-     */
+    /** 待异步发送的消息队列，由 NetService 后台任务统一 flush。 */
     Queue<AbstractMessagePacket> sendPacketQueue = new ConcurrentLinkedQueue<AbstractMessagePacket>();
 
-    /*** 所有收到的包都放在这个线程安全队列中，由业务层主动获取 */
+    /** 收到的业务包队列；Netty IO 线程只入队，业务逻辑自行 drain。 */
     BlockingQueue<AbstractMessagePacket> receivePacketQueue = new ArrayBlockingQueue<>(1024);
 
     public ConnectSession(long guid) {
@@ -53,8 +53,11 @@ public class ConnectSession {
         this.connector = connector;
     }
 
-    /***
-     * 添加收到的包
+    /**
+     * 添加收到的包。
+     * <p>
+     * 默认会做空包和 seq 连续性校验，子类可通过
+     * {@link #checkAddReceivePacket(AbstractMessagePacket)} 补充业务校验。
      */
     public void addReceivePacket(AbstractMessagePacket packet) {
         if (!canAddReceivePacket(packet))
@@ -65,6 +68,12 @@ public class ConnectSession {
         this.lastReceivedSeq = packet.getSeq();
     }
 
+    /**
+     * 判断包是否允许进入 receive 队列。
+     * <p>
+     * seq 为 0 的包被视为无序列要求，非 0 包必须严格递增，用于尽早发现客户端漏包、
+     * 重放或乱序。
+     */
     public boolean canAddReceivePacket(AbstractMessagePacket packet) {
         if (packet == null) {
             logger.error("Can't add receive packet, packet is null");
@@ -83,6 +92,9 @@ public class ConnectSession {
         return checkAddReceivePacket(packet);
     }
 
+    /**
+     * 子类扩展点，例如网关/游戏服可在这里做登录态、cmd 白名单等检查。
+     */
     protected boolean checkAddReceivePacket(AbstractMessagePacket packet) {
         return true;
     }
@@ -110,6 +122,11 @@ public class ConnectSession {
         return false;
     }
 
+    /**
+     * 刷新当前会话待发送队列。
+     * <p>
+     * 如果某个包发送失败，会保留后续未 poll 的包，避免在连接不可用时继续空转写入。
+     */
     public void sendAllPackets() {
         if (connector != null) {
             AbstractMessagePacket sendPacket;
@@ -137,6 +154,9 @@ public class ConnectSession {
         return packets;
     }
 
+    /**
+     * 业务周期回调。基础会话不做处理，子类可用于心跳、超时或批量消息处理。
+     */
     public void tick() {
     }
 }

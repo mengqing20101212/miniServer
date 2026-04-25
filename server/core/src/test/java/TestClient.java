@@ -2,10 +2,8 @@ import ly.net.NetClient;
 import ly.net.NetClientManager;
 import ly.net.packet.AbstractMessagePacket;
 
-/*
- * Author: liuYang
- * Date: 2025/4/9
- * File: TestClient
+/**
+ * 测试类，用于验证该模块的连接、生成器或工具方法行为。
  */
 public class TestClient {
   public static void main(String[] args) {

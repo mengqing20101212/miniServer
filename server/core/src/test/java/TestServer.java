@@ -7,10 +7,8 @@ import ly.net.NetService;
 import ly.net.packet.MessagePacketFactory;
 import ly.net.packet.AbstractMessagePacket;
 
-/*
- * Author: liuYang
- * Date: 2025/4/9
- * File: TestServer
+/**
+ * 公共服务器启动示例或独立运行入口，用于本地验证网络框架。
  */
 public class TestServer {
     public static void main(String[] args) {

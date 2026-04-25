@@ -15,7 +15,12 @@ import ly.LoggerDef;
 import ly.utils.RandomUtils;
 import org.slf4j.Logger;
 
-/** 负责操作 MySQL，不是线程安全 */
+/**
+ * MySQL 底层连接器。
+ * <p>
+ * 负责创建 HikariCP 连接池、执行参数化 SQL，并把查询结果转换为列名到值的 Map。
+ * 单个方法内部会从连接池获取独立 Connection；类字段本身不保存事务上下文。
+ */
 public class MysqlConnector {
   private static final String MYSQL_REQUIRED_PARAMS =
       "useSSL=false&allowPublicKeyRetrieval=true&connectTimeout=8000&socketTimeout=8000";
@@ -50,6 +55,11 @@ public class MysqlConnector {
     }
   }
 
+  /**
+   * 带重试创建连接池。
+   * <p>
+   * HikariDataSource 构造成功不代表数据库可用，因此每次创建后都会立即取连接验证。
+   */
   private HikariDataSource createDataSourceWithRetry(
       String jdbcUrl,
       String username,
@@ -123,6 +133,11 @@ public class MysqlConnector {
     }
   }
 
+  /**
+   * 补齐 MySQL 连接必需参数。
+   * <p>
+   * 避免本地 MySQL 8 公钥获取、SSL 和网络超时参数缺失导致启动卡死或握手失败。
+   */
   private static String normalizeJdbcUrl(String jdbcUrl) {
     if (jdbcUrl == null || jdbcUrl.isBlank() || !jdbcUrl.startsWith("jdbc:mysql://")) {
       return jdbcUrl;
@@ -164,6 +179,11 @@ public class MysqlConnector {
     }
   }
 
+  /**
+   * 执行查询 SQL。
+   *
+   * @return 每行以数据库列名为 key 的 Map；异常时返回已收集结果或空列表
+   */
   public List<Map<String, Object>> select(String sql, Object... params) {
     long startTime = System.currentTimeMillis();
     List<Map<String, Object>> resultList = new ArrayList<>();

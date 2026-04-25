@@ -7,6 +7,9 @@ import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 
+/**
+ * 游戏服连接会话，封装网络连接与玩家协议包收发逻辑。
+ */
 public class GameConnectSession extends ConnectSession {
     public GameConnectSession(long guid) {
         super(guid);

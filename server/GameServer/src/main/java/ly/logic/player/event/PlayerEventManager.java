@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
+/**
+ * 游戏服管理器，维护对应业务对象的生命周期和查询入口。
+ */
 public class PlayerEventManager {
     Map<PlayerEventType, List<IPlayerEvent>> eventHandlerMap = new HashMap<>();
     ArrayBlockingQueue<PlayerEventParam> eventQueue = new ArrayBlockingQueue<>(1024);

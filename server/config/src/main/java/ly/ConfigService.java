@@ -7,10 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 
-/*
- * Author: liuYang
- * Date: 2025/3/31
- * File: ConfigService
+/**
+ * 配置服务入口，统一加载所有配置管理器并支持配置热更新。
  */
 public class ConfigService {
 
@@ -50,7 +48,7 @@ public class ConfigService {
             .forEach(
                 file -> {
                   try {
-                    Class c = Class.forName("ly.config." + file.getName().replace(".class", ""));
+                    Class<?> c = Class.forName("ly.config." + file.getName().replace(".class", ""));
                     // 判断加载的类是否是 InterfaceConfigManager 的子类
                     if (!c.getSimpleName().equals(InterfaceConfigManagerProxy.class.getSimpleName())
                         && InterfaceConfigManagerProxy.class.isAssignableFrom(c)) {

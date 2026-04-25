@@ -9,11 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 模块管理器 - 管理机器人行为模块
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: ModuleManager
+ * ModuleManager 的核心定义，承载所在包对应的业务模型或辅助逻辑。
  */
 public class ModuleManager {
     private static final Logger logger = LoggerDef.SystemLogger;

@@ -7,10 +7,11 @@ import org.slf4j.Logger;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/*
- * Author: liuYang
- * Date: 2025/4/9
- * File: NetClientManager
+/**
+ * 出站 NetClient 管理器。
+ * <p>
+ * 复用到同一 ip:port 的客户端连接，并统一持有客户端使用的 worker EventLoopGroup。
+ * RPC 层通过这里创建和清理到其他服务器节点的 TCP 连接。
  */
 public class NetClientManager {
     static Logger logger = LoggerDef.SystemLogger;

@@ -11,6 +11,9 @@ import java.nio.file.Path;
 import java.util.List;
 import org.junit.Test;
 
+/**
+ * 数据库实体生成工具，读取表结构并生成 Entry 与 Helper 访问代码。
+ */
 public class ParserDbEntryTest {
   @Test
   public void generatedEntryShouldContainDirtyFieldTracking() throws Exception {

@@ -6,6 +6,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * 工具模块命令入口，用于串联配置、协议和数据库代码生成流程。
+ */
 public class ToolMain {
   public static void main(String[] args) {
     String type = args[0];

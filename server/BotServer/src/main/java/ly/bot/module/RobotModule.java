@@ -6,11 +6,7 @@ import ly.net.NetClient;
 import java.util.List;
 
 /**
- * 机器人模块接口 - 定义行为模块
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: RobotModule
+ * 机器人行为模块，封装登录、心跳、移动、战斗等可组合行为能力。
  */
 public interface RobotModule {
     

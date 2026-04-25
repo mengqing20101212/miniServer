@@ -7,11 +7,7 @@ import ly.bot.session.RobotSession;
 import ly.net.NetClient;
 
 /**
- * 登录模块 - 处理登录相关行为
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: LoginModule
+ * 机器人行为模块，封装登录、心跳、移动、战斗等可组合行为能力。
  */
 public class LoginModule implements RobotModule {
     private boolean completed = false;

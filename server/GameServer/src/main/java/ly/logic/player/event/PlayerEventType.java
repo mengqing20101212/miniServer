@@ -1,5 +1,8 @@
 package ly.logic.player.event;
 
+/**
+ * 游戏服玩家相关模型，承载玩家连接状态、持久化数据或模块数据。
+ */
 public enum PlayerEventType {
     PLAYER_LOAD_DATA_COMPLETE,//玩家数据加载完成
     PLAYER_CREATE_COMPLETE,//玩家创建完成

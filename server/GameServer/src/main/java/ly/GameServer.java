@@ -9,7 +9,7 @@ import ly.net.GameConnectSessionProvider;
 import ly.startup.StartupSkillLoader;
 
 /**
- * Hello world!
+ * 游戏服启动入口，初始化公共上下文并注册游戏逻辑控制器。
  */
 public class GameServer {
     public static void main(String[] args) {

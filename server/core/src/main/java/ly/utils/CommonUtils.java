@@ -7,10 +7,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import ly.ServerContext;
 import ly.config.ServerConfig;
 
-/*
- * Author: liuYang
- * Date: 2025/4/7
- * File: CommonUtils
+/**
+ * 公共工具类，提供时间、随机、位图、KV 解析或通用数据结构等辅助能力。
  */
 public class CommonUtils {
     public static <T> T parserYaml(Class<T> clazz, String yamlStr) throws JsonProcessingException {

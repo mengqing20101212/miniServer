@@ -2,10 +2,8 @@ package ly;
 
 import org.slf4j.Logger;
 
-/*
- * Author: liuYang
- * Date: 2025/3/31
- * File: InterfaceConfigManager
+/**
+ * 配置管理器代理接口，用于统一触发配置加载和开关判断。
  */
 public interface InterfaceConfigManagerProxy {
   /**
