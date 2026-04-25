@@ -45,13 +45,26 @@ public class RedisUtils {
       }
       
       Config config = new Config();
-      config
-          .useSingleServer()
-          .setAddress(
-              String.format(
-                  "redis://%s:%d",
-                  ServerContext.serverConfig.redis.host, ServerContext.serverConfig.redis.port))
-          .setPassword(ServerContext.serverConfig.redis.password);
+      var singleServerConfig =
+          config
+              .useSingleServer()
+              .setAddress(
+                  String.format(
+                      "redis://%s:%d",
+                      ServerContext.serverConfig.redis.host, ServerContext.serverConfig.redis.port))
+              .setTimeout(ServerContext.serverConfig.redis.timeout > 0
+                  ? Math.max(ServerContext.serverConfig.redis.timeout, 8000)
+                  : 8000)
+              .setConnectTimeout(8000)
+              .setRetryAttempts(1)
+              .setRetryInterval(1000)
+              .setConnectionMinimumIdleSize(1)
+              .setConnectionPoolSize(1);
+
+      if (ServerContext.serverConfig.redis.password != null
+          && !ServerContext.serverConfig.redis.password.trim().isEmpty()) {
+        singleServerConfig.setPassword(ServerContext.serverConfig.redis.password);
+      }
 
       redissonClient = Redisson.create(config);
       logger.info(

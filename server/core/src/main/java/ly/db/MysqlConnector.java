@@ -2,7 +2,11 @@ package ly.db;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,23 +15,19 @@ import ly.LoggerDef;
 import ly.utils.RandomUtils;
 import org.slf4j.Logger;
 
-/** 负责操作MySQL,不是线程安全 Author: liuYang Date: 2025/4/3 File: MysqlConnector */
+/** 负责操作 MySQL，不是线程安全 */
 public class MysqlConnector {
+  private static final String MYSQL_REQUIRED_PARAMS =
+      "useSSL=false&allowPublicKeyRetrieval=true&connectTimeout=8000&socketTimeout=8000";
+  private static final int MYSQL_INIT_MAX_RETRIES = 5;
+  private static final long MYSQL_INIT_RETRY_SLEEP_MS = 2000;
+
   HikariDataSource dataSource;
   Logger logger = LoggerDef.DbLogger;
 
-  // SQL执行的最大超时时间
+  // SQL 执行的最大超时时间
   private final int SQL_MAX_OPT_TIMEOUT = 300;
 
-  /**
-   * @param jdbcUrl 数据库 URL
-   * @param username 数据库用户名
-   * @param password 数据库密码
-   * @param maxPoolSize 连接池最大连接数
-   * @param minIdle 最小空闲连接数
-   * @param idleTimeout 连接空闲时间
-   * @param connectionTimeout 连接超时时间
-   */
   public MysqlConnector(
       String jdbcUrl,
       String username,
@@ -36,37 +36,125 @@ public class MysqlConnector {
       int minIdle,
       int idleTimeout,
       int connectionTimeout) {
-    // 创建 Hikari 配置对象
-    HikariConfig config = new HikariConfig();
-    config.setJdbcUrl(jdbcUrl); // 数据库 URL
-    config.setUsername(username); // 数据库用户名
-    config.setPassword(password); // 数据库密码
-    config.setDriverClassName("com.mysql.cj.jdbc.Driver"); // MySQL 驱动
-    //
-    //    // 连接池参数
-    config.setMaximumPoolSize(maxPoolSize == 0 ? 10 : maxPoolSize); // 连接池最大连接数
-    config.setMinimumIdle(minIdle == 0 ? 2 : minIdle); // 最小空闲连接数
-    config.setIdleTimeout(idleTimeout == 0 ? 30000 : idleTimeout); // 连接空闲时间
-    config.setConnectionTimeout(connectionTimeout == 0 ? 2000 : connectionTimeout); // 连接超时时间
-    config.setMaxLifetime(1800000); // 连接最大生命周期（30分钟）
-    try {
-      dataSource = new HikariDataSource(config);
-    } catch (Exception e) {
-      logger.error(
-          String.format(
-              "数据库连接失败,请检查 jdbcUrl:%s, userName:%s, password:%s", jdbcUrl, username, password));
-      e.printStackTrace();
-    }
-    if (testConnect()) {
-      logger.info(String.format("数据库连接成功, jdbcUrl:%s", jdbcUrl));
+    String effectiveJdbcUrl = normalizeJdbcUrl(jdbcUrl);
+    dataSource =
+        createDataSourceWithRetry(
+            effectiveJdbcUrl, username, password, maxPoolSize, minIdle, idleTimeout, connectionTimeout);
+    if (dataSource != null && testConnect()) {
+      logger.info(String.format("database connection success, jdbcUrl:%s", effectiveJdbcUrl));
     } else {
       logger.error(
           String.format(
-              "数据库连接失败,请检查 jdbcUrl:%s, userName:%s, password:%s", jdbcUrl, username, password));
+              "database connection failed, check jdbcUrl:%s, userName:%s, password:%s",
+              effectiveJdbcUrl, username, password));
     }
   }
 
+  private HikariDataSource createDataSourceWithRetry(
+      String jdbcUrl,
+      String username,
+      String password,
+      int maxPoolSize,
+      int minIdle,
+      int idleTimeout,
+      int connectionTimeout) {
+    RuntimeException lastException = null;
+    for (int attempt = 1; attempt <= MYSQL_INIT_MAX_RETRIES; attempt++) {
+      HikariDataSource currentDataSource = null;
+      try {
+        currentDataSource =
+            new HikariDataSource(
+                buildConfig(jdbcUrl, username, password, maxPoolSize, minIdle, idleTimeout, connectionTimeout));
+        try (Connection ignored = currentDataSource.getConnection()) {
+          logger.info(
+              "database connection initialized on attempt {}/{}",
+              attempt,
+              MYSQL_INIT_MAX_RETRIES);
+          return currentDataSource;
+        }
+      } catch (Exception e) {
+        if (currentDataSource != null) {
+          currentDataSource.close();
+        }
+        lastException = new RuntimeException(e);
+        logger.warn(
+            "database init attempt {}/{} failed, jdbcUrl:{}, error:{}",
+            attempt,
+            MYSQL_INIT_MAX_RETRIES,
+            jdbcUrl,
+            e.getMessage());
+        if (attempt < MYSQL_INIT_MAX_RETRIES) {
+          sleepBeforeRetry();
+        }
+      }
+    }
+    if (lastException != null) {
+      lastException.printStackTrace();
+    }
+    return null;
+  }
+
+  private HikariConfig buildConfig(
+      String jdbcUrl,
+      String username,
+      String password,
+      int maxPoolSize,
+      int minIdle,
+      int idleTimeout,
+      int connectionTimeout) {
+    HikariConfig config = new HikariConfig();
+    config.setJdbcUrl(jdbcUrl);
+    config.setUsername(username);
+    config.setPassword(password);
+    config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+    config.setMaximumPoolSize(maxPoolSize == 0 ? 10 : maxPoolSize);
+    config.setMinimumIdle(minIdle == 0 ? 2 : minIdle);
+    config.setIdleTimeout(idleTimeout == 0 ? 30000 : idleTimeout);
+    config.setConnectionTimeout(connectionTimeout == 0 ? 2000 : connectionTimeout);
+    config.setMaxLifetime(1800000);
+    return config;
+  }
+
+  private void sleepBeforeRetry() {
+    try {
+      Thread.sleep(MYSQL_INIT_RETRY_SLEEP_MS);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+  }
+
+  private static String normalizeJdbcUrl(String jdbcUrl) {
+    if (jdbcUrl == null || jdbcUrl.isBlank() || !jdbcUrl.startsWith("jdbc:mysql://")) {
+      return jdbcUrl;
+    }
+    String normalizedJdbcUrl = jdbcUrl;
+    for (String param : MYSQL_REQUIRED_PARAMS.split("&")) {
+      String key = param.substring(0, param.indexOf('='));
+      if (!containsJdbcParam(normalizedJdbcUrl, key)) {
+        normalizedJdbcUrl += normalizedJdbcUrl.contains("?") ? "&" + param : "?" + param;
+      }
+    }
+    return normalizedJdbcUrl;
+  }
+
+  private static boolean containsJdbcParam(String jdbcUrl, String key) {
+    int queryStart = jdbcUrl.indexOf('?');
+    if (queryStart < 0 || queryStart == jdbcUrl.length() - 1) {
+      return false;
+    }
+    String[] params = jdbcUrl.substring(queryStart + 1).split("&");
+    for (String param : params) {
+      if (param.equals(key) || param.startsWith(key + "=")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private boolean testConnect() {
+    if (dataSource == null) {
+      return false;
+    }
     try (Connection connection = dataSource.getConnection()) {
       connection.prepareStatement("select 1;").executeQuery().close();
       return true;
@@ -95,17 +183,16 @@ public class MysqlConnector {
         if (logger.isDebugEnabled()) {
           logger.debug(
               String.format(
-                  "select 执行sql: %s , params: %s ,  耗时: %d 毫秒",
+                  "select sql:%s, params:%s, cost:%d ms",
                   sql, getParamStr(params), System.currentTimeMillis() - startTime));
         }
       }
     } catch (Exception e) {
       logger.error(
-          String.format(
-              "执行SQL(%s) 报错, params:%s, error:%s", sql, getParamStr(params), e.getMessage()));
+          String.format("execute SQL(%s) error, params:%s, error:%s", sql, getParamStr(params), e.getMessage()));
     }
     if (System.currentTimeMillis() - startTime >= SQL_MAX_OPT_TIMEOUT) {
-      logger.warn(String.format("执行SQL 耗时过长，请检查: %s , %s", sql, getParamStr(params)));
+      logger.warn(String.format("select SQL cost too long, check %s, %s", sql, getParamStr(params)));
     }
     return resultList;
   }
@@ -115,7 +202,7 @@ public class MysqlConnector {
       for (int i = 0; i < params.length; i++) {
         Object param = params[i];
         if (param == null) {
-          throw new RuntimeException("SQL 参数不可以为 null, 请设置一个默认值");
+          throw new RuntimeException("SQL param can not be null, please provide a default value");
         }
         st.setObject(i + 1, param);
       }
@@ -125,15 +212,15 @@ public class MysqlConnector {
   public void batchExecute(List<String> sqls, List<Object[]> paramList) {
     long startTime = System.currentTimeMillis();
     if (sqls == null || sqls.isEmpty()) {
-      logger.error("参数错误，sqls == null || sqls.isEmpty() ");
+      logger.error("invalid args: sqls == null || sqls.isEmpty()");
       return;
     }
     if (paramList == null || paramList.isEmpty()) {
-      logger.error("参数错误，paramList == null || paramList.isEmpty() ");
+      logger.error("invalid args: paramList == null || paramList.isEmpty()");
       return;
     }
     if (sqls.size() != paramList.size()) {
-      logger.error("参数错误，sqls.size() != paramList.size() ");
+      logger.error("invalid args: sqls.size() != paramList.size()");
       return;
     }
     int successCount = 0;
@@ -149,18 +236,17 @@ public class MysqlConnector {
           if (logger.isDebugEnabled()) {
             logger.debug(
                 String.format(
-                    "batchExecute 执行第 %d : %d 条sql:%s, params:%s %s,  耗时:%d  毫秒",
+                    "batchExecute item %d/%d sql:%s, params:%s %s, cost:%d ms",
                     i,
                     sqls.size(),
                     sql,
                     getParamStr(params),
-                    result ? "成功" : "失败",
+                    result ? "success" : "fail",
                     System.currentTimeMillis() - beginTime));
           }
         } catch (Exception e) {
           logger.error(
-              String.format(
-                  "执行SQL(%s) 报错, params:%s, error:%s", sql, getParamStr(params), e.getMessage()));
+              String.format("execute SQL(%s) error, params:%s, error:%s", sql, getParamStr(params), e.getMessage()));
           e.printStackTrace();
         }
       }
@@ -171,7 +257,7 @@ public class MysqlConnector {
     if (endTime - startTime >= SQL_MAX_OPT_TIMEOUT) {
       logger.warn(
           String.format(
-              "batchExecute 执行SQL, 耗时(%d 毫秒)过长, 执行成功数量:%d 请检查 size:%d",
+              "batchExecute cost(%d ms) too long, successCount:%d size:%d",
               System.currentTimeMillis() - startTime, successCount, sqls.size()));
     }
   }
@@ -186,21 +272,20 @@ public class MysqlConnector {
       if (logger.isDebugEnabled()) {
         logger.debug(
             String.format(
-                "execute 执行sql: %s , params: %s %s, 耗时: %d 毫秒",
+                "execute sql:%s, params:%s %s, cost:%d ms",
                 sql,
                 getParamStr(params),
-                result ? "成功" : "失败",
+                result ? "success" : "fail",
                 System.currentTimeMillis() - startTime));
       }
     } catch (Exception e) {
       logger.error(
-          String.format(
-              "执行SQL(%s) 报错, params:%s, error:%s", sql, getParamStr(params), e.getMessage()));
+          String.format("execute SQL(%s) error, params:%s, error:%s", sql, getParamStr(params), e.getMessage()));
       e.printStackTrace();
     }
     long endTime = System.currentTimeMillis();
     if (endTime - startTime >= SQL_MAX_OPT_TIMEOUT) {
-      logger.warn(String.format("执行SQL, 耗时过长, 请检查 %s, %s", sql, getParamStr(params)));
+      logger.warn(String.format("execute SQL cost too long, check %s, %s", sql, getParamStr(params)));
     }
     return result;
   }
@@ -227,22 +312,21 @@ public class MysqlConnector {
       if (logger.isDebugEnabled()) {
         logger.debug(
             String.format(
-                "executeInsertReturnKey 执行sql: %s , params: %s %s, key:%s, 耗时: %d 毫秒",
+                "executeInsertReturnKey sql:%s, params:%s %s, key:%s, cost:%d ms",
                 sql,
                 getParamStr(params),
-                result ? "成功" : "失败",
+                result ? "success" : "fail",
                 generatedKey,
                 System.currentTimeMillis() - startTime));
       }
     } catch (Exception e) {
       logger.error(
-          String.format(
-              "执行SQL(%s) 报错, params:%s, error:%s", sql, getParamStr(params), e.getMessage()));
+          String.format("execute SQL(%s) error, params:%s, error:%s", sql, getParamStr(params), e.getMessage()));
       e.printStackTrace();
     }
     long endTime = System.currentTimeMillis();
     if (endTime - startTime >= SQL_MAX_OPT_TIMEOUT) {
-      logger.warn(String.format("执行SQL, 耗时过长, 请检查 %s, %s", sql, getParamStr(params)));
+      logger.warn(String.format("execute SQL cost too long, check %s, %s", sql, getParamStr(params)));
     }
     return result ? generatedKey : null;
   }
@@ -261,15 +345,17 @@ public class MysqlConnector {
       }
     }
     if (params.length > 0) {
-      sb.delete(sb.length() - 2, sb.length()); // 移除最后的 ", "
+      sb.delete(sb.length() - 2, sb.length());
     }
     sb.append("]");
     return sb.toString();
   }
 
   public void shutdown() {
-    dataSource.close();
-    logger.info("数据库连接关闭");
+    if (dataSource != null) {
+      dataSource.close();
+    }
+    logger.info("database connection closed");
   }
 
   public static void main(String[] args) {
@@ -301,7 +387,7 @@ public class MysqlConnector {
 
   private static void testInster(MysqlConnector mysqlConnector) {
     String insterSql = "insert into share_enum_config (code,name,config_desc) values(?,?,?)";
-    mysqlConnector.execute(insterSql, "321231", "测试测试测测试", "4543543543");
+    mysqlConnector.execute(insterSql, "321231", "test", "4543543543");
   }
 
   private static void testSelect(MysqlConnector mysqlConnector) {

@@ -1,12 +1,17 @@
 package ly.net;
 
 import com.google.protobuf.ByteString;
-
 import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacketFactory;
+import ly.ProtoMessageFactory;
+import ly.proto.Cmd;
 import ly.proto.Server;
-import ly.rpc.RpcUtils;
+import ly.rpc.RpcNodeConnector;
+import ly.rpc.RpcService;
 
 public class GateClient {
+    private static final int LOGIN_RPC_TIMEOUT_MS = 10_000;
+
     private final GateConnectSession session;
     private String account;
     private long playerId;
@@ -58,35 +63,74 @@ public class GateClient {
         this.token = token;
     }
 
-    public void sendPacketToGameServer(AbstractMessagePacket csPacket) {
-        // 发送给游戏服务器
-        Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket);
-        if (resp != null) {
-            AbstractMessagePacket s2cPacket = PacketCompat.createPacket(
-                    getSessionGuid(), csPacket.getCmd(), csPacket.getSid(), csPacket.getSeq(), resp.getData().toByteArray());
-            sendPacketToClient(s2cPacket);
-        }
-
+    public String getGameServerId() {
+        return gameServerId;
     }
 
-    // 网关调用游戏服务器Rpc方法
-//    message csGate2GameRpcGameCall{
-//        int32 cmd = 1;// client 发送给gate 请求 cmd
-//        int32 sid = 2;// client 发送给gate 请求 会话id
-//        int64 guid = 3;// client 发送给gate 请求 玩家id
-//        int32 seq = 4;// client 发送给gate 请求 序列id
-//        bytes data = 5;// client 发送给gate 请求 数据
-//    }
+    public void setGameServerId(String gameServerId) {
+        this.gameServerId = gameServerId;
+    }
+
+    public void sendPacketToGameServer(AbstractMessagePacket csPacket) {
+        Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket);
+        if (resp != null) {
+            AbstractMessagePacket s2cPacket =
+                    PacketCompat.createPacket(
+                            getSessionGuid(),
+                            csPacket.getCmd(),
+                            csPacket.getSid(),
+                            csPacket.getSeq(),
+                            resp.getData().toByteArray());
+            sendPacketToClient(s2cPacket);
+        }
+    }
+
     public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(AbstractMessagePacket csPacket) {
-        // 发送给游戏服务器
+        RpcNodeConnector rpcNodeConnector = RpcService.getInstance().getRpcNodeConnector(gameServerId);
+        if (rpcNodeConnector == null || rpcNodeConnector.getClient() == null) {
+            return null;
+        }
+
+        int rpcSeq = rpcNodeConnector.getClient().getSendSeq();
         Server.csGate2GameRpcGameCall.Builder req = Server.csGate2GameRpcGameCall.newBuilder();
         req.setCmd(csPacket.getCmd());
         req.setSid(csPacket.getSid());
         req.setGuid(getSessionGuid());
-        req.setSeq(csPacket.getSeq());
+        // Keep inner and outer seq aligned so Game's wrapped response can be matched.
+        req.setSeq(rpcSeq);
         req.setData(ByteString.copyFrom(csPacket.getData()));
 
-        return RpcUtils.syncRequest(gameServerId, req.getGuid(), csPacket.getCmd(), req.build());
+        AbstractMessagePacket rpcPacket =
+                MessagePacketFactory.createAbstractMessagePacket(
+                        req.getGuid(),
+                        Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE,
+                        req.build(),
+                        rpcSeq,
+                        rpcNodeConnector.getClient().getSid());
+        if (!rpcNodeConnector.sendPacket(rpcPacket)) {
+            return null;
+        }
+
+        long deadline = System.currentTimeMillis() + LOGIN_RPC_TIMEOUT_MS;
+        while (System.currentTimeMillis() < deadline) {
+            AbstractMessagePacket response =
+                    rpcNodeConnector
+                            .getClient()
+                            .getReceiveMsgBySeq(rpcSeq, Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE);
+            if (response != null) {
+                return (Server.scGate2GameRpcGameCall)
+                        ProtoMessageFactory.createProtoMessage(
+                                Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, response.getData());
+            }
+
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return null;
+            }
+        }
+        return null;
     }
 
     public void sendPacketToClient(AbstractMessagePacket s2cPacket) {

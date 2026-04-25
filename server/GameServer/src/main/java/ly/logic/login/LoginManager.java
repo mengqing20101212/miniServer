@@ -8,9 +8,12 @@ import ly.logic.player.PlayerStatusEnum;
 import ly.logic.player.PlayerUtils;
 import ly.logic.player.event.PlayerEventType;
 import ly.net.GamePlayer;
+import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 import ly.proto.Login;
+import ly.proto.Server;
 import ly.redis.RedisKeys;
 import ly.redis.RedisUtils;
 
@@ -122,10 +125,14 @@ public class LoginManager {
             // 将玩家添加到在线玩家管理器
             PlayerManager.getInstance().addOnlinePlayer(onlinePlayer);
 
-            onlinePlayer.setGamePlayer(new GamePlayer(task.session));
-            onlinePlayer.getGamePlayer().setLastSeq(task.packet.getSeq());
-            onlinePlayer.getGamePlayer().setLastClientCmd(task.packet.getCmd());
-            onlinePlayer.getGamePlayer().setLastSid(task.packet.getSid());
+            GamePlayer gamePlayer = new GamePlayer(task.session);
+            gamePlayer.setAccount(task.request.getAccount());
+            gamePlayer.setPlayerId(onlinePlayer.getPlayerId());
+            gamePlayer.setToken(task.request.getToken());
+            gamePlayer.setLastSeq(task.packet.getSeq());
+            gamePlayer.setLastClientCmd(task.packet.getCmd());
+            gamePlayer.setLastSid(task.packet.getSid());
+            onlinePlayer.setGamePlayer(gamePlayer);
         }
 
 
@@ -150,7 +157,7 @@ public class LoginManager {
         res.setToken(onlinePlayer.getToken());
         res.setGameServerId(ServerContext.getServerId());
         res.setPlayerInfo(PlayerUtils.genPlayerInfo(onlinePlayer));
-        onlinePlayer.sendMsg(Cmd.CMD.SC_Login, res.build());
+        sendLoginResponse(task, onlinePlayer, res.build());
         onlinePlayer.statPlay();
 
 
@@ -171,6 +178,24 @@ public class LoginManager {
         req.setErrorCode(errorCode);
         // 发送错误消息到客户端
         task.session.sendClientMsg(Cmd.CMD.CS_ErrorCode_VALUE, task.packet.getSeq(), 0, req.build());
+    }
+
+    private void sendLoginResponse(LoginTask task, Player onlinePlayer, Login.scLogin response) {
+        if (task.packet.getSid() != 0) {
+            Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
+            builder.setData(response.toByteString());
+            AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
+                    onlinePlayer.getPlayerId(),
+                    Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE,
+                    builder.build(),
+                    task.packet.getSeq(),
+                    task.packet.getSid());
+            task.session.addSendPacket(packet);
+            LoggerDef.SystemLogger.info("LoginManager send wrapped login response, account={}, playerId={}, seq={}, sid={}",
+                    onlinePlayer.getAccount(), onlinePlayer.getPlayerId(), task.packet.getSeq(), task.packet.getSid());
+            return;
+        }
+        onlinePlayer.sendMsg(Cmd.CMD.SC_Login, response);
     }
 
     /**

@@ -13,9 +13,15 @@ public class PlayerData {
         Codec<PlayerModuleData> moduleDataCodec = ProtobufProxy
                 .create(PlayerModuleData.class);
         try {
-            moduleData = moduleDataCodec.decode(playerEntry.getModules());
+            byte[] modules = playerEntry.getModules();
+            if (modules == null || modules.length == 0) {
+                moduleData = new PlayerModuleData();
+            } else {
+                moduleData = moduleDataCodec.decode(modules);
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            moduleData = new PlayerModuleData();
         }
     }
 

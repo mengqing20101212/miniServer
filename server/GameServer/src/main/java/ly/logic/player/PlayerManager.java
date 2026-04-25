@@ -1,5 +1,7 @@
 package ly.logic.player;
 
+import com.baidu.bjf.remoting.protobuf.Codec;
+import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import ly.LoggerDef;
 import ly.db.entry.PlayerEntry;
 import ly.db.entry.PlayerEntryHelper;
@@ -54,10 +56,15 @@ public class PlayerManager {
         entry.setAccount(csLogin.getAccount());
         entry.setCreatetime(TimeUtils.now());
         entry.setLogintime(TimeUtils.now());
-        entry.setId(createPlayerId());
+        entry.setLogouttime(TimeUtils.now());
+        if (entry.getId() == null || entry.getId() <= 0) {
+            entry.setId(createPlayerId());
+        }
         entry.setLevel(PlayerConstant.INIT_PLAYER_LEVEL);
+        entry.setViplevel(0);
         entry.setGuidid(0L);
         entry.setName(csLogin.getPlayerName());
+        entry.setModules(createDefaultModules());
         PlayerEntryHelper.save(entry);
         Player newPlayer = createNewPlayer(entry);
         newPlayer.setStatus(PlayerStatusEnum.CREATE);
@@ -68,5 +75,15 @@ public class PlayerManager {
 
     public void addOnlinePlayer(Player player) {
         playerMap.put(player.getPlayerId(), player);
+    }
+
+    private byte[] createDefaultModules() {
+        try {
+            Codec<PlayerModuleData> codec = ProtobufProxy.create(PlayerModuleData.class);
+            return codec.encode(new PlayerModuleData());
+        } catch (Exception e) {
+            LoggerDef.SystemLogger.warn("create default player modules failed", e);
+            return null;
+        }
     }
 }

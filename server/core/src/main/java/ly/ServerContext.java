@@ -11,6 +11,7 @@ import ly.net.GameObjectProvider;
 import ly.net.IController;
 import ly.net.NetService;
 import ly.redis.RedisUtils;
+import ly.startup.StartupSkillLoader;
 import ly.db.AutoTableService;
 import org.slf4j.Logger;
 
@@ -59,6 +60,7 @@ public class ServerContext {
         }
         
         // 加载策划表
+        StartupSkillLoader.validateServerConfig(serverType, serverConfig);
         ConfigService.getInstance().loadAllConfig(logger, serverConfig.configPath);
         RedisUtils.init();
         MysqlService.getInstance().init(serverConfig.db.jdbcUrl, serverConfig.db.userName, serverConfig.db.passWord, 0, 0, 0, 0);

@@ -3,6 +3,7 @@ package ly.logic.player;
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.google.protobuf.AbstractMessage;
+import ly.LoggerDef;
 import ly.logic.player.event.PlayerEventManager;
 import ly.logic.player.event.PlayerEventType;
 import ly.net.GamePlayer;
@@ -62,8 +63,7 @@ public class Player {
             for (ModuleEnum moduleEnum : ModuleEnum.values()) {
                 TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()), 50);
                 byte[] moduleData = playerData.getModuleData(moduleEnum);
-                Codec<?> codec = ProtobufProxy.create(moduleEnum.getModule().getClass());
-                AbstractModule module = (AbstractModule) codec.decode(moduleData);
+                AbstractModule module = createModuleInstance(moduleEnum, moduleData);
                 module.init(this);
                 module.onLoadData();
                 moduleInitLog.LogEnd();
@@ -81,6 +81,24 @@ public class Player {
 //            setStatus(PlayerStatusEnum.INIT_FAILED);
         }
 
+    }
+
+    private AbstractModule createModuleInstance(ModuleEnum moduleEnum, byte[] moduleData) throws Exception {
+        Class<? extends AbstractModule> moduleClass = moduleEnum.getModule().getClass();
+        if (moduleData == null || moduleData.length == 0) {
+            return moduleClass.getDeclaredConstructor().newInstance();
+        }
+        try {
+            Codec<?> codec = ProtobufProxy.create(moduleClass);
+            return (AbstractModule) codec.decode(moduleData);
+        } catch (Exception e) {
+            LoggerDef.SystemLogger.warn(
+                    "init module fallback, playerId={}, module={}, reason={}",
+                    getPlayerId(),
+                    moduleClass.getSimpleName(),
+                    e.getMessage());
+            return moduleClass.getDeclaredConstructor().newInstance();
+        }
     }
 
     public void setStatus(PlayerStatusEnum playerStatusEnum) {
@@ -113,11 +131,13 @@ public class Player {
     }
 
     public int getLevel() {
-        return playerData.playerEntry.getLevel();
+        Integer level = playerData.playerEntry.getLevel();
+        return level == null ? 1 : level;
     }
 
     public int getVipLevel() {
-        return playerData.playerEntry.getViplevel();
+        Integer vipLevel = playerData.playerEntry.getViplevel();
+        return vipLevel == null ? 0 : vipLevel;
     }
 
     public long getLoginTime() {

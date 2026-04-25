@@ -41,6 +41,12 @@ public class LoginController {
             result.setToken(loginService.getToken(account));
             loginService.saveToken(account, result.getToken());
             entry.asyncUpdate();
+        } else {
+            Integer cachedAccountId = RedisUtils.get(RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account));
+            if (cachedAccountId != null && cachedAccountId > 0) {
+                result.setAccountId(cachedAccountId);
+                result.setToken(loginService.getToken(account));
+            }
         }
         return new LoginResult<ServerListResult>(ErrorCode.OK, result);
     }

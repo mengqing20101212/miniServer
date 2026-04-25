@@ -2,6 +2,7 @@ package ly.loginserver;
 
 import ly.ServerContext;
 import ly.config.ServerTypeEnum;
+import ly.startup.StartupSkillLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,17 +17,23 @@ public class LoginServerApplication {
     private LoginServerConfig loginServerConfig;
 
     public static void main(String[] args) {
+        StartupSkillLoader.ResolvedServerArgs resolved = StartupSkillLoader.resolveLoginArgs();
+        System.setProperty("loginserver.nacosUrl", resolved.nacosUrl);
+        if (resolved.springPort != null) {
+            System.setProperty("server.port", String.valueOf(resolved.springPort));
+        }
         SpringApplication.run(LoginServerApplication.class, args);
     }
 
     @PostConstruct
     public void init() {
+        StartupSkillLoader.ResolvedServerArgs resolved = StartupSkillLoader.resolveLoginArgs();
         System.out.println("nacosUrl:" + loginServerConfig.getNacosUrl());
         ServerContext.startUp(
                 loginServerConfig.getNacosUrl(),
                 ServerTypeEnum.LOGIN.getType(),
-                "login",
-                "ly",
+                resolved.serverId,
+                resolved.env,
                 new LoginGameObjectProvider());
     }
 }

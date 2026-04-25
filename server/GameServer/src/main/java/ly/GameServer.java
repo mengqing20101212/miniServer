@@ -2,7 +2,11 @@ package ly;
 
 import ly.config.ServerTypeEnum;
 import ly.logic.login.GamePlayerLoginController;
+import ly.logic.login.GameLogoutController;
+import ly.logic.ping.PingController;
+import ly.logic.player.Gate2GameRpcGameCallController;
 import ly.net.GameConnectSessionProvider;
+import ly.startup.StartupSkillLoader;
 
 /**
  * Hello world!
@@ -10,15 +14,13 @@ import ly.net.GameConnectSessionProvider;
 public class GameServer {
     public static void main(String[] args) {
         System.out.println("Hello World!");
-        if (args.length != 3) {
-            System.out.println("args error");
-            return;
-        }
-        String nacosUrl = args[0];
-        String env = args[1];
-        String serverId = args[2];
-        ServerContext.addController(new GamePlayerLoginController());
-        ServerContext.startUp(nacosUrl, ServerTypeEnum.GAME.getType(), serverId, env, new GameConnectSessionProvider());
+        StartupSkillLoader.ResolvedServerArgs resolved = StartupSkillLoader.resolveServerArgs(ServerTypeEnum.GAME, args);
+        ServerContext.addController(
+                new GamePlayerLoginController(),
+                new GameLogoutController(),
+                new Gate2GameRpcGameCallController(),
+                new PingController());
+        ServerContext.startUp(resolved.nacosUrl, ServerTypeEnum.GAME.getType(), resolved.serverId, resolved.env, new GameConnectSessionProvider());
 
     }
 }

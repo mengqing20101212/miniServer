@@ -77,6 +77,7 @@ public class RobotSession {
     
     private final Random random = new Random();
     private final AtomicBoolean running = new AtomicBoolean(true);
+    private static final int LOGIN_WAIT_TIMEOUT_MS = 15_000;
     
     public RobotSession(int botId, String loginServerHost, int loginServerPort) {
         this.botId = botId;
@@ -275,12 +276,11 @@ public class RobotSession {
         // 登录响应现在由响应处理线程统一处理
         // 这里只需要等待登录成功标志
         Thread.ofVirtual().name("Robot-" + botId + "-LoginWaiter").start(() -> {
-            int attempts = 50; // 尝试5秒
+            long deadline = System.currentTimeMillis() + LOGIN_WAIT_TIMEOUT_MS;
             
-            while (attempts > 0 && !isLoginSuccess) {
+            while (System.currentTimeMillis() < deadline && !isLoginSuccess) {
                 try {
                     Thread.sleep(100);
-                    attempts--;
                 } catch (Exception e) {
                     logger.error("等待登录响应异常", botId, e);
                     break;

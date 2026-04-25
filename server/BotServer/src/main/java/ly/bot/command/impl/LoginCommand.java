@@ -1,12 +1,13 @@
 package ly.bot.command.impl;
 
+import org.slf4j.Logger;
+
+import ly.LoggerDef;
 import ly.bot.command.RobotCommand;
 import ly.net.NetClient;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Login;
-import org.slf4j.Logger;
-import ly.LoggerDef;
 
 /**
  * 登录命令实现
@@ -64,7 +65,7 @@ public class LoginCommand implements RobotCommand {
                 loginBuilder.setGameServerId(gameServerId);
             } else {
                 // 如果没有提供gameServerId，可以设置一个默认值或从其他地方获取
-                loginBuilder.setGameServerId("game_1"); // 使用默认游戏服务器ID
+                loginBuilder.setGameServerId("game1001"); // 使用默认游戏服务器ID
             }
             
             Login.csLogin loginRequest = loginBuilder.build();

@@ -13,6 +13,7 @@
         <module>proto</module>
         <module>tool</module>
         <module>core</module>
+        <module>LoginServer</module>
         <module>GameServer</module>
         <module>BotServer</module>
     </modules>
