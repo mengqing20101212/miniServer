@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit;
 import ly.GateClientManager;
 import ly.LoggerDef;
 import ly.ProtoMessageFactory;
-import ly.ServerContext;
 import ly.net.GateClient;
 import ly.net.GateConnectSession;
 import ly.net.HandlerContext;
@@ -21,9 +20,6 @@ import ly.rpc.RpcService;
 import ly.rpc.RpcUtils;
 
 public class GateLoginController implements IGateController {
-    static {
-        ServerContext.addController(new GateLoginController());
-    }
 
     @Override
     public void registerHandlerRouter() {

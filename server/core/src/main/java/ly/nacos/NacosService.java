@@ -75,8 +75,6 @@ public class NacosService {
             Properties properties = new Properties();
             properties.put(PropertyKeyConst.SERVER_ADDR, nacosUrl);
             properties.setProperty(PropertyKeyConst.NAMESPACE, env);
-            properties.setProperty(PropertyKeyConst.USERNAME, "nacos");
-            properties.setProperty(PropertyKeyConst.PASSWORD, "nacos");
             properties.setProperty(PropertyKeyConst.CONTEXT_PATH, "/");
             ConfigService configService = NacosFactory.createConfigService(properties);
             // 解析 服务器配置
@@ -292,7 +290,7 @@ public class NacosService {
             }
             String url =
                     String.format(
-                            "%s/nacos/v1/cs/configs?dataId=%s&group=%s&tenant=%s&username=nacos&password=nacos",
+                            "%s/nacos/v1/cs/configs?dataId=%s&group=%s&tenant=%s",
                             baseUrl,
                             URLEncoder.encode(dataId, StandardCharsets.UTF_8),
                             URLEncoder.encode(group, StandardCharsets.UTF_8),

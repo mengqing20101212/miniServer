@@ -18,6 +18,12 @@ public class LoginServerApplication {
 
     public static void main(String[] args) {
         StartupSkillLoader.ResolvedServerArgs resolved = StartupSkillLoader.resolveLoginArgs();
+        System.setProperty("debug", "false");
+        System.setProperty("logging.level.root", "INFO");
+        System.setProperty("logging.level.org.springframework", "INFO");
+        System.setProperty(
+                "logging.level.org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger",
+                "OFF");
         System.setProperty("loginserver.nacosUrl", resolved.nacosUrl);
         if (resolved.springPort != null) {
             System.setProperty("server.port", String.valueOf(resolved.springPort));

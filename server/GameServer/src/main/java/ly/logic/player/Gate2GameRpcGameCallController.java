@@ -1,7 +1,6 @@
 package ly.logic.player;
 
 import ly.ProtoMessageFactory;
-import ly.ServerContext;
 import ly.net.GameConnectSession;
 import ly.net.HandlerRouterManager;
 import ly.net.IGameController;
@@ -12,9 +11,6 @@ import ly.proto.ErrorMsg;
 import ly.proto.Server;
 
 public class Gate2GameRpcGameCallController implements IGameController {
-    static {
-        ServerContext.addController(new Gate2GameRpcGameCallController());
-    }
 
     @Override
     public void registerHandlerRouter() {

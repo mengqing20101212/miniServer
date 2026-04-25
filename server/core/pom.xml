@@ -71,6 +71,20 @@
             <version>${nacos.version}</version>
             <!-- 指定纯净版SDK -->
             <classifier>pure</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.alibaba.nacos</groupId>
+                    <artifactId>nacos-logback-adapter-12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.alibaba.nacos</groupId>
+                    <artifactId>logback-adapter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.alibaba.nacos</groupId>
+                    <artifactId>nacos-log4j2-adapter</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- 使用纯净版时必须要引入同版本nacos-api和nacos-common，否则可能出现运行时找不到类的问题 -->
         <dependency>

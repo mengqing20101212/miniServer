@@ -2,7 +2,6 @@ package ly.logic.login;
 
 import ly.GateClientManager;
 import ly.LoggerDef;
-import ly.ServerContext;
 import ly.net.GateClient;
 import ly.net.GateConnectSession;
 import ly.net.HandlerContext;
@@ -14,10 +13,6 @@ import ly.redis.RedisKeys;
 import ly.redis.RedisUtils;
 
 public class GateLogoutController implements IGateController {
-
-    static {
-        ServerContext.addController(new GateLogoutController());
-    }
 
     @Override
     public void registerHandlerRouter() {

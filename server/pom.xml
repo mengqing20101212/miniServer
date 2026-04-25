@@ -15,6 +15,7 @@
         <module>core</module>
         <module>LoginServer</module>
         <module>GameServer</module>
+        <module>GateServer</module>
         <module>BotServer</module>
     </modules>
 </project>
