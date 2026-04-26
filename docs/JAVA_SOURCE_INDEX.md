@@ -1,1175 +1,269 @@
 # Java Source Index
 
-生成时间: 2026-04-23 23:09:20
+生成时间: 2026-04-26 00:14:30 CST
 
 Java 文件总数: 189
 
-说明: 该索引按源码路径分组，覆盖仓库内全部 `*.java` 文件。每条记录至少包含路径、包名、主类型和职责归纳，便于后续检索。
+说明: 本索引基于当前仓库实时扫描生成，按模块汇总，并列出每个模块下全部 Java 文件的路径、源码类别、包名与主类型。
+
+## 汇总
+
+- main 源码: 173 files
+- test 源码: 16 files
+- other 位置源码: 0 files
 
 ## 模块概览
 
-- BotServer: 33 files
-- config: 8 files
-- core: 80 files
-- GameServer: 35 files
-- GateServer: 10 files
-- LoginServer: 9 files
-- proto: 6 files
-- redis-test: 1 files
-- root: 1 files
-- tool: 6 files
-
-## BotServer
-
-### `server\BotServer\src\main\java\ly\bot\command\impl\HeartbeatCommand.java`
-
-- Package: `ly.bot.command.impl`
-- Type: `HeartbeatCommand (class)`
-- Summary: 机器人命令实现，用于驱动具体动作。
-
-### `server\BotServer\src\main\java\ly\bot\command\impl\LoginCommand.java`
-
-- Package: `ly.bot.command.impl`
-- Type: `LoginCommand (class)`
-- Summary: 机器人命令实现，用于驱动具体动作。
-
-### `server\BotServer\src\main\java\ly\bot\command\impl\MoveCommand.java`
-
-- Package: `ly.bot.command.impl`
-- Type: `MoveCommand (class)`
-- Summary: 机器人命令实现，用于驱动具体动作。
-
-### `server\BotServer\src\main\java\ly\bot\command\RobotCommand.java`
-
-- Package: `ly.bot.command`
-- Type: `RobotCommand (interface)`
-- Summary: BotServer 相关机器人控制代码。
-
-### `server\BotServer\src\main\java\ly\bot\data\impl\ConcurrentModuleDataStore.java`
-
-- Package: `ly.bot.data.impl`
-- Type: `ConcurrentModuleDataStore (class)`
-- Summary: 机器人运行期数据存储或数据访问封装。
-
-### `server\BotServer\src\main\java\ly\bot\data\ModuleDataStore.java`
-
-- Package: `ly.bot.data`
-- Type: `ModuleDataStore (interface)`
-- Summary: 机器人运行期数据存储或数据访问封装。
-
-### `server\BotServer\src\main\java\ly\bot\data\RobotSessionDataStore.java`
-
-- Package: `ly.bot.data`
-- Type: `RobotSessionDataStore (class)`
-- Summary: 机器人运行期数据存储或数据访问封装。
-
-### `server\BotServer\src\main\java\ly\bot\entity\PlayerInfo.java`
-
-- Package: `ly.bot.entity`
-- Type: `PlayerInfo (class)`
-- Summary: BotServer 相关机器人控制代码。
-
-### `server\BotServer\src\main\java\ly\bot\factory\RobotCommandFactory.java`
-
-- Package: `ly.bot.factory`
-- Type: `RobotCommandFactory (class), CommandType (enum)`
-- Summary: BotServer 相关机器人控制代码。
-
-### `server\BotServer\src\main\java\ly\bot\http\HttpServerListClient.java`
-
-- Package: `ly.bot.http`
-- Type: `HttpServerListClient (class)`
-- Summary: BotServer 相关机器人控制代码。
-
-### `server\BotServer\src\main\java\ly\bot\module\impl\CombatModule.java`
-
-- Package: `ly.bot.module.impl`
-- Type: `CombatModule (class)`
-- Summary: 机器人模块实现，封装某一类自动化行为。
-
-### `server\BotServer\src\main\java\ly\bot\module\impl\CurrencyModule.java`
-
-- Package: `ly.bot.module.impl`
-- Type: `CurrencyModule (class)`
-- Summary: 机器人模块实现，封装某一类自动化行为。
-
-### `server\BotServer\src\main\java\ly\bot\module\impl\GachaModule.java`
-
-- Package: `ly.bot.module.impl`
-- Type: `GachaModule (class)`
-- Summary: 机器人模块实现，封装某一类自动化行为。
-
-### `server\BotServer\src\main\java\ly\bot\module\impl\HeartbeatModule.java`
-
-- Package: `ly.bot.module.impl`
-- Type: `HeartbeatModule (class)`
-- Summary: 机器人模块实现，封装某一类自动化行为。
-
-### `server\BotServer\src\main\java\ly\bot\module\impl\LoginModule.java`
-
-- Package: `ly.bot.module.impl`
-- Type: `LoginModule (class)`
-- Summary: 机器人模块实现，封装某一类自动化行为。
-
-### `server\BotServer\src\main\java\ly\bot\module\impl\MovementModule.java`
-
-- Package: `ly.bot.module.impl`
-- Type: `MovementModule (class)`
-- Summary: 机器人模块实现，封装某一类自动化行为。
-
-### `server\BotServer\src\main\java\ly\bot\module\ModuleManager.java`
-
-- Package: `ly.bot.module`
-- Type: `ModuleManager (class)`
-- Summary: BotServer 相关机器人控制代码。
-
-### `server\BotServer\src\main\java\ly\bot\module\RobotModule.java`
-
-- Package: `ly.bot.module`
-- Type: `RobotModule (interface)`
-- Summary: BotServer 相关机器人控制代码。
-
-### `server\BotServer\src\main\java\ly\bot\observer\impl\LoggingObserver.java`
-
-- Package: `ly.bot.observer.impl`
-- Type: `LoggingObserver (class)`
-- Summary: 机器人观察者接口或实现，用于事件监听。
-
-### `server\BotServer\src\main\java\ly\bot\observer\RobotObserver.java`
-
-- Package: `ly.bot.observer`
-- Type: `RobotObserver (interface)`
-- Summary: 机器人观察者接口或实现，用于事件监听。
-
-### `server\BotServer\src\main\java\ly\bot\RobotManager.java`
-
-- Package: `ly.bot`
-- Type: `RobotManager (class)`
-- Summary: 机器人整体生命周期与实例管理。
-
-### `server\BotServer\src\main\java\ly\bot\session\RobotSession.java`
-
-- Package: `ly.bot.session`
-- Type: `RobotSession (class)`
-- Summary: 机器人会话包装，承接网络交互。
-
-### `server\BotServer\src\main\java\ly\bot\state\impl\ConnectedState.java`
-
-- Package: `ly.bot.state.impl`
-- Type: `ConnectedState (class)`
-- Summary: 机器人状态实现，描述连接或登录阶段。
-
-### `server\BotServer\src\main\java\ly\bot\state\impl\ConnectingState.java`
-
-- Package: `ly.bot.state.impl`
-- Type: `ConnectingState (class)`
-- Summary: 机器人状态实现，描述连接或登录阶段。
-
-### `server\BotServer\src\main\java\ly\bot\state\impl\LoggedInState.java`
-
-- Package: `ly.bot.state.impl`
-- Type: `LoggedInState (class)`
-- Summary: 机器人状态实现，描述连接或登录阶段。
-
-### `server\BotServer\src\main\java\ly\bot\state\RobotContext.java`
-
-- Package: `ly.bot.state`
-- Type: `RobotContext (class)`
-- Summary: BotServer 相关机器人控制代码。
-
-### `server\BotServer\src\main\java\ly\bot\state\RobotState.java`
-
-- Package: `ly.bot.state`
-- Type: `RobotState (interface)`
-- Summary: BotServer 相关机器人控制代码。
-
-### `server\BotServer\src\main\java\ly\bot\stats\PacketLatencyStats.java`
-
-- Package: `ly.bot.stats`
-- Type: `PacketLatencyStats (class)`
-- Summary: BotServer 相关机器人控制代码。
-
-### `server\BotServer\src\main\java\ly\bot\strategy\impl\AggressiveBehaviorStrategy.java`
-
-- Package: `ly.bot.strategy.impl`
-- Type: `AggressiveBehaviorStrategy (class)`
-- Summary: 机器人行为策略接口或实现。
-
-### `server\BotServer\src\main\java\ly\bot\strategy\impl\NormalBehaviorStrategy.java`
-
-- Package: `ly.bot.strategy.impl`
-- Type: `NormalBehaviorStrategy (class)`
-- Summary: 机器人行为策略接口或实现。
-
-### `server\BotServer\src\main\java\ly\bot\strategy\RobotBehaviorStrategy.java`
-
-- Package: `ly.bot.strategy`
-- Type: `RobotBehaviorStrategy (interface)`
-- Summary: 机器人行为策略接口或实现。
-
-### `server\BotServer\src\main\java\ly\bot\util\ProtocolTester.java`
-
-- Package: `ly.bot.util`
-- Type: `ProtocolTester (class)`
-- Summary: BotServer 相关机器人控制代码。
-
-### `server\BotServer\src\main\java\ly\BotServer.java`
-
-- Package: `ly`
-- Type: `BotServer (class)`
-- Summary: BotServer 相关机器人控制代码。
+- config: 8 files, 2 packages
+- proto: 6 files, 2 packages
+- tool: 6 files, 1 packages
+- core: 82 files, 14 packages
+- LoginServer: 9 files, 4 packages
+- GameServer: 35 files, 6 packages
+- GateServer: 10 files, 3 packages
+- BotServer: 33 files, 20 packages
 
 ## config
 
-### `server\config\src\main\java\ly\AbstractConfigManger.java`
-
-- Package: `ly`
-- Type: `AbstractConfigManger (class)`
-- Summary: 配置表实体或配置管理器。
-
-### `server\config\src\main\java\ly\config\ActivityInfoConfig.java`
-
-- Package: `ly.config`
-- Type: `ActivityInfoConfig (class)`
-- Summary: 配置表实体或配置管理器。
-
-### `server\config\src\main\java\ly\config\HeroInfoConfig.java`
-
-- Package: `ly.config`
-- Type: `HeroInfoConfig (class)`
-- Summary: 配置表实体或配置管理器。
-
-### `server\config\src\main\java\ly\config\HeroInfoConfigManager.java`
-
-- Package: `ly.config`
-- Type: `HeroInfoConfigManager (class)`
-- Summary: 配置表实体或配置管理器。
-
-### `server\config\src\main\java\ly\ConfigLoadException.java`
-
-- Package: `ly`
-- Type: `ConfigLoadException (class)`
-- Summary: 配置表实体或配置管理器。
-
-### `server\config\src\main\java\ly\ConfigService.java`
-
-- Package: `ly`
-- Type: `ConfigService (class), c (Class)`
-- Summary: 配置表实体或配置管理器。
-
-### `server\config\src\main\java\ly\InterfaceConfigManagerProxy.java`
-
-- Package: `ly`
-- Type: `InterfaceConfigManagerProxy (interface)`
-- Summary: 配置表实体或配置管理器。
-
-### `server\config\src\main\java\ly\Main.java`
-
-- Package: `ly`
-- Type: `Main (class)`
-- Summary: 配置表实体或配置管理器。
-
-## core
-
-### `server\core\src\main\java\ly\cache\CacheService.java`
-
-- Package: `ly.cache`
-- Type: `CacheService (class)`
-- Summary: 缓存服务封装。
-
-### `server\core\src\main\java\ly\config\DbConfig.java`
-
-- Package: `ly.config`
-- Type: `DbConfig (class)`
-- Summary: 核心运行配置模型。
-
-### `server\core\src\main\java\ly\config\RedisConfig.java`
-
-- Package: `ly.config`
-- Type: `RedisConfig (class)`
-- Summary: 核心运行配置模型。
-
-### `server\core\src\main\java\ly\config\RunModuleEnum.java`
-
-- Package: `ly.config`
-- Type: `RunModuleEnum (enum)`
-- Summary: 核心运行配置模型。
-
-### `server\core\src\main\java\ly\config\ServerConfig.java`
-
-- Package: `ly.config`
-- Type: `ServerConfig (class)`
-- Summary: 核心运行配置模型。
-
-### `server\core\src\main\java\ly\config\ServerTypeEnum.java`
-
-- Package: `ly.config`
-- Type: `ServerTypeEnum (enum)`
-- Summary: 核心运行配置模型。
-
-### `server\core\src\main\java\ly\db\AbstractEntry.java`
-
-- Package: `ly.db`
-- Type: `AbstractEntry (class)`
-- Summary: 数据库实体基类，维护脏标记、保存条件和主键元信息。
-
-### `server\core\src\main\java\ly\db\AutoTableService.java`
-
-- Package: `ly.db`
-- Type: `AutoTableService (class)`
-- Summary: 根据 Entry 元数据自动建表或校验表结构。
-
-### `server\core\src\main\java\ly\db\DbMeta.java`
-
-- Package: `ly.db`
-- Type: `DbMeta (class)`
-- Summary: 数据库注解元数据定义。
-
-### `server\core\src\main\java\ly\db\entry\GameItemEntry.java`
-
-- Package: `ly.db.entry`
-- Type: `GameItemEntry (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\GameItemEntryHelper.java`
-
-- Package: `ly.db.entry`
-- Type: `GameItemEntryHelper (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\LoginEntry.java`
-
-- Package: `ly.db.entry`
-- Type: `LoginEntry (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\LoginEntryHelper.java`
-
-- Package: `ly.db.entry`
-- Type: `LoginEntryHelper (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\PlayerEntry.java`
-
-- Package: `ly.db.entry`
-- Type: `PlayerEntry (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\PlayerEntryHelper.java`
-
-- Package: `ly.db.entry`
-- Type: `PlayerEntryHelper (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\ShareDailyEntry.java`
-
-- Package: `ly.db.entry`
-- Type: `ShareDailyEntry (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\ShareDailyEntryHelper.java`
-
-- Package: `ly.db.entry`
-- Type: `ShareDailyEntryHelper (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\ShareEnumConfigEntry.java`
-
-- Package: `ly.db.entry`
-- Type: `ShareEnumConfigEntry (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\ShareEnumConfigEntryHelper.java`
-
-- Package: `ly.db.entry`
-- Type: `ShareEnumConfigEntryHelper (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\ShareMonthEntry.java`
-
-- Package: `ly.db.entry`
-- Type: `ShareMonthEntry (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\ShareMonthEntryHelper.java`
-
-- Package: `ly.db.entry`
-- Type: `ShareMonthEntryHelper (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\ShareWeekEntry.java`
-
-- Package: `ly.db.entry`
-- Type: `ShareWeekEntry (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\ShareWeekEntryHelper.java`
-
-- Package: `ly.db.entry`
-- Type: `ShareWeekEntryHelper (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\UserInfoEntry.java`
-
-- Package: `ly.db.entry`
-- Type: `UserInfoEntry (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\entry\UserInfoEntryHelper.java`
-
-- Package: `ly.db.entry`
-- Type: `UserInfoEntryHelper (class)`
-- Summary: 数据库 Entry 实体或对应 Helper。
-
-### `server\core\src\main\java\ly\db\MysqlConnector.java`
-
-- Package: `ly.db`
-- Type: `MysqlConnector (class)`
-- Summary: MySQL 连接与 SQL 执行封装。
-
-### `server\core\src\main\java\ly\db\MysqlService.java`
-
-- Package: `ly.db`
-- Type: `MysqlService (class), saveOrUpdateEntry (class)`
-- Summary: MySQL 持久化服务，负责保存、更新、查询与结果封装。
-
-### `server\core\src\main\java\ly\EntityToSqlGenerator.java`
-
-- Package: `ly`
-- Type: `EntityToSqlGenerator (class)`
-- Summary: 项目源码文件。
-
-### `server\core\src\main\java\ly\game\MiniPlayer.java`
-
-- Package: `ly.game`
-- Type: `MiniPlayer (class)`
-- Summary: 轻量玩家对象与辅助逻辑。
-
-### `server\core\src\main\java\ly\game\MiniPlayerHelper.java`
-
-- Package: `ly.game`
-- Type: `MiniPlayerHelper (class)`
-- Summary: 轻量玩家对象与辅助逻辑。
-
-### `server\core\src\main\java\ly\IServer.java`
-
-- Package: `ly`
-- Type: `IServer (interface)`
-- Summary: 服务接口定义。
-
-### `server\core\src\main\java\ly\LoggerDef.java`
-
-- Package: `ly`
-- Type: `LoggerDef (class)`
-- Summary: 统一日志定义。
-
-### `server\core\src\main\java\ly\Main.java`
-
-- Package: `ly`
-- Type: `Main (class)`
-- Summary: 核心模块入口或实验入口。
-
-### `server\core\src\main\java\ly\nacos\NacosServerNode.java`
-
-- Package: `ly.nacos`
-- Type: `NacosServerNode (class)`
-- Summary: Nacos 服务注册与节点信息封装。
-
-### `server\core\src\main\java\ly\nacos\NacosService.java`
-
-- Package: `ly.nacos`
-- Type: `NacosService (class)`
-- Summary: Nacos 服务注册与节点信息封装。
-
-### `server\core\src\main\java\ly\net\ClientHandler.java`
-
-- Package: `ly.net`
-- Type: `ClientHandler (class)`
-- Summary: 网络层组件、会话或路由定义。
-
-### `server\core\src\main\java\ly\net\CommonDecoder.java`
-
-- Package: `ly.net`
-- Type: `CommonDecoder (class)`
-- Summary: 网络层组件、会话或路由定义。
-
-### `server\core\src\main\java\ly\net\CommonEncoder.java`
-
-- Package: `ly.net`
-- Type: `CommonEncoder (class)`
-- Summary: 网络层组件、会话或路由定义。
-
-### `server\core\src\main\java\ly\net\Connector.java`
-
-- Package: `ly.net`
-- Type: `Connector (class)`
-- Summary: 网络层组件、会话或路由定义。
-
-### `server\core\src\main\java\ly\net\ConnectSession.java`
-
-- Package: `ly.net`
-- Type: `ConnectSession (class)`
-- Summary: 连接会话抽象，维护会话状态和收发能力。
-
-### `server\core\src\main\java\ly\net\GameObjectProvider.java`
-
-- Package: `ly.net`
-- Type: `GameObjectProvider (interface)`
-- Summary: 网络层组件、会话或路由定义。
-
-### `server\core\src\main\java\ly\net\HandlerContext.java`
-
-- Package: `ly.net`
-- Type: `HandlerContext (record)`
-- Summary: 网络层组件、会话或路由定义。
-
-### `server\core\src\main\java\ly\net\HandlerRouterManager.java`
-
-- Package: `ly.net`
-- Type: `HandlerRouterManager (class)`
-- Summary: 消息号到控制器/处理器的路由管理。
-
-### `server\core\src\main\java\ly\net\IController.java`
-
-- Package: `ly.net`
-- Type: `IController (interface)`
-- Summary: 网络层组件、会话或路由定义。
-
-### `server\core\src\main\java\ly\net\IGuidCreator.java`
-
-- Package: `ly.net`
-- Type: `IGuidCreator (interface)`
-- Summary: 网络层组件、会话或路由定义。
-
-### `server\core\src\main\java\ly\net\IHandlerRouter.java`
-
-- Package: `ly.net`
-- Type: `IHandlerRouter (interface)`
-- Summary: 网络层组件、会话或路由定义。
-
-### `server\core\src\main\java\ly\net\NetClient.java`
-
-- Package: `ly.net`
-- Type: `NetClient (class)`
-- Summary: Netty 客户端封装。
-
-### `server\core\src\main\java\ly\net\NetClientManager.java`
-
-- Package: `ly.net`
-- Type: `NetClientManager (class)`
-- Summary: 网络层组件、会话或路由定义。
-
-### `server\core\src\main\java\ly\net\NetServer.java`
-
-- Package: `ly.net`
-- Type: `NetServer (class)`
-- Summary: Netty 服务端封装。
-
-### `server\core\src\main\java\ly\net\NetService.java`
-
-- Package: `ly.net`
-- Type: `NetService (class)`
-- Summary: 网络服务总控，负责启动服务端与客户端网络组件。
-
-### `server\core\src\main\java\ly\net\packet\AbstractMessagePacket.java`
-
-- Package: `ly.net.packet`
-- Type: `AbstractMessagePacket (class)`
-- Summary: 消息包抽象与工厂。
-
-### `server\core\src\main\java\ly\net\packet\MessagePacketFactory.java`
-
-- Package: `ly.net.packet`
-- Type: `MessagePacketFactory (class)`
-- Summary: 消息包抽象与工厂。
-
-### `server\core\src\main\java\ly\net\ServerHandler.java`
-
-- Package: `ly.net`
-- Type: `ServerHandler (class)`
-- Summary: 网络层组件、会话或路由定义。
-
-### `server\core\src\main\java\ly\redis\RedisKeys.java`
-
-- Package: `ly.redis`
-- Type: `RedisKeys (enum)`
-- Summary: Redis 键定义或工具封装。
-
-### `server\core\src\main\java\ly\redis\RedisUtils.java`
-
-- Package: `ly.redis`
-- Type: `RedisUtils (class)`
-- Summary: Redis 键定义或工具封装。
-
-### `server\core\src\main\java\ly\rpc\RpcNodeConnector.java`
-
-- Package: `ly.rpc`
-- Type: `RpcNodeConnector (class)`
-- Summary: RPC 相关工具或连接封装。
-
-### `server\core\src\main\java\ly\rpc\RpcService.java`
-
-- Package: `ly.rpc`
-- Type: `RpcService (class)`
-- Summary: RPC 服务管理与节点连接协调。
-
-### `server\core\src\main\java\ly\rpc\RpcUtils.java`
-
-- Package: `ly.rpc`
-- Type: `RpcUtils (class)`
-- Summary: RPC 相关工具或连接封装。
-
-### `server\core\src\main\java\ly\ServerContext.java`
-
-- Package: `ly`
-- Type: `ServerContext (class)`
-- Summary: 服务启动总入口，组装配置、网络、注册与控制器。
-
-### `server\core\src\main\java\ly\StandaloneServer.java`
-
-- Package: `ly`
-- Type: `StandaloneServer (class)`
-- Summary: 独立模式服务启动封装。
-
-### `server\core\src\main\java\ly\TestEntityToSql.java`
-
-- Package: `ly`
-- Type: `TestEntityToSql (class)`
-- Summary: 项目源码文件。
-
-### `server\core\src\main\java\ly\utils\BitSwitchState.java`
-
-- Package: `ly.utils`
-- Type: `BitSwitchState (class)`
-- Summary: 通用工具类或示例代码。
-
-### `server\core\src\main\java\ly\utils\BitUtils.java`
-
-- Package: `ly.utils`
-- Type: `BitUtils (class)`
-- Summary: 通用工具类或示例代码。
-
-### `server\core\src\main\java\ly\utils\CommonUtils.java`
-
-- Package: `ly.utils`
-- Type: `CommonUtils (class)`
-- Summary: 通用工具类或示例代码。
-
-### `server\core\src\main\java\ly\utils\ExcelKVParser.java`
-
-- Package: `ly.utils`
-- Type: `ExcelKVParser (class)`
-- Summary: 通用工具类或示例代码。
-
-### `server\core\src\main\java\ly\utils\HttpUtils.java`
-
-- Package: `ly.utils`
-- Type: `HttpUtils (class)`
-- Summary: 通用工具类或示例代码。
-
-### `server\core\src\main\java\ly\utils\KV.java`
-
-- Package: `ly.utils`
-- Type: `KV (class)`
-- Summary: 通用工具类或示例代码。
-
-### `server\core\src\main\java\ly\utils\KVDemo.java`
-
-- Package: `ly.utils`
-- Type: `KVDemo (class)`
-- Summary: 通用工具类或示例代码。
-
-### `server\core\src\main\java\ly\utils\RandomUtils.java`
-
-- Package: `ly.utils`
-- Type: `RandomUtils (class)`
-- Summary: 通用工具类或示例代码。
-
-### `server\core\src\main\java\ly\utils\ThreeGateTest.java`
-
-- Package: `ly.utils`
-- Type: `ThreeGateTest (class)`
-- Summary: 测试或验证代码。
-
-### `server\core\src\main\java\ly\utils\TimeStatisticsUtils.java`
-
-- Package: `ly.utils`
-- Type: `TimeStatisticsUtils (class)`
-- Summary: 通用工具类或示例代码。
-
-### `server\core\src\main\java\ly\utils\TimeUtils.java`
-
-- Package: `ly.utils`
-- Type: `TimeUtils (class)`
-- Summary: 通用工具类或示例代码。
-
-### `server\core\src\main\java\ly\utils\Tuple.java`
-
-- Package: `ly.utils`
-- Type: `Tuple (class)`
-- Summary: 通用工具类或示例代码。
-
-### `server\core\src\test\java\ly\AutoTableServiceTest.java`
-
-- Package: `ly`
-- Type: `AutoTableServiceTest (class)`
-- Summary: 测试或验证代码。
-
-### `server\core\src\test\java\ly\db\AbstractEntryDirtyStateTest.java`
-
-- Package: `ly.db`
-- Type: `AbstractEntryDirtyStateTest (class)`
-- Summary: 测试或验证代码。
-
-### `server\core\src\test\java\ly\db\MysqlServiceTypeConversionTest.java`
-
-- Package: `ly.db`
-- Type: `MysqlServiceTypeConversionTest (class)`
-- Summary: 测试或验证代码。
-
-### `server\core\src\test\java\ly\utils\ExcelKVExample.java`
-
-- Package: `ly.utils`
-- Type: `ExcelKVExample (class)`
-- Summary: 测试或验证代码。
-
-### `server\core\src\test\java\ly\utils\KVTest.java`
-
-- Package: `ly.utils`
-- Type: `KVTest (class)`
-- Summary: 测试或验证代码。
-
-### `server\core\src\test\java\TestClient.java`
-
-- Package: `(default package)`
-- Type: `TestClient (class)`
-- Summary: 测试或验证代码。
-
-### `server\core\src\test\java\TestServer.java`
-
-- Package: `(default package)`
-- Type: `TestServer (class)`
-- Summary: 测试或验证代码。
-
-## GameServer
-
-### `server\GameServer\src\main\java\ly\GameClientManager.java`
-
-- Package: `ly`
-- Type: `GameClientManager (class)`
-- Summary: GameServer 侧客户端连接管理。
-
-### `server\GameServer\src\main\java\ly\GameServer.java`
-
-- Package: `ly`
-- Type: `GameServer (class)`
-- Summary: GameServer 进程启动入口。
-
-### `server\GameServer\src\main\java\ly\logic\login\GameLogoutController.java`
-
-- Package: `ly.logic.login`
-- Type: `GameLogoutController (class)`
-- Summary: GameServer 登录链路相关逻辑。
-
-### `server\GameServer\src\main\java\ly\logic\login\GamePlayerLoginController.java`
-
-- Package: `ly.logic.login`
-- Type: `GamePlayerLoginController (class)`
-- Summary: GameServer 登录链路相关逻辑。
-
-### `server\GameServer\src\main\java\ly\logic\login\LoginManager.java`
-
-- Package: `ly.logic.login`
-- Type: `LoginManager (class)`
-- Summary: GameServer 登录链路相关逻辑。
-
-### `server\GameServer\src\main\java\ly\logic\login\LoginTask.java`
-
-- Package: `ly.logic.login`
-- Type: `LoginTask (class)`
-- Summary: GameServer 登录链路相关逻辑。
-
-### `server\GameServer\src\main\java\ly\logic\login\PlayerLogicModule.java`
-
-- Package: `ly.logic.login`
-- Type: `PlayerLogicModule (class)`
-- Summary: GameServer 登录链路相关逻辑。
-
-### `server\GameServer\src\main\java\ly\logic\ping\PingController.java`
-
-- Package: `ly.logic.ping`
-- Type: `PingController (class)`
-- Summary: 心跳或连通性检测控制器。
-
-### `server\GameServer\src\main\java\ly\logic\player\AbstractModule.java`
-
-- Package: `ly.logic.player`
-- Type: `AbstractModule (class)`
-- Summary: 玩家对象、模块和业务数据管理。
-
-### `server\GameServer\src\main\java\ly\logic\player\event\IPlayerEvent.java`
-
-- Package: `ly.logic.player.event`
-- Type: `IPlayerEvent (interface)`
-- Summary: 玩家事件系统相关定义或管理器。
-
-### `server\GameServer\src\main\java\ly\logic\player\event\PlayerEventManager.java`
-
-- Package: `ly.logic.player.event`
-- Type: `PlayerEventManager (class)`
-- Summary: 玩家事件系统相关定义或管理器。
-
-### `server\GameServer\src\main\java\ly\logic\player\event\PlayerEventParam.java`
-
-- Package: `ly.logic.player.event`
-- Type: `PlayerEventParam (record)`
-- Summary: 玩家事件系统相关定义或管理器。
-
-### `server\GameServer\src\main\java\ly\logic\player\event\PlayerEventType.java`
-
-- Package: `ly.logic.player.event`
-- Type: `PlayerEventType (enum)`
-- Summary: 玩家事件系统相关定义或管理器。
-
-### `server\GameServer\src\main\java\ly\logic\player\Gate2GameRpcGameCallController.java`
-
-- Package: `ly.logic.player`
-- Type: `Gate2GameRpcGameCallController (class)`
-- Summary: 玩家对象、模块和业务数据管理。
-
-### `server\GameServer\src\main\java\ly\logic\player\IModule.java`
-
-- Package: `ly.logic.player`
-- Type: `IModule (interface)`
-- Summary: 玩家对象、模块和业务数据管理。
-
-### `server\GameServer\src\main\java\ly\logic\player\ModuleEnum.java`
-
-- Package: `ly.logic.player`
-- Type: `ModuleEnum (enum)`
-- Summary: 玩家对象、模块和业务数据管理。
-
-### `server\GameServer\src\main\java\ly\logic\player\Player.java`
-
-- Package: `ly.logic.player`
-- Type: `Player (class)`
-- Summary: 玩家对象、模块和业务数据管理。
-
-### `server\GameServer\src\main\java\ly\logic\player\PlayerConstant.java`
-
-- Package: `ly.logic.player`
-- Type: `PlayerConstant (class)`
-- Summary: 玩家对象、模块和业务数据管理。
-
-### `server\GameServer\src\main\java\ly\logic\player\PlayerData.java`
-
-- Package: `ly.logic.player`
-- Type: `PlayerData (class)`
-- Summary: 玩家对象、模块和业务数据管理。
-
-### `server\GameServer\src\main\java\ly\logic\player\PlayerManager.java`
-
-- Package: `ly.logic.player`
-- Type: `PlayerManager (class)`
-- Summary: 玩家对象、模块和业务数据管理。
-
-### `server\GameServer\src\main\java\ly\logic\player\PlayerModuleData.java`
-
-- Package: `ly.logic.player`
-- Type: `PlayerModuleData (class)`
-- Summary: 玩家对象、模块和业务数据管理。
-
-### `server\GameServer\src\main\java\ly\logic\player\PlayerStatusEnum.java`
-
-- Package: `ly.logic.player`
-- Type: `PlayerStatusEnum (enum)`
-- Summary: 玩家对象、模块和业务数据管理。
-
-### `server\GameServer\src\main\java\ly\logic\player\PlayerUtils.java`
-
-- Package: `ly.logic.player`
-- Type: `PlayerUtils (class)`
-- Summary: 玩家对象、模块和业务数据管理。
-
-### `server\GameServer\src\main\java\ly\net\GameConnectSession.java`
-
-- Package: `ly.net`
-- Type: `GameConnectSession (class)`
-- Summary: GameServer 网络层上下文、路由或会话实现。
-
-### `server\GameServer\src\main\java\ly\net\GameConnectSessionProvider.java`
-
-- Package: `ly.net`
-- Type: `GameConnectSessionProvider (class)`
-- Summary: GameServer 网络层上下文、路由或会话实现。
-
-### `server\GameServer\src\main\java\ly\net\GameHandlerContext.java`
-
-- Package: `ly.net`
-- Type: `GameHandlerContext (record)`
-- Summary: GameServer 网络层上下文、路由或会话实现。
-
-### `server\GameServer\src\main\java\ly\net\GameHandlerRouteManager.java`
-
-- Package: `ly.net`
-- Type: `GameHandlerRouteManager (class)`
-- Summary: GameServer 网络层上下文、路由或会话实现。
-
-### `server\GameServer\src\main\java\ly\net\GameHandlerRouter.java`
-
-- Package: `ly.net`
-- Type: `GameHandlerRouter (interface)`
-- Summary: GameServer 网络层上下文、路由或会话实现。
-
-### `server\GameServer\src\main\java\ly\net\GamePlayer.java`
-
-- Package: `ly.net`
-- Type: `GamePlayer (class)`
-- Summary: GameServer 网络层上下文、路由或会话实现。
-
-### `server\GameServer\src\main\java\ly\net\IGameController.java`
-
-- Package: `ly.net`
-- Type: `IGameController (interface)`
-- Summary: GameServer 网络层上下文、路由或会话实现。
-
-### `server\GameServer\src\test\java\ly\AppTest.java`
-
-- Package: `ly`
-- Type: `AppTest (class)`
-- Summary: 测试或验证代码。
-
-### `server\GameServer\src\test\java\ly\DatabaseConnectionTest.java`
-
-- Package: `ly`
-- Type: `DatabaseConnectionTest (class)`
-- Summary: 测试或验证代码。
-
-### `server\GameServer\src\test\java\ly\NacosConnectionTest.java`
-
-- Package: `ly`
-- Type: `NacosConnectionTest (class)`
-- Summary: 测试或验证代码。
-
-### `server\GameServer\src\test\java\ly\RedisConnectionTest.java`
-
-- Package: `ly`
-- Type: `RedisConnectionTest (class)`
-- Summary: 测试或验证代码。
-
-### `server\GameServer\src\test\java\ly\SystemIntegrationTest.java`
-
-- Package: `ly`
-- Type: `SystemIntegrationTest (class)`
-- Summary: 测试或验证代码。
-
-## GateServer
-
-### `server\GateServer\src\main\java\ly\GateClientManager.java`
-
-- Package: `ly`
-- Type: `GateClientManager (class)`
-- Summary: GateServer 客户端管理。
-
-### `server\GateServer\src\main\java\ly\GateServer.java`
-
-- Package: `ly`
-- Type: `GateServer (class)`
-- Summary: GateServer 进程启动入口。
-
-### `server\GateServer\src\main\java\ly\logic\login\GateLoginController.java`
-
-- Package: `ly.logic.login`
-- Type: `GateLoginController (class)`
-- Summary: GateServer 登录/登出链路控制器。
-
-### `server\GateServer\src\main\java\ly\logic\login\GateLogoutController.java`
-
-- Package: `ly.logic.login`
-- Type: `GateLogoutController (class)`
-- Summary: GateServer 登录/登出链路控制器。
-
-### `server\GateServer\src\main\java\ly\net\GateClient.java`
-
-- Package: `ly.net`
-- Type: `GateClient (class)`
-- Summary: GateServer 网络兼容、会话或客户端封装。
-
-### `server\GateServer\src\main\java\ly\net\GateConnectSession.java`
-
-- Package: `ly.net`
-- Type: `GateConnectSession (class)`
-- Summary: GateServer 网络兼容、会话或客户端封装。
-
-### `server\GateServer\src\main\java\ly\net\GateConnectSessionProvider.java`
-
-- Package: `ly.net`
-- Type: `GateConnectSessionProvider (class)`
-- Summary: GateServer 网络兼容、会话或客户端封装。
-
-### `server\GateServer\src\main\java\ly\net\IGateController.java`
-
-- Package: `ly.net`
-- Type: `IGateController (interface)`
-- Summary: GateServer 网络兼容、会话或客户端封装。
-
-### `server\GateServer\src\main\java\ly\net\PacketCompat.java`
-
-- Package: `ly.net`
-- Type: `PacketCompat (class)`
-- Summary: GateServer 网络兼容、会话或客户端封装。
-
-### `server\GateServer\src\test\java\ly\AppTest.java`
-
-- Package: `ly`
-- Type: `AppTest (class)`
-- Summary: 测试或验证代码。
-
-## LoginServer
-
-### `server\LoginServer\src\main\java\ly\loginserver\controller\LoginController.java`
-
-- Package: `ly.loginserver.controller`
-- Type: `LoginController (class)`
-- Summary: 登录服务 HTTP 或业务控制器。
-
-### `server\LoginServer\src\main\java\ly\loginserver\LoginClient.java`
-
-- Package: `ly.loginserver`
-- Type: `LoginClient (class)`
-- Summary: LoginServer 相关启动、配置或接入代码。
-
-### `server\LoginServer\src\main\java\ly\loginserver\LoginGameObjectProvider.java`
-
-- Package: `ly.loginserver`
-- Type: `LoginGameObjectProvider (class)`
-- Summary: LoginServer 相关启动、配置或接入代码。
-
-### `server\LoginServer\src\main\java\ly\loginserver\LoginServerApplication.java`
-
-- Package: `ly.loginserver`
-- Type: `LoginServerApplication (class)`
-- Summary: LoginServer 相关启动、配置或接入代码。
-
-### `server\LoginServer\src\main\java\ly\loginserver\LoginServerConfig.java`
-
-- Package: `ly.loginserver`
-- Type: `LoginServerConfig (class)`
-- Summary: LoginServer 相关启动、配置或接入代码。
-
-### `server\LoginServer\src\main\java\ly\loginserver\result\ErrorCode.java`
-
-- Package: `ly.loginserver.result`
-- Type: `ErrorCode (enum)`
-- Summary: 登录接口返回模型或错误码定义。
-
-### `server\LoginServer\src\main\java\ly\loginserver\result\LoginResult.java`
-
-- Package: `ly.loginserver.result`
-- Type: `LoginResult (class)`
-- Summary: 登录接口返回模型或错误码定义。
-
-### `server\LoginServer\src\main\java\ly\loginserver\result\ServerListResult.java`
-
-- Package: `ly.loginserver.result`
-- Type: `ServerListResult (class)`
-- Summary: 登录接口返回模型或错误码定义。
-
-### `server\LoginServer\src\main\java\ly\loginserver\service\LoginService.java`
-
-- Package: `ly.loginserver.service`
-- Type: `LoginService (class)`
-- Summary: 登录服务核心业务逻辑。
+- 文件数: 8
+- 包数: 2
+- main/test/other: 8/0/0
+
+- [main] `server/config/src/main/java/ly/AbstractConfigManger.java` — `ly` — AbstractConfigManger (class)
+- [main] `server/config/src/main/java/ly/ConfigLoadException.java` — `ly` — ConfigLoadException (class)
+- [main] `server/config/src/main/java/ly/ConfigService.java` — `ly` — ConfigService (class)
+- [main] `server/config/src/main/java/ly/InterfaceConfigManagerProxy.java` — `ly` — InterfaceConfigManagerProxy (interface)
+- [main] `server/config/src/main/java/ly/Main.java` — `ly` — Main (class)
+- [main] `server/config/src/main/java/ly/config/ActivityInfoConfig.java` — `ly.config` — ActivityInfoConfig (class)
+- [main] `server/config/src/main/java/ly/config/HeroInfoConfig.java` — `ly.config` — HeroInfoConfig (class)
+- [main] `server/config/src/main/java/ly/config/HeroInfoConfigManager.java` — `ly.config` — HeroInfoConfigManager (class)
 
 ## proto
 
-### `server\proto\src\main\java\ly\Main.java`
+- 文件数: 6
+- 包数: 2
+- main/test/other: 6/0/0
 
-- Package: `ly`
-- Type: `Main (class)`
-- Summary: Protobuf 相关生成类或工厂入口。
-
-### `server\proto\src\main\java\ly\proto\Cmd.java`
-
-- Package: `ly.proto`
-- Type: `Cmd (class), CMD (enum)`
-- Summary: Protobuf 相关生成类或工厂入口。
-
-### `server\proto\src\main\java\ly\proto\ErrorMsg.java`
-
-- Package: `ly.proto`
-- Type: `ErrorMsg (class), ErrorCode (enum), csErrorCodeOrBuilder (interface), scErrorCodeOrBuilder (interface)`
-- Summary: Protobuf 相关生成类或工厂入口。
-
-### `server\proto\src\main\java\ly\proto\Login.java`
-
-- Package: `ly.proto`
-- Type: `Login (class), PlayerInfoOrBuilder (interface), csLoginOrBuilder (interface), scLoginOrBuilder (interface), csLogoutOrBuilder (interface), scLogoutOrBuilder (interface)`
-- Summary: Protobuf 相关生成类或工厂入口。
-
-### `server\proto\src\main\java\ly\proto\Server.java`
-
-- Package: `ly.proto`
-- Type: `Server (class), ServerMsgType (enum), csServer2ServerOrBuilder (interface), scServer2ServerOrBuilder (interface), csRpcPingOrBuilder (interface), scRpcPingOrBuilder (interface), csGate2GameRpcGameCallOrBuilder (interface), scGate2GameRpcGameCallOrBuilder (interface)`
-- Summary: Protobuf 相关生成类或工厂入口。
-
-### `server\proto\src\main\java\ly\ProtoMessageFactory.java`
-
-- Package: `ly`
-- Type: `ProtoMessageFactory (class)`
-- Summary: Protobuf 相关生成类或工厂入口。
-
-## redis-test
-
-### `redis-test\src\main\java\RedisTest.java`
-
-- Package: `(default package)`
-- Type: `RedisTest (class)`
-- Summary: 测试或验证代码。
-
-## root
-
-### `test_entity_generator.java`
-
-- Package: `(default package)`
-- Type: `test_entity_generator (class)`
-- Summary: 项目源码文件。
+- [main] `server/proto/src/main/java/ly/Main.java` — `ly` — Main (class)
+- [main] `server/proto/src/main/java/ly/ProtoMessageFactory.java` — `ly` — ProtoMessageFactory (class)
+- [main] `server/proto/src/main/java/ly/proto/Cmd.java` — `ly.proto` — Cmd (class)
+- [main] `server/proto/src/main/java/ly/proto/ErrorMsg.java` — `ly.proto` — ErrorMsg (class)
+- [main] `server/proto/src/main/java/ly/proto/Login.java` — `ly.proto` — Login (class)
+- [main] `server/proto/src/main/java/ly/proto/Server.java` — `ly.proto` — Server (class)
 
 ## tool
 
-### `server\tool\src\main\java\ly\ParserDbEntry.java`
+- 文件数: 6
+- 包数: 1
+- main/test/other: 4/2/0
 
-- Package: `ly`
-- Type: `ParserDbEntry (class), FiledInfo (class), TableInfo (class)`
-- Summary: 代码生成或配置解析工具。
+- [main] `server/tool/src/main/java/ly/ParserDbEntry.java` — `ly` — ParserDbEntry (class)
+- [main] `server/tool/src/main/java/ly/ParserExcelConfig.java` — `ly` — ParserExcelConfig (class)
+- [main] `server/tool/src/main/java/ly/ParserProto.java` — `ly` — ParserProto (class)
+- [main] `server/tool/src/main/java/ly/ToolMain.java` — `ly` — ToolMain (class)
+- [test] `server/tool/src/test/java/ly/ParserDbEntryTest.java` — `ly` — ParserDbEntryTest (class)
+- [test] `server/tool/src/test/java/ly/ParserExcelConfigINT2Test.java` — `ly` — ParserExcelConfigINT2Test (class)
 
-### `server\tool\src\main\java\ly\ParserExcelConfig.java`
+## core
 
-- Package: `ly`
-- Type: `ParserExcelConfig (class), ExcelConfig (class)`
-- Summary: 代码生成或配置解析工具。
+- 文件数: 82
+- 包数: 14
+- main/test/other: 74/8/0
 
-### `server\tool\src\main\java\ly\ParserProto.java`
+- [main] `server/core/src/main/java/ly/EntityToSqlGenerator.java` — `ly` — EntityToSqlGenerator (class)
+- [main] `server/core/src/main/java/ly/IServer.java` — `ly` — IServer (interface)
+- [main] `server/core/src/main/java/ly/LoggerDef.java` — `ly` — LoggerDef (class)
+- [main] `server/core/src/main/java/ly/Main.java` — `ly` — Main (class)
+- [main] `server/core/src/main/java/ly/ServerContext.java` — `ly` — ServerContext (class)
+- [main] `server/core/src/main/java/ly/StandaloneServer.java` — `ly` — StandaloneServer (class)
+- [main] `server/core/src/main/java/ly/TestEntityToSql.java` — `ly` — TestEntityToSql (class)
+- [main] `server/core/src/main/java/ly/cache/CacheService.java` — `ly.cache` — CacheService (class)
+- [main] `server/core/src/main/java/ly/config/DbConfig.java` — `ly.config` — DbConfig (class)
+- [main] `server/core/src/main/java/ly/config/RedisConfig.java` — `ly.config` — RedisConfig (class)
+- [main] `server/core/src/main/java/ly/config/RunModuleEnum.java` — `ly.config` — RunModuleEnum (enum)
+- [main] `server/core/src/main/java/ly/config/ServerConfig.java` — `ly.config` — ServerConfig (class)
+- [main] `server/core/src/main/java/ly/config/ServerTypeEnum.java` — `ly.config` — ServerTypeEnum (enum)
+- [main] `server/core/src/main/java/ly/db/AbstractEntry.java` — `ly.db` — AbstractEntry (class)
+- [main] `server/core/src/main/java/ly/db/AutoTableService.java` — `ly.db` — AutoTableService (class)
+- [main] `server/core/src/main/java/ly/db/DbMeta.java` — `ly.db` — DbMeta (class)
+- [main] `server/core/src/main/java/ly/db/MysqlConnector.java` — `ly.db` — MysqlConnector (class)
+- [main] `server/core/src/main/java/ly/db/MysqlService.java` — `ly.db` — MysqlService (class)
+- [main] `server/core/src/main/java/ly/db/entry/GameItemEntry.java` — `ly.db.entry` — GameItemEntry (class)
+- [main] `server/core/src/main/java/ly/db/entry/GameItemEntryHelper.java` — `ly.db.entry` — GameItemEntryHelper (class)
+- [main] `server/core/src/main/java/ly/db/entry/LoginEntry.java` — `ly.db.entry` — LoginEntry (class)
+- [main] `server/core/src/main/java/ly/db/entry/LoginEntryHelper.java` — `ly.db.entry` — LoginEntryHelper (class)
+- [main] `server/core/src/main/java/ly/db/entry/PlayerEntry.java` — `ly.db.entry` — PlayerEntry (class)
+- [main] `server/core/src/main/java/ly/db/entry/PlayerEntryHelper.java` — `ly.db.entry` — PlayerEntryHelper (class)
+- [main] `server/core/src/main/java/ly/db/entry/ShareDailyEntry.java` — `ly.db.entry` — ShareDailyEntry (class)
+- [main] `server/core/src/main/java/ly/db/entry/ShareDailyEntryHelper.java` — `ly.db.entry` — ShareDailyEntryHelper (class)
+- [main] `server/core/src/main/java/ly/db/entry/ShareEnumConfigEntry.java` — `ly.db.entry` — ShareEnumConfigEntry (class)
+- [main] `server/core/src/main/java/ly/db/entry/ShareEnumConfigEntryHelper.java` — `ly.db.entry` — ShareEnumConfigEntryHelper (class)
+- [main] `server/core/src/main/java/ly/db/entry/ShareMonthEntry.java` — `ly.db.entry` — ShareMonthEntry (class)
+- [main] `server/core/src/main/java/ly/db/entry/ShareMonthEntryHelper.java` — `ly.db.entry` — ShareMonthEntryHelper (class)
+- [main] `server/core/src/main/java/ly/db/entry/ShareWeekEntry.java` — `ly.db.entry` — ShareWeekEntry (class)
+- [main] `server/core/src/main/java/ly/db/entry/ShareWeekEntryHelper.java` — `ly.db.entry` — ShareWeekEntryHelper (class)
+- [main] `server/core/src/main/java/ly/db/entry/UserInfoEntry.java` — `ly.db.entry` — UserInfoEntry (class)
+- [main] `server/core/src/main/java/ly/db/entry/UserInfoEntryHelper.java` — `ly.db.entry` — UserInfoEntryHelper (class)
+- [main] `server/core/src/main/java/ly/game/MiniPlayer.java` — `ly.game` — MiniPlayer (class)
+- [main] `server/core/src/main/java/ly/game/MiniPlayerHelper.java` — `ly.game` — MiniPlayerHelper (class)
+- [main] `server/core/src/main/java/ly/nacos/NacosServerNode.java` — `ly.nacos` — NacosServerNode (class)
+- [main] `server/core/src/main/java/ly/nacos/NacosService.java` — `ly.nacos` — NacosService (class)
+- [main] `server/core/src/main/java/ly/net/ClientHandler.java` — `ly.net` — ClientHandler (class)
+- [main] `server/core/src/main/java/ly/net/CommonDecoder.java` — `ly.net` — CommonDecoder (class)
+- [main] `server/core/src/main/java/ly/net/CommonEncoder.java` — `ly.net` — CommonEncoder (class)
+- [main] `server/core/src/main/java/ly/net/ConnectSession.java` — `ly.net` — ConnectSession (class)
+- [main] `server/core/src/main/java/ly/net/Connector.java` — `ly.net` — Connector (class)
+- [main] `server/core/src/main/java/ly/net/GameObjectProvider.java` — `ly.net` — GameObjectProvider (interface)
+- [main] `server/core/src/main/java/ly/net/HandlerContext.java` — `ly.net` — HandlerContext (record)
+- [main] `server/core/src/main/java/ly/net/HandlerRouterManager.java` — `ly.net` — HandlerRouterManager (class)
+- [main] `server/core/src/main/java/ly/net/IController.java` — `ly.net` — IController (interface)
+- [main] `server/core/src/main/java/ly/net/IGuidCreator.java` — `ly.net` — IGuidCreator (interface)
+- [main] `server/core/src/main/java/ly/net/IHandlerRouter.java` — `ly.net` — IHandlerRouter (interface)
+- [main] `server/core/src/main/java/ly/net/NetClient.java` — `ly.net` — NetClient (class)
+- [main] `server/core/src/main/java/ly/net/NetClientManager.java` — `ly.net` — NetClientManager (class)
+- [main] `server/core/src/main/java/ly/net/NetServer.java` — `ly.net` — NetServer (class)
+- [main] `server/core/src/main/java/ly/net/NetService.java` — `ly.net` — NetService (class)
+- [main] `server/core/src/main/java/ly/net/ServerHandler.java` — `ly.net` — ServerHandler (class)
+- [main] `server/core/src/main/java/ly/net/packet/AbstractMessagePacket.java` — `ly.net.packet` — AbstractMessagePacket (class)
+- [main] `server/core/src/main/java/ly/net/packet/MessagePacketFactory.java` — `ly.net.packet` — MessagePacketFactory (class)
+- [main] `server/core/src/main/java/ly/redis/RedisKeys.java` — `ly.redis` — RedisKeys (enum)
+- [main] `server/core/src/main/java/ly/redis/RedisUtils.java` — `ly.redis` — RedisUtils (class)
+- [main] `server/core/src/main/java/ly/rpc/RpcNodeConnector.java` — `ly.rpc` — RpcNodeConnector (class)
+- [main] `server/core/src/main/java/ly/rpc/RpcService.java` — `ly.rpc` — RpcService (class)
+- [main] `server/core/src/main/java/ly/rpc/RpcUtils.java` — `ly.rpc` — RpcUtils (class)
+- [main] `server/core/src/main/java/ly/startup/StartupSkillLoader.java` — `ly.startup` — StartupSkillLoader (class)
+- [main] `server/core/src/main/java/ly/utils/BitSwitchState.java` — `ly.utils` — BitSwitchState (class)
+- [main] `server/core/src/main/java/ly/utils/BitUtils.java` — `ly.utils` — BitUtils (class)
+- [main] `server/core/src/main/java/ly/utils/CommonUtils.java` — `ly.utils` — CommonUtils (class)
+- [main] `server/core/src/main/java/ly/utils/ExcelKVParser.java` — `ly.utils` — ExcelKVParser (class)
+- [main] `server/core/src/main/java/ly/utils/HttpUtils.java` — `ly.utils` — HttpUtils (class)
+- [main] `server/core/src/main/java/ly/utils/KV.java` — `ly.utils` — KV (class)
+- [main] `server/core/src/main/java/ly/utils/KVDemo.java` — `ly.utils` — KVDemo (class)
+- [main] `server/core/src/main/java/ly/utils/RandomUtils.java` — `ly.utils` — RandomUtils (class)
+- [main] `server/core/src/main/java/ly/utils/ThreeGateTest.java` — `ly.utils` — ThreeGateTest (class)
+- [main] `server/core/src/main/java/ly/utils/TimeStatisticsUtils.java` — `ly.utils` — TimeStatisticsUtils (class)
+- [main] `server/core/src/main/java/ly/utils/TimeUtils.java` — `ly.utils` — TimeUtils (class)
+- [main] `server/core/src/main/java/ly/utils/Tuple.java` — `ly.utils` — Tuple (class)
+- [test] `server/core/src/test/java/TestClient.java` — `(default)` — TestClient (class)
+- [test] `server/core/src/test/java/TestServer.java` — `(default)` — TestServer (class)
+- [test] `server/core/src/test/java/ly/AutoTableServiceTest.java` — `ly` — AutoTableServiceTest (class)
+- [test] `server/core/src/test/java/ly/EntityToSqlGeneratorSmokeTest.java` — `ly` — EntityToSqlGeneratorSmokeTest (class)
+- [test] `server/core/src/test/java/ly/db/AbstractEntryDirtyStateTest.java` — `ly.db` — AbstractEntryDirtyStateTest (class)
+- [test] `server/core/src/test/java/ly/db/MysqlServiceTypeConversionTest.java` — `ly.db` — MysqlServiceTypeConversionTest (class)
+- [test] `server/core/src/test/java/ly/utils/ExcelKVExample.java` — `ly.utils` — ExcelKVExample (class)
+- [test] `server/core/src/test/java/ly/utils/KVTest.java` — `ly.utils` — KVTest (class)
 
-- Package: `ly`
-- Type: `ParserProto (class)`
-- Summary: 代码生成或配置解析工具。
+## LoginServer
 
-### `server\tool\src\main\java\ly\ToolMain.java`
+- 文件数: 9
+- 包数: 4
+- main/test/other: 9/0/0
 
-- Package: `ly`
-- Type: `ToolMain (class)`
-- Summary: 工具模块入口或测试代码。
+- [main] `server/LoginServer/src/main/java/ly/loginserver/LoginClient.java` — `ly.loginserver` — LoginClient (class)
+- [main] `server/LoginServer/src/main/java/ly/loginserver/LoginGameObjectProvider.java` — `ly.loginserver` — LoginGameObjectProvider (class)
+- [main] `server/LoginServer/src/main/java/ly/loginserver/LoginServerApplication.java` — `ly.loginserver` — LoginServerApplication (class)
+- [main] `server/LoginServer/src/main/java/ly/loginserver/LoginServerConfig.java` — `ly.loginserver` — LoginServerConfig (class)
+- [main] `server/LoginServer/src/main/java/ly/loginserver/controller/LoginController.java` — `ly.loginserver.controller` — LoginController (class)
+- [main] `server/LoginServer/src/main/java/ly/loginserver/result/ErrorCode.java` — `ly.loginserver.result` — ErrorCode (enum)
+- [main] `server/LoginServer/src/main/java/ly/loginserver/result/LoginResult.java` — `ly.loginserver.result` — LoginResult (class)
+- [main] `server/LoginServer/src/main/java/ly/loginserver/result/ServerListResult.java` — `ly.loginserver.result` — ServerListResult (class)
+- [main] `server/LoginServer/src/main/java/ly/loginserver/service/LoginService.java` — `ly.loginserver.service` — LoginService (class)
 
-### `server\tool\src\test\java\ly\ParserDbEntryTest.java`
+## GameServer
 
-- Package: `ly`
-- Type: `ParserDbEntryTest (class)`
-- Summary: 测试或验证代码。
+- 文件数: 35
+- 包数: 6
+- main/test/other: 30/5/0
 
-### `server\tool\src\test\java\ly\ParserExcelConfigINT2Test.java`
+- [main] `server/GameServer/src/main/java/ly/GameClientManager.java` — `ly` — GameClientManager (class)
+- [main] `server/GameServer/src/main/java/ly/GameServer.java` — `ly` — GameServer (class)
+- [main] `server/GameServer/src/main/java/ly/logic/login/GameLogoutController.java` — `ly.logic.login` — GameLogoutController (class)
+- [main] `server/GameServer/src/main/java/ly/logic/login/GamePlayerLoginController.java` — `ly.logic.login` — GamePlayerLoginController (class)
+- [main] `server/GameServer/src/main/java/ly/logic/login/LoginManager.java` — `ly.logic.login` — LoginManager (class)
+- [main] `server/GameServer/src/main/java/ly/logic/login/LoginTask.java` — `ly.logic.login` — LoginTask (class)
+- [main] `server/GameServer/src/main/java/ly/logic/login/PlayerLogicModule.java` — `ly.logic.login` — PlayerLogicModule (class)
+- [main] `server/GameServer/src/main/java/ly/logic/ping/PingController.java` — `ly.logic.ping` — PingController (class)
+- [main] `server/GameServer/src/main/java/ly/logic/player/AbstractModule.java` — `ly.logic.player` — AbstractModule (class)
+- [main] `server/GameServer/src/main/java/ly/logic/player/Gate2GameRpcGameCallController.java` — `ly.logic.player` — Gate2GameRpcGameCallController (class)
+- [main] `server/GameServer/src/main/java/ly/logic/player/IModule.java` — `ly.logic.player` — IModule (interface)
+- [main] `server/GameServer/src/main/java/ly/logic/player/ModuleEnum.java` — `ly.logic.player` — ModuleEnum (enum)
+- [main] `server/GameServer/src/main/java/ly/logic/player/Player.java` — `ly.logic.player` — Player (class)
+- [main] `server/GameServer/src/main/java/ly/logic/player/PlayerConstant.java` — `ly.logic.player` — PlayerConstant (class)
+- [main] `server/GameServer/src/main/java/ly/logic/player/PlayerData.java` — `ly.logic.player` — PlayerData (class)
+- [main] `server/GameServer/src/main/java/ly/logic/player/PlayerManager.java` — `ly.logic.player` — PlayerManager (class)
+- [main] `server/GameServer/src/main/java/ly/logic/player/PlayerModuleData.java` — `ly.logic.player` — PlayerModuleData (class)
+- [main] `server/GameServer/src/main/java/ly/logic/player/PlayerStatusEnum.java` — `ly.logic.player` — PlayerStatusEnum (enum)
+- [main] `server/GameServer/src/main/java/ly/logic/player/PlayerUtils.java` — `ly.logic.player` — PlayerUtils (class)
+- [main] `server/GameServer/src/main/java/ly/logic/player/event/IPlayerEvent.java` — `ly.logic.player.event` — IPlayerEvent (interface)
+- [main] `server/GameServer/src/main/java/ly/logic/player/event/PlayerEventManager.java` — `ly.logic.player.event` — PlayerEventManager (class)
+- [main] `server/GameServer/src/main/java/ly/logic/player/event/PlayerEventParam.java` — `ly.logic.player.event` — PlayerEventParam (record)
+- [main] `server/GameServer/src/main/java/ly/logic/player/event/PlayerEventType.java` — `ly.logic.player.event` — PlayerEventType (enum)
+- [main] `server/GameServer/src/main/java/ly/net/GameConnectSession.java` — `ly.net` — GameConnectSession (class)
+- [main] `server/GameServer/src/main/java/ly/net/GameConnectSessionProvider.java` — `ly.net` — GameConnectSessionProvider (class)
+- [main] `server/GameServer/src/main/java/ly/net/GameHandlerContext.java` — `ly.net` — GameHandlerContext (record)
+- [main] `server/GameServer/src/main/java/ly/net/GameHandlerRouteManager.java` — `ly.net` — GameHandlerRouteManager (class)
+- [main] `server/GameServer/src/main/java/ly/net/GameHandlerRouter.java` — `ly.net` — GameHandlerRouter (interface)
+- [main] `server/GameServer/src/main/java/ly/net/GamePlayer.java` — `ly.net` — GamePlayer (class)
+- [main] `server/GameServer/src/main/java/ly/net/IGameController.java` — `ly.net` — IGameController (interface)
+- [test] `server/GameServer/src/test/java/ly/AppTest.java` — `ly` — AppTest (class)
+- [test] `server/GameServer/src/test/java/ly/DatabaseConnectionTest.java` — `ly` — DatabaseConnectionTest (class)
+- [test] `server/GameServer/src/test/java/ly/NacosConnectionTest.java` — `ly` — NacosConnectionTest (class)
+- [test] `server/GameServer/src/test/java/ly/RedisConnectionTest.java` — `ly` — RedisConnectionTest (class)
+- [test] `server/GameServer/src/test/java/ly/SystemIntegrationTest.java` — `ly` — SystemIntegrationTest (class)
 
-- Package: `ly`
-- Type: `ParserExcelConfigINT2Test (class)`
-- Summary: 测试或验证代码。
+## GateServer
 
+- 文件数: 10
+- 包数: 3
+- main/test/other: 9/1/0
+
+- [main] `server/GateServer/src/main/java/ly/GateClientManager.java` — `ly` — GateClientManager (class)
+- [main] `server/GateServer/src/main/java/ly/GateServer.java` — `ly` — GateServer (class)
+- [main] `server/GateServer/src/main/java/ly/logic/login/GateLoginController.java` — `ly.logic.login` — GateLoginController (class)
+- [main] `server/GateServer/src/main/java/ly/logic/login/GateLogoutController.java` — `ly.logic.login` — GateLogoutController (class)
+- [main] `server/GateServer/src/main/java/ly/net/GateClient.java` — `ly.net` — GateClient (class)
+- [main] `server/GateServer/src/main/java/ly/net/GateConnectSession.java` — `ly.net` — GateConnectSession (class)
+- [main] `server/GateServer/src/main/java/ly/net/GateConnectSessionProvider.java` — `ly.net` — GateConnectSessionProvider (class)
+- [main] `server/GateServer/src/main/java/ly/net/IGateController.java` — `ly.net` — IGateController (interface)
+- [main] `server/GateServer/src/main/java/ly/net/PacketCompat.java` — `ly.net` — PacketCompat (class)
+- [test] `server/GateServer/src/test/java/ly/AppTest.java` — `ly` — AppTest (class)
+
+## BotServer
+
+- 文件数: 33
+- 包数: 20
+- main/test/other: 33/0/0
+
+- [main] `server/BotServer/src/main/java/ly/BotServer.java` — `ly` — BotServer (class)
+- [main] `server/BotServer/src/main/java/ly/bot/RobotManager.java` — `ly.bot` — RobotManager (class)
+- [main] `server/BotServer/src/main/java/ly/bot/command/RobotCommand.java` — `ly.bot.command` — RobotCommand (interface)
+- [main] `server/BotServer/src/main/java/ly/bot/command/impl/HeartbeatCommand.java` — `ly.bot.command.impl` — HeartbeatCommand (class)
+- [main] `server/BotServer/src/main/java/ly/bot/command/impl/LoginCommand.java` — `ly.bot.command.impl` — LoginCommand (class)
+- [main] `server/BotServer/src/main/java/ly/bot/command/impl/MoveCommand.java` — `ly.bot.command.impl` — MoveCommand (class)
+- [main] `server/BotServer/src/main/java/ly/bot/data/ModuleDataStore.java` — `ly.bot.data` — ModuleDataStore (interface)
+- [main] `server/BotServer/src/main/java/ly/bot/data/RobotSessionDataStore.java` — `ly.bot.data` — RobotSessionDataStore (class)
+- [main] `server/BotServer/src/main/java/ly/bot/data/impl/ConcurrentModuleDataStore.java` — `ly.bot.data.impl` — ConcurrentModuleDataStore (class)
+- [main] `server/BotServer/src/main/java/ly/bot/entity/PlayerInfo.java` — `ly.bot.entity` — PlayerInfo (class)
+- [main] `server/BotServer/src/main/java/ly/bot/factory/RobotCommandFactory.java` — `ly.bot.factory` — RobotCommandFactory (class)
+- [main] `server/BotServer/src/main/java/ly/bot/http/HttpServerListClient.java` — `ly.bot.http` — HttpServerListClient (class)
+- [main] `server/BotServer/src/main/java/ly/bot/module/ModuleManager.java` — `ly.bot.module` — ModuleManager (class)
+- [main] `server/BotServer/src/main/java/ly/bot/module/RobotModule.java` — `ly.bot.module` — RobotModule (interface)
+- [main] `server/BotServer/src/main/java/ly/bot/module/impl/CombatModule.java` — `ly.bot.module.impl` — CombatModule (class)
+- [main] `server/BotServer/src/main/java/ly/bot/module/impl/CurrencyModule.java` — `ly.bot.module.impl` — CurrencyModule (class)
+- [main] `server/BotServer/src/main/java/ly/bot/module/impl/GachaModule.java` — `ly.bot.module.impl` — GachaModule (class)
+- [main] `server/BotServer/src/main/java/ly/bot/module/impl/HeartbeatModule.java` — `ly.bot.module.impl` — HeartbeatModule (class)
+- [main] `server/BotServer/src/main/java/ly/bot/module/impl/LoginModule.java` — `ly.bot.module.impl` — LoginModule (class)
+- [main] `server/BotServer/src/main/java/ly/bot/module/impl/MovementModule.java` — `ly.bot.module.impl` — MovementModule (class)
+- [main] `server/BotServer/src/main/java/ly/bot/observer/RobotObserver.java` — `ly.bot.observer` — RobotObserver (interface)
+- [main] `server/BotServer/src/main/java/ly/bot/observer/impl/LoggingObserver.java` — `ly.bot.observer.impl` — LoggingObserver (class)
+- [main] `server/BotServer/src/main/java/ly/bot/session/RobotSession.java` — `ly.bot.session` — RobotSession (class)
+- [main] `server/BotServer/src/main/java/ly/bot/state/RobotContext.java` — `ly.bot.state` — RobotContext (class)
+- [main] `server/BotServer/src/main/java/ly/bot/state/RobotState.java` — `ly.bot.state` — RobotState (interface)
+- [main] `server/BotServer/src/main/java/ly/bot/state/impl/ConnectedState.java` — `ly.bot.state.impl` — ConnectedState (class)
+- [main] `server/BotServer/src/main/java/ly/bot/state/impl/ConnectingState.java` — `ly.bot.state.impl` — ConnectingState (class)
+- [main] `server/BotServer/src/main/java/ly/bot/state/impl/LoggedInState.java` — `ly.bot.state.impl` — LoggedInState (class)
+- [main] `server/BotServer/src/main/java/ly/bot/stats/PacketLatencyStats.java` — `ly.bot.stats` — PacketLatencyStats (class)
+- [main] `server/BotServer/src/main/java/ly/bot/strategy/RobotBehaviorStrategy.java` — `ly.bot.strategy` — RobotBehaviorStrategy (interface)
+- [main] `server/BotServer/src/main/java/ly/bot/strategy/impl/AggressiveBehaviorStrategy.java` — `ly.bot.strategy.impl` — AggressiveBehaviorStrategy (class)
+- [main] `server/BotServer/src/main/java/ly/bot/strategy/impl/NormalBehaviorStrategy.java` — `ly.bot.strategy.impl` — NormalBehaviorStrategy (class)
+- [main] `server/BotServer/src/main/java/ly/bot/util/ProtocolTester.java` — `ly.bot.util` — ProtocolTester (class)

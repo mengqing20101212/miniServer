@@ -26,7 +26,7 @@ public class HttpServerListClient {
     private final String baseUrl;
 
     public HttpServerListClient(String host, int port) {
-        this.baseUrl = String.format("http://%s:%d", host, port);
+        this.baseUrl = String.format("http://%s:%d/login", host, port);
     }
 
     public static class ServerNode {
