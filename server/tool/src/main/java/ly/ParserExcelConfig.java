@@ -695,7 +695,7 @@ public class ParserExcelConfig {
               + "      new {javaFileSimpleName}ConfigManagerImpl();\n"
               + "\n"
               + "  public boolean isSwitched() {\n"
-              + "    return switched.getAndSet(!switched.get());\n"
+              + "    return switched.get();\n"
               + "  }\n"
               + "\n"
               + "  public static {javaFileSimpleName}ConfigManagerImpl getInstance() {\n"

@@ -3,12 +3,13 @@ package ly.logic.player;
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.google.protobuf.AbstractMessage;
+
 import ly.LoggerDef;
 import ly.logic.player.event.PlayerEventManager;
 import ly.logic.player.event.PlayerEventType;
 import ly.net.GamePlayer;
-import ly.net.packet.MessagePacketFactory;
 import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 import ly.proto.Server;
@@ -69,6 +70,7 @@ public class Player {
                 AbstractModule module = createModuleInstance(moduleEnum, moduleData);
                 module.init(this);
                 module.onLoadData();
+                playerData.putModule(moduleEnum, module);
                 moduleInitLog.LogEnd();
             }
 

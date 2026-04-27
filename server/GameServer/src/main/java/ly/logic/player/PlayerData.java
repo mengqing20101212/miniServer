@@ -1,7 +1,11 @@
 package ly.logic.player;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+
 import ly.db.entry.PlayerEntry;
 
 /**
@@ -10,6 +14,7 @@ import ly.db.entry.PlayerEntry;
 public class PlayerData {
     final PlayerEntry playerEntry;
     PlayerModuleData moduleData;
+    private final Map<String, AbstractModule> modules = new HashMap<>();
 
     public PlayerData(PlayerEntry playerEntry) {
         this.playerEntry = playerEntry;
@@ -32,6 +37,17 @@ public class PlayerData {
         return moduleData.getModuleData(moduleType.getName());
     }
 
+    public PlayerModuleData getModuleData() {
+        return moduleData;
+    }
+
+    public void putModule(ModuleEnum moduleType, AbstractModule module) {
+        modules.put(moduleType.getName(), module);
+    }
+
+    public AbstractModule getModule(ModuleEnum moduleType) {
+        return modules.get(moduleType.getName());
+    }
 
     public PlayerEntry getPlayerEntry() {
         return playerEntry;

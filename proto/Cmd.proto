@@ -11,6 +11,24 @@ enum CMD{
   CS_ErrorCode = 201;                                                               //错误码协议请求
   SC_ErrorCode = 202;                                                               //错误码协议响应
 
+  // 英雄相关协议 1000-1099
+  CS_HeroList = 1001;                                                               //获取英雄列表请求
+  SC_HeroList = 1002;                                                               //获取英雄列表响应
+  CS_HeroLevelUp = 1003;                                                            //英雄升级请求
+  SC_HeroLevelUp = 1004;                                                            //英雄升级响应
+  CS_HeroStarUp = 1005;                                                             //英雄升星请求
+  SC_HeroStarUp = 1006;                                                             //英雄升星响应
+  CS_HeroAwaken = 1007;                                                             //英雄觉醒请求
+  SC_HeroAwaken = 1008;                                                             //英雄觉醒响应
+  CS_HeroAdd = 1009;                                                                //添加英雄请求
+  SC_HeroAdd = 1010;                                                                //添加英雄响应
+
+  // 资源相关协议 1100-1199
+  CS_ResourceQuery = 1101;                                                         //资源查询请求
+  SC_ResourceQuery = 1102;                                                         //资源查询响应
+  SC_ResourceChange = 1201;                                                        //资源变化通知（单号，下行）
+  SC_ResourceBatchChange = 1202;                                                   //批量资源变更通知（单号，下行）
+
   ////////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用///////////////////////////////////////
   CS_Server2Server = 10001;                                                         //server2server 服务器之间通信的消息号 请求
   SC_Server2Server = 10002;                                                         //server2server 服务器之间通信的消息号 响应

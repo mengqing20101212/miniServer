@@ -78,6 +78,118 @@ public final class Cmd {
     SC_ErrorCode(202),
     /**
      * <pre>
+     * 英雄相关协议 1000-1099
+     * </pre>
+     *
+     * <code>CS_HeroList = 1001;</code>
+     */
+    CS_HeroList(1001),
+    /**
+     * <pre>
+     *获取英雄列表响应
+     * </pre>
+     *
+     * <code>SC_HeroList = 1002;</code>
+     */
+    SC_HeroList(1002),
+    /**
+     * <pre>
+     *英雄升级请求
+     * </pre>
+     *
+     * <code>CS_HeroLevelUp = 1003;</code>
+     */
+    CS_HeroLevelUp(1003),
+    /**
+     * <pre>
+     *英雄升级响应
+     * </pre>
+     *
+     * <code>SC_HeroLevelUp = 1004;</code>
+     */
+    SC_HeroLevelUp(1004),
+    /**
+     * <pre>
+     *英雄升星请求
+     * </pre>
+     *
+     * <code>CS_HeroStarUp = 1005;</code>
+     */
+    CS_HeroStarUp(1005),
+    /**
+     * <pre>
+     *英雄升星响应
+     * </pre>
+     *
+     * <code>SC_HeroStarUp = 1006;</code>
+     */
+    SC_HeroStarUp(1006),
+    /**
+     * <pre>
+     *英雄觉醒请求
+     * </pre>
+     *
+     * <code>CS_HeroAwaken = 1007;</code>
+     */
+    CS_HeroAwaken(1007),
+    /**
+     * <pre>
+     *英雄觉醒响应
+     * </pre>
+     *
+     * <code>SC_HeroAwaken = 1008;</code>
+     */
+    SC_HeroAwaken(1008),
+    /**
+     * <pre>
+     *添加英雄请求
+     * </pre>
+     *
+     * <code>CS_HeroAdd = 1009;</code>
+     */
+    CS_HeroAdd(1009),
+    /**
+     * <pre>
+     *添加英雄响应
+     * </pre>
+     *
+     * <code>SC_HeroAdd = 1010;</code>
+     */
+    SC_HeroAdd(1010),
+    /**
+     * <pre>
+     * 资源相关协议 1100-1199
+     * </pre>
+     *
+     * <code>CS_ResourceQuery = 1101;</code>
+     */
+    CS_ResourceQuery(1101),
+    /**
+     * <pre>
+     *资源查询响应
+     * </pre>
+     *
+     * <code>SC_ResourceQuery = 1102;</code>
+     */
+    SC_ResourceQuery(1102),
+    /**
+     * <pre>
+     *资源变化通知（单号，下行）
+     * </pre>
+     *
+     * <code>SC_ResourceChange = 1201;</code>
+     */
+    SC_ResourceChange(1201),
+    /**
+     * <pre>
+     *批量资源变更通知（单号，下行）
+     * </pre>
+     *
+     * <code>SC_ResourceBatchChange = 1202;</code>
+     */
+    SC_ResourceBatchChange(1202),
+    /**
+     * <pre>
      *&#47;/////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用///////////////////////////////////////
      * </pre>
      *
@@ -189,6 +301,118 @@ public final class Cmd {
     public static final int SC_ErrorCode_VALUE = 202;
     /**
      * <pre>
+     * 英雄相关协议 1000-1099
+     * </pre>
+     *
+     * <code>CS_HeroList = 1001;</code>
+     */
+    public static final int CS_HeroList_VALUE = 1001;
+    /**
+     * <pre>
+     *获取英雄列表响应
+     * </pre>
+     *
+     * <code>SC_HeroList = 1002;</code>
+     */
+    public static final int SC_HeroList_VALUE = 1002;
+    /**
+     * <pre>
+     *英雄升级请求
+     * </pre>
+     *
+     * <code>CS_HeroLevelUp = 1003;</code>
+     */
+    public static final int CS_HeroLevelUp_VALUE = 1003;
+    /**
+     * <pre>
+     *英雄升级响应
+     * </pre>
+     *
+     * <code>SC_HeroLevelUp = 1004;</code>
+     */
+    public static final int SC_HeroLevelUp_VALUE = 1004;
+    /**
+     * <pre>
+     *英雄升星请求
+     * </pre>
+     *
+     * <code>CS_HeroStarUp = 1005;</code>
+     */
+    public static final int CS_HeroStarUp_VALUE = 1005;
+    /**
+     * <pre>
+     *英雄升星响应
+     * </pre>
+     *
+     * <code>SC_HeroStarUp = 1006;</code>
+     */
+    public static final int SC_HeroStarUp_VALUE = 1006;
+    /**
+     * <pre>
+     *英雄觉醒请求
+     * </pre>
+     *
+     * <code>CS_HeroAwaken = 1007;</code>
+     */
+    public static final int CS_HeroAwaken_VALUE = 1007;
+    /**
+     * <pre>
+     *英雄觉醒响应
+     * </pre>
+     *
+     * <code>SC_HeroAwaken = 1008;</code>
+     */
+    public static final int SC_HeroAwaken_VALUE = 1008;
+    /**
+     * <pre>
+     *添加英雄请求
+     * </pre>
+     *
+     * <code>CS_HeroAdd = 1009;</code>
+     */
+    public static final int CS_HeroAdd_VALUE = 1009;
+    /**
+     * <pre>
+     *添加英雄响应
+     * </pre>
+     *
+     * <code>SC_HeroAdd = 1010;</code>
+     */
+    public static final int SC_HeroAdd_VALUE = 1010;
+    /**
+     * <pre>
+     * 资源相关协议 1100-1199
+     * </pre>
+     *
+     * <code>CS_ResourceQuery = 1101;</code>
+     */
+    public static final int CS_ResourceQuery_VALUE = 1101;
+    /**
+     * <pre>
+     *资源查询响应
+     * </pre>
+     *
+     * <code>SC_ResourceQuery = 1102;</code>
+     */
+    public static final int SC_ResourceQuery_VALUE = 1102;
+    /**
+     * <pre>
+     *资源变化通知（单号，下行）
+     * </pre>
+     *
+     * <code>SC_ResourceChange = 1201;</code>
+     */
+    public static final int SC_ResourceChange_VALUE = 1201;
+    /**
+     * <pre>
+     *批量资源变更通知（单号，下行）
+     * </pre>
+     *
+     * <code>SC_ResourceBatchChange = 1202;</code>
+     */
+    public static final int SC_ResourceBatchChange_VALUE = 1202;
+    /**
+     * <pre>
      *&#47;/////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用///////////////////////////////////////
      * </pre>
      *
@@ -276,6 +500,20 @@ public final class Cmd {
         case 104: return SC_Logout;
         case 201: return CS_ErrorCode;
         case 202: return SC_ErrorCode;
+        case 1001: return CS_HeroList;
+        case 1002: return SC_HeroList;
+        case 1003: return CS_HeroLevelUp;
+        case 1004: return SC_HeroLevelUp;
+        case 1005: return CS_HeroStarUp;
+        case 1006: return SC_HeroStarUp;
+        case 1007: return CS_HeroAwaken;
+        case 1008: return SC_HeroAwaken;
+        case 1009: return CS_HeroAdd;
+        case 1010: return SC_HeroAdd;
+        case 1101: return CS_ResourceQuery;
+        case 1102: return SC_ResourceQuery;
+        case 1201: return SC_ResourceChange;
+        case 1202: return SC_ResourceBatchChange;
         case 10001: return CS_Server2Server;
         case 10002: return SC_Server2Server;
         case 10003: return CS_RpcPing;
@@ -348,14 +586,22 @@ public final class Cmd {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\tCmd.proto*\224\002\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_" +
+      "\n\tCmd.proto*\267\004\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_" +
       "Login\020e\022\014\n\010SC_Login\020f\022\r\n\tCS_Logout\020g\022\r\n\t" +
       "SC_Logout\020h\022\021\n\014CS_ErrorCode\020\311\001\022\021\n\014SC_Err" +
-      "orCode\020\312\001\022\025\n\020CS_Server2Server\020\221N\022\025\n\020SC_S" +
-      "erver2Server\020\222N\022\017\n\nCS_RpcPing\020\223N\022\017\n\nSC_R" +
-      "pcPing\020\224N\022\034\n\027CS_Gate2GameRpcGameCall\020\225N\022" +
-      "\034\n\027SC_Gate2GameRpcGameCall\020\226N\022\023\n\rMaxServ" +
-      "eMsgId\020\240\234\001B\n\n\010ly.protob\006proto3"
+      "orCode\020\312\001\022\020\n\013CS_HeroList\020\351\007\022\020\n\013SC_HeroLi" +
+      "st\020\352\007\022\023\n\016CS_HeroLevelUp\020\353\007\022\023\n\016SC_HeroLev" +
+      "elUp\020\354\007\022\022\n\rCS_HeroStarUp\020\355\007\022\022\n\rSC_HeroSt" +
+      "arUp\020\356\007\022\022\n\rCS_HeroAwaken\020\357\007\022\022\n\rSC_HeroAw" +
+      "aken\020\360\007\022\017\n\nCS_HeroAdd\020\361\007\022\017\n\nSC_HeroAdd\020\362" +
+      "\007\022\025\n\020CS_ResourceQuery\020\315\010\022\025\n\020SC_ResourceQ" +
+      "uery\020\316\010\022\026\n\021SC_ResourceChange\020\261\t\022\033\n\026SC_Re" +
+      "sourceBatchChange\020\262\t\022\025\n\020CS_Server2Server" +
+      "\020\221N\022\025\n\020SC_Server2Server\020\222N\022\017\n\nCS_RpcPing" +
+      "\020\223N\022\017\n\nSC_RpcPing\020\224N\022\034\n\027CS_Gate2GameRpcG" +
+      "ameCall\020\225N\022\034\n\027SC_Gate2GameRpcGameCall\020\226N" +
+      "\022\023\n\rMaxServeMsgId\020\240\234\001B\n\n\010ly.protob\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

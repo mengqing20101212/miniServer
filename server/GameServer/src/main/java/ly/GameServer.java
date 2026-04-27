@@ -1,8 +1,9 @@
 package ly;
 
 import ly.config.ServerTypeEnum;
-import ly.logic.login.GamePlayerLoginController;
+import ly.logic.hero.HeroController;
 import ly.logic.login.GameLogoutController;
+import ly.logic.login.GamePlayerLoginController;
 import ly.logic.ping.PingController;
 import ly.logic.player.Gate2GameRpcGameCallController;
 import ly.net.GameConnectSessionProvider;
@@ -19,7 +20,8 @@ public class GameServer {
                 new GamePlayerLoginController(),
                 new GameLogoutController(),
                 new Gate2GameRpcGameCallController(),
-                new PingController());
+                new PingController(),
+                new HeroController());
         ServerContext.startUp(resolved.nacosUrl, ServerTypeEnum.GAME.getType(), resolved.serverId, resolved.env, new GameConnectSessionProvider());
 
     }
