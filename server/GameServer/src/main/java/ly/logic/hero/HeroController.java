@@ -12,7 +12,7 @@ import ly.config.HeroInfoConfigManager;
 import ly.config.HeroStarConfig;
 import ly.config.HeroStarConfigManager;
 import ly.config.ResourceType;
-import ly.logic.hero.module.HeroEntry;
+import ly.logic.hero.module.HeroBean;
 import ly.logic.hero.module.HeroModule;
 import ly.logic.player.ModuleEnum;
 import ly.logic.player.Player;
@@ -45,10 +45,10 @@ public class HeroController implements IGameController {
     public void handleHeroList(GameHandlerContext context, Hero.CS_HeroList request) {
         Player player = context.player();
         HeroModule heroModule = (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
-        List<HeroEntry> heroList = heroModule.getHeroList();
+        List<HeroBean> heroList = heroModule.getHeroList();
 
         Hero.SC_HeroList.Builder builder = Hero.SC_HeroList.newBuilder();
-        for (HeroEntry entry : heroList) {
+        for (HeroBean entry : heroList) {
             Hero.HeroInfo info = buildHeroInfo(entry);
             builder.addHeroList(info);
         }
@@ -65,7 +65,7 @@ public class HeroController implements IGameController {
         ResourceModule resourceModule = (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
 
         // 验证英雄存在
-        HeroEntry hero = heroModule.getHero(request.getHeroUid());
+        HeroBean hero = heroModule.getHero(request.getHeroUid());
         if (hero == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroLevelUp, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
@@ -142,7 +142,7 @@ public class HeroController implements IGameController {
         ResourceModule resourceModule = (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
 
         // 验证英雄存在
-        HeroEntry hero = heroModule.getHero(request.getHeroUid());
+        HeroBean hero = heroModule.getHero(request.getHeroUid());
         if (hero == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroStarUp, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
@@ -197,7 +197,7 @@ public class HeroController implements IGameController {
         ResourceModule resourceModule = (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
 
         // 验证英雄存在
-        HeroEntry hero = heroModule.getHero(request.getHeroUid());
+        HeroBean hero = heroModule.getHero(request.getHeroUid());
         if (hero == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroAwaken, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
@@ -257,7 +257,7 @@ public class HeroController implements IGameController {
         }
 
         for (int i = 0; i < request.getCount(); i++) {
-            HeroEntry hero = heroModule.addHero(request.getHeroId());
+            HeroBean hero = heroModule.addHero(request.getHeroId());
             if (hero == null) {
                 player.sendErrorCode(Cmd.CMD.CS_HeroAdd, ErrorMsg.ErrorCode.HERO_SLOT_FULL);
                 return;
@@ -274,7 +274,7 @@ public class HeroController implements IGameController {
     /**
      * 构建英雄信息
      */
-    private Hero.HeroInfo buildHeroInfo(HeroEntry entry) {
+    private Hero.HeroInfo buildHeroInfo(HeroBean entry) {
         Hero.HeroInfo.Builder builder = Hero.HeroInfo.newBuilder();
         builder.setHeroUid(entry.heroUid);
         builder.setHeroId(entry.heroId);

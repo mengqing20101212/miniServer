@@ -4,9 +4,9 @@ import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 
 import ly.config.ResourceType;
-import ly.logic.hero.module.HeroEntry;
+import ly.logic.hero.module.HeroBean;
 import ly.logic.hero.module.HeroModule;
-import ly.logic.hero.module.HeroModuleData;
+import ly.logic.hero.module.HeroModule;
 import ly.logic.player.ModuleEnum;
 import ly.logic.player.Player;
 import ly.logic.player.PlayerData;
@@ -73,8 +73,6 @@ public class HeroControllerTest {
         // 初始化英雄模块和资源模块
         heroModule = new HeroModule();
         heroModule.init(mockPlayer);
-        // 直接设置 moduleData，跳过 onLoadData
-        setField(heroModule, "moduleData", new HeroModuleData());
 
         resourceModule = new ResourceModule();
         resourceModule.init(mockPlayer);
@@ -184,7 +182,7 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroLevelUp() {
         // 添加一个英雄
-        HeroEntry hero = heroModule.addHero(1001);
+        HeroBean hero = heroModule.addHero(1001);
         int initialLevel = hero.level;
 
         // 创建升级请求（使用经验道具 ID 列表）
@@ -238,7 +236,7 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroLevelUpInsufficientExpItems() {
         // 添加一个英雄
-        HeroEntry hero = heroModule.addHero(1001);
+        HeroBean hero = heroModule.addHero(1001);
 
         // 清空经验道具
         resourceModule.deductResource(ResourceType.EXP_ITEM, 5000);
@@ -263,7 +261,7 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroStarUp() {
         // 添加一个英雄
-        HeroEntry hero = heroModule.addHero(2);
+        HeroBean hero = heroModule.addHero(2);
 
         // 创建升星请求
         Hero.CS_HeroStarUp request = Hero.CS_HeroStarUp.newBuilder()
@@ -303,7 +301,7 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroAwaken() {
         // 添加一个英雄
-        HeroEntry hero = heroModule.addHero(2);
+        HeroBean hero = heroModule.addHero(2);
 
         // 创建觉醒请求
         Hero.CS_HeroAwaken request = Hero.CS_HeroAwaken.newBuilder()
@@ -366,7 +364,7 @@ public class HeroControllerTest {
         assertEquals("应返回 1 个英雄", 1, response.getHeroListCount());
 
         // 验证英雄确实被添加
-        HeroEntry addedHero = heroModule.getHero(mockPlayer.getPlayerId() * 1000000L + 2);
+        HeroBean addedHero = heroModule.getHero(mockPlayer.getPlayerId() * 1000000L + 2);
         assertNotNull("英雄应被添加", addedHero);
         assertEquals("英雄 ID 应正确", 2, addedHero.heroId);
     }
@@ -453,7 +451,7 @@ public class HeroControllerTest {
         long initialExpItem = resourceModule.getResource(ResourceType.EXP_ITEM);
 
         // 添加英雄并尝试升级
-        HeroEntry hero = heroModule.addHero(1001);
+        HeroBean hero = heroModule.addHero(1001);
 
         // 创建升级请求
         Hero.CS_HeroLevelUp request = Hero.CS_HeroLevelUp.newBuilder()

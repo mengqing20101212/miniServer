@@ -31,8 +31,6 @@ public class HeroModuleTest {
         // 初始化英雄模块
         heroModule = new HeroModule();
         setField(heroModule, "player", mockPlayer);
-        // 直接初始化 moduleData，跳过 onLoadData（因为需要 PlayerData）
-        setField(heroModule, "moduleData", new HeroModuleData());
     }
 
     @After
@@ -62,7 +60,7 @@ public class HeroModuleTest {
     @Test
     public void testAddHero() {
         // 添加英雄ID为1的英雄
-        HeroEntry hero = heroModule.addHero(1);
+        HeroBean hero = heroModule.addHero(1);
 
         assertNotNull("添加的英雄不应为空", hero);
         assertEquals("英雄ID应为1", 1, hero.heroId);
@@ -85,11 +83,11 @@ public class HeroModuleTest {
     @Test
     public void testGetHero() {
         // 添加一个英雄
-        HeroEntry addedHero = heroModule.addHero(2);
+        HeroBean addedHero = heroModule.addHero(2);
         long heroUid = addedHero.heroUid;
 
         // 获取英雄
-        HeroEntry hero = heroModule.getHero(heroUid);
+        HeroBean hero = heroModule.getHero(heroUid);
 
         assertNotNull("应能获取到英雄", hero);
         assertEquals("获取的英雄ID应正确", hero.heroId, addedHero.heroId);
@@ -101,7 +99,7 @@ public class HeroModuleTest {
      */
     @Test
     public void testGetNonExistentHero() {
-        HeroEntry hero = heroModule.getHero(999999L);
+        HeroBean hero = heroModule.getHero(999999L);
         assertNull("不存在的英雄应返回null", hero);
     }
 
@@ -145,15 +143,13 @@ public class HeroModuleTest {
         MockPlayer player1 = new MockPlayer(1L);
         HeroModule module1 = new HeroModule();
         setField(module1, "player", player1);
-        setField(module1, "moduleData", new HeroModuleData());
-        HeroEntry hero1 = module1.addHero(100);
+        HeroBean hero1 = module1.addHero(100);
 
         // 玩家2添加相同ID的英雄
         MockPlayer player2 = new MockPlayer(2L);
         HeroModule module2 = new HeroModule();
         setField(module2, "player", player2);
-        setField(module2, "moduleData", new HeroModuleData());
-        HeroEntry hero2 = module2.addHero(100);
+        HeroBean hero2 = module2.addHero(100);
 
         // 验证heroUid不同
         assertNotEquals("不同玩家的heroUid应不同", hero1.heroUid, hero2.heroUid);

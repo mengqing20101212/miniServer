@@ -1,10 +1,11 @@
 package ly.logic.hero.module;
 
-import com.baidu.bjf.remoting.protobuf.Codec;
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
+import com.baidu.bjf.remoting.protobuf.annotation.EnableZigZap;
 import ly.logic.player.AbstractModule;
 import ly.logic.player.ModuleEnum;
-import ly.proto.Hero;
 
 import ly.logic.player.event.PlayerEventParam;
 
@@ -16,37 +17,27 @@ import ly.logic.player.event.PlayerEventType;
 
 /**
  * 英雄模块
+ * 继承 AbstractModule，自身为 @ProtobufClass，框架自动处理序列化/反序列化。
  */
+@ProtobufClass
+@EnableZigZap
 public class HeroModule extends AbstractModule {
-    private HeroModuleData moduleData;
+
+    @Protobuf(fieldType = FieldType.OBJECT, order = 1, required = false)
+    public List<HeroBean> heroList = new ArrayList<>();
+
+    @Protobuf(fieldType = FieldType.INT32, order = 2, required = false)
+    public int maxHeroCount = 100; // 最大英雄数量
 
     @Override
     public void onLoadData() {
-        byte[] data = player.getPlayerData().getModuleData(ModuleEnum.HERO_MODULE);
-        if (data != null && data.length > 0) {
-            try {
-                Codec<HeroModuleData> codec = ProtobufProxy.create(HeroModuleData.class);
-                moduleData = codec.decode(data);
-            } catch (Exception e) {
-                System.err.println("Error loading HeroModuleData for player " + player.getPlayerId() + ": " + e.getMessage());
-                moduleData = new HeroModuleData();
-            }
-        } else {
-            moduleData = new HeroModuleData();
-        }
+        // 框架自动反序列化，无需特殊逻辑
     }
 
     @Override
     public boolean saveData() {
-        try {
-            Codec<HeroModuleData> codec = ProtobufProxy.create(HeroModuleData.class);
-            byte[] data = codec.encode(moduleData);
-            player.getPlayerData().getModuleData().addModuleData(ModuleEnum.HERO_MODULE.getName(), data);
-            return true;
-        } catch (Exception e) {
-            System.err.println("Error saving HeroModuleData for player " + player.getPlayerId() + ": " + e.getMessage());
-            return false;
-        }
+        // 框架定时自动保存，无需特殊逻辑
+        return true;
     }
 
     @Override
@@ -67,15 +58,15 @@ public class HeroModule extends AbstractModule {
     /**
      * 获取英雄列表
      */
-    public List<HeroEntry> getHeroList() {
-        return moduleData.heroList;
+    public List<HeroBean> getHeroList() {
+        return heroList;
     }
 
     /**
      * 获取单个英雄
      */
-    public HeroEntry getHero(long heroUid) {
-        for (HeroEntry hero : moduleData.heroList) {
+    public HeroBean getHero(long heroUid) {
+        for (HeroBean hero : heroList) {
             if (hero.heroUid == heroUid) {
                 return hero;
             }
@@ -86,22 +77,22 @@ public class HeroModule extends AbstractModule {
     /**
      * 添加英雄
      */
-    public HeroEntry addHero(int heroId) {
-        if (moduleData.heroList.size() >= moduleData.maxHeroCount) {
+    public HeroBean addHero(int heroId) {
+        if (heroList.size() >= maxHeroCount) {
             return null;
         }
         long heroUid = generateHeroUid(heroId);
         if (getHero(heroUid) != null) {
             return null;
         }
-        HeroEntry hero = new HeroEntry();
+        HeroBean hero = new HeroBean();
         hero.heroUid = heroUid;
         hero.heroId = heroId;
         hero.level = 1;
         hero.star = 1;
         hero.awaken = 0;
         hero.exp = 0;
-        moduleData.heroList.add(hero);
+        heroList.add(hero);
         return hero;
     }
 

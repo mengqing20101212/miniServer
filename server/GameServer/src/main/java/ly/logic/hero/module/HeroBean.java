@@ -6,11 +6,11 @@ import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.annotation.EnableZigZap;
 
 /**
- * 英雄数据实体
+ * 英雄数据 JavaBean
  */
 @ProtobufClass
 @EnableZigZap
-public class HeroEntry {
+public class HeroBean {
     @Protobuf(fieldType = FieldType.INT64, order = 1, required = false)
     public long heroUid;  // 英雄唯一ID（生成规则：playerId * 1000000 + heroId）
 
