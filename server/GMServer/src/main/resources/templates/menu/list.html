@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .menu-container { padding: 20px; }
+        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .menu-header h2 { margin: 0; font-size: 1.5rem; }
+        .table th { white-space: nowrap; background-color: #f8f9fa; }
+        .table td { vertical-align: middle; }
+        .action-btns .btn { padding: 0.25rem 0.5rem; font-size: 0.85rem; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #6c757d; }
+        .empty-state i { font-size: 3rem; margin-bottom: 15px; display: block; }
+        .tree-indent { display: inline-block; }
+        .tree-toggle { cursor: pointer; color: #6c757d; margin-right: 4px; user-select: none; }
+        .tree-toggle:hover { color: #0d6efd; }
+        .menu-icon-display { display: inline-block; width: 28px; text-align: center; }
+        .floating-alert { position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .menu-name-cell { font-weight: 500; }
+        .menu-name-cell .text-muted { font-weight: normal; }
+        .perm-badge { font-size: 0.8em; font-family: monospace; }
+    </style>
+</head>
+<body>
+<div class="menu-container">
+    <!-- Header -->
+    <div class="menu-header">
+        <h2><i class="fas fa-sitemap me-2"></i>Menu Management</h2>
+        <button class="btn btn-primary" onclick="location.href='/gm/menu/add'">
+            <i class="fas fa-plus me-1"></i>Add Menu
+        </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th style="width:60px;">ID</th>
+                    <th>Name</th>
+                    <th style="width:180px;">Parent</th>
+                    <th style="width:140px;">Permission</th>
+                    <th>Path</th>
+                    <th style="width:60px;">Icon</th>
+                    <th style="width:60px;">Sort</th>
+                    <th style="width:130px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="menuTableBody">
+                <tr id="loadingRow">
+                    <td colspan="8" class="text-center py-4">
+                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                        Loading...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display:none;">
+        <i class="fas fa-sitemap"></i>
+        <p>No menus found. Click "Add Menu" to create one.</p>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-danger me-2"></i>Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="deleteMenuId">
+                <p>Are you sure you want to delete menu <strong id="deleteMenuName"></strong>?</p>
+                <p class="text-danger mb-0"><i class="fas fa-info-circle me-1"></i>This will also remove all child menus. This action cannot be undone.</p>
+                <div id="deleteError" class="alert alert-danger d-none mt-2"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="submitDelete()">
+                    <i class="fas fa-trash me-1"></i>Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    var deleteModal = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        loadMenus();
+    });
+
+    function loadMenus() {
+        document.getElementById('emptyState').style.display = 'none';
+
+        apiGet('/api/menu/tree', function(err, data) {
+            if (err) {
+                showError('Failed to load menus: ' + (err.message || 'Unknown error'));
+                return;
+            }
+            renderTable(data);
+        });
+    }
+
+    function flattenTree(nodes, depth) {
+        if (!nodes || !Array.isArray(nodes)) return [];
+        depth = depth || 0;
+        var result = [];
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            node._depth = depth;
+            result.push(node);
+            var children = node.children || node.subMenu || node.submenu || [];
+            if (children && Array.isArray(children) && children.length > 0) {
+                var childItems = flattenTree(children, depth + 1);
+                result = result.concat(childItems);
+            }
+        }
+        return result;
+    }
+
+    function getParentName(nodes, parentId) {
+        if (!parentId || parentId === 0) return '';
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].id === parentId) {
+                return nodes[i].name || nodes[i].title || '';
+            }
+        }
+        return 'ID: ' + parentId;
+    }
+
+    function renderTable(data) {
+        var menus = data;
+        if (data && data.data && Array.isArray(data.data)) menus = data.data;
+        else if (data && data.menus && Array.isArray(data.menus)) menus = data.menus;
+        else if (data && data.list && Array.isArray(data.list)) menus = data.list;
+        else if (data && data.content && Array.isArray(data.content)) menus = data.content;
+        else if (data && data.rows && Array.isArray(data.rows)) menus = data.rows;
+
+        if (!Array.isArray(menus)) menus = [];
+
+        var tbody = document.getElementById('menuTableBody');
+        var emptyState = document.getElementById('emptyState');
+
+        if (!menus.length) {
+            tbody.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+
+        var flat = flattenTree(menus, 0);
+        var html = '';
+
+        for (var i = 0; i < flat.length; i++) {
+            var m = flat[i];
+            var id = m.id || m.menuId || '';
+            var name = m.name || m.title || m.label || '-';
+            var permission = m.permission || m.perm || '';
+            var path = m.path || m.route || m.url || '';
+            var icon = m.icon || '';
+            var sort = m.sort || m.sortOrder || m.orderNum || 0;
+            var depth = m._depth || 0;
+            var parentId = m.parentId || 0;
+
+            // Indent by depth
+            var indentHtml = '';
+            var indentPx = depth * 24;
+            if (depth > 0) {
+                indentHtml = '<span class="tree-indent" style="width:' + indentPx + 'px;display:inline-block;"></span>';
+                indentHtml += '<span class="tree-toggle"><i class="fas fa-level-down fa-rotate-90"></i></span>';
+            }
+
+            var iconHtml = icon ? '<i class="fas ' + esc(icon) + '"></i>' : '<span class="text-muted">-</span>';
+            var permHtml = permission ? '<span class="badge bg-secondary perm-badge">' + esc(permission) + '</span>' : '<span class="text-muted">-</span>';
+            var pathHtml = path ? '<code>' + esc(path) + '</code>' : '<span class="text-muted">-</span>';
+
+            // Find parent name from flat list
+            var parentName = getParentName(flat, parentId);
+            var parentHtml = parentName ? esc(parentName) : '<span class="text-muted fst-italic">None (Root)</span>';
+
+            html += '<tr>' +
+                '<td>' + esc(id) + '</td>' +
+                '<td class="menu-name-cell">' + indentHtml + esc(name) + '</td>' +
+                '<td class="small">' + parentHtml + '</td>' +
+                '<td>' + permHtml + '</td>' +
+                '<td>' + pathHtml + '</td>' +
+                '<td class="menu-icon-display">' + iconHtml + '</td>' +
+                '<td>' + sort + '</td>' +
+                '<td class="action-btns">' +
+                    '<a href="/gm/menu/edit/' + id + '" class="btn btn-sm btn-outline-primary me-1" title="Edit"><i class="fas fa-edit"></i></a>' +
+                    '<button class="btn btn-sm btn-outline-danger" title="Delete" onclick="openDelete(' + id + ',\'' + escJS(name) + '\')"><i class="fas fa-trash"></i></button>' +
+                '</td></tr>';
+        }
+
+        tbody.innerHTML = html;
+    }
+
+    function showError(msg) {
+        var tbody = document.getElementById('menuTableBody');
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-danger">' +
+            '<i class="fas fa-exclamation-circle me-2"></i>' + esc(msg) + '</td></tr>';
+        document.getElementById('emptyState').style.display = 'none';
+    }
+
+    window.openDelete = function(id, name) {
+        document.getElementById('deleteMenuId').value = id;
+        document.getElementById('deleteMenuName').textContent = decodeHTMLEntities(name);
+        document.getElementById('deleteError').classList.add('d-none');
+        deleteModal.show();
+    };
+
+    window.submitDelete = function() {
+        var id = document.getElementById('deleteMenuId').value;
+        var errEl = document.getElementById('deleteError');
+        errEl.classList.add('d-none');
+
+        var btn = document.querySelector('#deleteModal .btn-danger');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Deleting...';
+
+        apiPost('/api/menu/delete/' + id, null, function(err) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-trash me-1"></i>Delete';
+            if (err) {
+                errEl.textContent = 'Error: ' + (err.message || 'Unknown error');
+                errEl.classList.remove('d-none');
+                return;
+            }
+            deleteModal.hide();
+            showSuccess('Menu deleted successfully.');
+            loadMenus();
+        });
+    };
+
+    function showSuccess(msg) {
+        var el = document.getElementById('successAlert');
+        if (el) el.remove();
+        el = document.createElement('div');
+        el.id = 'successAlert';
+        el.className = 'alert alert-success alert-dismissible fade show floating-alert';
+        el.innerHTML = '<i class="fas fa-check-circle me-2"></i>' + esc(msg) +
+            '<button type="button" class="btn-close ms-2" onclick="this.parentElement.remove()"></button>';
+        document.body.appendChild(el);
+        setTimeout(function() { if (el.parentElement) el.remove(); }, 4000);
+    }
+
+    function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    function escJS(s) { if (!s) return ''; return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'\\r'); }
+    function decodeHTMLEntities(s) { if (!s) return ''; var t = document.createElement('textarea'); t.innerHTML = s; return t.value; }
+})();
+</script>
+</body>
+</html>

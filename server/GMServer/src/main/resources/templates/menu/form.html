@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-container { padding: 20px; max-width: 650px; margin: 0 auto; }
+        .form-header { margin-bottom: 20px; }
+        .form-header h2 { font-size: 1.5rem; margin: 0; }
+        .form-label { font-weight: 500; }
+        .required::after { content: " *"; color: #dc3545; }
+        .card-body { padding: 30px; }
+        .btn-group-wide { display: flex; gap: 10px; }
+        .btn-group-wide .btn { flex: 1; }
+        .icon-preview { display: inline-block; width: 32px; text-align: center; font-size: 1.2rem; color: #6c757d; }
+        .alert-fixed { position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .form-text small { color: #6c757d; }
+        .input-group-text { background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <!-- Header -->
+    <div class="form-header d-flex justify-content-between align-items-center">
+        <h2 id="formTitle"><i class="fas fa-plus-square me-2"></i>Add Menu</h2>
+        <a href="/gm/menu/list" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
+
+    <!-- Error Alert -->
+    <div id="errorAlert" class="alert alert-danger d-none" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span id="errorText"></span>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card">
+        <div class="card-body">
+            <input type="hidden" id="menuId" value="">
+
+            <!-- Name -->
+            <div class="mb-3">
+                <label for="name" class="form-label required">Name</label>
+                <input type="text" id="name" class="form-control" placeholder="e.g. User Management" maxlength="50" autocomplete="off">
+            </div>
+
+            <!-- Permission -->
+            <div class="mb-3">
+                <label for="permission" class="form-label">Permission</label>
+                <input type="text" id="permission" class="form-control" placeholder="e.g. system:user:list (optional)" maxlength="100" autocomplete="off">
+                <div class="form-text"><small>Permission identifier for role-based access control. Leave blank if not needed.</small></div>
+            </div>
+
+            <!-- Parent Menu -->
+            <div class="mb-3">
+                <label for="parentId" class="form-label">Parent Menu</label>
+                <select id="parentId" class="form-select">
+                    <option value="0">-- None (Root) --</option>
+                </select>
+                <div class="form-text"><small>Select a parent menu to create a sub-menu.</small></div>
+            </div>
+
+            <!-- Path -->
+            <div class="mb-3">
+                <label for="path" class="form-label">Path</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-link"></i></span>
+                    <input type="text" id="path" class="form-control" placeholder="e.g. /gm/admin/list" maxlength="200" autocomplete="off">
+                </div>
+                <div class="form-text"><small>The route path for this menu item.</small></div>
+            </div>
+
+            <!-- Icon -->
+            <div class="mb-3">
+                <label for="icon" class="form-label">Icon</label>
+                <div class="input-group">
+                    <span class="input-group-text icon-preview" id="iconPreview"><i class="fas fa-icons"></i></span>
+                    <input type="text" id="icon" class="form-control" placeholder="e.g. fa-users, fa-cog" maxlength="50" autocomplete="off">
+                </div>
+                <div class="form-text"><small>Font Awesome icon class (without the "fas" prefix). Example: fa-user-shield</small></div>
+            </div>
+
+            <!-- Sort Order -->
+            <div class="mb-3">
+                <label for="sortOrder" class="form-label">Sort Order</label>
+                <input type="number" id="sortOrder" class="form-control" value="0" min="0" max="9999">
+                <div class="form-text"><small>Lower numbers appear first.</small></div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="btn-group-wide mt-4">
+                <button type="button" class="btn btn-primary" onclick="submitForm()" id="submitBtn">
+                    <i class="fas fa-save me-1"></i><span id="submitBtnText">Save</span>
+                </button>
+                <a href="/gm/menu/list" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    var isEditMode = false;
+    var editMenuId = null;
+    var allMenus = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Detect mode from URL path
+        var path = window.location.pathname;
+        if (/\/edit\//.test(path)) {
+            isEditMode = true;
+            var parts = path.split('/');
+            for (var i = 0; i < parts.length; i++) {
+                if (parts[i] === 'edit' && i + 1 < parts.length) {
+                    editMenuId = parts[i + 1];
+                    break;
+                }
+            }
+        }
+
+        setupMode();
+
+        // Live icon preview
+        document.getElementById('icon').addEventListener('input', function() {
+            updateIconPreview();
+        });
+
+        // Load parent menu list
+        loadParentMenus();
+    });
+
+    function setupMode() {
+        var title = document.getElementById('formTitle');
+        var submitBtnText = document.getElementById('submitBtnText');
+
+        if (isEditMode) {
+            title.innerHTML = '<i class="fas fa-edit me-2"></i>Edit Menu';
+            submitBtnText.textContent = 'Update';
+        } else {
+            title.innerHTML = '<i class="fas fa-plus-square me-2"></i>Add Menu';
+            submitBtnText.textContent = 'Save';
+        }
+    }
+
+    function updateIconPreview() {
+        var iconVal = document.getElementById('icon').value.trim();
+        var preview = document.getElementById('iconPreview');
+        if (iconVal) {
+            preview.innerHTML = '<i class="fas ' + esc(iconVal) + '"></i>';
+        } else {
+            preview.innerHTML = '<i class="fas fa-icons"></i>';
+        }
+    }
+
+    // Flatten tree for dropdown options
+    function flattenForDropdown(nodes, depth) {
+        if (!nodes || !Array.isArray(nodes)) return [];
+        depth = depth || 0;
+        var result = [];
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            var indent = '';
+            for (var j = 0; j < depth; j++) {
+                indent += '&nbsp;&nbsp;&nbsp;';
+            }
+            if (depth > 0) {
+                indent += '└ ';
+            }
+            node._displayName = indent + (node.name || node.title || node.label || 'Menu');
+            node._depth = depth;
+            result.push(node);
+            var children = node.children || node.subMenu || node.submenu || [];
+            if (children && Array.isArray(children) && children.length > 0) {
+                var childItems = flattenForDropdown(children, depth + 1);
+                result = result.concat(childItems);
+            }
+        }
+        return result;
+    }
+
+    function loadParentMenus() {
+        var select = document.getElementById('parentId');
+        select.innerHTML = '<option value="0">-- None (Root) --</option>';
+
+        apiGet('/api/menu/tree', function(err, data) {
+            if (err) {
+                console.error('Failed to load menus:', err);
+                return;
+            }
+
+            var menus = data;
+            if (data && data.data && Array.isArray(data.data)) menus = data.data;
+            else if (data && data.menus && Array.isArray(data.menus)) menus = data.menus;
+            else if (data && data.list && Array.isArray(data.list)) menus = data.list;
+            else if (data && data.content && Array.isArray(data.content)) menus = data.content;
+            else if (data && data.rows && Array.isArray(data.rows)) menus = data.rows;
+
+            if (!Array.isArray(menus)) menus = [];
+
+            allMenus = flattenForDropdown(menus, 0);
+
+            for (var i = 0; i < allMenus.length; i++) {
+                var m = allMenus[i];
+                var mid = m.id || m.menuId || m.key || '';
+                if (mid) {
+                    // Don't allow selecting self as parent in edit mode
+                    if (isEditMode && String(mid) === String(editMenuId)) {
+                        continue;
+                    }
+                    var opt = document.createElement('option');
+                    opt.value = mid;
+                    opt.innerHTML = m._displayName;
+                    select.appendChild(opt);
+                }
+            }
+
+            // If edit mode, load menu data after dropdown is ready
+            if (isEditMode && editMenuId) {
+                loadMenuData(editMenuId);
+            }
+        });
+    }
+
+    function loadMenuData(id) {
+        apiGet('/api/menu/tree', function(err, data) {
+            if (err) {
+                showAlert('Failed to load menu data: ' + (err.message || 'Unknown error'));
+                return;
+            }
+
+            var menus = data;
+            if (data && data.data && Array.isArray(data.data)) menus = data.data;
+            else if (data && data.menus && Array.isArray(data.menus)) menus = data.menus;
+            else if (data && data.list && Array.isArray(data.list)) menus = data.list;
+            else if (data && data.content && Array.isArray(data.content)) menus = data.content;
+            else if (data && data.rows && Array.isArray(data.rows)) menus = data.rows;
+            if (!Array.isArray(menus)) menus = [];
+
+            // Find the menu by id in the flattened tree
+            function findInTree(nodes, targetId) {
+                for (var i = 0; i < nodes.length; i++) {
+                    if (String(nodes[i].id) === String(targetId)) {
+                        return nodes[i];
+                    }
+                    var children = nodes[i].children || nodes[i].subMenu || nodes[i].submenu || [];
+                    if (children && Array.isArray(children) && children.length > 0) {
+                        var found = findInTree(children, targetId);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            }
+
+            var menu = findInTree(menus, id);
+
+            if (!menu) {
+                showAlert('Menu not found.');
+                return;
+            }
+
+            document.getElementById('menuId').value = id;
+            document.getElementById('name').value = menu.name || menu.title || '';
+            document.getElementById('permission').value = menu.permission || '';
+            document.getElementById('path').value = menu.path || menu.route || menu.url || '';
+            document.getElementById('icon').value = menu.icon || '';
+            document.getElementById('sortOrder').value = menu.sort || menu.sortOrder || menu.orderNum || 0;
+
+            // Set parent
+            var parentId = menu.parentId || 0;
+            var parentSelect = document.getElementById('parentId');
+            if (parentId && parentId !== 0) {
+                for (var i = 0; i < parentSelect.options.length; i++) {
+                    if (String(parentSelect.options[i].value) === String(parentId)) {
+                        parentSelect.value = parentId;
+                        break;
+                    }
+                }
+            }
+
+            updateIconPreview();
+        });
+    }
+
+    // Form submission
+    window.submitForm = function() {
+        var btn = document.getElementById('submitBtn');
+        var errorEl = document.getElementById('errorAlert');
+        var errorText = document.getElementById('errorText');
+        errorEl.classList.add('d-none');
+
+        // Validation
+        var name = document.getElementById('name').value.trim();
+        if (!name) {
+            showAlert('Menu name is required.');
+            document.getElementById('name').focus();
+            return;
+        }
+
+        var permission = document.getElementById('permission').value.trim();
+        var parentId = parseInt(document.getElementById('parentId').value) || 0;
+        var path = document.getElementById('path').value.trim();
+        var icon = document.getElementById('icon').value.trim();
+        var sortOrder = parseInt(document.getElementById('sortOrder').value) || 0;
+
+        // Build payload
+        var payload = {
+            name: name,
+            permission: permission || undefined,
+            parentId: parentId,
+            path: path || undefined,
+            icon: icon || undefined,
+            sortOrder: sortOrder
+        };
+
+        if (isEditMode) {
+            payload.id = document.getElementById('menuId').value;
+        }
+
+        // Clean up undefined values
+        if (payload.permission === undefined) delete payload.permission;
+        if (payload.path === undefined) delete payload.path;
+        if (payload.icon === undefined) delete payload.icon;
+
+        // Disable button
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+
+        var url = isEditMode ? '/api/menu/update' : '/api/menu/create';
+
+        apiPost(url, payload, function(err, data) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save me-1"></i>' + (isEditMode ? 'Update' : 'Save');
+
+            if (err) {
+                showAlert('Failed to save: ' + (err.message || 'Unknown error'));
+                return;
+            }
+
+            // Success - redirect to list
+            window.location.href = '/gm/menu/list';
+        });
+    };
+
+    function showAlert(msg) {
+        var errorEl = document.getElementById('errorAlert');
+        var errorText = document.getElementById('errorText');
+        errorText.textContent = msg;
+        errorEl.classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+})();
+</script>
+</body>
+</html>

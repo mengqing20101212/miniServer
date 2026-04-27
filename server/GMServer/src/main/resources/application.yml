@@ -11,9 +11,9 @@ spring:
     encoding: UTF-8
     cache: false
   datasource:
-    url: jdbc:mysql://localhost:3306/gm_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8
+    url: jdbc:mysql://118.25.76.117:3306/pick_money?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8
     username: root
-    password: root
+    password: Ly@2026Root!8899
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -31,9 +31,3 @@ logging:
     ly: DEBUG
     org.springframework.security: INFO
     org.springframework.web: INFO
-
-# Nacos configuration for game server discovery
-gmserver:
-  nacos-url: localhost:8848
-  server-id: gm1001
-  env: ly
