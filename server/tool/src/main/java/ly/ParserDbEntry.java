@@ -23,6 +23,16 @@ public class ParserDbEntry {
   String username = "root";
   String password = "Ly@2026Root!8899";
   String targetDir = "D:\\WORK\\me\\miniServer\\server\\core\\src\\main\\java\\ly\\db\\entry";
+
+  public ParserDbEntry() {}
+
+  public ParserDbEntry(String targetModule) {
+    if ("core".equalsIgnoreCase(targetModule)) {
+      this.targetDir = "D:\\WORK\\me\\miniServer\\server\\core\\src\\main\\java\\ly\\db\\entry";
+    } else if ("GMServer".equalsIgnoreCase(targetModule)) {
+      this.targetDir = "D:\\WORK\\me\\miniServer\\server\\GMServer\\src\\main\\java\\ly\\db\\entry";
+    }
+  }
   HikariDataSource dataSource;
   List<TableInfo> tables = new ArrayList<TableInfo>();
 
@@ -551,9 +561,9 @@ public class ParserDbEntry {
   }
 
   public static void main(String[] args) {
-    String str = "test";
-    System.out.println(toUpperCamelCase(str));
-    ParserDbEntry dbParser = new ParserDbEntry();
+    String targetModule = (args.length > 0) ? args[0] : "core";
+    System.out.println("Generating entries for module: " + targetModule);
+    ParserDbEntry dbParser = new ParserDbEntry(targetModule);
     dbParser.parser();
     System.out.println(dbParser.tables);
   }

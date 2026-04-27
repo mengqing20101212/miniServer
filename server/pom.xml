@@ -17,5 +17,6 @@
         <module>GameServer</module>
         <module>GateServer</module>
         <module>BotServer</module>
+        <module>GMServer</module>
     </modules>
 </project>
