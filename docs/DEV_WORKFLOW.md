@@ -1,247 +1,373 @@
-# MiniServer Dev Workflow
+# miniServer 全链路开发流程
 
-更新时间: 2026-04-26
+> 本文档由 Hermes Agent 维护，对应 skill: `miniserver-full-dev-workflow`
+> 最后更新: 2026-04-27
 
-## 1. 目标
-本文整理 miniServer 当前真实可用的开发工作流，重点覆盖：
-- 构建
-- 生成链路
-- 本地启动顺序
-- VS Code 调试
-- 常见验证点
+## 项目概要
 
-运行参数优先级：
-1. `STARTUP.SKILL.md`
-2. `server/core/src/main/java/ly/startup/StartupSkillLoader.java`
-3. `.vscode/launch.json`
-4. 旧说明文件，如 `nacos-config.txt`
+miniServer 是一个 Java 21 + Maven 多模块游戏服务器项目。
 
-如果这些文件冲突，以 `STARTUP.SKILL.md` 为准。
+**repo 路径（WSL）：** `/mnt/d/WORK/me/miniServer`  
+**Maven 聚合根：** `server/pom.xml`
 
-## 2. 当前确认的运行参数
-来自 `STARTUP.SKILL.md`：
-- Nacos: `118.25.76.117:8848`
-- namespace/env: `ly`
-- LoginServer:
-  - serverType: `LOGIN`
-  - serverId: `login`
-  - netPort: `8888`
-  - springPort: `8889`
-- GameServer:
-  - serverType: `GAME`
-  - serverId: `game1001`
-  - netPort: `9002`
-- GateServer:
-  - serverType: `GATE`
-  - serverId: `gate1001`
-  - netPort: `9001`
-- BotServer:
-  - command: `--run-bots`
-  - loginHost: `127.0.0.1`
-  - loginHttpPort: `8889`
-  - numBots: `1`
+## 模块一览
 
-固定启动顺序：
-1. LoginServer
-2. GameServer
-3. GateServer
-4. BotServer
+| 模块 | 路径 | 用途 |
+|------|------|------|
+| config | `server/config/` | 配置类 & 管理器（自动生成） |
+| proto | `server/proto/` | Protobuf Java 类 & 工厂 |
+| core | `server/core/` | 运行时基础（net/rpc/nacos/mysql/redis） |
+| tool | `server/tool/` | Excel→txt→Java 代码生成器 |
+| LoginServer | `server/LoginServer/` | HTTP 登录服务 |
+| GameServer | `server/GameServer/` | 主游戏逻辑（heroModel 等在这里） |
+| GateServer | `server/GateServer/` | 客户端网关 |
+| BotServer | `server/BotServer/` | 机器人压力测试 |
 
-## 3. 环境要求
-- Java 21
-- Maven
-- 可访问的 Nacos / MySQL / Redis
-- 推荐使用仓库自带 VS Code Java 配置
+## 配置表生成流水线
 
-已看到的本地编辑器配置：
-- `.vscode/settings.json` 指向 `D:\Soft\env\Java\jdk-21`
-- Maven 构建根设为 `server/pom.xml`
+这是最关键的流程，**Excel 是数据源**：
 
-## 4. 构建入口
-推荐构建根目录：`server/`
-
-全量构建：
-```bash
-cd server
-mvn -DskipTests install
+```
+excel/hero*.xlsx
+    │  (ParserExcelConfig 读取 Excel Row0=表头, Row2=类型)
+    ▼
+excel/serverConfig/hero*.txt       ← 导出文本
+server/config/src/main/java/ly/config/Hero*Config*.java  ← 生成 Java
 ```
 
-如果只想做常规编译：
+### Excel 结构约定（ParserExcelConfig 解析规则）
+
+| Excel Row | 内容 |
+|-----------|------|
+| Row 0 | 服务端表头（字段名） |
+| Row 1 | 客户端表头（客户端专用） |
+| Row 2 | 类型定义（INT / STRING / INT1 / INT2 / STRING2 / LONG / FLOAT / DOUBLE） |
+| Row 3 | 注释/描述 |
+| Row 4 | 空行 |
+| Row 5+ | 数据行（第1列标记 `#` 才被导出） |
+
+### 类型映射
+
+| Excel 类型 | Java 类型 | 示例 |
+|-----------|-----------|------|
+| INT | `int` | `Integer.parseInt(arr[i])` |
+| LONG | `long` | `Long.parseLong(arr[i])` |
+| STRING | `String` | `arr[i].trim()` |
+| INT1 | `List<Integer>` | `parseIntList(arr[i])` — 逗号分隔 |
+| INT2 | `List<KV<Integer,Integer>>` | `parseIntKVList(arr[i])` — `key:value,key:value` |
+| STRING2 | `List<KV<String,String>>` | `parseStringKVList(arr[i])` |
+
+### 重新生成配置（当 Excel 修改后）
+
 ```bash
-cd server
-mvn clean compile -DskipTests
+# 1. 构建 tool 模块（Windows JDK 21）
+cd /mnt/d/WORK/me/miniServer/server
+cmd.exe /c "D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -DskipTests install -pl tool -am"
+
+# 2. 运行生成器
+cmd.exe /c "D:\Soft\env\Java\jdk-21\bin\java.exe -cp target\tool-1.0-SNAPSHOT.jar ly.ParserExcelConfig"
 ```
 
-已有辅助入口：
-- `.vscode/tasks.json`
-  - `build entire server directory`
-  - `mvn build`
-  - `clean and build all server projects`
-  - `clean and build GateServer`
-- `start_app.bat`
-  - 本质上也是 `cd server && mvn clean package -DskipTests`
+**警告：** 重新生成会覆盖 `config` 模块的 Java 代码，并重写 `excel/serverConfig/*.txt` 文件。如果 HeroController 等业务代码引用了旧字段名，需要同步更新。
 
-## 5. 生成链路
-项目有三类明显生成/辅助链路：
+### 自动生成代码的特征
 
-### 5.1 Excel 配置生成
-入口：
-- `server/tool/src/main/java/ly/ToolMain.java`
-- `server/tool/src/main/java/ly/ParserExcelConfig.java`
+- Config Java 文件注释：`自动生成的代码 请不要改动`
+- 自定义区：`@@@@@自定义方法开始区@@@@@` 和 `@@@@@自定义属性开始区@@@@@` — 这些区域的内容在重新生成时会保留
+- Manager 文件的 `reload()` 方法使用 `arr[i]` 位置解析。**列数变更后必须重新生成**，否则会解析错位报错如 `For input string: "1230002,50"`
 
-README 中给出的入口：
-```bash
-cd server/tool
-mvn compile exec:java -Dexec.mainClass="ly.ToolMain" -Dexec.args="parserExcelConfig ../../excel"
-```
+### 重新生成后的必做检查清单
 
-说明：
-- Excel 原始数据在 `excel/`
-- 生成结果会影响 `server/config` 及相关配置代码
-- 不建议在不了解策划表约束时批量改动 `excel/`
+重新生成后，**不能直接编译通过**，必须依次检查：
 
-### 5.2 Proto 相关生成
-入口：
-- `server/tool/src/main/java/ly/ParserProto.java`
-- 根目录 `proto/` 下的 `.proto` 文件
+1. **KV 循环依赖** — 生成器在 `*Config.java` 和 `*ConfigManager.java` 中硬编码了 `import ly.utils.KV`。
+   - config 模块不依赖 core，core 依赖 config → 循环引用
+   - 修复：在 `server/config/src/main/java/ly/utils/KV.java` 创建副本（跟 core 里的 KV.java 内容一致）
+   - 删除 `*Config.java` 中未使用的 `import ly.utils.KV; import ly.utils.ExcelKVParser;`
+   - `*ConfigManager.java` 补齐 `import ly.utils.KV;`（批量 sed 即可）
 
-说明：
-- `server/proto` 中存在生成后的 Java 协议类
-- 修改协议时，优先确认是只改 `.proto`，还是同步改工具链
-
-### 5.3 DB Entry / SQL 生成
-入口：
-- `server/tool/src/main/java/ly/ParserDbEntry.java`
-- `server/core/src/main/java/ly/EntityToSqlGenerator.java`
-- `generated-sql/create-tables.sql`
-
-说明：
-- `generated-sql/create-tables.sql` 看起来是正式生成产物，不应按临时文件对待
-
-## 6. 启动机制
-`GameServer`、`GateServer`、`BotServer`、`LoginServer` 现在都接入了：
-- `ly.startup.StartupSkillLoader`
-
-这意味着：
-- 启动时会自动查找仓库根目录下的 `STARTUP.SKILL.md`
-- 如果你传入 CLI 参数，参数必须与 skill 中定义一致
-- 如果参数与 skill 不一致，代码会直接抛异常，而不是“按 CLI 覆盖”
-
-关键约束：
-- LoginServer `springPort` 必须满足 `netPort + 1`
-- BotServer `loginHttpPort` 必须等于 LoginServer `springPort`
-- startup 顺序必须固定为 `login -> game -> gate -> bot`
-
-## 7. 本地启动方式
-
-### 7.1 LoginServer
-入口类：
-- `ly.loginserver.LoginServerApplication`
-
-特点：
-- Spring Boot 应用
-- 启动时会读取 `STARTUP.SKILL.md`
-- 会设置 `loginserver.nacosUrl`
-- 会把 Spring 端口设置为 `8889`
-
-IDE/命令行关注点：
-- HTTP 入口走 `8889`
-- Net 侧注册信息仍走 skill 中的 login 配置
-
-### 7.2 GameServer
-入口类：
-- `ly.GameServer`
-
-启动参数形态：
-```bash
-<nacosUrl> <env> <serverId>
-```
-
-当前应等于：
-```bash
-118.25.76.117:8848 ly game1001
-```
-
-### 7.3 GateServer
-入口类：
-- `ly.GateServer`
-
-当前应等于：
-```bash
-118.25.76.117:8848 ly gate1001
-```
-
-### 7.4 BotServer
-入口类：
-- `ly.BotServer`
-
-当前应等于：
-```bash
---run-bots 127.0.0.1 8889 1
-```
-
-注意：
-- `StartupSkillLoader` 明确要求 Bot 的 HTTP 登录端口等于 LoginServer `springPort`
-- 所以这里应该是 `8889`，不是 `8888`
-
-## 8. VS Code 调试
-`.vscode/launch.json` 已经给出可直接使用的配置：
-- `Debug LoginServer`
-- `Debug GameServer`
-- `Debug GateServer`
-- `Debug BotServer`
-- 组合调试：`Debug Backend Core`
-- 组合调试：`Debug Full Stack With Bot`
-
-当前 `.vscode/launch.json` 已经与 `STARTUP.SKILL.md` 对齐，`Debug BotServer` 参数已修正为：
-- `--run-bots 127.0.0.1 8889 1`
-
-如果 Java 索引异常，可优先使用：
-- `reindex_vscode.bat`
-
-该脚本会清理 VS Code Java 缓存、各模块 `target/`，并提示重新对 `server` 目录执行 “Rescan Java Projects”。
-
-## 9. 推荐开发顺序
-
-### 9.1 修改普通 Java 代码
-1. 先看 `server/doc/module_index.md`
-2. 进入对应模块修改代码
-3. 在 `server/` 下执行：
-   ```bash
-   mvn clean compile -DskipTests
+2. **`isSwitched()` 自动取反 bug** — 生成器模板产出：
+   ```java
+   return switched.getAndSet(!switched.get());  // ❌ 每次调用都翻转
    ```
-4. 需要联调时，按 `login -> game -> gate -> bot` 启动
+   **这是 bug，必须改为：**
+   ```java
+   return switched.get();  // ✅ 只返回当前值，不翻转
+   ```
+   - 修复来源：`server/tool/src/main/java/ly/ParserExcelConfig.java` 模板
+   - 然后批量修复所有已生成的 `*ConfigManager.java`（345 个文件统一 sed）
 
-### 9.2 修改 Excel 配置
-1. 修改 `excel/` 下源表
-2. 运行 Excel 生成链路
-3. 再执行 Maven 编译
-4. 启动服务验证配置是否生效
+3. **自定义方法中的旧字段名** — `@@@@@自定义方法开始区@@@@@` 中的代码如果引用了旧字段名，需要手动更新。常见：
+   - `getByModelIdAndStar()` 中 `config.starLevel` → `config.star`
+   - `getByHeroAwakenDataAndLevel()` 中 `config.awakenLevel` → `config.sequence`，并补充 `modelName` 过滤
 
-### 9.3 修改协议或网络包
-1. 先确认是改 `.proto` 还是改 `ly.net.packet`
-2. 如果涉及旧设计草案，参考 `server/doc/net_packet_unification_plan.md`
-3. 修改后必须至少验证 Login / Gate / Game / Bot 链路
+4. **业务代码引用旧字段** — 如 `HeroController` 中 `starCurrencyType` → `currencyType` 等
 
-## 10. 最低验证清单
-构建后至少验证：
-- `server/` 全量编译通过
-- LoginServer 成功监听 `8888` / `8889`
-- GameServer 成功监听 `9002`
-- GateServer 成功监听 `9001`
-- BotServer 能连到 LoginServer，并出现登录成功相关日志
-- `http://127.0.0.1:8889/actuator` 可访问
+5. **全量 clean 构建** — `-rf :GameServer` 不够，必须：
+   ```bash
+   mvn.cmd clean test -pl GameServer -am
+   ```
 
-## 11. 当前已知仍需注意的点
-1. `STARTUP.SKILL.md` 指向远程 Nacos：`118.25.76.117:8848`
-2. `nacos-config.txt` 记录的是 localhost Nacos 历史说明
-3. 运行参数仍应优先信 `STARTUP.SKILL.md`
+### 已知字段名变更案例（heroStar）
 
-结论：
-- 不要再把旧 localhost Nacos 说明当作当前默认启动参数
-- BotServer 端口相关 VS Code 配置已经修正到 `8889`
+Excel 改版后旧字段名（过时）→ 新字段名：
 
-## 12. 推荐后续修正
-如果继续收敛开发体验，建议下一步优先做：
-- 将 `reindex_vscode.bat` 的用途补充进 README 或单独的 IDE 指南
-- 视团队实际情况决定是否保留 `nacos-config.txt` 作为历史说明文件
+| 旧字段名 | 新字段名 | 说明 |
+|---------|---------|------|
+| starLevel | star | 星级 |
+| starCurrencyType | currencyType | 消耗货币类型 |
+| starCurrencyNum | currencyNum | 改为 String 格式 |
+| starItemId | starItem | 改为 String（逗号分隔） |
+| starItemNum | starItem2 | 改为 String |
+| allAttributePercent | retainItem | 含义不同 |
+| breakThroughStar | (已删除) | 字段不存在 |
+| awakenAttrId1-V2 | circuitSlot/followAwaken | 列结构变化 |
+
+## 构建与编译
+
+### 不要使用 WSL 的 Java（WSL 只有 Java 17）
+项目需要 **Java 21**，使用 Windows 宿主机 JDK：
+
+```bash
+# 完整构建（跳过测试）
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -DskipTests install"
+```
+
+### 单模块构建
+
+```bash
+# 构建 GameServer 及其依赖
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -DskipTests install -pl GameServer -am"
+
+# clean 构建（解决缓存问题）
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd clean install -pl GameServer -am"
+```
+
+### 编译错误处理
+
+**`ly.utils.KV` 找不到符号：**  
+生成器在 `*Config.java` 和 `*ConfigManager.java` 中硬编码了 `import ly.utils.KV`。config 模块本不依赖 core。
+
+修复方式（已解决）：
+- 在 config 模块中创建 `server/config/src/main/java/ly/utils/KV.java` 副本
+- 删除 *Config.java 中未使用的 import
+- *ConfigManager.java 补齐 `import ly.utils.KV;`（生成器模板缺了这句）
+
+**循环依赖（config ↔ core）：**  
+不要在 config/pom.xml 加 core 依赖，Maven 会发现循环。用上述 KV 副本方案解决。
+
+**`-rf :GameServer` 不重建依赖模块：**  
+`-rf` 只从指定模块起构建，不会重编 config/core。需要全量 clean 构建。
+
+## 启动与运行流程
+
+启动顺序：`LoginServer → GateServer → GameServer → BotServer`
+
+使用 Windows JDK/mvn：
+
+```bash
+# LoginServer（Spring Boot）
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server\LoginServer && D:\Soft\env\Java\jdk-21\bin\java.exe -jar target\LoginServer-0.0.1-SNAPSHOT.jar"
+
+# GateServer（mvn exec）
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server\GateServer && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -q exec:java"
+
+# GameServer（mvn exec）
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server\GameServer && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -q exec:java"
+
+# BotServer（验证登录流程）
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server\BotServer && D:\Soft\env\Java\jdk-21\bin\java.exe -jar target\BotServer-1.0-SNAPSHOT-shaded.jar --run-bots 127.0.0.1 8889 1"
+```
+
+详细启动流程见 `STARTUP.SKILL.md`。
+
+## HeroModel 模块开发
+
+### 模块框架说明
+
+所有业务模块继承 `AbstractModule`，使用 `PlayerModuleData` 存储：
+
+```java
+public class HeroModule extends AbstractModule {
+    private HeroModuleData moduleData;
+    
+    @Override
+    public void onLoadData() {
+        // 从 player.getPlayerData() 反序列化
+    }
+    
+    @Override
+    public boolean saveData() {
+        // Protobuf 序列化到 player.getPlayerData()
+    }
+}
+```
+
+### 协议消息处理
+
+继承 `IGameController` 接口：
+
+```java
+public class HeroController implements IGameController {
+    @Override
+    public void registerHandlerRouter() {
+        gameHandlerRegister(Cmd.CMD.CS_HeroList, this::handleHeroList);
+        gameHandlerRegister(Cmd.CMD.CS_HeroStarUp, this::handleHeroStarUp);
+        // ...
+    }
+}
+```
+
+### heroUid 生成规则
+
+```
+heroUid = playerId * 1000000 + heroId
+```
+
+### 升级消费格式
+
+配置表的 `currencyNum` 字段（String 类型）格式为 `slotLevel,cost|slotLevel,cost|...`。
+示例：`1,0|2,0|3,0|4,0|5,0|...|10,0`
+
+解析工具方法：`parseStarCurrencyCost()` — 取第一档 slot 的 cost。
+
+## ConfigService 配置加载机制
+
+### init() 类扫描
+
+```java
+URL classUrl = ConfigService.class.getClassLoader().getResource("ly/ConfigService.class");
+// 提取目录，找子目录 config/ 下的所有 .class 文件
+// 实例化所有 InterfaceConfigManagerProxy 实现类
+```
+
+**测试环境注意：** `ConfigService.init()` 在测试 JVM 中可能因为 `classUrl.getPath()` 的 URL 路径解析问题而找不到 Manager class 文件（尤其在 Windows 环境下路径有 `file:/D:/...` 格式问题）。测试中不要依赖 `init()` 的自动扫描，改用：
+
+```java
+String configDir = new File("../../excel/serverConfig").getAbsolutePath();
+ly.ConfigService.getInstance().loadAllConfig(logger, configDir);
+```
+
+注意用全限定名 `ly.ConfigService` 避免和 Nacos 的 `com.alibaba.nacos.api.config.ConfigService` 冲突。
+
+### 热加载双实例机制（关键！）
+
+每个 `*ConfigManager` **维护两个内部实现**（instanceImplA / instanceImplB）用于支持热加载。`getInstance()` 通过 `isSwitched()` 标志选择返回哪个：
+
+```
+loadConfig(configDir) → 加载到 getInstance() 返回的当前实例
+                         （loadConfig 内部调用 getInstance()）
+Manager手动切换 →
+    manager.isSwitched() → 翻转标志          ← 原来是 bug: 自动取反！
+    manager.getInstance() → 现在返回另一个实例
+```
+
+### ⚠️ `isSwitched()` 的历史 bug
+
+原始代码（生成器模板）：
+
+```java
+public boolean isSwitched() {
+    return switched.getAndSet(!switched.get());  // ❌ 每次都翻转
+}
+```
+
+这个实现的问题是：**每次调用 `getInstance()` 都无副作用地翻转了标志**。在正常的服务端启动流程中，`loadAllConfig()` 只在启动时调用一次，而后续 `getInstance()` 只会被请求处理代码调用一次，所以按顺序调用能恰好拿到正确的实例。但在测试或任何需要连续两次调用 `getInstance()` 的场景中，第二次调用会拿到**另一个（空的）实例**。
+
+**正确做法（已修复）：**
+
+```java
+public boolean isSwitched() {
+    return switched.get();  // ✅ 只返回当前值，不翻转
+}
+```
+
+热加载的正确工作流：
+1. 收到 GM 热加载指令
+2. `new HeroInfoConfigManager().loadConfig(logger, configDir)` → 加载到当前非活跃实例
+3. `HeroInfoConfigManager.getInstance().isSwitched()` → 手动翻转，使新数据生效
+4. 所有后续调用 `getInstance()` 返回新实例（不再翻转）
+
+## 测试
+
+### 测试运行
+
+```bash
+# 全量构建并运行所有测试
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd clean test -pl GameServer -am"
+
+# 指定测试类
+cmd.exe /c "... -Dtest="ly.logic.hero.HeroControllerTest" -Dsurefire.failIfNoSpecifiedTests=false"
+
+# 指定测试方法
+cmd.exe /c "... -Dtest="ly.logic.hero.HeroControllerTest#testHandleHeroStarUp" -Dsurefire.failIfNoSpecifiedTests=false"
+```
+
+### 测试注意事项
+
+1. **Config 加载方式** — 测试中不要依赖 `ConfigService.init()` 的类扫描。直接调用：
+   ```java
+   String configDir = new File("../../excel/serverConfig").getAbsolutePath();
+   ly.ConfigService.getInstance().loadAllConfig(logger, configDir);
+   ```
+
+2. **heroId 必须真实存在** — 必须使用配置表中存在的英雄 ID，如 `2`（杰诺斯·武装），不能用假 ID（如 `1001`）。
+
+3. **测试资源要充足** — 升级/升星/觉醒的业务逻辑会检查资源是否充足，测试需要添加足够的资源：
+   ```java
+   resourceModule.addResource(ResourceType.GOLD, 100000);
+   resourceModule.addResource(ResourceType.DIAMOND, 10000);
+   resourceModule.addResource(ResourceType.EXP_ITEM, 5000);
+   resourceModule.addResource(ResourceType.HERO_DEBRIS, 1000);
+   resourceModule.addResource(ResourceType.AWAKEN_ITEM, 500);
+   resourceModule.addResource(1120001, 50000);  // 觉醒货币
+   resourceModule.addResource(1210001, 100);    // 觉醒材料（配置要求 1210001,40）
+   ```
+
+4. **saveData() 的 protobuf 问题** — 用 `Unsafe.allocateInstance(PlayerData.class)` 创建 PlayerData（跳过构造函数中的 protobuf），手动初始化字段。
+
+5. **测试用的 heroUid 计算** — mockPlayer 的 playerId=100001，英雄 heroId=2，则 heroUid = 100001 * 1000000 + 2 = 100001000002
+
+### 当前测试覆盖
+
+| 测试类 | 测试数 | 状态 |
+|--------|--------|------|
+| HeroModuleTest | 7 | 全部通过 |
+| ResourceModuleTest | 12 | 全部通过 |
+| HeroControllerTest | 9 运行 + 4@Ignore | 全部通过 |
+| **合计** | **31** | **27通过，4跳过** |
+
+### 跳过原因
+
+4 个被 @Ignore 的测试都是因为 protobuf 3.21.7 不支持 repeated 字段的 `makeMutableCopy`，需要升级到 3.25+。
+
+## 常用调试命令
+
+### 查看 config 文件列结构
+```bash
+head -1 excel/serverConfig/heroStar.txt | awk -F'\t' '{for(i=1;i<=NF;i++) print i": "$i}'
+```
+
+### 查看某行数据
+```bash
+awk -F'\t' 'NR==2 { print "col33="  }' excel/serverConfig/heroInfo.txt
+```
+
+### 端口检查
+```bash
+cmd.exe /c "netstat -ano | findstr :8889 && netstat -ano | findstr :9001 && netstat -ano | findstr :9002"
+```
+
+## 常见 Pitfalls
+
+1. ❌ **WSL Java 17 不够** — 项目需要 Java 21，永远用 Windows JDK
+2. ❌ **直接运行 `mvn` 而不通过 `cmd.exe /c`** — WSL bash 调用 Windows 程序必须用 `cmd.exe /c`
+3. ❌ **对自动生成的代码手动加字段** — 应在 `@@@@@自定义区@@@@@` 添加，否则重新生成时被覆盖
+4. ❌ **`-rf :GameServer` 不重建依赖** — config/core 改了必须 clean 全量
+5. ❌ **测试用假 heroId（如 1001）** — 真实配置中没有此 ID，必须用配置表中存在的 ID
+6. ⚠️ **Excel 改列后必须重新生成代码** — 否则旧代码的位置解析会报错
+7. ⚠️ **`currencyNum` 是 String 格式** — 不是简单 int，需要专用解析方法
+8. ❌ **`ConfigService` 未用全限定名导致 Nacos 冲突** — 测试中要写 `ly.ConfigService`
+9. ❌ **生成器模板的 `isSwitched()` 自动取反** — 生成后必须改为 `return switched.get()`
+10. ❌ **重新生成后不检查自定义区** — `@@@@@自定义方法开始区@@@@@` 的代码引用了旧字段名，需要手动更新
+11. ❌ **`ConfigService.init()` 类扫描依赖环境** — 在 Windows 测试环境中可能找不到 Manager 的 .class 文件
