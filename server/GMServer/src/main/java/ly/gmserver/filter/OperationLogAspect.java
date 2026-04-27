@@ -1,17 +1,17 @@
 package ly.gmserver.filter;
 
 import jakarta.servlet.http.HttpServletRequest;
-import ly.gmserver.entity.GmOperationLogEntry;
-import ly.gmserver.entity.GmOperationLogHelper;
-import ly.gmserver.service.GmAdminService;
+import ly.db.entry.GmOperationLogEntry;
+import ly.db.entry.GmOperationLogEntryHelper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -22,12 +22,6 @@ import java.util.Arrays;
 @Component
 public class OperationLogAspect {
     private static final Logger log = LoggerFactory.getLogger(OperationLogAspect.class);
-
-    private final GmAdminService adminService;
-
-    public OperationLogAspect(GmAdminService adminService) {
-        this.adminService = adminService;
-    }
 
     @Around("@annotation(org.springframework.web.bind.annotation.RequestMapping) || "
           + "@annotation(org.springframework.web.bind.annotation.PostMapping) || "
@@ -52,11 +46,10 @@ public class OperationLogAspect {
                     HttpServletRequest request = attributes.getRequest();
                     String path = request.getRequestURI();
 
-                    // Skip login endpoint to avoid recursion
-                    if (path.contains("/api/admin/login") || path.contains("/gm/")) {
-                        return;
-                    }
-
+                    // Skip login endpoint and static resources to avoid recursion
+                    if (path.contains("/api/admin/login") || path.startsWith("/gm/")) {
+                        // skip logging, fall through
+                    } else {
                     MethodSignature signature = (MethodSignature) joinPoint.getSignature();
                     String className = signature.getDeclaringType().getSimpleName();
                     String methodName = signature.getName();
@@ -67,8 +60,19 @@ public class OperationLogAspect {
                     String ip = getClientIp(request);
 
                     // Get current admin info from security context
-                    Long adminId = adminService.getCurrentAdminId();
-                    String username = adminService.getCurrentUsername();
+                    Long adminId = null;
+                    String username = null;
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    if (auth != null && auth.isAuthenticated()
+                        && !"anonymousUser".equals(auth.getPrincipal())) {
+                        Object principal = auth.getPrincipal();
+                        if (principal instanceof Long) {
+                            adminId = (Long) principal;
+                        }
+                        if (auth.getCredentials() instanceof String) {
+                            username = (String) auth.getCredentials();
+                        }
+                    }
 
                     if (adminId != null) {
                         GmOperationLogEntry logEntry = new GmOperationLogEntry();
@@ -81,7 +85,8 @@ public class OperationLogAspect {
                         logEntry.setIp(ip);
                         logEntry.setResult(result);
                         logEntry.setCreatedAt(LocalDateTime.now());
-                        GmOperationLogHelper.asyncSave(logEntry);
+                        GmOperationLogEntryHelper.asyncSave(logEntry);
+                    }
                     }
                 }
             } catch (Exception e) {
@@ -108,7 +113,7 @@ public class OperationLogAspect {
     private String extractTargetType(String path) {
         String[] parts = path.split("/");
         if (parts.length >= 3) {
-            return parts[2]; // e.g., /api/player/query -> player
+            return parts[2];
         }
         return "";
     }
@@ -116,7 +121,6 @@ public class OperationLogAspect {
     private String extractTargetId(String path) {
         String[] parts = path.split("/");
         if (parts.length >= 4 && !parts[3].matches("\\d+")) {
-            // Try to extract from query or params
             return "";
         }
         return parts.length >= 4 ? parts[3] : "";

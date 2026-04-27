@@ -22,15 +22,59 @@ public class ParserDbEntry {
   String jdbcUrl = "jdbc:mysql://118.25.76.117:3306/pick_money";
   String username = "root";
   String password = "Ly@2026Root!8899";
-  String targetDir = "D:\\WORK\\me\\miniServer\\server\\core\\src\\main\\java\\ly\\db\\entry";
+  String targetDir = "./core/src/main/java/ly/db/entry";
+  String tableNamePrefix = ""; // 表名前缀过滤，空=不限制
+  String targetModule = "";
+  String baseDir = "";
 
-  public ParserDbEntry() {}
+  public ParserDbEntry() {
+    this.baseDir = resolveBaseDir();
+  }
 
   public ParserDbEntry(String targetModule) {
+    this();
+    this.targetModule = targetModule;
     if ("core".equalsIgnoreCase(targetModule)) {
-      this.targetDir = "D:\\WORK\\me\\miniServer\\server\\core\\src\\main\\java\\ly\\db\\entry";
+      this.targetDir = "./core/src/main/java/ly/db/entry";
     } else if ("GMServer".equalsIgnoreCase(targetModule)) {
-      this.targetDir = "D:\\WORK\\me\\miniServer\\server\\GMServer\\src\\main\\java\\ly\\db\\entry";
+      this.targetDir = "./GMServer/src/main/java/ly/db/entry";
+      this.tableNamePrefix = "gm_";
+    }
+  }
+
+  private static String resolveBaseDir() {
+    // 根据 user.dir 自动定位 server 目录
+    String userDir = System.getProperty("user.dir").replace("\\", "/");
+    // 如果在 tool 目录下运行，往上一级到 server 目录
+    if (userDir.endsWith("/tool") || userDir.endsWith("/tool/target")) {
+      return userDir.substring(0, userDir.lastIndexOf("/tool"));
+    }
+    // 如果在 server 目录下运行（pom.xml 所在目录），直接返回
+    if (userDir.endsWith("/server")) {
+      return userDir;
+    }
+    // 尝试从代码位置推断：tool jar 的路径中包含 server/tool/target
+    try {
+      var cs = ParserDbEntry.class.getProtectionDomain().getCodeSource();
+      if (cs != null) {
+        String jarPath = java.net.URLDecoder.decode(cs.getLocation().getPath(), "UTF-8");
+        if (jarPath.contains("/server/tool/")) {
+          return jarPath.substring(0, jarPath.indexOf("/server/tool/")) + "/server";
+        }
+      }
+    } catch (Exception e) {
+      // fallback to user.dir
+    }
+    return userDir;
+  }
+
+  private String absPath(String relativePath) {
+    // 拼接 baseDir + relativePath，然后规范化
+    java.io.File f = new java.io.File(baseDir, relativePath);
+    try {
+      return f.getCanonicalPath();
+    } catch (Exception e) {
+      return f.getAbsolutePath();
     }
   }
   HikariDataSource dataSource;
@@ -87,15 +131,67 @@ public class ParserDbEntry {
     connectDb();
   }
 
+  private void executeSchemaSql() {
+    if (!"GMServer".equalsIgnoreCase(this.targetModule)) return;
+    String absTargetDir = absPath(this.targetDir);
+    String schemaPath = absTargetDir.substring(0, absTargetDir.indexOf("/src/main/java"))
+        + "/src/main/resources/schema.sql";
+    System.out.println("Executing schema.sql: " + schemaPath);
+    try {
+      java.nio.file.Path path = java.nio.file.Paths.get(schemaPath);
+      String sql = java.nio.file.Files.readString(path);
+      // Split by semicolons and execute each statement
+      String[] statements = sql.split(";");
+      try (var conn = dataSource.getConnection(); var stmt = conn.createStatement()) {
+        for (String s : statements) {
+          String trimmed = s.trim();
+          if (!trimmed.isEmpty()) {
+            try {
+              stmt.execute(trimmed);
+            } catch (Exception e) {
+              System.out.println("  SQL warn: " + e.getMessage());
+            }
+          }
+        }
+      }
+      System.out.println("schema.sql executed successfully");
+    } catch (Exception e) {
+      System.out.println("schema.sql execution skipped: " + e.getMessage());
+    }
+  }
+
+  /** 补齐 MySQL 连接必需参数（同步 core 模块 MysqlConnector 的做法） */
+  private static String normalizeJdbcUrl(String jdbcUrl) {
+    if (jdbcUrl == null || jdbcUrl.isBlank() || !jdbcUrl.startsWith("jdbc:mysql://")) return jdbcUrl;
+    String requiredParams = "useSSL=false&allowPublicKeyRetrieval=true&connectTimeout=8000&socketTimeout=8000";
+    String result = jdbcUrl;
+    for (String param : requiredParams.split("&")) {
+      if (!result.contains(param.split("=")[0])) {
+        result += (result.contains("?") ? "&" : "?") + param;
+      }
+    }
+    return result;
+  }
+
   private void connectDb() {
     // 创建 Hikari 配置对象
     HikariConfig config = new HikariConfig();
-    config.setJdbcUrl(jdbcUrl); // 数据库 URL
+    String effectiveJdbcUrl = normalizeJdbcUrl(jdbcUrl);
+    config.setJdbcUrl(effectiveJdbcUrl); // 数据库 URL
     config.setUsername(username); // 数据库用户名
     config.setPassword(password); // 数据库密码
     config.setDriverClassName("com.mysql.cj.jdbc.Driver"); // MySQL 驱动
-    String curDbName = jdbcUrl.substring(jdbcUrl.lastIndexOf('/') + 1);
+    config.setMaximumPoolSize(3);
+    config.setMinimumIdle(1);
+    config.setConnectionTimeout(5000);
+    config.setMaxLifetime(60000);
+    String curDbName = effectiveJdbcUrl.substring(effectiveJdbcUrl.lastIndexOf('/') + 1);
+    // 去掉 URL 参数部分得到纯数据库名
+    if (curDbName.contains("?")) curDbName = curDbName.substring(0, curDbName.indexOf("?"));
     dataSource = new HikariDataSource(config);
+
+    // 执行建表 SQL（如果模块有对应 schema.sql）
+    executeSchemaSql();
 
     // 获取数据库表元数据
     fetchDatabaseSchema(curDbName);
@@ -124,7 +220,7 @@ public class ParserDbEntry {
   private void createDbEntryHelperJava() {
     tables.forEach(
         table -> {
-          String targetFileName = targetDir + File.separator + table.javaName + "EntryHelper.java";
+          String targetFileName = absPath(targetDir) + File.separator + table.javaName + "EntryHelper.java";
           File file = new File(targetFileName);
           String extractStr = "";
           String key = toCamelCase(table.key.name);
@@ -207,7 +303,7 @@ public class ParserDbEntry {
   private void createDbEntryJava() {
     tables.forEach(
         table -> {
-          String targetFileName = targetDir + File.separator + table.javaName + "Entry.java";
+          String targetFileName = absPath(targetDir) + File.separator + table.javaName + "Entry.java";
           File file = new File(targetFileName);
           String methodStr = "";
           String filedStr = "";
@@ -360,6 +456,10 @@ public class ParserDbEntry {
       ResultSet tables = metaData.getTables(databaseName, null, "%", new String[] {"TABLE"});
       while (tables.next()) {
         String tableName = tables.getString("TABLE_NAME");
+        // 如果有前缀过滤，跳过不匹配的表
+        if (!tableNamePrefix.isEmpty() && !tableName.startsWith(tableNamePrefix)) {
+          continue;
+        }
         System.out.println("\n表: " + tableName);
         TableInfo tableInfo = new TableInfo();
         tableInfo.javaName = getTableName(tableName);
