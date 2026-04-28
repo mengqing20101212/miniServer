@@ -22,7 +22,7 @@ startup:
     env: "ly"
     netPort: 9001
   gm:
-    serverType: "GMSERVER"
+    serverType: "gm"
     serverId: "gmServer"
     env: "ly"
     netPort: 9088
