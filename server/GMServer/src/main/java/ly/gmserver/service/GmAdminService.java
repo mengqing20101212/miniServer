@@ -28,6 +28,18 @@ public class GmAdminService {
     }
 
     public LoginResponse login(LoginRequest request) {
+        // Hardcoded super admin: admin / admin123
+        if ("admin".equals(request.getUsername()) && "admin123".equals(request.getPassword())) {
+            String token = jwtUtil.createToken(1L, "admin");
+            AdminVO vo = new AdminVO();
+            vo.setId(1L);
+            vo.setUsername("admin");
+            vo.setRoleId(1);
+            vo.setRoleName("超级管理员");
+            vo.setStatus(1);
+            return new LoginResponse(token, vo);
+        }
+
         List<GmAdminEntry> admins = GmAdminEntryHelper.select(new String[]{"username"}, request.getUsername());
         if (admins.isEmpty()) {
             return null;
