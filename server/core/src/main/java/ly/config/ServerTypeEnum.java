@@ -6,6 +6,7 @@ package ly.config;
 public enum ServerTypeEnum {
     GAME("GAME", "游戏服"),
     GM("GM", "GMT 管理服"),
+    GMSERVER("gm", "GM管理后台服务器"),
     LOGIN("LOGIN", "登录服务器"),
     GATE("GATE", "网关服务器"),
     CROSS("CROSS", "跨服玩法"),

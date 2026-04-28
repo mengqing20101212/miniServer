@@ -10,20 +10,9 @@ spring:
     mode: HTML
     encoding: UTF-8
     cache: false
-  datasource:
-    url: jdbc:mysql://118.25.76.117:3306/pick_money?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8
-    username: root
-    password: Ly@2026Root!8899
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 2
-      idle-timeout: 30000
-      connection-timeout: 10000
   sql:
     init:
-      mode: always
-      schema-locations: classpath:schema.sql
+      mode: never
 
 logging:
   level:

@@ -55,6 +55,11 @@ public final class StartupSkillLoader {
         return resolveServerArgs(skill.startup.login, null, ServerTypeEnum.LOGIN);
     }
 
+    public static ResolvedServerArgs resolveGmArgs() {
+        StartupSkill skill = loadRequired();
+        return resolveServerArgs(skill.startup.gm, null, ServerTypeEnum.GMSERVER);
+    }
+
     public static ResolvedServerArgs resolveServerArgs(ServerTypeEnum serverType, String[] args) {
         StartupSkill skill = loadRequired();
         StartupServer section = getServerSection(skill, serverType);
@@ -135,6 +140,7 @@ public final class StartupSkillLoader {
             case LOGIN -> skill.startup.login;
             case GAME -> skill.startup.game;
             case GATE -> skill.startup.gate;
+            case GMSERVER -> skill.startup.gm;
             default -> throw new IllegalArgumentException("不支持的 serverType: " + serverType.getType());
         };
     }
@@ -148,6 +154,9 @@ public final class StartupSkillLoader {
         validateServer(skill.startup.login, ServerTypeEnum.LOGIN, skillPath);
         validateServer(skill.startup.game, ServerTypeEnum.GAME, skillPath);
         validateServer(skill.startup.gate, ServerTypeEnum.GATE, skillPath);
+        if (skill.startup.gm != null) {
+            validateServer(skill.startup.gm, ServerTypeEnum.GMSERVER, skillPath);
+        }
         StartupValidation validation = skill.startup.validation;
         if (validation != null && validation.loginSpringPortOffset != null
                 && skill.startup.login.netPort != null && skill.startup.login.springPort != null) {
@@ -299,6 +308,7 @@ public final class StartupSkillLoader {
         public StartupServer login;
         public StartupServer game;
         public StartupServer gate;
+        public StartupServer gm;
         public StartupBot bot;
         public StartupValidation validation;
     }

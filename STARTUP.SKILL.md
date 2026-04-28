@@ -21,6 +21,12 @@ startup:
     serverId: "gate1001"
     env: "ly"
     netPort: 9001
+  gm:
+    serverType: "GMSERVER"
+    serverId: "gmServer"
+    env: "ly"
+    netPort: 9088
+    springPort: 9090
   bot:
     command: "--run-bots"
     loginHost: "127.0.0.1"
