@@ -31,10 +31,11 @@ public class WebSecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
+            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/admin/login", "/static/**", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                .requestMatchers("/gm/login").permitAll()
+                .requestMatchers("/gm/login", "/gm/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

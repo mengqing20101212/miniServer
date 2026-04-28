@@ -38,7 +38,7 @@ public class GmAdminEntryHelper {
     if (fields != null && params != null && fields.length == params.length) {
       return MysqlService.getInstance().selectAll(GmAdminEntry.class, fields, params);
     }
-    return new ArrayList<>();
+    return MysqlService.getInstance().selectAll(GmAdminEntry.class, null, (Object[]) null);
   }
 
   // @@@@@自定义方法开始区@@@@@

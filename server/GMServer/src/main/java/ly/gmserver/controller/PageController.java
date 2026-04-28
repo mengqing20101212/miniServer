@@ -67,4 +67,14 @@ public class PageController {
     public String logList() {
         return "log/list";
     }
+
+    @GetMapping("/admin/dashboard")
+    public String dashboard() {
+        return "admin/list";
+    }
+
+    @GetMapping("/admin/profile")
+    public String profile() {
+        return "admin/list";
+    }
 }

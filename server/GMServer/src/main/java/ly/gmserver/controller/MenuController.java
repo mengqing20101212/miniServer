@@ -6,6 +6,7 @@ import ly.gmserver.service.GmMenuService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/menu")
@@ -30,24 +31,26 @@ public class MenuController {
     }
 
     @PostMapping("/create")
-    public ApiResponse<Void> create(@RequestParam String name,
-                                     @RequestParam(required = false) String permission,
-                                     @RequestParam(required = false, defaultValue = "0") Integer parentId,
-                                     @RequestParam(required = false) String path,
-                                     @RequestParam(required = false) String icon,
-                                     @RequestParam(required = false) Integer sortOrder) {
+    public ApiResponse<Void> create(@RequestBody Map<String, Object> body) {
+        String name = (String) body.get("name");
+        String permission = (String) body.get("permission");
+        Integer parentId = body.get("parentId") != null ? Integer.valueOf(body.get("parentId").toString()) : 0;
+        String path = (String) body.get("path");
+        String icon = (String) body.get("icon");
+        Integer sortOrder = body.get("sortOrder") != null ? Integer.valueOf(body.get("sortOrder").toString()) : 0;
         boolean ok = menuService.create(name, permission, parentId, path, icon, sortOrder);
         return ok ? ApiResponse.success() : ApiResponse.error("创建失败");
     }
 
     @PostMapping("/update")
-    public ApiResponse<Void> update(@RequestParam Integer id,
-                                     @RequestParam(required = false) String name,
-                                     @RequestParam(required = false) String permission,
-                                     @RequestParam(required = false) Integer parentId,
-                                     @RequestParam(required = false) String path,
-                                     @RequestParam(required = false) String icon,
-                                     @RequestParam(required = false) Integer sortOrder) {
+    public ApiResponse<Void> update(@RequestBody Map<String, Object> body) {
+        Integer id = Integer.valueOf(body.get("id").toString());
+        String name = (String) body.get("name");
+        String permission = (String) body.get("permission");
+        Integer parentId = body.get("parentId") != null ? Integer.valueOf(body.get("parentId").toString()) : null;
+        String path = (String) body.get("path");
+        String icon = (String) body.get("icon");
+        Integer sortOrder = body.get("sortOrder") != null ? Integer.valueOf(body.get("sortOrder").toString()) : null;
         boolean ok = menuService.update(id, name, permission, parentId, path, icon, sortOrder);
         return ok ? ApiResponse.success() : ApiResponse.error("更新失败");
     }

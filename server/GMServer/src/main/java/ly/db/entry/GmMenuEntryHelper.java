@@ -38,7 +38,7 @@ public class GmMenuEntryHelper {
     if (fields != null && params != null && fields.length == params.length) {
       return MysqlService.getInstance().selectAll(GmMenuEntry.class, fields, params);
     }
-    return new ArrayList<>();
+    return MysqlService.getInstance().selectAll(GmMenuEntry.class, null, (Object[]) null);
   }
 
   // @@@@@自定义方法开始区@@@@@

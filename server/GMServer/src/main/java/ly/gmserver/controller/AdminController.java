@@ -1,14 +1,12 @@
 package ly.gmserver.controller;
 
-import ly.gmserver.dto.AdminVO;
-import ly.gmserver.dto.ApiResponse;
-import ly.gmserver.dto.LoginRequest;
-import ly.gmserver.dto.LoginResponse;
-import ly.gmserver.dto.PageResult;
+import ly.gmserver.dto.*;
 import ly.gmserver.service.GmAdminService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -56,25 +54,28 @@ public class AdminController {
     }
 
     @PostMapping("/create")
-    public ApiResponse<Void> create(@RequestParam String username,
-                                     @RequestParam String password,
-                                     @RequestParam(required = false) Integer roleId) {
+    public ApiResponse<Void> create(@RequestBody Map<String, Object> body) {
+        String username = (String) body.get("username");
+        String password = (String) body.get("password");
+        Integer roleId = body.get("roleId") != null ? Integer.valueOf(body.get("roleId").toString()) : null;
         boolean ok = adminService.create(username, password, roleId);
         return ok ? ApiResponse.success() : ApiResponse.error("创建失败（用户名可能已存在）");
     }
 
     @PostMapping("/update")
-    public ApiResponse<Void> update(@RequestParam Long id,
-                                     @RequestParam(required = false) String username,
-                                     @RequestParam(required = false) Integer roleId,
-                                     @RequestParam(required = false) Byte status) {
+    public ApiResponse<Void> update(@RequestBody Map<String, Object> body) {
+        Long id = Long.valueOf(body.get("id").toString());
+        String username = (String) body.get("username");
+        Integer roleId = body.get("roleId") != null ? Integer.valueOf(body.get("roleId").toString()) : null;
+        Byte status = body.get("status") != null ? Byte.valueOf(body.get("status").toString()) : null;
         boolean ok = adminService.update(id, username, roleId, status);
         return ok ? ApiResponse.success() : ApiResponse.error("更新失败");
     }
 
     @PostMapping("/reset-password")
-    public ApiResponse<Void> resetPassword(@RequestParam Long id,
-                                            @RequestParam String newPassword) {
+    public ApiResponse<Void> resetPassword(@RequestBody Map<String, Object> body) {
+        Long id = Long.valueOf(body.get("id").toString());
+        String newPassword = (String) body.get("password");
         boolean ok = adminService.resetPassword(id, newPassword);
         return ok ? ApiResponse.success() : ApiResponse.error("重置密码失败");
     }

@@ -103,7 +103,34 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-(function() {
+    // Standalone API helpers for iframe pages
+    function getToken() { try { return parent.getToken ? parent.getToken() : localStorage.getItem('gm_token'); } catch(e) { return localStorage.getItem('gm_token'); } }
+    function redirectToLogin() { window.location.href = '/gm/login'; }
+    function apiGet(url, cb) {
+        var t = getToken();
+        if (!t) { redirectToLogin(); return; }
+        fetch(url, { method: 'GET', headers: { 'Authorization': 'Bearer ' + t, 'Accept': 'application/json' } })
+        .then(function(r) {
+            if (r.status === 401) { redirectToLogin(); return; }
+            return r.json();
+        })
+        .then(function(d) { cb(d.code === 200 ? null : new Error(d.message || 'Request failed'), d.code === 200 ? d.data : null); })
+        .catch(function(e) { cb(e, null); });
+    }
+    function apiPost(url, data, cb) {
+        var t = getToken();
+        if (!t) { redirectToLogin(); return; }
+        var body = data ? JSON.stringify(data) : null;
+        fetch(url, { method: 'POST', headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: body })
+        .then(function(r) {
+            if (r.status === 401) { redirectToLogin(); return; }
+            return r.json();
+        })
+        .then(function(d) { cb(d.code === 200 ? null : new Error(d.message || 'Request failed'), d.code === 200 ? d.data : null); })
+        .catch(function(e) { cb(e, null); });
+    }
+
+    (function() {
     'use strict';
 
     var isEditMode = false;

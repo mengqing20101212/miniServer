@@ -277,7 +277,7 @@ public class ParserDbEntry {
                       + "    if (fields != null && params != null && fields.length == params.length) {\n"
                       + "      return MysqlService.getInstance().selectAll({javaName}Entry.class, fields, params);\n"
                       + "    }\n"
-                      + "    return new ArrayList<>();\n"
+                      + "    return MysqlService.getInstance().selectAll({javaName}Entry.class, null, (Object[]) null);\n"
                       + "  }\n"
                       + "\n"
                       + "  // @@@@@自定义方法开始区@@@@@\n"

@@ -38,7 +38,7 @@ public class GmRoleEntryHelper {
     if (fields != null && params != null && fields.length == params.length) {
       return MysqlService.getInstance().selectAll(GmRoleEntry.class, fields, params);
     }
-    return new ArrayList<>();
+    return MysqlService.getInstance().selectAll(GmRoleEntry.class, null, (Object[]) null);
   }
 
   // @@@@@自定义方法开始区@@@@@

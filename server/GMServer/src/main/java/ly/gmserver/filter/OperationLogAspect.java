@@ -23,12 +23,9 @@ import java.util.Arrays;
 public class OperationLogAspect {
     private static final Logger log = LoggerFactory.getLogger(OperationLogAspect.class);
 
-    @Around("@annotation(org.springframework.web.bind.annotation.RequestMapping) || "
-          + "@annotation(org.springframework.web.bind.annotation.PostMapping) || "
-          + "@annotation(org.springframework.web.bind.annotation.GetMapping) || "
-          + "@annotation(org.springframework.web.bind.annotation.PutMapping) || "
-          + "@annotation(org.springframework.web.bind.annotation.DeleteMapping)")
+    @Around("execution(* ly.gmserver.controller.*.*(..))")
     public Object logOperation(ProceedingJoinPoint joinPoint) throws Throwable {
+        System.err.println("AOP HIT: " + joinPoint.getSignature().toShortString());
         long startTime = System.currentTimeMillis();
         String result = "SUCCESS";
         Object response;
@@ -39,6 +36,8 @@ public class OperationLogAspect {
             throw e;
         } finally {
             long duration = System.currentTimeMillis() - startTime;
+            String methodName = joinPoint.getSignature().toShortString();
+            log.info("AOP [{}] duration={}ms", methodName, duration);
             try {
                 ServletRequestAttributes attributes =
                     (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -49,7 +48,7 @@ public class OperationLogAspect {
                     // Skip login endpoint and static resources to avoid recursion
                     if (path.contains("/api/admin/login") || path.startsWith("/gm/")) {
                         // skip logging, fall through
-                    } else {
+                    } else if (path.startsWith("/api/")) {
                     MethodSignature signature = (MethodSignature) joinPoint.getSignature();
                     String className = signature.getDeclaringType().getSimpleName();
                     String methodName = signature.getName();
@@ -60,17 +59,20 @@ public class OperationLogAspect {
                     String ip = getClientIp(request);
 
                     // Get current admin info from security context
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                     Long adminId = null;
                     String username = null;
-                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                     if (auth != null && auth.isAuthenticated()
                         && !"anonymousUser".equals(auth.getPrincipal())) {
                         Object principal = auth.getPrincipal();
                         if (principal instanceof Long) {
                             adminId = (Long) principal;
+                        } else if (principal instanceof String) {
+                            try { adminId = Long.valueOf((String) principal); } catch (Exception ignored) {}
                         }
-                        if (auth.getCredentials() instanceof String) {
-                            username = (String) auth.getCredentials();
+                        Object creds = auth.getCredentials();
+                        if (creds instanceof String) {
+                            username = (String) creds;
                         }
                     }
 

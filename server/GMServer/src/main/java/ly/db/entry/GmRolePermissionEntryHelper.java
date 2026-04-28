@@ -38,7 +38,7 @@ public class GmRolePermissionEntryHelper {
     if (fields != null && params != null && fields.length == params.length) {
       return MysqlService.getInstance().selectAll(GmRolePermissionEntry.class, fields, params);
     }
-    return new ArrayList<>();
+    return MysqlService.getInstance().selectAll(GmRolePermissionEntry.class, null, (Object[]) null);
   }
 
   // @@@@@自定义方法开始区@@@@@
