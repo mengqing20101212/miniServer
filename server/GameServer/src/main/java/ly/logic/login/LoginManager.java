@@ -177,7 +177,7 @@ public class LoginManager {
         // 设置错误码
         req.setErrorCode(errorCode);
         // 发送错误消息到客户端
-        task.session.sendClientMsg(Cmd.CMD.CS_ErrorCode_VALUE, task.packet.getSeq(), 0, req.build());
+        task.session.sendClientMsg(Cmd.CMD.CS_ErrorCode_VALUE, task.packet.getSeq() + 1, 0, req.build());
     }
 
     private void sendLoginResponse(LoginTask task, Player onlinePlayer, Login.scLogin response) {
@@ -188,11 +188,11 @@ public class LoginManager {
                     onlinePlayer.getPlayerId(),
                     Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE,
                     builder.build(),
-                    task.packet.getSeq(),
+                    task.packet.getSeq() + 1,
                     task.packet.getSid());
             task.session.addSendPacket(packet);
             LoggerDef.SystemLogger.info("LoginManager send wrapped login response, account={}, playerId={}, seq={}, sid={}",
-                    onlinePlayer.getAccount(), onlinePlayer.getPlayerId(), task.packet.getSeq(), task.packet.getSid());
+                    onlinePlayer.getAccount(), onlinePlayer.getPlayerId(), task.packet.getSeq() + 1, task.packet.getSid());
             return;
         }
         onlinePlayer.sendMsg(Cmd.CMD.SC_Login, response);

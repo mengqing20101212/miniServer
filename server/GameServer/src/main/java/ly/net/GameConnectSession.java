@@ -34,6 +34,6 @@ public class GameConnectSession extends ConnectSession {
 
     public void sendErrorMsg(long playerId, ErrorMsg.ErrorCode errorCode, int req, int cmd) {
         ErrorMsg.scErrorCode errorMsg = ErrorMsg.scErrorCode.newBuilder().setErrorCode(errorCode).setMsgId(cmd).build();
-        sendClientMsg(Cmd.CMD.SC_ErrorCode_VALUE, req, playerId, errorMsg);
+        sendClientMsg(Cmd.CMD.SC_ErrorCode_VALUE, req + 1, playerId, errorMsg);
     }
 }

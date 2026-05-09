@@ -51,7 +51,7 @@ public class GateConnectSession extends ConnectSession {
             } else {
                 GateClient client = GateClientManager.getInstance().getClient(getGuid());
                 if (client == null) {
-                    client = GateClientManager.getInstance().getClient((long) s2sPacket.getSid());
+                    client = GateClientManager.getInstance().getClientBySid(s2sPacket.getSid());
                 }
                 if (client != null) {
                     client.sendPacketToClient(s2sPacket);

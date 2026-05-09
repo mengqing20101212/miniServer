@@ -23,9 +23,15 @@ public class Gate2GameRpcGameCallController implements IGameController {
                     final int seq = req.getSeq();
                     final long guid = req.getGuid();
                     final byte[] data = req.getData().toByteArray();
+                    AbstractMessagePacket clientPacket =
+                            MessagePacketFactory.createAbstractMessagePacket(
+                                    guid,
+                                    cmd,
+                                    ProtoMessageFactory.createProtoMessage(cmd, data),
+                                    seq,
+                                    req.getSid());
                     if (cmd == Cmd.CMD.CS_Login_VALUE) {// 登录
-                        AbstractMessagePacket loginPack = MessagePacketFactory.createAbstractMessagePacket(guid, cmd, ProtoMessageFactory.createProtoMessage(cmd, data), seq, req.getSid());
-                        HandlerRouterManager.execute(context.session(), loginPack);
+                        HandlerRouterManager.execute(context.session(), clientPacket);
                         return;
                     }
                     Player player = PlayerManager.getInstance().getOnlinePlayer(guid);
@@ -33,7 +39,8 @@ public class Gate2GameRpcGameCallController implements IGameController {
                         context.session().sendErrorMsg(guid, ErrorMsg.ErrorCode.PLAYER_NOT_EXIST, seq, cmd);
                         return;
                     }
-                    player.getGamePlayer().addPacket(context.packet());
+                    // Game 后续业务只看客户端原始包，seq/sid 保持 Gate 收到客户端时的值。
+                    player.getGamePlayer().addPacket(clientPacket);
 //                    AbstractMessage clientReq = ProtoMessageFactory.createProtoMessage(cmd, data);
 //                    assert clientReq != null;
 //                    GameHandlerRouteManager.execute(player, cmd, seq, req.getSid(), clientReq);

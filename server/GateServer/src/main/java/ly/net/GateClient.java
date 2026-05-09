@@ -35,6 +35,10 @@ public class GateClient {
         return getAccountId();
     }
 
+    public int getClientSid() {
+        return session.getConnector().getSessionId();
+    }
+
     public long getAccountId() {
         return accountId;
     }
@@ -82,9 +86,9 @@ public class GateClient {
             AbstractMessagePacket s2cPacket =
                     PacketCompat.createPacket(
                             getSessionGuid(),
-                            csPacket.getCmd(),
+                            csPacket.getCmd() + 1,
                             csPacket.getSid(),
-                            csPacket.getSeq(),
+                            csPacket.getSeq() + 1,
                             resp.getData().toByteArray());
             sendPacketToClient(s2cPacket);
         }
@@ -113,8 +117,8 @@ public class GateClient {
         req.setCmd(csPacket.getCmd());
         req.setSid(csPacket.getSid());
         req.setGuid(getSessionGuid());
-        // Keep inner and outer seq aligned so Game's wrapped response can be matched.
-        req.setSeq(rpcSeq);
+        // 内层请求必须保留客户端原始 seq，Game 回对应响应时会使用 seq + 1。
+        req.setSeq(csPacket.getSeq());
         req.setData(ByteString.copyFrom(csPacket.getData()));
 
         AbstractMessagePacket rpcPacket =
@@ -134,7 +138,7 @@ public class GateClient {
             AbstractMessagePacket response =
                     rpcNodeConnector
                             .getClient()
-                            .getReceiveMsgBySeq(rpcSeq, Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE);
+                            .getReceiveMsgBySeq(csPacket.getSeq() + 1, Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE);
             if (response != null) {
                 return (Server.scGate2GameRpcGameCall)
                         ProtoMessageFactory.createProtoMessage(
@@ -168,7 +172,7 @@ public class GateClient {
                             .setCmd(csPacket.getCmd())
                             .setSid(csPacket.getSid())
                             .setGuid(getSessionGuid())
-                            .setSeq(0)
+                            .setSeq(csPacket.getSeq())
                             .setData(ByteString.copyFrom(csPacket.getData()))
                             .build();
         }

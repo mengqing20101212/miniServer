@@ -196,13 +196,15 @@ public class Player {
             if (cmd.getNumber() == getGamePlayer().getLastClientCmd() + 1) {
                 Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
                 builder.setData(message.toByteString());
-                AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), getGamePlayer().getLastSeq(), gamePlayer.getLastSid());
+                AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), getGamePlayer().getLastSeq() + 1, gamePlayer.getLastSid());
                 getGamePlayer().getSession().addSendPacket(sendPacket);
                 getGamePlayer().setLastClientCmd(0);
                 getGamePlayer().setLastSeq(0);
                 getGamePlayer().setLastSid(0);
             } else {
-                AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), cmd.getNumber(), message, gamePlayer.getLastSeq(), gamePlayer.getLastSid());
+                Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
+                builder.setData(message.toByteString());
+                AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), gamePlayer.getLastSeq(), gamePlayer.getLastSid());
                 getGamePlayer().getSession().addSendPacket(sendPacket);
             }
         }

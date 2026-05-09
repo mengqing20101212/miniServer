@@ -12,6 +12,7 @@ public class GateClientManager {
     private static GateClientManager gateClientManager = new GateClientManager();
 
     private final Map<Long, GateClient> clientMap = new ConcurrentHashMap<>();
+    private final Map<Integer, GateClient> sidClientMap = new ConcurrentHashMap<>();
 
     private GateClientManager() {
         
@@ -23,14 +24,22 @@ public class GateClientManager {
 
     public void addClient(GateClient client) {
         clientMap.put(client.getSessionGuid(), client);
+        sidClientMap.put(client.getClientSid(), client);
     }
 
     public GateClient getClient(long guid) {
         return clientMap.get(guid);
     }
 
+    public GateClient getClientBySid(int sid) {
+        return sidClientMap.get(sid);
+    }
+
     public void removeClient(long guid) {
-        clientMap.remove(guid);
+        GateClient client = clientMap.remove(guid);
+        if (client != null) {
+            sidClientMap.remove(client.getClientSid());
+        }
     }
 
 }

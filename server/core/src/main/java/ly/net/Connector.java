@@ -53,6 +53,10 @@ public class Connector {
         this.status = status;
     }
 
+    public int getSessionId() {
+        return sessionId;
+    }
+
    /* public void write(byte[] msg) throws Exception {
         if (isConnected()) {
             socketChannel.channel().writeAndFlush(msg);

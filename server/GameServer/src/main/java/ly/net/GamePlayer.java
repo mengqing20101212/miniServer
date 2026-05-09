@@ -84,11 +84,10 @@ public class GamePlayer {
     }
 
     public void addPacket(AbstractMessagePacket packet) {
-        if (packet.getCmd() == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) {// gate 转发来之客户端的Rpc调用 非登录包 请求
-            setLastSeq(packet.getSeq());
-            setLastClientCmd(packet.getCmd());
-            setLastSid(packet.getSid());
-        }
+        // Gate 转发过来的业务包已经在 RPC 控制器中还原为客户端原始包，这里记录原始 seq/sid。
+        setLastSeq(packet.getSeq());
+        setLastClientCmd(packet.getCmd());
+        setLastSid(packet.getSid());
         packetQueue.add(packet);
     }
 
