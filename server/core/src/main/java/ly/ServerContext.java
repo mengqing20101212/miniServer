@@ -86,13 +86,14 @@ public class ServerContext {
         StartupSkillLoader.validateServerConfig(serverType, serverConfig);
         ConfigService.getInstance().loadAllConfig(logger, serverConfig.configPath);
         RedisUtils.init();
-        RpcService.getInstance().replayReliableMessagesOnStartup();
         MysqlService.getInstance().init(serverConfig.db.jdbcUrl, serverConfig.db.userName, serverConfig.db.passWord, 0, 0, 0, 0);
         
         // 启动自动建表服务
         AutoTableService.getInstance().startAutoTableService();
         
         NetService.getInstance().startUp(gameObjectProvider, serverConfig.serverPort);
+        // 当前服务器端口绑定完成后再补发可靠 RPC，避免目标服处理后回包找不到本服连接。
+        RpcService.getInstance().replayReliableMessagesOnStartup();
         logger.info("服务器 启动成功 耗时: " + (System.currentTimeMillis() - startTime) + "ms");
     }
 
