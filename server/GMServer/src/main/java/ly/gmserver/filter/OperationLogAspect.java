@@ -25,7 +25,6 @@ public class OperationLogAspect {
 
     @Around("execution(* ly.gmserver.controller.*.*(..))")
     public Object logOperation(ProceedingJoinPoint joinPoint) throws Throwable {
-        System.err.println("AOP HIT: " + joinPoint.getSignature().toShortString());
         long startTime = System.currentTimeMillis();
         String result = "SUCCESS";
         Object response;
@@ -36,8 +35,8 @@ public class OperationLogAspect {
             throw e;
         } finally {
             long duration = System.currentTimeMillis() - startTime;
-            String methodName = joinPoint.getSignature().toShortString();
-            log.info("AOP [{}] duration={}ms", methodName, duration);
+            String signatureName = joinPoint.getSignature().toShortString();
+            log.info("AOP [{}] duration={}ms", signatureName, duration);
             try {
                 ServletRequestAttributes attributes =
                     (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

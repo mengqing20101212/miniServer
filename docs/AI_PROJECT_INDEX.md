@@ -1,26 +1,32 @@
-# MiniServer AI Project Index
+# MiniServer AI 项目索引
 
-更新时间: 2026-04-25
+更新时间：2026-05-09
 
-## 1. 初始化结论
-已读取并纳入索引的现有 AI / 中间文档：
-- `STARTUP.SKILL.md`
-- `docs/JAVA_SOURCE_INDEX.md`
-- `server/doc/module_index.md`
-- `server/doc/net_packet_unification_plan.md`
-- `nacos-config.txt`
+## 当前可信入口
 
-这些文件里，最可信的运行参数来源是 `STARTUP.SKILL.md`。
-`nacos-config.txt` 更像较早阶段的本地化说明，不应直接覆盖 startup skill。
+在做较大范围判断前，优先阅读这些文件：
 
-## 2. 仓库总览
-- 仓库根目录: `miniServer`
-- 主要源码根目录: `server/`
-- Maven 聚合 POM: `server/pom.xml`
-- 当前聚合模块数: 8
-- 最新实扫 Java 文件数: 189
+- `STARTUP.SKILL.md`：当前本地启动参数、启动顺序和验收标准。
+- `docs/DEV_WORKFLOW.md`：构建、生成、启动、调试流程。
+- `docs/JAVA_SOURCE_INDEX.md`：按当前源码树重新扫描得到的 Java 源码索引。
+- `server/doc/module_index.md`：模块级阅读指南。
+- `server/doc/net_packet_unification_plan.md`：网络包统一改造设计记录。
+- `docs/ROOT_LOOSE_FILES_AUDIT.md`：根目录散落文件审计与清理记录。
+- `nacos-config.txt`：旧的 localhost Nacos 说明，只能作为历史参考。
 
-聚合模块：
+当前运行参数以 `STARTUP.SKILL.md` 为准。该文件指向 Nacos
+`118.25.76.117:8848`，namespace/env 为 `ly`；不要用 `nacos-config.txt`
+里的旧 localhost 示例覆盖它。
+
+## 仓库概况
+
+- 仓库根目录：`miniServer`
+- Maven 聚合工程：`server/pom.xml`
+- 当前 Maven 模块数：9
+- 当前 Java 源码文件数：924 个，不包含 `target/`
+
+当前聚合模块：
+
 1. `config`
 2. `proto`
 3. `tool`
@@ -29,45 +35,23 @@
 6. `GameServer`
 7. `GateServer`
 8. `BotServer`
+9. `GMServer`
 
-## 3. 目录索引
-- `server/`：主工程与 Maven 多模块源码
-- `excel/`：策划表 / 配置表来源
-- `proto/`：`.proto` 协议定义与工具 jar
-- `generated-sql/`：SQL 生成产物
-- `logs/`：系统日志
-- `runlogs/`：服务启动输出日志
-- `.vscode/`：本地 Java / Maven / task 配置
-- `.github/`：CI 与升级辅助脚本
+## 模块职责
 
-## 4. 模块职责摘要
-### core
-基础运行时，承载网络、RPC、Nacos、MySQL、Redis、配置等公共能力。
+- `config`：生成的配置模型和配置管理器。
+- `proto`：生成的 protobuf Java 类和消息工厂。
+- `tool`：Excel、proto、DB Entry/Helper 等离线生成工具。
+- `core`：网络、RPC、Nacos、MySQL、Redis、配置、工具类等公共运行时基础。
+- `LoginServer`：Spring Boot 登录和服务器列表服务。
+- `GameServer`：游戏逻辑、玩家生命周期、业务消息处理。
+- `GateServer`：客户端网关、连接管理、登录和游戏消息转发。
+- `BotServer`：机器人客户端、协议验证和压力测试。
+- `GMServer`：Spring Boot 后台管理服务，包含 Thymeleaf 页面、JWT 鉴权、管理员/角色/菜单管理和操作日志。
 
-### GameServer
-主游戏逻辑模块，处理玩家生命周期、业务模块、登录后的核心逻辑。
+## 高价值入口
 
-### GateServer
-网关模块，负责连接接入、消息转发与登录链路衔接。
-
-### LoginServer
-Spring Boot 登录服务，提供 HTTP 登录与服务器列表能力。
-
-### BotServer
-机器人客户端 / 压测模块，用于自动登录、行为模拟和协议验证。
-
-### tool
-离线生成工具，处理 Excel、Proto、DB Entry 等生成链路。
-
-### config
-配置模型与配置管理。
-
-### proto
-协议生成代码与消息工厂。
-
-## 5. 高价值入口
-- `README.md`
-- `server/doc/module_index.md`
+- `server/core/src/main/java/ly/Main.java`
 - `server/core/src/main/java/ly/ServerContext.java`
 - `server/core/src/main/java/ly/net/NetService.java`
 - `server/core/src/main/java/ly/rpc/RpcService.java`
@@ -75,47 +59,35 @@ Spring Boot 登录服务，提供 HTTP 登录与服务器列表能力。
 - `server/GateServer/src/main/java/ly/GateServer.java`
 - `server/LoginServer/src/main/java/ly/loginserver/LoginServerApplication.java`
 - `server/BotServer/src/main/java/ly/BotServer.java`
+- `server/GMServer/src/main/java/ly/gmserver/GMServerApplication.java`
 - `server/tool/src/main/java/ly/ToolMain.java`
+- `server/tool/src/main/java/ly/ParserDbEntry.java`
 
-## 6. 现有 AI / 中间文件评估
-### `STARTUP.SKILL.md`
-价值高。给出了当前最明确的启动顺序、端口约束、Bot 参数与成功判定标准。
+## 最近工作上下文
 
-### `docs/JAVA_SOURCE_INDEX.md`
-价值高，但会随仓库变化而变化。当前已按最新状态重生成，最新扫描结果是 189 个 Java 文件。
-后续若继续新增/迁移 Java 文件，建议整体重生成而不是手改计数。
+当前 `dev_hero` 分支最近的提交重点在 `GMServer`：
 
-### `server/doc/module_index.md`
-价值高。模块级理解入口清晰，适合新人或 AI 首轮熟悉代码时先读。
+- 已将 `GMServer` 加入 `server/pom.xml` 聚合模块。
+- 实现了后台管理相关 `gm_*` 表，并生成 Entry/Helper。
+- 增加了管理员、角色、菜单、日志、登录、dashboard/profile 等页面和接口。
+- 增加 JWT 鉴权、角色菜单数据、临时超级管理员登录路径、操作日志 AOP。
+- 修复生成的 `EntryHelper.select(null)` 返回空列表的问题，改为查询全部行。
+- 同步更新 `ParserDbEntry`，保证后续生成的 Helper 继承相同行为。
 
-### `server/doc/net_packet_unification_plan.md`
-设计草案类文档。仅在处理 `ly.net.packet` 协议收敛改造时作为设计输入，不应当成现状文档。
+## 当前清理状态
 
-### `nacos-config.txt`
-价值中等。它记录的是 localhost Nacos 场景，与 `STARTUP.SKILL.md` 的远程 Nacos 配置存在冲突。
-运行时优先以 `STARTUP.SKILL.md` 为准。
+早前列出的根目录清理项大多已经完成：
 
-## 7. 风险与注意点
-- 根目录历史上的松散实验文件已经开始收敛：4 个 `*.class` 已清理，`test_entity_generator.java` 与 `test_new_types.xlsx` 已迁移到测试目录；后续仍可继续整理残余历史说明文件。
-- `logs/`、`runlogs/` 中存在历史日志，定位问题时必须看时间戳。
-- `generated-sql/create-tables.sql` 看起来是正式输出，不建议按临时文件处理。
-- `README.md` 的部分描述较理想化，实际启动参数仍应以 `STARTUP.SKILL.md` 和当前代码为准。
+- 根目录 `.class` 产物已清理。
+- `test_entity_generator.java` 已规范到 `server/core/src/test/java/ly/EntityToSqlGeneratorSmokeTest.java`。
+- `test_new_types.xlsx` 已移动到 `server/tool/src/test/resources/test_new_types.xlsx`。
+- `nacos-config.txt` 已标记为旧 localhost 说明。
+- 本轮发现的剩余跟踪清理项是 `server/nul`，它只是一次 shell 路径错误输出的误产物。
 
-## 8. 已初始化 / 已补齐的 AI 文件
-当前已补齐：
-- `AGENTS.md`
-- `CLAUDE.md`
-- `GEMINI.md`
-- `.github/copilot-instructions.md`
-- `docs/AI_PROJECT_INDEX.md`
-- `docs/DEV_WORKFLOW.md`
-- `docs/ROOT_LOOSE_FILES_AUDIT.md`
+## 注意区
 
-另外，`docs/JAVA_SOURCE_INDEX.md` 已按当前仓库状态重生成，最新统计为 189 个 Java 文件。
-
-## 9. 下一步可继续做的事情
-如果继续收口，我建议优先做：
-1. 修正 `.vscode/launch.json` 与 `.vscode/tasks.json` 中 BotServer 仍使用 `8888` 的问题
-2. 删除根目录 4 个未跟踪 `.class` 文件
-3. 给 `nacos-config.txt` 加“历史说明”标记，避免误导
-4. 把 `test_entity_generator.java` 与 `test_new_types.xlsx` 迁移到更规范的测试/样例目录
+- `excel/` 是配置源数据，不要随意改名或批量编辑。
+- `generated-sql/create-tables.sql` 是跟踪输出，不是临时文件。
+- `logs/` 和 `runlogs/` 需要按时间戳判断，历史失败日志不能直接代表当前状态。
+- 如果修改生成代码行为，要同步修改生成器模板和已生成代码。
+- 刷新项目索引时必须重新扫描当前树，只能基于扫描结果声明数量。

@@ -19,6 +19,7 @@
 | GameServer | 9002 | Game logic, player lifecycle, business logic |
 | GateServer | 9001 | Client gateway, message routing, connection management |
 | BotServer | - | Robot client for load testing and protocol verification |
+| GMServer | 9090 | Game management backend, admin/role/menu pages, operation logs |
 
 ### Architecture
 - **Nacos**: `118.25.76.117:8848`, namespace: `ly`
@@ -95,6 +96,7 @@ miniServer/
 │   ├── GateServer/        # Gateway server
 │   ├── LoginServer/       # Login server (Spring Boot)
 │   ├── BotServer/         # Bot/load testing server
+│   ├── GMServer/          # GM/admin backend (Spring Boot)
 │   ├── proto/             # Generated protobuf Java classes
 │   ├── tool/              # Excel/proto/DB generation tools
 │   └── pom.xml            # Aggregator POM
@@ -122,7 +124,8 @@ miniServer/
 4. `server/GameServer/src/main/java/ly/GameServer.java` - Game server entry
 5. `server/GateServer/src/main/java/ly/GateServer.java` - Gateway entry
 6. `server/LoginServer/src/main/java/ly/loginserver/LoginServerApplication.java` - Login entry
-7. `server/tool/src/main/java/ly/ToolMain.java` - Generation tools entry
+7. `server/GMServer/src/main/java/ly/gmserver/GMServerApplication.java` - GM backend entry
+8. `server/tool/src/main/java/ly/ToolMain.java` - Generation tools entry
 
 ### Configuration Generation
 Excel tables are auto-converted to Java config classes:

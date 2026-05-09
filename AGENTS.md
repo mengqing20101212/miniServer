@@ -6,7 +6,7 @@ This repository is a Java 21 + Maven multi-module game server project.
 - Root repo: `miniServer`
 - Main code lives under: `server/`
 - Maven aggregator: `server/pom.xml`
-- Aggregated modules: `config`, `proto`, `tool`, `core`, `LoginServer`, `GameServer`, `GateServer`, `BotServer`
+- Aggregated modules: `config`, `proto`, `tool`, `core`, `LoginServer`, `GameServer`, `GateServer`, `BotServer`, `GMServer`
 - Config tables: `excel/`
 - Proto definitions: `proto/`
 - Generated SQL output: `generated-sql/`
@@ -50,6 +50,7 @@ Notes:
 - `GateServer`: client gateway and login forwarding
 - `LoginServer`: HTTP login and server-list service
 - `BotServer`: robot client / pressure testing
+- `GMServer`: Spring Boot game-management backend, admin/role/menu pages, JWT auth, and operation logs
 - `tool`: Excel / proto / db-entry generation tooling
 - `config`: config models and managers
 - `proto`: generated protobuf Java classes and factories
@@ -63,6 +64,7 @@ Notes:
 - `server/GateServer/src/main/java/ly/GateServer.java`
 - `server/LoginServer/src/main/java/ly/loginserver/LoginServerApplication.java`
 - `server/BotServer/src/main/java/ly/BotServer.java`
+- `server/GMServer/src/main/java/ly/gmserver/GMServerApplication.java`
 - `server/tool/src/main/java/ly/ToolMain.java`
 
 ## 7. Caution zones

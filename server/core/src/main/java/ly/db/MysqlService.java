@@ -72,24 +72,24 @@ public class MysqlService {
         .name("MysqlService-dbSaveVirtual")
         .start(
             () -> {
-              saveOrUpdateEntry entry = null;
-              try {
-                while ((entry = dataQueue.poll()) != null) {
-                  try {
-                    if (entry.type == SAVE_TYPE) save(entry.data);
-                    else if (entry.type == UPDATE_TYPE) update(entry.data, entry.fileds);
-                  } catch (Exception e) {
-                    logger.error(
-                        String.format(
-                            "save  AbstractEntry:%s error", entry.getClass().getSimpleName()),
-                        e);
-                    e.printStackTrace();
+              while (!Thread.currentThread().isInterrupted()) {
+                saveOrUpdateEntry entry = null;
+                try {
+                  entry = dataQueue.take();
+                  if (entry.type == SAVE_TYPE) {
+                    save(entry.data);
+                  } else if (entry.type == UPDATE_TYPE) {
+                    update(entry.data, entry.fileds);
                   }
+                } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
+                } catch (Exception e) {
+                  String entryName =
+                      entry != null && entry.data != null
+                          ? entry.data.getClass().getSimpleName()
+                          : "unknown";
+                  logger.error("save AbstractEntry:{} error", entryName, e);
                 }
-
-              } catch (Exception e) {
-                logger.error("MysqlService-dbSaveThread error", e);
-                e.printStackTrace();
               }
             });
   }
