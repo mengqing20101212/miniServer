@@ -8,11 +8,14 @@ import java.sql.Clob;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -55,6 +58,8 @@ public class MysqlService {
   private static final long INITIAL_RETRY_DELAY_MILLIS = 5_000L;
   private static final long MAX_RETRY_DELAY_MILLIS = 5 * 60_000L;
   private static final long RETRY_WRITE_INTERVAL_MILLIS = 100L;
+  private static final Path DEAD_LETTER_ROOT = Path.of("runlogs", "db-dead-letter");
+  private static final String DEAD_LETTER_FILE_NAME = "db-write-failed.log";
 
   private final LinkedBlockingQueue<DbWriteTask> dataQueue =
       new LinkedBlockingQueue<>(DATA_QUEUE_CAPACITY);
@@ -83,6 +88,8 @@ public class MysqlService {
     mysqlConnector =
         new MysqlConnector(
             jdbcUrl, username, password, maxPoolSize, minIdle, idleTimeout, connectionTimeout);
+
+    loadDeadLettersForRetry();
 
     // 启动一个保存的协程
     startAsyncWriteWorkers();
@@ -223,16 +230,121 @@ public class MysqlService {
     return retryQueueSize.get();
   }
 
+  int loadDeadLettersForRetry() {
+    return loadDeadLettersForRetry(DEAD_LETTER_ROOT);
+  }
+
+  /** 启动时加载历史死信文件，把可恢复的写入任务重新放回重试队列。 */
+  int loadDeadLettersForRetry(Path root) {
+    if (!Files.isDirectory(root)) {
+      return 0;
+    }
+    int loadedCount = 0;
+    try (var files = Files.walk(root, 2)) {
+      for (Path file : files.filter(Files::isRegularFile).filter(this::canLoadDeadLetterFile).toList()) {
+        loadedCount += loadDeadLetterFile(file);
+      }
+    } catch (Exception e) {
+      LoggerDef.DeadLetterLogger.error("load dead letter files error, root={}", root, e);
+    }
+    if (loadedCount > 0) {
+      LoggerDef.DeadLetterLogger.warn("loaded async db dead letters for retry, count={}", loadedCount);
+    }
+    return loadedCount;
+  }
+
+  private boolean canLoadDeadLetterFile(Path file) {
+    String fileName = file.getFileName().toString();
+    return fileName.startsWith("db-write-failed") && fileName.endsWith(".log");
+  }
+
+  private int loadDeadLetterFile(Path file) throws Exception {
+    // 先改名为 loading 文件，避免加载过程中再次被当作新的死信文件写入或重复扫描。
+    Path loadingFile =
+        file.resolveSibling(file.getFileName() + ".loading." + System.currentTimeMillis() + ".log");
+    Files.move(file, loadingFile, StandardCopyOption.REPLACE_EXISTING);
+
+    int loadedCount = 0;
+    boolean completed = false;
+    try {
+      List<String> lines = Files.readAllLines(loadingFile, StandardCharsets.UTF_8);
+      for (int i = 0; i < lines.size(); i++) {
+        String line = lines.get(i);
+        if (line == null || line.isBlank()) {
+          continue;
+        }
+        DeadLetterRecord record = JSON.parseObject(line, DeadLetterRecord.class);
+        DbWriteTask task = DbWriteTask.from(record);
+        if (task == null || task.data == null) {
+          LoggerDef.DeadLetterLogger.warn("skip invalid async db dead letter line, file={}", loadingFile);
+          continue;
+        }
+        task.nextRetryAt = System.currentTimeMillis() + INITIAL_RETRY_DELAY_MILLIS;
+        if (!offerRetryTask(task)) {
+          LoggerDef.DeadLetterLogger.error(
+              "retry queue full while loading dead letter, file={}, loaded={}",
+              loadingFile,
+              loadedCount);
+          preserveUnloadedDeadLetterLines(loadingFile, lines.subList(i, lines.size()));
+          completed = true;
+          return loadedCount;
+        }
+        loadedCount++;
+      }
+      completed = true;
+      return loadedCount;
+    } finally {
+      if (completed) {
+        archiveLoadedDeadLetterFile(loadingFile);
+      }
+    }
+  }
+
+  private void preserveUnloadedDeadLetterLines(Path loadingFile, List<String> lines) throws Exception {
+    if (lines == null || lines.isEmpty()) {
+      return;
+    }
+    Path currentFile = loadingFile.getParent().resolve(DEAD_LETTER_FILE_NAME);
+    Files.write(
+        currentFile,
+        lines,
+        StandardCharsets.UTF_8,
+        StandardOpenOption.CREATE,
+        StandardOpenOption.APPEND);
+  }
+
+  private boolean offerRetryTask(DbWriteTask task) {
+    int queued = retryQueueSize.incrementAndGet();
+    if (queued > RETRY_QUEUE_CAPACITY) {
+      retryQueueSize.decrementAndGet();
+      return false;
+    }
+    retryQueue.offer(task);
+    return true;
+  }
+
+  private void archiveLoadedDeadLetterFile(Path loadingFile) {
+    try {
+      // 加载完成后归档到 loaded 目录，避免服务下次启动重复回放同一批死信。
+      Path loadedDir = loadingFile.getParent().resolve("loaded");
+      Files.createDirectories(loadedDir);
+      Files.move(
+          loadingFile,
+          loadedDir.resolve(loadingFile.getFileName() + ".done"),
+          StandardCopyOption.REPLACE_EXISTING);
+    } catch (Exception e) {
+      LoggerDef.DeadLetterLogger.error("archive loaded dead letter file error, file={}", loadingFile, e);
+    }
+  }
+
   void writeDeadLetter(DbWriteTask task, String reason) {
     try {
       // 死信文件使用追加写 JSONL；同时保存序列化后的 Entry，避免回放工具依赖有损的 toString 输出。
       Path dir =
-          Path.of(
-              "runlogs",
-              "db-dead-letter",
+          DEAD_LETTER_ROOT.resolve(
               LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE));
       Files.createDirectories(dir);
-      Path file = dir.resolve("db-write-failed.log");
+      Path file = dir.resolve(DEAD_LETTER_FILE_NAME);
       String line = JSON.toJSONString(DeadLetterRecord.from(task, reason)) + System.lineSeparator();
       Files.writeString(
           file,
@@ -264,6 +376,20 @@ public class MysqlService {
       return Base64.getEncoder().encodeToString(bytes.toByteArray());
     } catch (Exception e) {
       return "";
+    }
+  }
+
+  private static AbstractEntry deserializeEntry(String serializedEntry) {
+    if (serializedEntry == null || serializedEntry.isBlank()) {
+      return null;
+    }
+    try (ByteArrayInputStream bytes =
+            new ByteArrayInputStream(Base64.getDecoder().decode(serializedEntry));
+        ObjectInputStream in = new ObjectInputStream(bytes)) {
+      Object data = in.readObject();
+      return data instanceof AbstractEntry entry ? entry : null;
+    } catch (Exception e) {
+      return null;
     }
   }
 
@@ -769,6 +895,19 @@ public class MysqlService {
     public DbWriteTask(int type, AbstractEntry data, String[] fileds) {
       this(type, data);
       this.fileds = fileds;
+    }
+
+    static DbWriteTask from(DeadLetterRecord record) {
+      if (record == null) {
+        return null;
+      }
+      AbstractEntry entry = deserializeEntry(record.serializedEntry);
+      if (entry == null) {
+        return null;
+      }
+      DbWriteTask task = new DbWriteTask(record.type, entry, record.fields);
+      task.lastError = record.lastError;
+      return task;
     }
 
     @Override
