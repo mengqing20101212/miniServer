@@ -8,14 +8,27 @@ import java.sql.Clob;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import com.alibaba.fastjson2.JSON;
 import org.slf4j.Logger;
 
 import io.netty.util.internal.StringUtil;
@@ -35,7 +48,22 @@ public class MysqlService {
   private static final MysqlService instance = new MysqlService();
 
   /** 所有待入库的entry集合 */
-  private LinkedBlockingQueue<saveOrUpdateEntry> dataQueue = new LinkedBlockingQueue<>();
+  // Async DB writes are bounded. If DB is slow or unavailable, unbounded in-memory queues can
+  // turn a DB outage into an OOM.
+  private static final int DATA_QUEUE_CAPACITY = 10_000;
+  private static final int RETRY_QUEUE_CAPACITY = 50_000;
+  private static final int MAX_RETRY_COUNT = 20;
+  private static final long INITIAL_RETRY_DELAY_MILLIS = 5_000L;
+  private static final long MAX_RETRY_DELAY_MILLIS = 5 * 60_000L;
+  private static final long RETRY_WRITE_INTERVAL_MILLIS = 100L;
+
+  private final LinkedBlockingQueue<DbWriteTask> dataQueue =
+      new LinkedBlockingQueue<>(DATA_QUEUE_CAPACITY);
+  // DelayQueue avoids tight retry loops. retryQueueSize provides a hard logical cap because
+  // DelayQueue itself is unbounded.
+  private final DelayQueue<DbWriteTask> retryQueue = new DelayQueue<>();
+  private final AtomicInteger retryQueueSize = new AtomicInteger();
+  private final AtomicBoolean asyncWorkersStarted = new AtomicBoolean();
 
   public static MysqlService getInstance() {
     return instance;
@@ -59,7 +87,15 @@ public class MysqlService {
             jdbcUrl, username, password, maxPoolSize, minIdle, idleTimeout, connectionTimeout);
 
     // 启动一个保存的协程
+    startAsyncWriteWorkers();
+  }
+
+  private void startAsyncWriteWorkers() {
+    if (!asyncWorkersStarted.compareAndSet(false, true)) {
+      return;
+    }
     startSaveThread();
+    startRetryThread();
   }
 
   /**
@@ -73,25 +109,167 @@ public class MysqlService {
         .start(
             () -> {
               while (!Thread.currentThread().isInterrupted()) {
-                saveOrUpdateEntry entry = null;
+                DbWriteTask entry = null;
                 try {
                   entry = dataQueue.take();
-                  if (entry.type == SAVE_TYPE) {
-                    save(entry.data);
-                  } else if (entry.type == UPDATE_TYPE) {
-                    update(entry.data, entry.fileds);
+                  if (!processWriteTask(entry)) {
+                    scheduleRetry(entry, null);
                   }
                 } catch (InterruptedException e) {
                   Thread.currentThread().interrupt();
                 } catch (Exception e) {
-                  String entryName =
-                      entry != null && entry.data != null
-                          ? entry.data.getClass().getSimpleName()
-                          : "unknown";
-                  logger.error("save AbstractEntry:{} error", entryName, e);
+                  scheduleRetry(entry, e);
                 }
               }
             });
+  }
+
+  private void startRetryThread() {
+    Thread.ofVirtual()
+        .name("MysqlService-dbRetryVirtual")
+        .start(
+            () -> {
+              long lastRetryWriteAt = 0L;
+              while (!Thread.currentThread().isInterrupted()) {
+                DbWriteTask task = null;
+                try {
+                  task = retryQueue.take();
+                  retryQueueSize.decrementAndGet();
+                  // Retry writes are rate-limited so DB recovery is not followed by a retry storm.
+                  long waitMillis =
+                      RETRY_WRITE_INTERVAL_MILLIS
+                          - (System.currentTimeMillis() - lastRetryWriteAt);
+                  if (waitMillis > 0) {
+                    Thread.sleep(waitMillis);
+                  }
+                  lastRetryWriteAt = System.currentTimeMillis();
+                  if (!processWriteTask(task)) {
+                    scheduleRetry(task, null);
+                  }
+                } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
+                } catch (Exception e) {
+                  scheduleRetry(task, e);
+                }
+              }
+            });
+  }
+
+  boolean processWriteTask(DbWriteTask task) {
+    if (task == null || task.data == null) {
+      return true;
+    }
+    if (task.type == SAVE_TYPE) {
+      return save(task.data);
+    }
+    if (task.type == UPDATE_TYPE) {
+      return update(task.data, task.fileds);
+    }
+    logger.error("unknown async db write type: {}", task.type);
+    return true;
+  }
+
+  void scheduleRetry(DbWriteTask task, Exception error) {
+    if (task == null) {
+      return;
+    }
+    task.retryCount++;
+    task.lastError = error != null ? error.toString() : "write returned false";
+
+    // Do not keep failing writes in memory forever. After bounded retries, preserve them on disk
+    // for later inspection or replay tooling.
+    if (task.retryCount > MAX_RETRY_COUNT) {
+      writeDeadLetter(task, "max retry exceeded");
+      return;
+    }
+    int queued = retryQueueSize.incrementAndGet();
+    if (queued > RETRY_QUEUE_CAPACITY) {
+      retryQueueSize.decrementAndGet();
+      writeDeadLetter(task, "retry queue full");
+      return;
+    }
+    task.nextRetryAt = System.currentTimeMillis() + calculateRetryDelayMillis(task.retryCount);
+    retryQueue.offer(task);
+  }
+
+  long calculateRetryDelayMillis(int retryCount) {
+    long delay = INITIAL_RETRY_DELAY_MILLIS;
+    for (int i = 1; i < retryCount; i++) {
+      if (delay >= MAX_RETRY_DELAY_MILLIS / 2) {
+        return MAX_RETRY_DELAY_MILLIS;
+      }
+      delay *= 2;
+    }
+    return Math.min(delay, MAX_RETRY_DELAY_MILLIS);
+  }
+
+  void enqueueAsyncTask(DbWriteTask task) {
+    if (task == null || task.data == null || !task.data.canSave()) {
+      return;
+    }
+    try {
+      // Wait briefly for bursts, then spill to dead letter so business threads are not blocked
+      // indefinitely by a full async queue.
+      if (!dataQueue.offer(task, 100, TimeUnit.MILLISECONDS)) {
+        writeDeadLetter(task, "main queue full");
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      writeDeadLetter(task, "interrupted while enqueue");
+    }
+  }
+
+  int asyncQueueSize() {
+    return dataQueue.size();
+  }
+
+  int retryQueueSize() {
+    return retryQueueSize.get();
+  }
+
+  void writeDeadLetter(DbWriteTask task, String reason) {
+    try {
+      // Append-only JSONL. The serialized entry is included so a replay tool can restore the
+      // original object without depending on lossy toString output.
+      Path dir =
+          Path.of(
+              "runlogs",
+              "db-dead-letter",
+              LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE));
+      Files.createDirectories(dir);
+      Path file = dir.resolve("db-write-failed.log");
+      String line = JSON.toJSONString(DeadLetterRecord.from(task, reason)) + System.lineSeparator();
+      Files.writeString(
+          file,
+          line,
+          StandardCharsets.UTF_8,
+          StandardOpenOption.CREATE,
+          StandardOpenOption.APPEND);
+      LoggerDef.DeadLetterLogger.error(
+          "async db write moved to dead letter, reason={}, entry={}, retryCount={}",
+          reason,
+          task.data != null ? task.data.getClass().getSimpleName() : "unknown",
+          task.retryCount);
+    } catch (Exception e) {
+      String entryName =
+          task != null && task.data != null ? task.data.getClass().getSimpleName() : "unknown";
+      LoggerDef.DeadLetterLogger.error(
+          "failed to write async db dead letter, entry={}, reason={}", entryName, reason, e);
+    }
+  }
+
+  private static String serializeEntry(AbstractEntry entry) {
+    if (entry == null) {
+      return "";
+    }
+    try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(bytes)) {
+      out.writeObject(entry);
+      out.flush();
+      return Base64.getEncoder().encodeToString(bytes.toByteArray());
+    } catch (Exception e) {
+      return "";
+    }
   }
 
   /**
@@ -179,16 +357,12 @@ public class MysqlService {
 
   /** 异步保存，添加到保存队列；真正执行由保存线程完成。 */
   public void addSaveEntry(AbstractEntry entry) {
-    if (entry.canSave()) {
-      dataQueue.add(new saveOrUpdateEntry(SAVE_TYPE, entry));
-    }
+    enqueueAsyncTask(new DbWriteTask(SAVE_TYPE, entry));
   }
 
   /** 异步更新，字段参数为空时由实体脏字段决定 UPDATE 列。 */
   public void addUpdateEntry(AbstractEntry entry, String... fileds) {
-    if (entry.canSave()) {
-      dataQueue.add(new saveOrUpdateEntry(UPDATE_TYPE, entry, fileds));
-    }
+    enqueueAsyncTask(new DbWriteTask(UPDATE_TYPE, entry, fileds));
   }
 
   /**
@@ -512,19 +686,22 @@ public class MysqlService {
 
   public void shutdown() {
     long maxSleepTime = 1000;
-    // 数据未全部入库，最多阻塞 1秒
-    while (!dataQueue.isEmpty() && maxSleepTime > 0) {
+    while ((!dataQueue.isEmpty() || retryQueueSize.get() > 0) && maxSleepTime > 0) {
       try {
         Thread.sleep(10);
         maxSleepTime -= 10;
       } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
         throw new RuntimeException(e);
       }
     }
     if (mysqlConnector != null) {
       mysqlConnector.shutdown();
     }
-    logger.info("MysqlService shutdown , 待入库的数据:" + dataQueue.size());
+    logger.info(
+        "MysqlService shutdown , pending={}, retryPending={}",
+        dataQueue.size(),
+        retryQueueSize.get());
   }
 
   private static final int SAVE_TYPE = 1;
@@ -577,19 +754,68 @@ public class MysqlService {
     return mysqlConnector.execute(sql, keyValue);
   }
 
-  class saveOrUpdateEntry {
+  static class DbWriteTask implements Delayed {
     int type;
     AbstractEntry data;
     String[] fileds;
+    int retryCount;
+    long createdAt;
+    long nextRetryAt;
+    String lastError;
 
-    public saveOrUpdateEntry(int type, AbstractEntry data) {
+    // nextRetryAt is used by DelayQueue; normal queue writes use the same task object but ignore it.
+    public DbWriteTask(int type, AbstractEntry data) {
       this.type = type;
       this.data = data;
+      this.createdAt = System.currentTimeMillis();
+      this.nextRetryAt = this.createdAt;
     }
 
-    public saveOrUpdateEntry(int type, AbstractEntry data, String[] fileds) {
+    public DbWriteTask(int type, AbstractEntry data, String[] fileds) {
       this(type, data);
       this.fileds = fileds;
+    }
+
+    @Override
+    public long getDelay(TimeUnit unit) {
+      return unit.convert(nextRetryAt - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public int compareTo(Delayed other) {
+      if (other == this) {
+        return 0;
+      }
+      long diff = getDelay(TimeUnit.MILLISECONDS) - other.getDelay(TimeUnit.MILLISECONDS);
+      return diff == 0 ? 0 : (diff < 0 ? -1 : 1);
+    }
+  }
+
+  static class DeadLetterRecord {
+    public int type;
+    public String typeName;
+    public String className;
+    public String[] fields;
+    public int retryCount;
+    public long createdAt;
+    public long failedAt;
+    public String reason;
+    public String lastError;
+    public String serializedEntry;
+
+    static DeadLetterRecord from(DbWriteTask task, String reason) {
+      DeadLetterRecord record = new DeadLetterRecord();
+      record.type = task.type;
+      record.typeName = task.type == SAVE_TYPE ? "SAVE" : task.type == UPDATE_TYPE ? "UPDATE" : "UNKNOWN";
+      record.className = task.data != null ? task.data.getClass().getName() : "";
+      record.fields = task.fileds;
+      record.retryCount = task.retryCount;
+      record.createdAt = task.createdAt;
+      record.failedAt = System.currentTimeMillis();
+      record.reason = reason;
+      record.lastError = task.lastError;
+      record.serializedEntry = serializeEntry(task.data);
+      return record;
     }
   }
 

@@ -40,6 +40,15 @@
                 <TimeBasedTriggeringPolicy/>
             </Policies>
         </RollingFile>
+
+        <!-- 姝讳俊鏃ュ織 -->
+        <RollingFile name="deadLetterRollingFile" fileName="logs/dead-letter.log"
+                     filePattern="logs/dead-letter-%d{yyyy-MM-dd}.log">
+            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
     </Appenders>
 
     <Loggers>
@@ -58,6 +67,10 @@
         </Logger>
         <Logger name="DbLogger" level="DEBUG" additivity="false">
             <AppenderRef ref="DbRollingFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="deadLetterLogger" level="WARN" additivity="false">
+            <AppenderRef ref="deadLetterRollingFile"/>
             <AppenderRef ref="Console"/>
         </Logger>
         <Root level="INFO">

@@ -15,6 +15,7 @@ public class LoggerDef {
     public final static Logger DbLogger = LoggerFactory.getLogger("DbLogger");
     public final static Logger NetLogger = LoggerFactory.getLogger("netLogger");
     public final static Logger ProtoLogger = LoggerFactory.getLogger("protoLogger");
+    public final static Logger DeadLetterLogger = LoggerFactory.getLogger("deadLetterLogger");
 
     public static void LogProto(String msg, Object... args) {
         ProtoLogger.info(msg, args);
@@ -32,5 +33,8 @@ public class LoggerDef {
         DbLogger.info(msg, args);
     }
 
+    public static void LogDeadLetter(String msg, Object... args) {
+        DeadLetterLogger.info(msg, args);
+    }
 
 }
