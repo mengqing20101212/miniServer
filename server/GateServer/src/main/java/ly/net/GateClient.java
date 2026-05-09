@@ -109,7 +109,8 @@ public class GateClient {
         Server.csGate2GameRpcGameCall.Builder req = Server.csGate2GameRpcGameCall.newBuilder();
         req.setCmd(csPacket.getCmd());
         req.setSid(csPacket.getSid());
-        req.setGuid(getSessionGuid());
+        // 非登录业务包的 guid 是玩家 id，必须原样转给 GameServer 才能定位在线玩家。
+        req.setGuid(csPacket.getGuid());
         // 内层请求必须保留客户端原始 seq，Game 回对应响应时会使用 seq + 1。
         req.setSeq(csPacket.getSeq());
         req.setData(ByteString.copyFrom(csPacket.getData()));
@@ -164,7 +165,7 @@ public class GateClient {
                     Server.csGate2GameRpcGameCall.newBuilder()
                             .setCmd(csPacket.getCmd())
                             .setSid(csPacket.getSid())
-                            .setGuid(getSessionGuid())
+                            .setGuid(csPacket.getGuid())
                             .setSeq(csPacket.getSeq())
                             .setData(ByteString.copyFrom(csPacket.getData()))
                             .build();

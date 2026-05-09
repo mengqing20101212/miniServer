@@ -100,6 +100,7 @@ public class GamePlayer {
     }
 
     public void setPlayer(Player player) {
+        this.player = player;
     }
 
 

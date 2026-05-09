@@ -1,6 +1,7 @@
 package ly;
 
 import ly.bot.RobotManager;
+import ly.bot.module.impl.RpcSeqSidTestModule;
 import ly.bot.util.ProtocolTester;
 import ly.startup.StartupSkillLoader;
 
@@ -12,6 +13,13 @@ public class BotServer {
     public static void main(String[] args) {
         System.out.println("BotServer - 机器人压测服务器启动");
         System.out.println("支持完整的登录流程：LoginServer -> GateServer");
+
+        if (args != null && args.length > 0 && "--test-rpc-seq-sid".equals(args[0])) {
+            String loginHost = args.length >= 2 ? args[1] : "127.0.0.1";
+            int loginHttpPort = args.length >= 3 ? Integer.parseInt(args[2]) : 8889;
+            boolean success = RpcSeqSidTestModule.runStandalone(loginHost, loginHttpPort);
+            System.exit(success ? 0 : 1);
+        }
 
         StartupSkillLoader.ResolvedBotArgs resolved = StartupSkillLoader.resolveBotArgs(args);
         String command = resolved.command;

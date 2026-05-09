@@ -1,10 +1,8 @@
 package ly.logic.player;
 
-import ly.ProtoMessageFactory;
 import ly.net.GameConnectSession;
 import ly.net.HandlerRouterManager;
 import ly.net.IGameController;
-import ly.net.packet.MessagePacketFactory;
 import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
@@ -23,13 +21,9 @@ public class Gate2GameRpcGameCallController implements IGameController {
                     final int seq = req.getSeq();
                     final long guid = req.getGuid();
                     final byte[] data = req.getData().toByteArray();
-                    AbstractMessagePacket clientPacket =
-                            MessagePacketFactory.createAbstractMessagePacket(
-                                    guid,
-                                    cmd,
-                                    ProtoMessageFactory.createProtoMessage(cmd, data),
-                                    seq,
-                                    req.getSid());
+                    // Gate 已经把客户端原始包的 cmd/seq/sid/data 放进 RPC 载荷，这里只还原包头。
+                    // 具体业务 proto 由后续路由层按 cmd 反序列化，避免工厂漏映射时在转发入口丢包。
+                    AbstractMessagePacket clientPacket = new AbstractMessagePacket(guid, cmd, req.getSid(), seq, data);
                     if (cmd == Cmd.CMD.CS_Login_VALUE) {// 登录
                         HandlerRouterManager.execute(context.session(), clientPacket);
                         return;

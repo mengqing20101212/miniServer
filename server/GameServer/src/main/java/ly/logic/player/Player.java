@@ -155,6 +155,10 @@ public class Player {
 
     public void setGamePlayer(GamePlayer gamePlayer) {
         this.gamePlayer = gamePlayer;
+        // GamePlayer 处理队列中的业务包时需要反向拿到 Player 上下文。
+        if (gamePlayer != null) {
+            gamePlayer.setPlayer(this);
+        }
     }
 
     public void statPlay() {

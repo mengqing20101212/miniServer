@@ -25,6 +25,9 @@ public class ProtoMessageFactory {
         case Cmd.CMD.SC_RpcPing_VALUE ->{return Server.scRpcPing.parseFrom(data);}
         case Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE ->{return Server.csGate2GameRpcGameCall.parseFrom(data);}
         case Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE ->{return Server.scGate2GameRpcGameCall.parseFrom(data);}
+        // 英雄模块协议需要在 GameServer 路由层反序列化，BotServer 的 RPC seq/sid 测试会覆盖该链路。
+        case Cmd.CMD.CS_HeroList_VALUE ->{return Hero.CS_HeroList.parseFrom(data);}
+        case Cmd.CMD.SC_HeroList_VALUE ->{return Hero.SC_HeroList.parseFrom(data);}
       }
     } catch (InvalidProtocolBufferException e) {
       e.printStackTrace();

@@ -75,6 +75,10 @@ public class GateConnectSession extends ConnectSession {
         if (!serverInnerCmd && packet.getCmd() != Cmd.CMD.SC_Logout_VALUE) {
             AbstractMessagePacket csPacket = packet;
             GateClient client = GateClientManager.getInstance().getClient(getGuid());
+            if (client == null) {
+                // 登录后的客户端业务包可能携带 playerId 作为 guid，Gate 连接定位必须按 sid 兜底。
+                client = GateClientManager.getInstance().getClientBySid(csPacket.getSid());
+            }
 
             if (client == null) {
                 try {
