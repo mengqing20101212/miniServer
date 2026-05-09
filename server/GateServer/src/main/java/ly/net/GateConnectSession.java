@@ -9,12 +9,18 @@ import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Server;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * 网关连接会话，封装客户端连接、收发队列和网关转发所需状态。
  */
 public class GateConnectSession extends ConnectSession {
+    private final AtomicBoolean receiveWorkerStarted = new AtomicBoolean();
+    private volatile Thread receiveWorker;
+
     public GateConnectSession(long guid) {
         super(guid);
+        startReceiveWorker();
     }
 
     @Override
@@ -24,6 +30,42 @@ public class GateConnectSession extends ConnectSession {
     @Override
     public void addReceivePacket(AbstractMessagePacket packet) {
         super.addReceivePacket(packet);
+    }
+
+    private void startReceiveWorker() {
+        if (!receiveWorkerStarted.compareAndSet(false, true)) {
+            return;
+        }
+        receiveWorker = Thread.ofVirtual()
+                .name("gate-session-receive-" + getGuid())
+                .start(
+                        () -> {
+                            while (!Thread.currentThread().isInterrupted()) {
+                                try {
+                                    AbstractMessagePacket packet = receivePacketQueue.take();
+                                    handleReceivePacket(packet);
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                } catch (Exception e) {
+                                    LoggerDef.SystemLogger.error(
+                                            "GateConnectSession handle receive packet error, guid={}",
+                                            getGuid(),
+                                            e);
+                                }
+                            }
+                        });
+    }
+
+    @Override
+    public void closeChannel() {
+        Thread worker = receiveWorker;
+        if (worker != null) {
+            worker.interrupt();
+        }
+        super.closeChannel();
+    }
+
+    private void handleReceivePacket(AbstractMessagePacket packet) {
         LoggerDef.LogProto("receive {}|{}|{}|{}", getGuid(), packet.getSid(), packet.getCmd(), packet.getLength());
 
         boolean serverInnerCmd =
