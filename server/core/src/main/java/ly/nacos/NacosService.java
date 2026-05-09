@@ -14,6 +14,7 @@ import ly.LoggerDef;
 import ly.ServerContext;
 import ly.config.ServerConfig;
 import ly.config.ServerTypeEnum;
+import ly.rpc.RpcService;
 import ly.utils.CommonUtils;
 import org.slf4j.Logger;
 
@@ -155,6 +156,9 @@ public class NacosService {
         } else {
             node.update(instance);
             logger.info(String.format("updateNode 当前节点数量:%d, 更新服务器节点: %s", nodeMap.size(), instance));
+            if (node.canUse()) {
+                RpcService.getInstance().onNodeAvailable(node.getServerId());
+            }
         }
     }
 
@@ -162,6 +166,9 @@ public class NacosService {
         NacosServerNode delNode = nodeMap.remove(instanceId);
         logger.info(String.format("当前节点数量:%d, 删除服务器节点: %s", nodeMap.size(), delNode));
         nodeMap.remove(instanceId);
+        if (delNode != null) {
+            RpcService.getInstance().onNodeDeleted(delNode.getServerId());
+        }
     }
 
     /** 把 Nacos 原始实例转换为项目内部节点模型并加入本地缓存。 */
@@ -172,6 +179,7 @@ public class NacosService {
             currentNode = newNode;
         }
         nodeMap.put(newNode.getServerId(), newNode);
+        RpcService.getInstance().onNodeAvailable(newNode.getServerId());
     }
 
     public static NacosServerNode getCurrentNode() {

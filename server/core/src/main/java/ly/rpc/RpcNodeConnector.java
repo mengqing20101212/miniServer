@@ -10,6 +10,7 @@ import ly.nacos.NacosService;
 import ly.net.NetClient;
 import ly.net.NetClientManager;
 import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Server;
 
@@ -234,9 +235,22 @@ public class RpcNodeConnector {
      * @return 响应消息对象，如果超时或失败则返回null
      */
     public AbstractMessage syncSendProtoMessage(long guid, int cmd, AbstractMessage protoData, int timeout) {
-        int sendReq = sendProtoMessage(guid, cmd, protoData);
-        if (sendReq == -1) {
+        return syncSendProtoMessage(guid, cmd, protoData, timeout, RpcFailSavePolicy.NONE);
+    }
+
+    /**
+     * 同步发送 RPC，并在发送失败或响应超时时按策略保存为可靠消息。
+     */
+    public AbstractMessage syncSendProtoMessage(
+            long guid, int cmd, AbstractMessage protoData, int timeout, RpcFailSavePolicy failSavePolicy) {
+        AbstractMessagePacket packet =
+                MessagePacketFactory.createAbstractMessagePacket(guid, cmd, protoData, client.getSendSeq(), 0);
+        AbstractMessagePacket reliablePacket =
+                MessagePacketFactory.createAbstractMessagePacket(guid, cmd, protoData, 0, 0);
+        int sendReq = packet.getSeq();
+        if (!sendPacket(packet)) {
             LoggerDef.NetLogger.warn("send proto message failed, serverId={}, guid={}, cmd={}", serverId, guid, cmd);
+            saveReliableIfNeeded(reliablePacket, failSavePolicy, "send failed");
             return null;
         }
 
@@ -258,11 +272,24 @@ public class RpcNodeConnector {
             }
 
             // 超时返回null
+            saveReliableIfNeeded(reliablePacket, failSavePolicy, "response timeout");
             return null;
         } catch (Exception e) {
             LoggerDef.NetLogger.warn("RPC proto call failed, serverId={}, cmd={}, error={}", serverId, cmd, e.getMessage());
+            saveReliableIfNeeded(reliablePacket, failSavePolicy, "rpc exception");
         }
         return null;
+    }
+
+    private void saveReliableIfNeeded(
+            AbstractMessagePacket packet, RpcFailSavePolicy failSavePolicy, String reason) {
+        if (failSavePolicy == null || failSavePolicy == RpcFailSavePolicy.NONE) {
+            return;
+        }
+        if (failSavePolicy == RpcFailSavePolicy.SEND_FAILED_ONLY && !"send failed".equals(reason)) {
+            return;
+        }
+        ReliableRpcStore.getInstance().save(serverId, packet, reason);
     }
 
     /**
