@@ -83,14 +83,7 @@ public class GateClient {
         // 普通客户端业务包已经通过登录态，Gate 不适合自行补偿业务失败；RPC 失败时保存给 Game 恢复后补发。
         Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket, true);
         if (resp != null) {
-            AbstractMessagePacket s2cPacket =
-                    PacketCompat.createPacket(
-                            getSessionGuid(),
-                            csPacket.getCmd() + 1,
-                            csPacket.getSid(),
-                            csPacket.getSeq() + 1,
-                            resp.getData().toByteArray());
-            sendPacketToClient(s2cPacket);
+            sendGameResponseToClient(resp);
         }
     }
 
@@ -188,6 +181,21 @@ public class GateClient {
 
     public void sendPacketToClient(AbstractMessagePacket s2cPacket) {
         session.sendPacket(s2cPacket);
+    }
+
+    public void sendGameResponseToClient(Server.scGate2GameRpcGameCall resp) {
+        if (resp == null) {
+            return;
+        }
+        // Gate 只按 GameServer 已经判定好的客户端 cmd/seq/sid 转发，不在网关侧推导协议序号。
+        AbstractMessagePacket s2cPacket =
+                PacketCompat.createPacket(
+                        getSessionGuid(),
+                        resp.getCmd(),
+                        resp.getSid(),
+                        resp.getSeq(),
+                        resp.getData().toByteArray());
+        sendPacketToClient(s2cPacket);
     }
 
     public void closeConnection() {

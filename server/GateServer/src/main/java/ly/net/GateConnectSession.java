@@ -4,8 +4,10 @@ import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.Message;
 import ly.GateClientManager;
 import ly.LoggerDef;
+import ly.ProtoMessageFactory;
 import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
+import ly.proto.Server;
 
 /**
  * 网关连接会话，封装客户端连接、收发队列和网关转发所需状态。
@@ -54,7 +56,16 @@ public class GateConnectSession extends ConnectSession {
                     client = GateClientManager.getInstance().getClientBySid(s2sPacket.getSid());
                 }
                 if (client != null) {
-                    client.sendPacketToClient(s2sPacket);
+                    if (s2sPacket.getCmd() == Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE) {
+                        // GameServer 包装给客户端的消息时已经写入真实 cmd/seq/sid，Gate 只负责解包转发。
+                        Server.scGate2GameRpcGameCall resp =
+                                (Server.scGate2GameRpcGameCall)
+                                        ProtoMessageFactory.createProtoMessage(
+                                                Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, s2sPacket.getData());
+                        client.sendGameResponseToClient(resp);
+                    } else {
+                        client.sendPacketToClient(s2sPacket);
+                    }
                 }
             }
         }

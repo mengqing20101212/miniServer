@@ -3497,10 +3497,40 @@ public final class Server {
 
     /**
      * <pre>
+     * game 发送给gate 的客户端下行 cmd
+     * </pre>
+     *
+     * <code>int32 cmd = 1;</code>
+     * @return The cmd.
+     */
+    int getCmd();
+
+    /**
+     * <pre>
+     * game 发送给gate 的客户端会话id
+     * </pre>
+     *
+     * <code>int32 sid = 2;</code>
+     * @return The sid.
+     */
+    int getSid();
+
+    /**
+     * <pre>
+     * game 发送给gate 的客户端下行序列id
+     * </pre>
+     *
+     * <code>int32 seq = 3;</code>
+     * @return The seq.
+     */
+    int getSeq();
+
+    /**
+     * <pre>
      * game 发送给gate 响应 数据
      * </pre>
      *
-     * <code>bytes data = 1;</code>
+     * <code>bytes data = 4;</code>
      * @return The data.
      */
     com.google.protobuf.ByteString getData();
@@ -3545,14 +3575,59 @@ public final class Server {
               ly.proto.Server.scGate2GameRpcGameCall.class, ly.proto.Server.scGate2GameRpcGameCall.Builder.class);
     }
 
-    public static final int DATA_FIELD_NUMBER = 1;
+    public static final int CMD_FIELD_NUMBER = 1;
+    private int cmd_ = 0;
+    /**
+     * <pre>
+     * game 发送给gate 的客户端下行 cmd
+     * </pre>
+     *
+     * <code>int32 cmd = 1;</code>
+     * @return The cmd.
+     */
+    @java.lang.Override
+    public int getCmd() {
+      return cmd_;
+    }
+
+    public static final int SID_FIELD_NUMBER = 2;
+    private int sid_ = 0;
+    /**
+     * <pre>
+     * game 发送给gate 的客户端会话id
+     * </pre>
+     *
+     * <code>int32 sid = 2;</code>
+     * @return The sid.
+     */
+    @java.lang.Override
+    public int getSid() {
+      return sid_;
+    }
+
+    public static final int SEQ_FIELD_NUMBER = 3;
+    private int seq_ = 0;
+    /**
+     * <pre>
+     * game 发送给gate 的客户端下行序列id
+     * </pre>
+     *
+     * <code>int32 seq = 3;</code>
+     * @return The seq.
+     */
+    @java.lang.Override
+    public int getSeq() {
+      return seq_;
+    }
+
+    public static final int DATA_FIELD_NUMBER = 4;
     private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
     /**
      * <pre>
      * game 发送给gate 响应 数据
      * </pre>
      *
-     * <code>bytes data = 1;</code>
+     * <code>bytes data = 4;</code>
      * @return The data.
      */
     @java.lang.Override
@@ -3574,8 +3649,17 @@ public final class Server {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (cmd_ != 0) {
+        output.writeInt32(1, cmd_);
+      }
+      if (sid_ != 0) {
+        output.writeInt32(2, sid_);
+      }
+      if (seq_ != 0) {
+        output.writeInt32(3, seq_);
+      }
       if (!data_.isEmpty()) {
-        output.writeBytes(1, data_);
+        output.writeBytes(4, data_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -3586,9 +3670,21 @@ public final class Server {
       if (size != -1) return size;
 
       size = 0;
+      if (cmd_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, cmd_);
+      }
+      if (sid_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, sid_);
+      }
+      if (seq_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, seq_);
+      }
       if (!data_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, data_);
+          .computeBytesSize(4, data_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -3605,6 +3701,12 @@ public final class Server {
       }
       ly.proto.Server.scGate2GameRpcGameCall other = (ly.proto.Server.scGate2GameRpcGameCall) obj;
 
+      if (getCmd()
+          != other.getCmd()) return false;
+      if (getSid()
+          != other.getSid()) return false;
+      if (getSeq()
+          != other.getSeq()) return false;
       if (!getData()
           .equals(other.getData())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
@@ -3618,6 +3720,12 @@ public final class Server {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CMD_FIELD_NUMBER;
+      hash = (53 * hash) + getCmd();
+      hash = (37 * hash) + SID_FIELD_NUMBER;
+      hash = (53 * hash) + getSid();
+      hash = (37 * hash) + SEQ_FIELD_NUMBER;
+      hash = (53 * hash) + getSeq();
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
@@ -3755,6 +3863,9 @@ public final class Server {
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
+        cmd_ = 0;
+        sid_ = 0;
+        seq_ = 0;
         data_ = com.google.protobuf.ByteString.EMPTY;
         return this;
       }
@@ -3790,6 +3901,15 @@ public final class Server {
       private void buildPartial0(ly.proto.Server.scGate2GameRpcGameCall result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.cmd_ = cmd_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.sid_ = sid_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.seq_ = seq_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
           result.data_ = data_;
         }
       }
@@ -3838,6 +3958,15 @@ public final class Server {
 
       public Builder mergeFrom(ly.proto.Server.scGate2GameRpcGameCall other) {
         if (other == ly.proto.Server.scGate2GameRpcGameCall.getDefaultInstance()) return this;
+        if (other.getCmd() != 0) {
+          setCmd(other.getCmd());
+        }
+        if (other.getSid() != 0) {
+          setSid(other.getSid());
+        }
+        if (other.getSeq() != 0) {
+          setSeq(other.getSeq());
+        }
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
         }
@@ -3867,11 +3996,26 @@ public final class Server {
               case 0:
                 done = true;
                 break;
-              case 10: {
-                data_ = input.readBytes();
+              case 8: {
+                cmd_ = input.readInt32();
                 bitField0_ |= 0x00000001;
                 break;
-              } // case 10
+              } // case 8
+              case 16: {
+                sid_ = input.readInt32();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 24: {
+                seq_ = input.readInt32();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              case 34: {
+                data_ = input.readBytes();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -3889,13 +4033,145 @@ public final class Server {
       }
       private int bitField0_;
 
+      private int cmd_ ;
+      /**
+       * <pre>
+       * game 发送给gate 的客户端下行 cmd
+       * </pre>
+       *
+       * <code>int32 cmd = 1;</code>
+       * @return The cmd.
+       */
+      @java.lang.Override
+      public int getCmd() {
+        return cmd_;
+      }
+      /**
+       * <pre>
+       * game 发送给gate 的客户端下行 cmd
+       * </pre>
+       *
+       * <code>int32 cmd = 1;</code>
+       * @param value The cmd to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCmd(int value) {
+
+        cmd_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * game 发送给gate 的客户端下行 cmd
+       * </pre>
+       *
+       * <code>int32 cmd = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCmd() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        cmd_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int sid_ ;
+      /**
+       * <pre>
+       * game 发送给gate 的客户端会话id
+       * </pre>
+       *
+       * <code>int32 sid = 2;</code>
+       * @return The sid.
+       */
+      @java.lang.Override
+      public int getSid() {
+        return sid_;
+      }
+      /**
+       * <pre>
+       * game 发送给gate 的客户端会话id
+       * </pre>
+       *
+       * <code>int32 sid = 2;</code>
+       * @param value The sid to set.
+       * @return This builder for chaining.
+       */
+      public Builder setSid(int value) {
+
+        sid_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * game 发送给gate 的客户端会话id
+       * </pre>
+       *
+       * <code>int32 sid = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearSid() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        sid_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int seq_ ;
+      /**
+       * <pre>
+       * game 发送给gate 的客户端下行序列id
+       * </pre>
+       *
+       * <code>int32 seq = 3;</code>
+       * @return The seq.
+       */
+      @java.lang.Override
+      public int getSeq() {
+        return seq_;
+      }
+      /**
+       * <pre>
+       * game 发送给gate 的客户端下行序列id
+       * </pre>
+       *
+       * <code>int32 seq = 3;</code>
+       * @param value The seq to set.
+       * @return This builder for chaining.
+       */
+      public Builder setSeq(int value) {
+
+        seq_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * game 发送给gate 的客户端下行序列id
+       * </pre>
+       *
+       * <code>int32 seq = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearSeq() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        seq_ = 0;
+        onChanged();
+        return this;
+      }
+
       private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <pre>
        * game 发送给gate 响应 数据
        * </pre>
        *
-       * <code>bytes data = 1;</code>
+       * <code>bytes data = 4;</code>
        * @return The data.
        */
       @java.lang.Override
@@ -3907,14 +4183,14 @@ public final class Server {
        * game 发送给gate 响应 数据
        * </pre>
        *
-       * <code>bytes data = 1;</code>
+       * <code>bytes data = 4;</code>
        * @param value The data to set.
        * @return This builder for chaining.
        */
       public Builder setData(com.google.protobuf.ByteString value) {
         if (value == null) { throw new NullPointerException(); }
         data_ = value;
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000008;
         onChanged();
         return this;
       }
@@ -3923,11 +4199,11 @@ public final class Server {
        * game 发送给gate 响应 数据
        * </pre>
        *
-       * <code>bytes data = 1;</code>
+       * <code>bytes data = 4;</code>
        * @return This builder for chaining.
        */
       public Builder clearData() {
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000008);
         data_ = getDefaultInstance().getData();
         onChanged();
         return this;
@@ -4043,9 +4319,10 @@ public final class Server {
       "verId\030\002 \001(\t\"\031\n\tscRpcPing\022\014\n\004time\030\001 \001(\003\"[" +
       "\n\026csGate2GameRpcGameCall\022\013\n\003cmd\030\001 \001(\005\022\013\n" +
       "\003sid\030\002 \001(\005\022\014\n\004guid\030\003 \001(\003\022\013\n\003seq\030\004 \001(\005\022\014\n" +
-      "\004data\030\005 \001(\014\"&\n\026scGate2GameRpcGameCall\022\014\n" +
-      "\004data\030\001 \001(\014*/\n\rServerMsgType\022\017\n\013protobuf" +
-      "Msg\020\000\022\r\n\tstructMsg\020\001B\n\n\010ly.protob\006proto3"
+      "\004data\030\005 \001(\014\"M\n\026scGate2GameRpcGameCall\022\013\n" +
+      "\003cmd\030\001 \001(\005\022\013\n\003sid\030\002 \001(\005\022\013\n\003seq\030\003 \001(\005\022\014\n\004" +
+      "data\030\004 \001(\014*/\n\rServerMsgType\022\017\n\013protobufM" +
+      "sg\020\000\022\r\n\tstructMsg\020\001B\n\n\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -4086,7 +4363,7 @@ public final class Server {
     internal_static_scGate2GameRpcGameCall_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scGate2GameRpcGameCall_descriptor,
-        new java.lang.String[] { "Data", });
+        new java.lang.String[] { "Cmd", "Sid", "Seq", "Data", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -46,5 +46,8 @@ message csGate2GameRpcGameCall{
 }
 // 网关调用游戏服务器Rpc方法响应
 message scGate2GameRpcGameCall{
-  bytes data = 1;// game 发送给gate 响应 数据
+  int32 cmd = 1;// game 发送给gate 的客户端下行 cmd
+  int32 sid = 2;// game 发送给gate 的客户端会话id
+  int32 seq = 3;// game 发送给gate 的客户端下行序列id
+  bytes data = 4;// game 发送给gate 响应 数据
 }

@@ -195,6 +195,10 @@ public class Player {
         } else {
             if (cmd.getNumber() == getGamePlayer().getLastClientCmd() + 1) {
                 Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
+                // 当前请求对应的响应由 GameServer 统一确定客户端下行 cmd/seq/sid。
+                builder.setCmd(cmd.getNumber());
+                builder.setSid(gamePlayer.getLastSid());
+                builder.setSeq(getGamePlayer().getLastSeq() + 1);
                 builder.setData(message.toByteString());
                 AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), getGamePlayer().getLastSeq() + 1, gamePlayer.getLastSid());
                 getGamePlayer().getSession().addSendPacket(sendPacket);
@@ -203,6 +207,10 @@ public class Player {
                 getGamePlayer().setLastSid(0);
             } else {
                 Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
+                // 主动推送不消耗客户端请求序号，保持最近一次客户端 seq，便于 Gate 按 sid 定位连接。
+                builder.setCmd(cmd.getNumber());
+                builder.setSid(gamePlayer.getLastSid());
+                builder.setSeq(gamePlayer.getLastSeq());
                 builder.setData(message.toByteString());
                 AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), gamePlayer.getLastSeq(), gamePlayer.getLastSid());
                 getGamePlayer().getSession().addSendPacket(sendPacket);

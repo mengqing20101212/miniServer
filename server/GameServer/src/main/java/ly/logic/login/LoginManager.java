@@ -183,6 +183,10 @@ public class LoginManager {
     private void sendLoginResponse(LoginTask task, Player onlinePlayer, Login.scLogin response) {
         if (task.packet.getSid() != 0) {
             Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
+            // 通过 Gate 登录时，客户端响应 cmd/seq/sid 在 GameServer 侧确定，Gate 只解包转发。
+            builder.setCmd(Cmd.CMD.SC_Login_VALUE);
+            builder.setSid(task.packet.getSid());
+            builder.setSeq(task.packet.getSeq() + 1);
             builder.setData(response.toByteString());
             AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
                     onlinePlayer.getPlayerId(),

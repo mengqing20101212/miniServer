@@ -8,6 +8,7 @@ import ly.net.GateClient;
 import ly.net.GateConnectSession;
 import ly.net.HandlerContext;
 import ly.net.IGateController;
+import ly.net.PacketCompat;
 import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
@@ -127,7 +128,14 @@ public class GateLoginController implements IGateController {
                         return;
                     }
 
-                    session.sendClientMsg(Cmd.CMD.SC_Login_VALUE, scLogin);
+                    // 登录响应也使用 GameServer 写入的客户端 cmd/seq/sid，避免 Gate 侧重新推导。
+                    session.addSendPacket(
+                            PacketCompat.createPacket(
+                                    session.getGuid(),
+                                    resp.getCmd(),
+                                    resp.getSid(),
+                                    resp.getSeq(),
+                                    scLogin.toByteArray()));
                 } finally {
                     RedisUtils.unlock(
                             RedisKeys.LOCK_LOGIN_ACCOUNT_ID_KEY.getKey(request.getAccount()));
