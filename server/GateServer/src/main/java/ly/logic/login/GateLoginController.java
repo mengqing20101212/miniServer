@@ -17,6 +17,7 @@ import ly.redis.RedisKeys;
 import ly.redis.RedisUtils;
 import ly.rpc.RpcNodeConnector;
 import ly.rpc.RpcService;
+import ly.rpc.RpcFailSavePolicy;
 import ly.rpc.RpcUtils;
 
 /**
@@ -72,12 +73,14 @@ public class GateLoginController implements IGateController {
                                         .setGameServerId(oldGameServerId)
                                         .setLogoutReason("player login by other node server")
                                         .build();
+                        // 旧游戏服下线是状态修正类 RPC，超时也要保存，避免玩家同时挂在两个 GameServer。
                         Login.scLogout logoutRes =
-                                RpcUtils.syncRequest(
+                                RpcUtils.syncRequestOrSaveOnFail(
                                         oldGameServerId,
                                         session.getGuid(),
                                         Cmd.CMD.CS_Logout_VALUE,
-                                        csLogout);
+                                        csLogout,
+                                        RpcFailSavePolicy.SEND_FAILED_OR_TIMEOUT);
                         if (logoutRes != null) {
                             LoggerDef.SystemLogger.info(
                                     "player {} logout success, reason: {}",
@@ -98,6 +101,7 @@ public class GateLoginController implements IGateController {
                     client.setGameServerId(request.getGameServerId());
                     GateClientManager.getInstance().addClient(client);
 
+                    // 登录主流程不能超时后补发；客户端已经收到失败时，Game 延迟登录成功会产生幽灵在线状态。
                     Server.scGate2GameRpcGameCall resp = client.sendPacketToGameServerSync(packet);
                     if (resp == null) {
                         LoggerDef.SystemLogger.error(

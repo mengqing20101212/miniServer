@@ -8,6 +8,7 @@ import ly.proto.Cmd;
 import ly.proto.Server;
 import ly.rpc.RpcNodeConnector;
 import ly.rpc.RpcService;
+import ly.rpc.ReliableRpcStore;
 
 /**
  * 网关客户端对象，保存账号、token、目标游戏服和长连接上下文。
@@ -75,7 +76,8 @@ public class GateClient {
     }
 
     public void sendPacketToGameServer(AbstractMessagePacket csPacket) {
-        Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket);
+        // 普通客户端业务包已经通过登录态，Gate 不适合自行补偿业务失败；RPC 失败时保存给 Game 恢复后补发。
+        Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket, true);
         if (resp != null) {
             AbstractMessagePacket s2cPacket =
                     PacketCompat.createPacket(
@@ -89,8 +91,20 @@ public class GateClient {
     }
 
     public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(AbstractMessagePacket csPacket) {
+        return sendPacketToGameServerSync(csPacket, false);
+    }
+
+    /**
+     * 同步转发客户端包到 GameServer。
+     *
+     * <p>登录流程调用默认不保存，普通业务转发可开启 saveOnFailOrTimeout，把包装后的 RPC
+     * 请求保存到可靠 outbox，等目标 GameServer 恢复后补发。
+     */
+    public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(
+            AbstractMessagePacket csPacket, boolean saveOnFailOrTimeout) {
         RpcNodeConnector rpcNodeConnector = RpcService.getInstance().getRpcNodeConnector(gameServerId);
         if (rpcNodeConnector == null || rpcNodeConnector.getClient() == null) {
+            saveReliableRpcIfNeeded(csPacket, null, saveOnFailOrTimeout, "connector unavailable");
             return null;
         }
 
@@ -111,6 +125,7 @@ public class GateClient {
                         rpcSeq,
                         rpcNodeConnector.getClient().getSid());
         if (!rpcNodeConnector.sendPacket(rpcPacket)) {
+            saveReliableRpcIfNeeded(csPacket, req.build(), saveOnFailOrTimeout, "send failed");
             return null;
         }
 
@@ -133,7 +148,38 @@ public class GateClient {
                 return null;
             }
         }
+        saveReliableRpcIfNeeded(csPacket, req.build(), saveOnFailOrTimeout, "response timeout");
         return null;
+    }
+
+    private void saveReliableRpcIfNeeded(
+            AbstractMessagePacket csPacket,
+            Server.csGate2GameRpcGameCall wrappedRequest,
+            boolean saveOnFailOrTimeout,
+            String reason) {
+        if (!saveOnFailOrTimeout || csPacket == null || gameServerId == null) {
+            return;
+        }
+        Server.csGate2GameRpcGameCall request = wrappedRequest;
+        if (request == null) {
+            // 连接器不可用时还没有分配 RPC seq，这里只保留客户端原始 cmd/data，补发时重新走 RPC 发送。
+            request =
+                    Server.csGate2GameRpcGameCall.newBuilder()
+                            .setCmd(csPacket.getCmd())
+                            .setSid(csPacket.getSid())
+                            .setGuid(getSessionGuid())
+                            .setSeq(0)
+                            .setData(ByteString.copyFrom(csPacket.getData()))
+                            .build();
+        }
+        AbstractMessagePacket reliablePacket =
+                MessagePacketFactory.createAbstractMessagePacket(
+                        request.getGuid(),
+                        Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE,
+                        request,
+                        0,
+                        0);
+        ReliableRpcStore.getInstance().save(gameServerId, reliablePacket, reason);
     }
 
     public void sendPacketToClient(AbstractMessagePacket s2cPacket) {
