@@ -245,6 +245,7 @@ public class RpcNodeConnector {
             long guid, int cmd, AbstractMessage protoData, int timeout, RpcFailSavePolicy failSavePolicy) {
         AbstractMessagePacket packet =
                 MessagePacketFactory.createAbstractMessagePacket(guid, cmd, protoData, client.getSendSeq(), 0);
+        // 可靠补发包必须脱离当前 TCP 连接上下文，避免旧 sid/seq 在新连接上触发目标服丢包校验。
         AbstractMessagePacket reliablePacket =
                 MessagePacketFactory.createAbstractMessagePacket(guid, cmd, protoData, 0, 0);
         int sendReq = packet.getSeq();
@@ -271,7 +272,7 @@ public class RpcNodeConnector {
                 Thread.sleep(10);
             }
 
-            // 超时返回null
+            // SEND_FAILED_OR_TIMEOUT 会把响应超时也保存下来；调用方仍然立即拿到 null。
             saveReliableIfNeeded(reliablePacket, failSavePolicy, "response timeout");
             return null;
         } catch (Exception e) {
@@ -283,9 +284,11 @@ public class RpcNodeConnector {
 
     private void saveReliableIfNeeded(
             AbstractMessagePacket packet, RpcFailSavePolicy failSavePolicy, String reason) {
+        // 默认策略不改变旧同步 RPC 行为，只有显式传入策略时才进入 Redis outbox。
         if (failSavePolicy == null || failSavePolicy == RpcFailSavePolicy.NONE) {
             return;
         }
+        // SEND_FAILED_ONLY 不处理响应超时，避免同步请求已经在目标服执行但响应丢失时被重复补发。
         if (failSavePolicy == RpcFailSavePolicy.SEND_FAILED_ONLY && !"send failed".equals(reason)) {
             return;
         }

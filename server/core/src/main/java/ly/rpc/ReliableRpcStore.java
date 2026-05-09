@@ -7,12 +7,19 @@ import ly.ServerContext;
 import ly.net.packet.AbstractMessagePacket;
 import ly.redis.RedisUtils;
 
-/** RPC 可靠消息 Redis outbox，保存发送失败或超时后需要补发的消息。 */
+/**
+ * RPC 可靠消息 Redis outbox。
+ *
+ * <p>这里只保存“当前服务器发往目标服务器”的待补发消息。目标服恢复后仍然通过正常 TCP RPC
+ * 通道补发，不直接在目标服本地执行，避免绕过连接、session 和现有路由校验。
+ */
 public class ReliableRpcStore {
   private static final ReliableRpcStore INSTANCE = new ReliableRpcStore();
   private static final int MAX_RETRY_COUNT = 20;
   private static final long INITIAL_RETRY_DELAY_MILLIS = 5_000L;
+  // 目标服故障可能持续很久，最大退避放到 8 小时，避免长故障期间每几分钟持续冲击目标服。
   private static final long MAX_RETRY_DELAY_MILLIS = TimeUnit.HOURS.toMillis(8);
+  // 补发成功路径也要限频，防止目标服刚恢复时被历史积压 RPC 打满。
   private static final long REPLAY_INTERVAL_MILLIS = 100L;
   private static final long MESSAGE_EXPIRE_MILLIS = TimeUnit.HOURS.toMillis(72);
 
@@ -33,6 +40,7 @@ public class ReliableRpcStore {
     }
 
     String sourceServerId = currentServerId();
+    // Redis list 作为发送方 outbox：同一个 source -> target 的消息保存在同一条队列里。
     ReliableRpcMessage message =
         ReliableRpcMessage.from(
             nextMsgId(sourceServerId, targetServerId),
@@ -69,6 +77,7 @@ public class ReliableRpcStore {
       return;
     }
 
+    // listGetAll 只是快照；成功补发后按 msgId 删除，失败则更新重试信息后放回队列。
     long lastReplayAt = 0L;
     long now = System.currentTimeMillis();
     for (ReliableRpcMessage message : messages) {
@@ -78,6 +87,7 @@ public class ReliableRpcStore {
       if (message.getNextRetryAt() > now) {
         continue;
       }
+      // 超过保留时间或重试次数后不再补发，避免永远占用 Redis 队列。
       if (now - message.getCreatedAt() > MESSAGE_EXPIRE_MILLIS
           || message.getRetryCount() >= MAX_RETRY_COUNT) {
         RedisUtils.listRemove(key, message);
@@ -100,6 +110,7 @@ public class ReliableRpcStore {
             targetServerId,
             message.getCmd());
       } else {
+        // 补发失败后放回队列尾部，下一轮按 nextRetryAt 再尝试。
         message.increaseRetryCount(System.currentTimeMillis() + calculateRetryDelayMillis(message.getRetryCount() + 1));
         RedisUtils.listRemove(key, message);
         RedisUtils.listAdd(key, message);
@@ -120,6 +131,7 @@ public class ReliableRpcStore {
   }
 
   long calculateRetryDelayMillis(int retryCount) {
+    // 指数退避：5s、10s、20s... 最大 8 小时。
     long delay = INITIAL_RETRY_DELAY_MILLIS;
     for (int i = 1; i < retryCount; i++) {
       if (delay >= MAX_RETRY_DELAY_MILLIS / 2) {
@@ -131,6 +143,7 @@ public class ReliableRpcStore {
   }
 
   String queueKey(String sourceServerId, String targetServerId) {
+    // 按环境、发送方、目标方隔离队列，避免不同服务器互相消费可靠 RPC。
     return "rpc:reliable:"
         + safeSegment(ServerContext.ENV, "unknown-env")
         + ":"

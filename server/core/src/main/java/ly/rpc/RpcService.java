@@ -103,6 +103,7 @@ public class RpcService {
         .name("reliable-rpc-replay-startup")
         .start(
             () -> {
+              // 先尝试为当前 Nacos 缓存中的节点建立连接，再补发对应 outbox。
               for (ServerTypeEnum serverType : ServerTypeEnum.values()) {
                 if (serverType != ServerTypeEnum.UNKNOWN) {
                   getRpcNodeConnectorsByServerType(serverType);
@@ -117,6 +118,7 @@ public class RpcService {
     for (RpcNodeConnector rpcNodeConnector : rpcNodeConnectorMap.values()) {
       rpcNodeConnector.pingConnect();
     }
+    // 心跳后顺手补发已到重试时间的可靠 RPC，不额外引入新定时器。
     ReliableRpcStore.getInstance().replayAllAvailableTargets();
   }
 }
