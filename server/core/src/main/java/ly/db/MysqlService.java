@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 
 import io.netty.util.internal.StringUtil;
 import ly.LoggerDef;
+import ly.ServerContext;
 import ly.db.entry.ShareEnumConfigEntry;
 import ly.db.entry.ShareEnumConfigEntryHelper;
 
@@ -89,7 +90,7 @@ public class MysqlService {
         new MysqlConnector(
             jdbcUrl, username, password, maxPoolSize, minIdle, idleTimeout, connectionTimeout);
 
-    loadDeadLettersForRetry();
+    replayDeadLettersBeforeStartup();
 
     // 启动一个保存的协程
     startAsyncWriteWorkers();
@@ -230,27 +231,28 @@ public class MysqlService {
     return retryQueueSize.get();
   }
 
-  int loadDeadLettersForRetry() {
-    return loadDeadLettersForRetry(DEAD_LETTER_ROOT);
+  int replayDeadLettersBeforeStartup() {
+    return replayDeadLettersBeforeStartup(currentDeadLetterRoot());
   }
 
-  /** 启动时加载历史死信文件，把可恢复的写入任务重新放回重试队列。 */
-  int loadDeadLettersForRetry(Path root) {
+  /** 启动时同步重放当前服务器的历史死信；只要有一条失败，就直接中断启动。 */
+  int replayDeadLettersBeforeStartup(Path root) {
     if (!Files.isDirectory(root)) {
       return 0;
     }
-    int loadedCount = 0;
+    int replayedCount = 0;
     try (var files = Files.walk(root, 2)) {
       for (Path file : files.filter(Files::isRegularFile).filter(this::canLoadDeadLetterFile).toList()) {
-        loadedCount += loadDeadLetterFile(file);
+        replayedCount += replayDeadLetterFile(file);
       }
     } catch (Exception e) {
-      LoggerDef.DeadLetterLogger.error("load dead letter files error, root={}", root, e);
+      LoggerDef.DeadLetterLogger.error("replay dead letter files failed, root={}", root, e);
+      throw new IllegalStateException("启动失败：数据库死信任务未全部执行完成，root=" + root, e);
     }
-    if (loadedCount > 0) {
-      LoggerDef.DeadLetterLogger.warn("loaded async db dead letters for retry, count={}", loadedCount);
+    if (replayedCount > 0) {
+      LoggerDef.DeadLetterLogger.warn("replayed async db dead letters before startup, count={}", replayedCount);
     }
-    return loadedCount;
+    return replayedCount;
   }
 
   private boolean canLoadDeadLetterFile(Path file) {
@@ -258,13 +260,13 @@ public class MysqlService {
     return fileName.startsWith("db-write-failed") && fileName.endsWith(".log");
   }
 
-  private int loadDeadLetterFile(Path file) throws Exception {
-    // 先改名为 loading 文件，避免加载过程中再次被当作新的死信文件写入或重复扫描。
+  private int replayDeadLetterFile(Path file) throws Exception {
+    // 先改名为 loading 文件，避免启动重放过程中又被当作新的死信文件写入或重复扫描。
     Path loadingFile =
         file.resolveSibling(file.getFileName() + ".loading." + System.currentTimeMillis() + ".log");
     Files.move(file, loadingFile, StandardCopyOption.REPLACE_EXISTING);
 
-    int loadedCount = 0;
+    int replayedCount = 0;
     boolean completed = false;
     try {
       List<String> lines = Files.readAllLines(loadingFile, StandardCharsets.UTF_8);
@@ -273,26 +275,29 @@ public class MysqlService {
         if (line == null || line.isBlank()) {
           continue;
         }
-        DeadLetterRecord record = JSON.parseObject(line, DeadLetterRecord.class);
+        DeadLetterRecord record;
+        try {
+          record = JSON.parseObject(line, DeadLetterRecord.class);
+        } catch (Exception e) {
+          preserveUnfinishedDeadLetterLines(loadingFile, lines.subList(i, lines.size()));
+          completed = true;
+          throw new IllegalStateException("死信任务解析失败，file=" + loadingFile, e);
+        }
         DbWriteTask task = DbWriteTask.from(record);
         if (task == null || task.data == null) {
-          LoggerDef.DeadLetterLogger.warn("skip invalid async db dead letter line, file={}", loadingFile);
-          continue;
-        }
-        task.nextRetryAt = System.currentTimeMillis() + INITIAL_RETRY_DELAY_MILLIS;
-        if (!offerRetryTask(task)) {
-          LoggerDef.DeadLetterLogger.error(
-              "retry queue full while loading dead letter, file={}, loaded={}",
-              loadingFile,
-              loadedCount);
-          preserveUnloadedDeadLetterLines(loadingFile, lines.subList(i, lines.size()));
+          preserveUnfinishedDeadLetterLines(loadingFile, lines.subList(i, lines.size()));
           completed = true;
-          return loadedCount;
+          throw new IllegalStateException("死信任务反序列化失败，file=" + loadingFile);
         }
-        loadedCount++;
+        if (!processWriteTask(task)) {
+          preserveUnfinishedDeadLetterLines(loadingFile, lines.subList(i, lines.size()));
+          completed = true;
+          throw new IllegalStateException("死信任务执行失败，file=" + loadingFile);
+        }
+        replayedCount++;
       }
       completed = true;
-      return loadedCount;
+      return replayedCount;
     } finally {
       if (completed) {
         archiveLoadedDeadLetterFile(loadingFile);
@@ -300,7 +305,7 @@ public class MysqlService {
     }
   }
 
-  private void preserveUnloadedDeadLetterLines(Path loadingFile, List<String> lines) throws Exception {
+  private void preserveUnfinishedDeadLetterLines(Path loadingFile, List<String> lines) throws Exception {
     if (lines == null || lines.isEmpty()) {
       return;
     }
@@ -313,19 +318,9 @@ public class MysqlService {
         StandardOpenOption.APPEND);
   }
 
-  private boolean offerRetryTask(DbWriteTask task) {
-    int queued = retryQueueSize.incrementAndGet();
-    if (queued > RETRY_QUEUE_CAPACITY) {
-      retryQueueSize.decrementAndGet();
-      return false;
-    }
-    retryQueue.offer(task);
-    return true;
-  }
-
   private void archiveLoadedDeadLetterFile(Path loadingFile) {
     try {
-      // 加载完成后归档到 loaded 目录，避免服务下次启动重复回放同一批死信。
+      // 全部执行完成后归档到 loaded 目录，避免服务下次启动重复回放同一批死信。
       Path loadedDir = loadingFile.getParent().resolve("loaded");
       Files.createDirectories(loadedDir);
       Files.move(
@@ -341,7 +336,7 @@ public class MysqlService {
     try {
       // 死信文件使用追加写 JSONL；同时保存序列化后的 Entry，避免回放工具依赖有损的 toString 输出。
       Path dir =
-          DEAD_LETTER_ROOT.resolve(
+          currentDeadLetterRoot().resolve(
               LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE));
       Files.createDirectories(dir);
       Path file = dir.resolve(DEAD_LETTER_FILE_NAME);
@@ -363,6 +358,23 @@ public class MysqlService {
       LoggerDef.DeadLetterLogger.error(
           "failed to write async db dead letter, entry={}, reason={}", entryName, reason, e);
     }
+  }
+
+  Path currentDeadLetterRoot() {
+    String env = safePathSegment(ServerContext.ENV, "unknown-env");
+    String serverType =
+        ServerContext.serverType != null
+            ? safePathSegment(ServerContext.serverType.getType(), "unknown-type")
+            : "unknown-type";
+    String serverId = safePathSegment(ServerContext.getServerId(), "unknown-server");
+    return DEAD_LETTER_ROOT.resolve(env).resolve(serverType).resolve(serverId);
+  }
+
+  private static String safePathSegment(String value, String defaultValue) {
+    if (value == null || value.isBlank()) {
+      return defaultValue;
+    }
+    return value.replaceAll("[^a-zA-Z0-9._-]", "_");
   }
 
   private static String serializeEntry(AbstractEntry entry) {
