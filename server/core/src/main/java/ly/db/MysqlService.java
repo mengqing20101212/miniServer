@@ -1,22 +1,22 @@
 package ly.db;
 
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -31,8 +31,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.alibaba.fastjson2.JSON;
 import org.slf4j.Logger;
+
+import com.alibaba.fastjson2.JSON;
 
 import io.netty.util.internal.StringUtil;
 import ly.LoggerDef;
@@ -62,8 +63,7 @@ public class MysqlService {
   private static final Path DEAD_LETTER_ROOT = Path.of("runlogs", "db-dead-letter");
   private static final String DEAD_LETTER_FILE_NAME = "db-write-failed.log";
 
-  private final LinkedBlockingQueue<DbWriteTask> dataQueue =
-      new LinkedBlockingQueue<>(DATA_QUEUE_CAPACITY);
+  private final LinkedBlockingQueue<DbWriteTask> dataQueue = new LinkedBlockingQueue<>(DATA_QUEUE_CAPACITY);
   // DelayQueue 用于避免失败任务立刻空转重试；由于 DelayQueue 本身无界，retryQueueSize 负责提供逻辑容量上限。
   private final DelayQueue<DbWriteTask> retryQueue = new DelayQueue<>();
   private final AtomicInteger retryQueueSize = new AtomicInteger();
@@ -76,7 +76,8 @@ public class MysqlService {
   /**
    * 初始化 MySQL 连接池并启动异步保存任务。
    *
-   * <p>连接池大小、空闲连接、空闲超时和连接超时参数传 0 时使用默认值。
+   * <p>
+   * 连接池大小、空闲连接、空闲超时和连接超时参数传 0 时使用默认值。
    */
   public void init(
       String jdbcUrl,
@@ -86,9 +87,8 @@ public class MysqlService {
       int minIdle,
       int idleTimeout,
       int connectionTimeout) {
-    mysqlConnector =
-        new MysqlConnector(
-            jdbcUrl, username, password, maxPoolSize, minIdle, idleTimeout, connectionTimeout);
+    mysqlConnector = new MysqlConnector(
+        jdbcUrl, username, password, maxPoolSize, minIdle, idleTimeout, connectionTimeout);
 
     replayDeadLettersBeforeStartup();
 
@@ -142,9 +142,8 @@ public class MysqlService {
                   task = retryQueue.take();
                   retryQueueSize.decrementAndGet();
                   // 重试写入需要限频，避免 DB 恢复后大量失败任务同时冲击数据库。
-                  long waitMillis =
-                      RETRY_WRITE_INTERVAL_MILLIS
-                          - (System.currentTimeMillis() - lastRetryWriteAt);
+                  long waitMillis = RETRY_WRITE_INTERVAL_MILLIS
+                      - (System.currentTimeMillis() - lastRetryWriteAt);
                   if (waitMillis > 0) {
                     Thread.sleep(waitMillis);
                   }
@@ -262,8 +261,7 @@ public class MysqlService {
 
   private int replayDeadLetterFile(Path file) throws Exception {
     // 先改名为 loading 文件，避免启动重放过程中又被当作新的死信文件写入或重复扫描。
-    Path loadingFile =
-        file.resolveSibling(file.getFileName() + ".loading." + System.currentTimeMillis() + ".log");
+    Path loadingFile = file.resolveSibling(file.getFileName() + ".loading." + System.currentTimeMillis() + ".log");
     Files.move(file, loadingFile, StandardCopyOption.REPLACE_EXISTING);
 
     int replayedCount = 0;
@@ -335,9 +333,8 @@ public class MysqlService {
   void writeDeadLetter(DbWriteTask task, String reason) {
     try {
       // 死信文件使用追加写 JSONL；同时保存序列化后的 Entry，避免回放工具依赖有损的 toString 输出。
-      Path dir =
-          currentDeadLetterRoot().resolve(
-              LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE));
+      Path dir = currentDeadLetterRoot().resolve(
+          LocalDate.now().format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE));
       Files.createDirectories(dir);
       Path file = dir.resolve(DEAD_LETTER_FILE_NAME);
       String line = JSON.toJSONString(DeadLetterRecord.from(task, reason)) + System.lineSeparator();
@@ -353,8 +350,7 @@ public class MysqlService {
           task.data != null ? task.data.getClass().getSimpleName() : "unknown",
           task.retryCount);
     } catch (Exception e) {
-      String entryName =
-          task != null && task.data != null ? task.data.getClass().getSimpleName() : "unknown";
+      String entryName = task != null && task.data != null ? task.data.getClass().getSimpleName() : "unknown";
       LoggerDef.DeadLetterLogger.error(
           "failed to write async db dead letter, entry={}, reason={}", entryName, reason, e);
     }
@@ -362,10 +358,9 @@ public class MysqlService {
 
   Path currentDeadLetterRoot() {
     String env = safePathSegment(ServerContext.ENV, "unknown-env");
-    String serverType =
-        ServerContext.serverType != null
-            ? safePathSegment(ServerContext.serverType.getType(), "unknown-type")
-            : "unknown-type";
+    String serverType = ServerContext.serverType != null
+        ? safePathSegment(ServerContext.serverType.getType(), "unknown-type")
+        : "unknown-type";
     String serverId = safePathSegment(ServerContext.getServerId(), "unknown-server");
     return DEAD_LETTER_ROOT.resolve(env).resolve(serverType).resolve(serverId);
   }
@@ -395,8 +390,7 @@ public class MysqlService {
     if (serializedEntry == null || serializedEntry.isBlank()) {
       return null;
     }
-    try (ByteArrayInputStream bytes =
-            new ByteArrayInputStream(Base64.getDecoder().decode(serializedEntry));
+    try (ByteArrayInputStream bytes = new ByteArrayInputStream(Base64.getDecoder().decode(serializedEntry));
         ObjectInputStream in = new ObjectInputStream(bytes)) {
       Object data = in.readObject();
       return data instanceof AbstractEntry entry ? entry : null;
@@ -572,7 +566,7 @@ public class MysqlService {
       LoggerDef.DbLogger.error("packetEntry: clazz 不能为 null");
       return null;
     }
-    
+
     try {
       // 1. 反射创建对象实例
       T instance = clazz.getDeclaredConstructor().newInstance();
@@ -607,7 +601,7 @@ public class MysqlService {
     if (clazz == null) {
       throw new IllegalArgumentException("Class 不能为 null");
     }
-    
+
     // 获取 @DbTable 注解
     if (clazz.isAnnotationPresent(DbMeta.DbTable.class)) {
       DbMeta.DbTable tableAnnotation = clazz.getAnnotation(DbMeta.DbTable.class);
@@ -615,7 +609,7 @@ public class MysqlService {
         throw new IllegalArgumentException(
             "Class " + clazz.getSimpleName() + " 的 @DbTable 注解信息无效。");
       }
-      
+
       String tableName = tableAnnotation.name();
 
       // 如果注解未提供表名，则返回空字符串
@@ -644,9 +638,9 @@ public class MysqlService {
   /**
    * 生成 update SQL
    *
-   * @param data 需要更新的对象
+   * @param data       需要更新的对象
    * @param paramsList 参数列表
-   * @param fileds 需要更新的字段列表，为空 则更新所有字段
+   * @param fileds     需要更新的字段列表，为空 则更新所有字段
    * @return 拼接的字段
    * @param <T> 实例的类型
    */
@@ -664,7 +658,7 @@ public class MysqlService {
     if (paramsList == null) {
       throw new IllegalArgumentException("paramsList 不能为 null");
     }
-    
+
     Class<?> clazz = data.getClass();
     StringBuilder sql = new StringBuilder();
     // 获取 @DbTable 注解
@@ -674,7 +668,7 @@ public class MysqlService {
         throw new IllegalArgumentException(
             "Class " + clazz.getSimpleName() + " 的 @DbTable 注解信息无效。");
       }
-      
+
       String tableName = tableAnnotation.name();
 
       String keyName = "";
@@ -747,7 +741,7 @@ public class MysqlService {
     if (paramList == null) {
       throw new IllegalArgumentException("paramList 不能为 null");
     }
-    
+
     StringBuilder sql = new StringBuilder();
     // 获取 @DbTable 注解
     Class<?> clazz = data.getClass();
@@ -757,7 +751,7 @@ public class MysqlService {
         throw new IllegalArgumentException(
             "Class " + clazz.getSimpleName() + " 的 @DbTable 注解信息无效。");
       }
-      
+
       String tableName = tableAnnotation.name();
       // 未指定更新的字段 则更新所有的字段
       List<String> allFields = new ArrayList<>();
@@ -845,12 +839,12 @@ public class MysqlService {
       logger.error("删除数据失败: data 不能为 null");
       return false;
     }
-    
+
     if (mysqlConnector == null) {
       logger.error("MysqlConnector 未初始化，无法删除数据");
       return false;
     }
-    
+
     // 获取 @DbTable 注解
     Class<?> clazz = data.getClass();
     String tableName = "";
@@ -1178,16 +1172,16 @@ public class MysqlService {
     String username = "root";
     String password = "Ly@2026Root!8899";
     getInstance().init(jdbcUrl, username, password, 0, 0, 0, 0);
-    ShareEnumConfigEntry entry =
-        getInstance().selectOnce(ShareEnumConfigEntry.class, new String[] {"name"}, "1231");
+    ShareEnumConfigEntry entry = getInstance().selectOnce(ShareEnumConfigEntry.class, new String[] { "name" }, "1231");
     ShareEnumConfigEntryHelper.getShareEnumConfigEntryById(1231);
 
     ShareEnumConfigEntry data = new ShareEnumConfigEntry();
     data.setCode("qqqqq");
     data.setName("wwwwwwww");
     data.setConfigDesc("ssssssss");
-    //    getInstance().save(data);
-    // entry = getInstance().selectOnce(ShareEnumConfigEntry.class, new String[] {"code"}, "qqqqq");
+    // getInstance().save(data);
+    // entry = getInstance().selectOnce(ShareEnumConfigEntry.class, new String[]
+    // {"code"}, "qqqqq");
     data.setConfigDesc("dadaw");
     getInstance().save(data);
     data.setConfigDesc("43432");
