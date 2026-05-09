@@ -48,8 +48,7 @@ public class MysqlService {
   private static final MysqlService instance = new MysqlService();
 
   /** 所有待入库的entry集合 */
-  // Async DB writes are bounded. If DB is slow or unavailable, unbounded in-memory queues can
-  // turn a DB outage into an OOM.
+  // 异步入库队列必须限制容量；如果 DB 变慢或不可用，无界内存队列会把 DB 故障放大成 OOM。
   private static final int DATA_QUEUE_CAPACITY = 10_000;
   private static final int RETRY_QUEUE_CAPACITY = 50_000;
   private static final int MAX_RETRY_COUNT = 20;
@@ -59,8 +58,7 @@ public class MysqlService {
 
   private final LinkedBlockingQueue<DbWriteTask> dataQueue =
       new LinkedBlockingQueue<>(DATA_QUEUE_CAPACITY);
-  // DelayQueue avoids tight retry loops. retryQueueSize provides a hard logical cap because
-  // DelayQueue itself is unbounded.
+  // DelayQueue 用于避免失败任务立刻空转重试；由于 DelayQueue 本身无界，retryQueueSize 负责提供逻辑容量上限。
   private final DelayQueue<DbWriteTask> retryQueue = new DelayQueue<>();
   private final AtomicInteger retryQueueSize = new AtomicInteger();
   private final AtomicBoolean asyncWorkersStarted = new AtomicBoolean();
@@ -135,7 +133,7 @@ public class MysqlService {
                 try {
                   task = retryQueue.take();
                   retryQueueSize.decrementAndGet();
-                  // Retry writes are rate-limited so DB recovery is not followed by a retry storm.
+                  // 重试写入需要限频，避免 DB 恢复后大量失败任务同时冲击数据库。
                   long waitMillis =
                       RETRY_WRITE_INTERVAL_MILLIS
                           - (System.currentTimeMillis() - lastRetryWriteAt);
@@ -176,8 +174,7 @@ public class MysqlService {
     task.retryCount++;
     task.lastError = error != null ? error.toString() : "write returned false";
 
-    // Do not keep failing writes in memory forever. After bounded retries, preserve them on disk
-    // for later inspection or replay tooling.
+    // 失败任务不能一直留在内存里；达到最大重试次数后落到死信文件，便于后续排查或回放。
     if (task.retryCount > MAX_RETRY_COUNT) {
       writeDeadLetter(task, "max retry exceeded");
       return;
@@ -208,8 +205,7 @@ public class MysqlService {
       return;
     }
     try {
-      // Wait briefly for bursts, then spill to dead letter so business threads are not blocked
-      // indefinitely by a full async queue.
+      // 短暂等待瞬时峰值消退；如果队列仍然满，则写入死信，避免业务线程被异步队列长期阻塞。
       if (!dataQueue.offer(task, 100, TimeUnit.MILLISECONDS)) {
         writeDeadLetter(task, "main queue full");
       }
@@ -229,8 +225,7 @@ public class MysqlService {
 
   void writeDeadLetter(DbWriteTask task, String reason) {
     try {
-      // Append-only JSONL. The serialized entry is included so a replay tool can restore the
-      // original object without depending on lossy toString output.
+      // 死信文件使用追加写 JSONL；同时保存序列化后的 Entry，避免回放工具依赖有损的 toString 输出。
       Path dir =
           Path.of(
               "runlogs",
@@ -763,7 +758,7 @@ public class MysqlService {
     long nextRetryAt;
     String lastError;
 
-    // nextRetryAt is used by DelayQueue; normal queue writes use the same task object but ignore it.
+    // nextRetryAt 仅供 DelayQueue 判断可重试时间；普通写入队列复用同一个任务对象但不会读取它。
     public DbWriteTask(int type, AbstractEntry data) {
       this.type = type;
       this.data = data;
