@@ -27,7 +27,13 @@ public class RpcSeqSidTestModule implements RobotModule {
 
     public static boolean runStandalone(String loginHost, int loginHttpPort) {
         RpcSeqSidTestModule module = new RpcSeqSidTestModule();
-        return module.runFullTest(loginHost, loginHttpPort);
+        return module.runFullTest(loginHost, loginHttpPort, 0, RESPONSE_TIMEOUT_MS, false);
+    }
+
+    public static boolean runReliableReplayStandalone(
+            String loginHost, int loginHttpPort, long delayBeforeHeroMs, long responseTimeoutMs) {
+        RpcSeqSidTestModule module = new RpcSeqSidTestModule();
+        return module.runFullTest(loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, true);
     }
 
     @Override
@@ -90,7 +96,12 @@ public class RpcSeqSidTestModule implements RobotModule {
         return success;
     }
 
-    private boolean runFullTest(String loginHost, int loginHttpPort) {
+    private boolean runFullTest(
+            String loginHost,
+            int loginHttpPort,
+            long delayBeforeHeroMs,
+            long responseTimeoutMs,
+            boolean reliableReplayMode) {
         String account = "bot_rpc_seq_sid_" + System.currentTimeMillis();
         NetClient gateClient = null;
         try {
@@ -148,6 +159,13 @@ public class RpcSeqSidTestModule implements RobotModule {
             }
             System.out.printf("[RPC-SEQ-SID] PASS login cmd=%d seq=%d sid=%d playerId=%d%n",
                     loginResp.getCmd(), loginResp.getSeq(), loginResp.getSid(), scLogin.getPlayerId());
+            if (delayBeforeHeroMs > 0) {
+                // 可靠重放测试需要在登录后停掉 GameServer，再发送业务包触发 Gate 保存 outbox。
+                System.out.printf(
+                        "[RPC-SEQ-SID] WAIT before heroList %dms, stop GameServer now if testing reliable replay%n",
+                        delayBeforeHeroMs);
+                Thread.sleep(delayBeforeHeroMs);
+            }
 
             int heroSeq = gateClient.getSendSeq();
             Hero.CS_HeroList heroReq = Hero.CS_HeroList.newBuilder().build();
@@ -158,7 +176,8 @@ public class RpcSeqSidTestModule implements RobotModule {
                 return fail("发送 CS_HeroList 失败");
             }
             AbstractMessagePacket heroResp =
-                    waitForResponse(gateClient, Cmd.CMD.SC_HeroList_VALUE, heroSeq + 1, sid);
+                    waitForResponse(
+                            gateClient, Cmd.CMD.SC_HeroList_VALUE, heroSeq + 1, sid, responseTimeoutMs);
             assertPacket(heroResp, Cmd.CMD.SC_HeroList_VALUE, heroSeq + 1, sid, "英雄列表响应");
             Hero.SC_HeroList scHeroList =
                     (Hero.SC_HeroList)
@@ -169,7 +188,7 @@ public class RpcSeqSidTestModule implements RobotModule {
             }
             System.out.printf("[RPC-SEQ-SID] PASS heroList cmd=%d seq=%d sid=%d heroCount=%d%n",
                     heroResp.getCmd(), heroResp.getSeq(), heroResp.getSid(), scHeroList.getHeroListCount());
-            System.out.println("[RPC-SEQ-SID] ALL PASS");
+            System.out.println(reliableReplayMode ? "[RPC-SEQ-SID] RELIABLE REPLAY PASS" : "[RPC-SEQ-SID] ALL PASS");
             success = true;
             completed = true;
             return true;
@@ -206,7 +225,13 @@ public class RpcSeqSidTestModule implements RobotModule {
 
     private static AbstractMessagePacket waitForResponse(NetClient client, int cmd, int seq, int sid)
             throws InterruptedException {
-        long deadline = System.currentTimeMillis() + RESPONSE_TIMEOUT_MS;
+        return waitForResponse(client, cmd, seq, sid, RESPONSE_TIMEOUT_MS);
+    }
+
+    private static AbstractMessagePacket waitForResponse(
+            NetClient client, int cmd, int seq, int sid, long timeoutMs)
+            throws InterruptedException {
+        long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
             AbstractMessagePacket packet = client.readPacket();
             if (packet != null) {

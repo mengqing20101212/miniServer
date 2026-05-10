@@ -20,6 +20,16 @@ public class BotServer {
             boolean success = RpcSeqSidTestModule.runStandalone(loginHost, loginHttpPort);
             System.exit(success ? 0 : 1);
         }
+        if (args != null && args.length > 0 && "--test-rpc-reliable-replay".equals(args[0])) {
+            String loginHost = args.length >= 2 ? args[1] : "127.0.0.1";
+            int loginHttpPort = args.length >= 3 ? Integer.parseInt(args[2]) : 8889;
+            long delayBeforeHeroMs = args.length >= 4 ? Long.parseLong(args[3]) : 10_000L;
+            long responseTimeoutMs = args.length >= 5 ? Long.parseLong(args[4]) : 90_000L;
+            boolean success =
+                    RpcSeqSidTestModule.runReliableReplayStandalone(
+                            loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs);
+            System.exit(success ? 0 : 1);
+        }
 
         StartupSkillLoader.ResolvedBotArgs resolved = StartupSkillLoader.resolveBotArgs(args);
         String command = resolved.command;
@@ -66,7 +76,7 @@ public class BotServer {
 
             default:
                 System.out.println("未知命令: " + command);
-                System.out.println("可用命令: --test-protocol, --run-bots");
+                System.out.println("可用命令: --test-protocol, --run-bots, --test-rpc-seq-sid, --test-rpc-reliable-replay");
                 break;
         }
     }
