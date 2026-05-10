@@ -110,6 +110,9 @@ public class RpcSeqSidTestModule implements RobotModule {
             if (serverList == null || serverList.getGate() == null) {
                 return fail("未获取到 GateServer 信息");
             }
+            if (serverList.getAccountId() <= 0 || serverList.getToken() == null || serverList.getToken().isBlank()) {
+                return fail("未获取到有效账号 token，无法继续登录 GateServer");
+            }
             String gameServerId = serverList.getFirstGameServerId();
             if (gameServerId == null || gameServerId.isBlank()) {
                 return fail("未获取到可用 GameServer");
@@ -203,11 +206,16 @@ public class RpcSeqSidTestModule implements RobotModule {
     }
 
     private static HttpServerListClient.ServerListResult ensureAccountAndServerList(
-            HttpServerListClient httpClient, String account) {
-        HttpServerListClient.ServerListResult serverList = httpClient.getServerList(account);
-        if (serverList == null || serverList.getAccountId() <= 0 || serverList.getToken() == null) {
-            httpClient.register(account, "bot");
+            HttpServerListClient httpClient, String account) throws InterruptedException {
+        HttpServerListClient.ServerListResult serverList = null;
+        for (int attempt = 1; attempt <= 3; attempt++) {
             serverList = httpClient.getServerList(account);
+            if (serverList != null && serverList.getAccountId() > 0 && serverList.getToken() != null) {
+                return serverList;
+            }
+            // 远端 Redis/MySQL 偶发抖动时，注册可能短暂失败；这里重试避免测试入口直接 NPE。
+            httpClient.register(account, "bot");
+            Thread.sleep(500L * attempt);
         }
         return serverList;
     }
