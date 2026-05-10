@@ -3,8 +3,11 @@ package ly.rpc;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import ly.LoggerDef;
+import ly.ProtoMessageFactory;
 import ly.ServerContext;
 import ly.net.packet.AbstractMessagePacket;
+import ly.proto.Cmd;
+import ly.proto.Server;
 import ly.redis.RedisUtils;
 
 /**
@@ -103,6 +106,17 @@ public class ReliableRpcStore {
       sleepForReplayRateLimit(lastReplayAt);
       lastReplayAt = System.currentTimeMillis();
       if (connector.sendPacket(message.toPacket())) {
+        if (requiresReplayResponse(message) && !waitAndHandleReplayResponse(connector, message)) {
+          RedisUtils.listRemove(key, message);
+          message.increaseRetryCount(System.currentTimeMillis() + calculateRetryDelayMillis(message.getRetryCount() + 1));
+          RedisUtils.listAdd(key, message);
+          LoggerDef.NetLogger.warn(
+              "replay reliable rpc response timeout, msgId={}, target={}, retryCount={}",
+              message.getMsgId(),
+              targetServerId,
+              message.getRetryCount());
+          return;
+        }
         RedisUtils.listRemove(key, message);
         LoggerDef.NetLogger.info(
             "replayed reliable rpc, msgId={}, target={}, cmd={}",
@@ -111,8 +125,8 @@ public class ReliableRpcStore {
             message.getCmd());
       } else {
         // 补发失败后放回队列尾部，下一轮按 nextRetryAt 再尝试。
-        message.increaseRetryCount(System.currentTimeMillis() + calculateRetryDelayMillis(message.getRetryCount() + 1));
         RedisUtils.listRemove(key, message);
+        message.increaseRetryCount(System.currentTimeMillis() + calculateRetryDelayMillis(message.getRetryCount() + 1));
         RedisUtils.listAdd(key, message);
         LoggerDef.NetLogger.warn(
             "replay reliable rpc failed, msgId={}, target={}, retryCount={}",
@@ -122,6 +136,42 @@ public class ReliableRpcStore {
         return;
       }
     }
+  }
+
+  private boolean requiresReplayResponse(ReliableRpcMessage message) {
+    return message.getCmd() == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE;
+  }
+
+  private boolean waitAndHandleReplayResponse(RpcNodeConnector connector, ReliableRpcMessage message) {
+    Server.csGate2GameRpcGameCall request =
+        (Server.csGate2GameRpcGameCall)
+            ProtoMessageFactory.createProtoMessage(Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE, message.toPacket().getData());
+    if (request == null) {
+      LoggerDef.NetLogger.error("parse reliable rpc replay request failed, msgId={}", message.getMsgId());
+      return false;
+    }
+
+    long deadline = System.currentTimeMillis() + 10_000L;
+    while (System.currentTimeMillis() < deadline) {
+      AbstractMessagePacket response =
+          connector
+              .getClient()
+              .getReceiveMsgBySeq(request.getSeq() + 1, Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE);
+      if (response != null) {
+        boolean handled = RpcService.getInstance().handleReliableReplayResponse(message, response);
+        if (!handled) {
+          LoggerDef.NetLogger.warn("reliable rpc replay response no handler, msgId={}", message.getMsgId());
+        }
+        return handled;
+      }
+      try {
+        Thread.sleep(10L);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return false;
+      }
+    }
+    return false;
   }
 
   public void replayAllAvailableTargets() {

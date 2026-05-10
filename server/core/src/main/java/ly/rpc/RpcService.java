@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import ly.LoggerDef;
@@ -15,6 +16,8 @@ import ly.nacos.NacosService;
 public class RpcService {
   private static final RpcService rpcService = new RpcService();
   private final Map<String, RpcNodeConnector> rpcNodeConnectorMap = new ConcurrentHashMap<>();
+  private final AtomicBoolean reliableReplayWorkerStarted = new AtomicBoolean();
+  private volatile ReliableRpcReplayResponseHandler reliableReplayResponseHandler;
 
   private RpcService() {}
 
@@ -45,7 +48,11 @@ public class RpcService {
   }
 
   /** 根据 Nacos 节点信息创建连接器。 */
-  private RpcNodeConnector createRpcNodeConnector(String serverId) {
+  private synchronized RpcNodeConnector createRpcNodeConnector(String serverId) {
+    RpcNodeConnector existing = rpcNodeConnectorMap.get(serverId);
+    if (existing != null && existing.isConnect()) {
+      return existing;
+    }
     NacosServerNode nacosServerNode = NacosService.getInstance().getNodeMap().get(serverId);
     if (nacosServerNode == null) {
       LoggerDef.NetLogger.error(
@@ -97,8 +104,19 @@ public class RpcService {
         .collect(Collectors.toSet());
   }
 
+  /** 注册可靠 RPC 重放回包处理器，业务模块可用它把重放后的回包继续投递到自己的连接上下文。 */
+  public void setReliableReplayResponseHandler(ReliableRpcReplayResponseHandler handler) {
+    this.reliableReplayResponseHandler = handler;
+  }
+
+  boolean handleReliableReplayResponse(ReliableRpcMessage message, ly.net.packet.AbstractMessagePacket response) {
+    ReliableRpcReplayResponseHandler handler = reliableReplayResponseHandler;
+    return handler != null && handler.handle(message, response);
+  }
+
   /** 本服启动后扫描当前可连接目标，避免错过目标服已经在线的补发机会。 */
   public void replayReliableMessagesOnStartup() {
+    startReliableReplayWorker();
     Thread.ofVirtual()
         .name("reliable-rpc-replay-startup")
         .start(
@@ -111,6 +129,37 @@ public class RpcService {
               }
               ReliableRpcStore.getInstance().replayAllAvailableTargets();
             });
+  }
+
+  private void startReliableReplayWorker() {
+    if (!reliableReplayWorkerStarted.compareAndSet(false, true)) {
+      return;
+    }
+    Thread.ofVirtual()
+        .name("reliable-rpc-replay-worker")
+        .start(
+            () -> {
+              while (!Thread.currentThread().isInterrupted()) {
+                try {
+                  replayKnownTargets();
+                  Thread.sleep(5_000L);
+                } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
+                } catch (Exception e) {
+                  LoggerDef.NetLogger.error("reliable rpc replay worker error", e);
+                }
+              }
+            });
+  }
+
+  private void replayKnownTargets() {
+    // Nacos 可能先通知节点上线，目标端口稍后才真正绑定；周期性重建连接可以覆盖这段窗口。
+    for (ServerTypeEnum serverType : ServerTypeEnum.values()) {
+      if (serverType != ServerTypeEnum.UNKNOWN) {
+        getRpcNodeConnectorsByServerType(serverType);
+      }
+    }
+    ReliableRpcStore.getInstance().replayAllAvailableTargets();
   }
 
   /** 周期心跳入口，由外部定时器每秒调用一次。 */

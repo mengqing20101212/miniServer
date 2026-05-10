@@ -6,8 +6,6 @@ import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
 import org.slf4j.Logger;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * 服务端 Netty 入站处理器。
  * <p>
@@ -16,13 +14,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePacket> {
     static final Logger log = LoggerDef.NetLogger;
-    static AtomicInteger sessionCreator = new AtomicInteger(1);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, AbstractMessagePacket packet) throws Exception {
         // 客户端建立 TCP 后会发 CMD_ACK=0 请求 sid，服务端返回分配的会话 id。
         if (packet.getCmd() == AbstractMessagePacket.CMD_ACK) {
-            ctx.channel().writeAndFlush(new AbstractMessagePacket(sessionCreator.getAndIncrement()));
+            ConnectSession session = NetService.getInstance().getGameObject(ctx);
+            if (session == null || session.getConnector() == null) {
+                log.error("ACK failed, session not found for channel[{}], remote:{}", ctx.channel().id(), ctx.channel().remoteAddress());
+                ctx.close();
+                return;
+            }
+            // ACK sid 必须和 Connector sid 保持一致，Gate 后续要靠客户端原样带回的 sid 定位连接。
+            ctx.channel().writeAndFlush(new AbstractMessagePacket(session.getConnector().getSessionId()));
             return;
         }
 

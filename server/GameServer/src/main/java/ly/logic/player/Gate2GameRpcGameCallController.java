@@ -1,6 +1,7 @@
 package ly.logic.player;
 
 import ly.net.GameConnectSession;
+import ly.net.GamePlayer;
 import ly.net.HandlerRouterManager;
 import ly.net.IGameController;
 import ly.net.packet.AbstractMessagePacket;
@@ -30,8 +31,20 @@ public class Gate2GameRpcGameCallController implements IGameController {
                     }
                     Player player = PlayerManager.getInstance().getOnlinePlayer(guid);
                     if (player == null) {
-                        context.session().sendErrorMsg(guid, ErrorMsg.ErrorCode.PLAYER_NOT_EXIST, seq, cmd);
-                        return;
+                        // GameServer 重启后内存在线态会丢失，可靠 RPC 重放时需要从 DB 懒加载玩家再继续处理。
+                        player = PlayerManager.getInstance().getPlayerByDB(guid);
+                        if (player == null) {
+                            context.session().sendErrorMsg(guid, ErrorMsg.ErrorCode.PLAYER_NOT_EXIST, seq, cmd);
+                            return;
+                        }
+                        GamePlayer gamePlayer = new GamePlayer(context.session());
+                        gamePlayer.setPlayerId(player.getPlayerId());
+                        gamePlayer.setLastSeq(seq);
+                        gamePlayer.setLastClientCmd(cmd);
+                        gamePlayer.setLastSid(req.getSid());
+                        player.setGamePlayer(gamePlayer);
+                        PlayerManager.getInstance().addOnlinePlayer(player);
+                        player.statPlay();
                     }
                     // Game 后续业务只看客户端原始包，seq/sid 保持 Gate 收到客户端时的值。
                     player.getGamePlayer().addPacket(clientPacket);
