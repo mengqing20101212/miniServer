@@ -42,8 +42,20 @@ public class RpcSeqSidTestModule implements RobotModule {
             long delayBeforeHeroMs,
             long responseTimeoutMs,
             String account) {
+        return runReliableReplayStandalone(
+                loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, account, null);
+    }
+
+    public static boolean runReliableReplayStandalone(
+            String loginHost,
+            int loginHttpPort,
+            long delayBeforeHeroMs,
+            long responseTimeoutMs,
+            String account,
+            String tokenOverride) {
         RpcSeqSidTestModule module = new RpcSeqSidTestModule();
-        return module.runFullTest(loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, true, account);
+        return module.runFullTest(
+                loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, true, account, tokenOverride);
     }
 
     @Override
@@ -123,6 +135,24 @@ public class RpcSeqSidTestModule implements RobotModule {
             long responseTimeoutMs,
             boolean reliableReplayMode,
             String accountOverride) {
+        return runFullTest(
+                loginHost,
+                loginHttpPort,
+                delayBeforeHeroMs,
+                responseTimeoutMs,
+                reliableReplayMode,
+                accountOverride,
+                null);
+    }
+
+    private boolean runFullTest(
+            String loginHost,
+            int loginHttpPort,
+            long delayBeforeHeroMs,
+            long responseTimeoutMs,
+            boolean reliableReplayMode,
+            String accountOverride,
+            String tokenOverride) {
         String account =
                 accountOverride != null && !accountOverride.isBlank()
                         ? accountOverride
@@ -151,7 +181,8 @@ public class RpcSeqSidTestModule implements RobotModule {
 
             int sid = gateClient.getSid();
             long accountId = serverList.getAccountId();
-            String token = serverList.getToken();
+            String token =
+                    tokenOverride != null && !tokenOverride.isBlank() ? tokenOverride : serverList.getToken();
             System.out.printf("[RPC-SEQ-SID] Gate connected sid=%d, accountId=%d, gameServerId=%s%n",
                     sid, accountId, gameServerId);
 

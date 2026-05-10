@@ -26,9 +26,10 @@ public class BotServer {
             long delayBeforeHeroMs = args.length >= 4 ? Long.parseLong(args[3]) : 10_000L;
             long responseTimeoutMs = args.length >= 5 ? Long.parseLong(args[4]) : 90_000L;
             String account = args.length >= 6 ? args[5] : null;
+            String token = args.length >= 7 ? args[6] : null;
             boolean success =
                     RpcSeqSidTestModule.runReliableReplayStandalone(
-                            loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, account);
+                            loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, account, token);
             System.exit(success ? 0 : 1);
         }
 
