@@ -32,8 +32,18 @@ public class RpcSeqSidTestModule implements RobotModule {
 
     public static boolean runReliableReplayStandalone(
             String loginHost, int loginHttpPort, long delayBeforeHeroMs, long responseTimeoutMs) {
+        return runReliableReplayStandalone(
+                loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, null);
+    }
+
+    public static boolean runReliableReplayStandalone(
+            String loginHost,
+            int loginHttpPort,
+            long delayBeforeHeroMs,
+            long responseTimeoutMs,
+            String account) {
         RpcSeqSidTestModule module = new RpcSeqSidTestModule();
-        return module.runFullTest(loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, true);
+        return module.runFullTest(loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, true, account);
     }
 
     @Override
@@ -102,7 +112,21 @@ public class RpcSeqSidTestModule implements RobotModule {
             long delayBeforeHeroMs,
             long responseTimeoutMs,
             boolean reliableReplayMode) {
-        String account = "bot_rpc_seq_sid_" + System.currentTimeMillis();
+        return runFullTest(
+                loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, reliableReplayMode, null);
+    }
+
+    private boolean runFullTest(
+            String loginHost,
+            int loginHttpPort,
+            long delayBeforeHeroMs,
+            long responseTimeoutMs,
+            boolean reliableReplayMode,
+            String accountOverride) {
+        String account =
+                accountOverride != null && !accountOverride.isBlank()
+                        ? accountOverride
+                        : "bot_rpc_seq_sid_" + System.currentTimeMillis();
         NetClient gateClient = null;
         try {
             HttpServerListClient httpClient = new HttpServerListClient(loginHost, loginHttpPort);
