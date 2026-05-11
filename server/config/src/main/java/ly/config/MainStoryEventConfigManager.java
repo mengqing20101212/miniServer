@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import ly.utils.KV;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
+import ly.utils.KV;
 import org.slf4j.Logger;
 
 /*
@@ -20,23 +20,17 @@ import org.slf4j.Logger;
  * File: MainStoryEventConfigManager
  */
 public class MainStoryEventConfigManager implements InterfaceConfigManagerProxy {
-  AtomicBoolean switched = new AtomicBoolean(false);
+  private static final AtomicBoolean switched = new AtomicBoolean(false);
   private static final MainStoryEventConfigManager instance = new MainStoryEventConfigManager();
-  private static final MainStoryEventConfigManagerImpl instanceImplA =
-      new MainStoryEventConfigManagerImpl();
-  private static final MainStoryEventConfigManagerImpl instanceImplB =
-      new MainStoryEventConfigManagerImpl();
-
-  public boolean isSwitched() {
-    return switched.get();
-  }
+  private static final MainStoryEventConfigManagerImpl instanceImplA = new MainStoryEventConfigManagerImpl();
+  private static final MainStoryEventConfigManagerImpl instanceImplB = new MainStoryEventConfigManagerImpl();
 
   public static MainStoryEventConfigManagerImpl getInstance() {
-    if (instance.isSwitched()) {
-      return instanceImplA;
-    } else {
-      return instanceImplB;
-    }
+    return switched.get() ? instanceImplA : instanceImplB;
+  }
+
+  private static MainStoryEventConfigManagerImpl getStandby() {
+    return switched.get() ? instanceImplB : instanceImplA;
   }
 
   @Override
@@ -44,165 +38,163 @@ public class MainStoryEventConfigManager implements InterfaceConfigManagerProxy 
     getInstance().reload(logger, configDir);
   }
 
+  @Override
+  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
+    getStandby().reload(logger, configDir);
+  }
+
+  @Override
+  public AbstractConfigManger switchConfig() {
+    MainStoryEventConfigManagerImpl oldActive = getInstance();
+    switched.set(!switched.get());
+    return oldActive;
+  }
+
+  @Override
+  public String getConfigFileName() {
+    return getInstance().getConfigFileName();
+  }
+
   public static class MainStoryEventConfigManagerImpl extends AbstractConfigManger {
-
-    List<MainStoryEventConfig> configList = new ArrayList<MainStoryEventConfig>();
-    Map<Integer, MainStoryEventConfig> configMap = new HashMap<Integer, MainStoryEventConfig>();
-
+    private List<MainStoryEventConfig> configList = List.of();
+    private Map<Integer, MainStoryEventConfig> configMap = Map.of();
 
     // @@@@@自定义属性开始区@@@@@
 
     // @@@@@自定义属性结束区@@@@@
 
     @Override
-    protected void reload(Logger logger, String configDir) throws ConfigLoadException {
+    public void reload(Logger logger, String configDir) throws ConfigLoadException {
       String fileName = configDir + File.separator + getConfigFileName();
       File file = new File(fileName);
-      clear();
       if (!file.exists()) {
         logger.error(fileName + " does not exist");
         throw new ConfigLoadException("Config file does not exist :" + fileName);
       }
+      MainStoryEventConfigChecker checker = new MainStoryEventConfigChecker();
+      checker.checkHeader(logger, configDir);
+      List<MainStoryEventConfig> newList = new ArrayList<>();
+      Map<Integer, MainStoryEventConfig> newMap = new HashMap<>();
       try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String line;
-        br.readLine(); //先读取一行表头 
-        while ((line = br.readLine()) != null) { // 按行读取
-          String[] arr = line.split("\t");
-          MainStoryEventConfig config = new MainStoryEventConfig();
+        String rowText;
+        br.readLine();
+        br.readLine();
+        while ((rowText = br.readLine()) != null) {
+          if (rowText.isBlank()) { continue; }
+          String[] arr = rowText.split("\\t", -1);
+          if (arr.length < 9) {
+            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
+          }
+          int id = 0;
+          String name = null;
+          int type = 0;
+          String values = null;
+          int group = 0;
+          String sceneResource = null;
+          int loseContinue = 0;
+          int transitionType = 0;
+          int isPreload = 0;
           try {
-            //解析 ID（event唯一id）
+            // 解析 ID（event唯一id）
             if (!arr[0].trim().isEmpty()) {
-            config.id =  Integer.parseInt(arr[0].trim());
+              id = Integer.parseInt(arr[0].trim());
             }
 
-            //解析 名称(备注)
+            // 解析 名称(备注)
             if (!arr[1].trim().isEmpty()) {
-            config.name = arr[1].trim();
+              name = arr[1].trim();
             }
 
-            //解析 事件类型
+            // 解析 事件类型
             if (!arr[2].trim().isEmpty()) {
-            config.type =  Integer.parseInt(arr[2].trim());
+              type = Integer.parseInt(arr[2].trim());
             }
 
-            //解析 参数
+            // 解析 参数
             if (!arr[3].trim().isEmpty()) {
-            config.values = arr[3].trim();
+              values = arr[3].trim();
             }
 
-            //解析 事件节点组
+            // 解析 事件节点组
             if (!arr[4].trim().isEmpty()) {
-            config.group =  Integer.parseInt(arr[4].trim());
+              group = Integer.parseInt(arr[4].trim());
             }
 
-            //解析 场景( 目前每章都是一个场景)
+            // 解析 场景( 目前每章都是一个场景)
             if (!arr[5].trim().isEmpty()) {
-            config.sceneResource = arr[5].trim();
+              sceneResource = arr[5].trim();
             }
 
-            //解析 战斗失败后能否继续往下读取事件
+            // 解析 战斗失败后能否继续往下读取事件
             if (!arr[6].trim().isEmpty()) {
-            config.loseContinue =  Integer.parseInt(arr[6].trim());
+              loseContinue = Integer.parseInt(arr[6].trim());
             }
 
-            //解析 转场类型
+            // 解析 转场类型
             if (!arr[7].trim().isEmpty()) {
-            config.transitionType =  Integer.parseInt(arr[7].trim());
+              transitionType = Integer.parseInt(arr[7].trim());
             }
 
-            //解析 是否预加载(只支持对话并且连续)
+            // 解析 是否预加载(只支持对话并且连续)
             if (!arr[8].trim().isEmpty()) {
-            config.isPreload =  Integer.parseInt(arr[8].trim());
+              isPreload = Integer.parseInt(arr[8].trim());
             }
-
 
           } catch (Exception e) {
-            logger.error(
-                String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, line, e.getMessage()));
-            e.printStackTrace();
+            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
             throw new ConfigLoadException("Error parsing config file :" + fileName);
           }
+          MainStoryEventConfig config = new MainStoryEventConfig(id, name, type, values, group, sceneResource, loseContinue, transitionType, isPreload);
           config.afterLoad();
-          configList.add(config);
-          configMap.put(config.id, config);
+          newList.add(config);
+          newMap.put(config.id, config);
         }
+        checker.checkAfterParse(logger, newList);
+        configList = List.copyOf(newList);
+        configMap = Map.copyOf(newMap);
         afterLoad();
       } catch (IOException e) {
-        e.printStackTrace();
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }
     }
 
     @Override
-    protected void clear() {
-
-      configList.clear();
-      configMap.clear();
-
+    public void clear() {
+      configList = List.of();
+      configMap = Map.of();
       // @@@@@自定义clear方法开始区@@@@@
-
 
       // @@@@@自定义clear方法结束区@@@@@
     }
 
     private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       String[] parts = value.split(",");
       List<Integer> result = new ArrayList<>();
       for (String part : parts) {
-        try {
-          result.add(Integer.parseInt(part.trim()));
-        } catch (NumberFormatException e) {
-          // 如果不是数字，则跳过
-        }
+        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
       }
       return result;
     }
 
     private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<Integer, Integer>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            try {
-              Integer key = Integer.parseInt(keyStr);
-              Integer val = Integer.parseInt(valueStr);
-              result.add(new KV<>(key, val));
-            } catch (NumberFormatException e) {
-              // 如果不是数字，则跳过
-            }
-          }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) {
+          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
         }
       }
       return result;
     }
 
     private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<String, String>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            result.add(new KV<>(keyStr, valueStr));
-          }
-        }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
       }
       return result;
     }
@@ -214,17 +206,17 @@ public class MainStoryEventConfigManager implements InterfaceConfigManagerProxy 
     public Map<Integer, MainStoryEventConfig> getConfigMap() {
       return configMap;
     }
+
     @Override
     public String getConfigFileName() {
       return "mainStoryEvent.txt";
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
 
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

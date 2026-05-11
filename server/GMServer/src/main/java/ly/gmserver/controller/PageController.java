@@ -78,6 +78,11 @@ public class PageController {
         return "security/event";
     }
 
+    @GetMapping("/config/hot-update")
+    public String configHotUpdate() {
+        return "config/hot-update";
+    }
+
     @GetMapping("/admin/dashboard")
     public String dashboard() {
         return "admin/list";

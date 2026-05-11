@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import ly.utils.KV;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
+import ly.utils.KV;
 import org.slf4j.Logger;
 
 /*
@@ -20,23 +20,17 @@ import org.slf4j.Logger;
  * File: ElectronicFairCircuitConfigManager
  */
 public class ElectronicFairCircuitConfigManager implements InterfaceConfigManagerProxy {
-  AtomicBoolean switched = new AtomicBoolean(false);
+  private static final AtomicBoolean switched = new AtomicBoolean(false);
   private static final ElectronicFairCircuitConfigManager instance = new ElectronicFairCircuitConfigManager();
-  private static final ElectronicFairCircuitConfigManagerImpl instanceImplA =
-      new ElectronicFairCircuitConfigManagerImpl();
-  private static final ElectronicFairCircuitConfigManagerImpl instanceImplB =
-      new ElectronicFairCircuitConfigManagerImpl();
-
-  public boolean isSwitched() {
-    return switched.get();
-  }
+  private static final ElectronicFairCircuitConfigManagerImpl instanceImplA = new ElectronicFairCircuitConfigManagerImpl();
+  private static final ElectronicFairCircuitConfigManagerImpl instanceImplB = new ElectronicFairCircuitConfigManagerImpl();
 
   public static ElectronicFairCircuitConfigManagerImpl getInstance() {
-    if (instance.isSwitched()) {
-      return instanceImplA;
-    } else {
-      return instanceImplB;
-    }
+    return switched.get() ? instanceImplA : instanceImplB;
+  }
+
+  private static ElectronicFairCircuitConfigManagerImpl getStandby() {
+    return switched.get() ? instanceImplB : instanceImplA;
   }
 
   @Override
@@ -44,200 +38,205 @@ public class ElectronicFairCircuitConfigManager implements InterfaceConfigManage
     getInstance().reload(logger, configDir);
   }
 
+  @Override
+  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
+    getStandby().reload(logger, configDir);
+  }
+
+  @Override
+  public AbstractConfigManger switchConfig() {
+    ElectronicFairCircuitConfigManagerImpl oldActive = getInstance();
+    switched.set(!switched.get());
+    return oldActive;
+  }
+
+  @Override
+  public String getConfigFileName() {
+    return getInstance().getConfigFileName();
+  }
+
   public static class ElectronicFairCircuitConfigManagerImpl extends AbstractConfigManger {
-
-    List<ElectronicFairCircuitConfig> configList = new ArrayList<ElectronicFairCircuitConfig>();
-    Map<Integer, ElectronicFairCircuitConfig> configMap = new HashMap<Integer, ElectronicFairCircuitConfig>();
-
+    private List<ElectronicFairCircuitConfig> configList = List.of();
+    private Map<Integer, ElectronicFairCircuitConfig> configMap = Map.of();
 
     // @@@@@自定义属性开始区@@@@@
 
     // @@@@@自定义属性结束区@@@@@
 
     @Override
-    protected void reload(Logger logger, String configDir) throws ConfigLoadException {
+    public void reload(Logger logger, String configDir) throws ConfigLoadException {
       String fileName = configDir + File.separator + getConfigFileName();
       File file = new File(fileName);
-      clear();
       if (!file.exists()) {
         logger.error(fileName + " does not exist");
         throw new ConfigLoadException("Config file does not exist :" + fileName);
       }
+      ElectronicFairCircuitConfigChecker checker = new ElectronicFairCircuitConfigChecker();
+      checker.checkHeader(logger, configDir);
+      List<ElectronicFairCircuitConfig> newList = new ArrayList<>();
+      Map<Integer, ElectronicFairCircuitConfig> newMap = new HashMap<>();
       try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String line;
-        br.readLine(); //先读取一行表头 
-        while ((line = br.readLine()) != null) { // 按行读取
-          String[] arr = line.split("\t");
-          ElectronicFairCircuitConfig config = new ElectronicFairCircuitConfig();
+        String rowText;
+        br.readLine();
+        br.readLine();
+        while ((rowText = br.readLine()) != null) {
+          if (rowText.isBlank()) { continue; }
+          String[] arr = rowText.split("\\t", -1);
+          if (arr.length < 16) {
+            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
+          }
+          int id = 0;
+          String circuitName = null;
+          int circuit1 = 0;
+          String circuitAttr1 = null;
+          int circuit2 = 0;
+          String circuitAttr2 = null;
+          int circuit3 = 0;
+          String circuitAttr3 = null;
+          int circuit4 = 0;
+          String circuitAttr4 = null;
+          int circuit5 = 0;
+          String circuitAttr5 = null;
+          int circuit6 = 0;
+          String circuitAttr6 = null;
+          int circuit7 = 0;
+          String circuitAttr7 = null;
           try {
-            //解析 编号
+            // 解析 编号
             if (!arr[0].trim().isEmpty()) {
-            config.id =  Integer.parseInt(arr[0].trim());
+              id = Integer.parseInt(arr[0].trim());
             }
 
-            //解析 源核套装名称
+            // 解析 源核套装名称
             if (!arr[1].trim().isEmpty()) {
-            config.circuitName = arr[1].trim();
+              circuitName = arr[1].trim();
             }
 
-            //解析 1号位置源核
+            // 解析 1号位置源核
             if (!arr[2].trim().isEmpty()) {
-            config.circuit1 =  Integer.parseInt(arr[2].trim());
+              circuit1 = Integer.parseInt(arr[2].trim());
             }
 
-            //解析 1号位置源核属性
+            // 解析 1号位置源核属性
             if (!arr[3].trim().isEmpty()) {
-            config.circuitAttr1 = arr[3].trim();
+              circuitAttr1 = arr[3].trim();
             }
 
-            //解析 2号位置源核
+            // 解析 2号位置源核
             if (!arr[4].trim().isEmpty()) {
-            config.circuit2 =  Integer.parseInt(arr[4].trim());
+              circuit2 = Integer.parseInt(arr[4].trim());
             }
 
-            //解析 2号位置源核属性
+            // 解析 2号位置源核属性
             if (!arr[5].trim().isEmpty()) {
-            config.circuitAttr2 = arr[5].trim();
+              circuitAttr2 = arr[5].trim();
             }
 
-            //解析 3号位置源核
+            // 解析 3号位置源核
             if (!arr[6].trim().isEmpty()) {
-            config.circuit3 =  Integer.parseInt(arr[6].trim());
+              circuit3 = Integer.parseInt(arr[6].trim());
             }
 
-            //解析 3号位置源核属性
+            // 解析 3号位置源核属性
             if (!arr[7].trim().isEmpty()) {
-            config.circuitAttr3 = arr[7].trim();
+              circuitAttr3 = arr[7].trim();
             }
 
-            //解析 4号位置源核
+            // 解析 4号位置源核
             if (!arr[8].trim().isEmpty()) {
-            config.circuit4 =  Integer.parseInt(arr[8].trim());
+              circuit4 = Integer.parseInt(arr[8].trim());
             }
 
-            //解析 4号位置源核属性
+            // 解析 4号位置源核属性
             if (!arr[9].trim().isEmpty()) {
-            config.circuitAttr4 = arr[9].trim();
+              circuitAttr4 = arr[9].trim();
             }
 
-            //解析 5号位置源核
+            // 解析 5号位置源核
             if (!arr[10].trim().isEmpty()) {
-            config.circuit5 =  Integer.parseInt(arr[10].trim());
+              circuit5 = Integer.parseInt(arr[10].trim());
             }
 
-            //解析 5号位置源核属性
+            // 解析 5号位置源核属性
             if (!arr[11].trim().isEmpty()) {
-            config.circuitAttr5 = arr[11].trim();
+              circuitAttr5 = arr[11].trim();
             }
 
-            //解析 6号位置源核
+            // 解析 6号位置源核
             if (!arr[12].trim().isEmpty()) {
-            config.circuit6 =  Integer.parseInt(arr[12].trim());
+              circuit6 = Integer.parseInt(arr[12].trim());
             }
 
-            //解析 6号位置源核属性
+            // 解析 6号位置源核属性
             if (!arr[13].trim().isEmpty()) {
-            config.circuitAttr6 = arr[13].trim();
+              circuitAttr6 = arr[13].trim();
             }
 
-            //解析 7号位置源核
+            // 解析 7号位置源核
             if (!arr[14].trim().isEmpty()) {
-            config.circuit7 =  Integer.parseInt(arr[14].trim());
+              circuit7 = Integer.parseInt(arr[14].trim());
             }
 
-            //解析 7号位置源核属性
+            // 解析 7号位置源核属性
             if (!arr[15].trim().isEmpty()) {
-            config.circuitAttr7 = arr[15].trim();
+              circuitAttr7 = arr[15].trim();
             }
-
 
           } catch (Exception e) {
-            logger.error(
-                String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, line, e.getMessage()));
-            e.printStackTrace();
+            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
             throw new ConfigLoadException("Error parsing config file :" + fileName);
           }
+          ElectronicFairCircuitConfig config = new ElectronicFairCircuitConfig(id, circuitName, circuit1, circuitAttr1, circuit2, circuitAttr2, circuit3, circuitAttr3, circuit4, circuitAttr4, circuit5, circuitAttr5, circuit6, circuitAttr6, circuit7, circuitAttr7);
           config.afterLoad();
-          configList.add(config);
-          configMap.put(config.id, config);
+          newList.add(config);
+          newMap.put(config.id, config);
         }
+        checker.checkAfterParse(logger, newList);
+        configList = List.copyOf(newList);
+        configMap = Map.copyOf(newMap);
         afterLoad();
       } catch (IOException e) {
-        e.printStackTrace();
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }
     }
 
     @Override
-    protected void clear() {
-
-      configList.clear();
-      configMap.clear();
-
+    public void clear() {
+      configList = List.of();
+      configMap = Map.of();
       // @@@@@自定义clear方法开始区@@@@@
-
 
       // @@@@@自定义clear方法结束区@@@@@
     }
 
     private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       String[] parts = value.split(",");
       List<Integer> result = new ArrayList<>();
       for (String part : parts) {
-        try {
-          result.add(Integer.parseInt(part.trim()));
-        } catch (NumberFormatException e) {
-          // 如果不是数字，则跳过
-        }
+        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
       }
       return result;
     }
 
     private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<Integer, Integer>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            try {
-              Integer key = Integer.parseInt(keyStr);
-              Integer val = Integer.parseInt(valueStr);
-              result.add(new KV<>(key, val));
-            } catch (NumberFormatException e) {
-              // 如果不是数字，则跳过
-            }
-          }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) {
+          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
         }
       }
       return result;
     }
 
     private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<String, String>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            result.add(new KV<>(keyStr, valueStr));
-          }
-        }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
       }
       return result;
     }
@@ -249,17 +248,17 @@ public class ElectronicFairCircuitConfigManager implements InterfaceConfigManage
     public Map<Integer, ElectronicFairCircuitConfig> getConfigMap() {
       return configMap;
     }
+
     @Override
     public String getConfigFileName() {
       return "electronicFairCircuit.txt";
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
 
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

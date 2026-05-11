@@ -1,4 +1,5 @@
-id	name	type	canReTrigger	playAni	playShowAni	skipTurn	banEnergySkill	banPassiveSkill	banSSkill	canTriggerSkill	selectType	dispelList	preventList	isPlayAnim	stateAnim	stateDead	stateStart	stateFinish	startEffect	runEffect	endEffect	statePriority	damageHitPro	
+#fields	id	name	type	canReTrigger	playAni	playShowAni	skipTurn	banEnergySkill	banPassiveSkill	banSSkill	canTriggerSkill	selectType	dispelList	preventList	isPlayAnim	stateAnim	stateDead	stateStart	stateFinish	startEffect	runEffect	endEffect	statePriority	damageHitPro
+#types	INT	STRING	INT	INT	INT	INT	INT	INT	INT	INT	INT	INT	STRING	STRING	INT	STRING	STRING	STRING	STRING	STRING	STRING	STRING	INT	INT
 0	无	0	0	1	1	0	0	0	0	0	0	 	 	1	idle_loop	dead	skill1	 	210028008,0,point_root	 	 	1	0
 1	眩晕	1	0	1	0	1	0	0	1	0	0	18	 	1	idle_paralysis_loop	dead	 	 	 	 	 	100	0
 2	虚弱	2	0	1	0	1	0	0	1	0	0	 	 	1	skill_idle_loop	dead	 	 	 	 	 	150	0

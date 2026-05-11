@@ -1,54 +1,64 @@
 package ly.config;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
+import ly.utils.KV;
 
 /***
  * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
  */
-public class ChapterBossConfig { 
-  /**编号*/ 
-   public int id;
+public class ChapterBossConfig {
+  /**编号*/
+  public final int id;
 
-  /**星星数量*/ 
-   public int starNum;
+  /**星星数量*/
+  public final int starNum;
 
-  /**奖励类型*/ 
-   public int type;
+  /**奖励类型*/
+  public final int type;
 
-  /**奖励展示*/ 
-   public String dropShow;
+  /**奖励展示*/
+  public final String dropShow;
 
-  /**实际掉落*/ 
-   public int drop;
+  /**实际掉落*/
+  public final int drop;
 
-  /**关卡id*/ 
-   public int sceneId;
+  /**关卡id*/
+  public final int sceneId;
 
-  /**怪物id*/ 
-   public String npcId;
+  /**怪物id*/
+  public final String npcId;
 
-  /**模型id*/ 
-   public int modelId;
+  /**模型id*/
+  public final int modelId;
 
-  /**外显怪物半身像*/ 
-   public int resourceNpc;
+  /**外显怪物半身像*/
+  public final int resourceNpc;
 
-  /**外显奖励图标*/ 
-   public int resourceIcon;
+  /**外显奖励图标*/
+  public final int resourceIcon;
 
-  /**外显奖励数量*/ 
-   public int iconNum;
+  /**外显奖励数量*/
+  public final int iconNum;
 
-// @@@@@自定义属性开始区@@@@@ 
+  // @@@@@自定义属性开始区@@@@@
 
- // @@@@@自定义属性结束区@@@@@ 
+  // @@@@@自定义属性结束区@@@@@
 
-// @@@@@自定义方法开始区@@@@@ 
+  public ChapterBossConfig(int id, int starNum, int type, String dropShow, int drop, int sceneId, String npcId, int modelId, int resourceNpc, int resourceIcon, int iconNum) {
+    this.id = id;
+    this.starNum = starNum;
+    this.type = type;
+    this.dropShow = dropShow;
+    this.drop = drop;
+    this.sceneId = sceneId;
+    this.npcId = npcId;
+    this.modelId = modelId;
+    this.resourceNpc = resourceNpc;
+    this.resourceIcon = resourceIcon;
+    this.iconNum = iconNum;
+  }
+
+  // @@@@@自定义方法开始区@@@@@
 public void afterLoad() {}
-
-
- // @@@@@自定义方法结束区@@@@@ 
-
- }
+  // @@@@@自定义方法结束区@@@@@
+}

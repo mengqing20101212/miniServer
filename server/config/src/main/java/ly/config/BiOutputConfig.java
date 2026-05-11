@@ -1,30 +1,32 @@
 package ly.config;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
+import ly.utils.KV;
 
 /***
  * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
  */
-public class BiOutputConfig { 
-  /**编号*/ 
-   public int id;
+public class BiOutputConfig {
+  /**编号*/
+  public final int id;
 
-  /**类型*/ 
-   public int type;
+  /**类型*/
+  public final int type;
 
-  /**输出ID*/ 
-   public int outPutId;
+  /**输出ID*/
+  public final int outPutId;
 
-// @@@@@自定义属性开始区@@@@@ 
+  // @@@@@自定义属性开始区@@@@@
 
- // @@@@@自定义属性结束区@@@@@ 
+  // @@@@@自定义属性结束区@@@@@
 
-// @@@@@自定义方法开始区@@@@@ 
+  public BiOutputConfig(int id, int type, int outPutId) {
+    this.id = id;
+    this.type = type;
+    this.outPutId = outPutId;
+  }
+
+  // @@@@@自定义方法开始区@@@@@
 public void afterLoad() {}
-
-
- // @@@@@自定义方法结束区@@@@@ 
-
- }
+  // @@@@@自定义方法结束区@@@@@
+}

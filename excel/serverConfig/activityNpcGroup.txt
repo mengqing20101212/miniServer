@@ -1,4 +1,5 @@
-id	defaultAni	p1	groupName	clickAniList	moveDistance	cameraHight	cameraDistance	npcDistance	textPrefabType	
+#fields	id	defaultAni	p1	groupName	clickAniList	moveDistance	cameraHight	cameraDistance	npcDistance	textPrefabType
+#types	INT	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING
 1	maincity_super_idle_loop	1	黄金球、弹簧胡子	maincity_super_talk_start|0|zhucheng2,maincity_super_talk_loop|1|zhucheng2idle,maincity_super_talk_end	9,0	1	2	0	1
 2	maincity_super_idle_loop	1	背心黑洞、背心猛虎	maincity_super_talk_start|0|zhucheng2,maincity_super_talk_loop|1|zhucheng2idle,maincity_super_talk_end	9,0	1	2	0	5
 3	maincity_super_idle_loop	1	原子武士、居合庵	maincity_super_talk_start|0|zhucheng2,maincity_super_talk_loop|1|zhucheng2idle,maincity_super_talk_end	9,0	1	2	0	6

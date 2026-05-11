@@ -1,4 +1,5 @@
-id	heroid	page	name	rewardShow	drop	redirectionId	commanderShow	
+#fields	id	heroid	page	name	rewardShow	drop	redirectionId	commanderShow
+#types	INT	STRING	INT	STRING	INT	INT	INT	STRING
 1	2	1	拥有杰诺斯·武装	20000090	20000090	52	340640001
 2	2,50	1	拥有杰诺斯、杰诺斯·武装	20000089	20000089	52	340640001
 5	6	3	拥有原子武士	20000090	20000090	52	340640003

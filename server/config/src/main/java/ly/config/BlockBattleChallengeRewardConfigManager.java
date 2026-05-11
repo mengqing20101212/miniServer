@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import ly.utils.KV;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
+import ly.utils.KV;
 import org.slf4j.Logger;
 
 /*
@@ -20,23 +20,17 @@ import org.slf4j.Logger;
  * File: BlockBattleChallengeRewardConfigManager
  */
 public class BlockBattleChallengeRewardConfigManager implements InterfaceConfigManagerProxy {
-  AtomicBoolean switched = new AtomicBoolean(false);
+  private static final AtomicBoolean switched = new AtomicBoolean(false);
   private static final BlockBattleChallengeRewardConfigManager instance = new BlockBattleChallengeRewardConfigManager();
-  private static final BlockBattleChallengeRewardConfigManagerImpl instanceImplA =
-      new BlockBattleChallengeRewardConfigManagerImpl();
-  private static final BlockBattleChallengeRewardConfigManagerImpl instanceImplB =
-      new BlockBattleChallengeRewardConfigManagerImpl();
-
-  public boolean isSwitched() {
-    return switched.get();
-  }
+  private static final BlockBattleChallengeRewardConfigManagerImpl instanceImplA = new BlockBattleChallengeRewardConfigManagerImpl();
+  private static final BlockBattleChallengeRewardConfigManagerImpl instanceImplB = new BlockBattleChallengeRewardConfigManagerImpl();
 
   public static BlockBattleChallengeRewardConfigManagerImpl getInstance() {
-    if (instance.isSwitched()) {
-      return instanceImplA;
-    } else {
-      return instanceImplB;
-    }
+    return switched.get() ? instanceImplA : instanceImplB;
+  }
+
+  private static BlockBattleChallengeRewardConfigManagerImpl getStandby() {
+    return switched.get() ? instanceImplB : instanceImplA;
   }
 
   @Override
@@ -44,145 +38,139 @@ public class BlockBattleChallengeRewardConfigManager implements InterfaceConfigM
     getInstance().reload(logger, configDir);
   }
 
+  @Override
+  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
+    getStandby().reload(logger, configDir);
+  }
+
+  @Override
+  public AbstractConfigManger switchConfig() {
+    BlockBattleChallengeRewardConfigManagerImpl oldActive = getInstance();
+    switched.set(!switched.get());
+    return oldActive;
+  }
+
+  @Override
+  public String getConfigFileName() {
+    return getInstance().getConfigFileName();
+  }
+
   public static class BlockBattleChallengeRewardConfigManagerImpl extends AbstractConfigManger {
-
-    List<BlockBattleChallengeRewardConfig> configList = new ArrayList<BlockBattleChallengeRewardConfig>();
-    Map<Integer, BlockBattleChallengeRewardConfig> configMap = new HashMap<Integer, BlockBattleChallengeRewardConfig>();
-
+    private List<BlockBattleChallengeRewardConfig> configList = List.of();
+    private Map<Integer, BlockBattleChallengeRewardConfig> configMap = Map.of();
 
     // @@@@@自定义属性开始区@@@@@
 
     // @@@@@自定义属性结束区@@@@@
 
     @Override
-    protected void reload(Logger logger, String configDir) throws ConfigLoadException {
+    public void reload(Logger logger, String configDir) throws ConfigLoadException {
       String fileName = configDir + File.separator + getConfigFileName();
       File file = new File(fileName);
-      clear();
       if (!file.exists()) {
         logger.error(fileName + " does not exist");
         throw new ConfigLoadException("Config file does not exist :" + fileName);
       }
+      BlockBattleChallengeRewardConfigChecker checker = new BlockBattleChallengeRewardConfigChecker();
+      checker.checkHeader(logger, configDir);
+      List<BlockBattleChallengeRewardConfig> newList = new ArrayList<>();
+      Map<Integer, BlockBattleChallengeRewardConfig> newMap = new HashMap<>();
       try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String line;
-        br.readLine(); //先读取一行表头 
-        while ((line = br.readLine()) != null) { // 按行读取
-          String[] arr = line.split("\t");
-          BlockBattleChallengeRewardConfig config = new BlockBattleChallengeRewardConfig();
+        String rowText;
+        br.readLine();
+        br.readLine();
+        while ((rowText = br.readLine()) != null) {
+          if (rowText.isBlank()) { continue; }
+          String[] arr = rowText.split("\\t", -1);
+          if (arr.length < 5) {
+            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
+          }
+          int id = 0;
+          int prestigeNum = 0;
+          String des = null;
+          int drop = 0;
+          int dropShow = 0;
           try {
-            //解析 编号
+            // 解析 编号
             if (!arr[0].trim().isEmpty()) {
-            config.id =  Integer.parseInt(arr[0].trim());
+              id = Integer.parseInt(arr[0].trim());
             }
 
-            //解析 声望数量
+            // 解析 声望数量
             if (!arr[1].trim().isEmpty()) {
-            config.prestigeNum =  Integer.parseInt(arr[1].trim());
+              prestigeNum = Integer.parseInt(arr[1].trim());
             }
 
-            //解析 任务描述
+            // 解析 任务描述
             if (!arr[2].trim().isEmpty()) {
-            config.des = arr[2].trim();
+              des = arr[2].trim();
             }
 
-            //解析 奖励
+            // 解析 奖励
             if (!arr[3].trim().isEmpty()) {
-            config.drop =  Integer.parseInt(arr[3].trim());
+              drop = Integer.parseInt(arr[3].trim());
             }
 
-            //解析 奖励展示
+            // 解析 奖励展示
             if (!arr[4].trim().isEmpty()) {
-            config.dropShow =  Integer.parseInt(arr[4].trim());
+              dropShow = Integer.parseInt(arr[4].trim());
             }
-
 
           } catch (Exception e) {
-            logger.error(
-                String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, line, e.getMessage()));
-            e.printStackTrace();
+            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
             throw new ConfigLoadException("Error parsing config file :" + fileName);
           }
+          BlockBattleChallengeRewardConfig config = new BlockBattleChallengeRewardConfig(id, prestigeNum, des, drop, dropShow);
           config.afterLoad();
-          configList.add(config);
-          configMap.put(config.id, config);
+          newList.add(config);
+          newMap.put(config.id, config);
         }
+        checker.checkAfterParse(logger, newList);
+        configList = List.copyOf(newList);
+        configMap = Map.copyOf(newMap);
         afterLoad();
       } catch (IOException e) {
-        e.printStackTrace();
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }
     }
 
     @Override
-    protected void clear() {
-
-      configList.clear();
-      configMap.clear();
-
+    public void clear() {
+      configList = List.of();
+      configMap = Map.of();
       // @@@@@自定义clear方法开始区@@@@@
-
 
       // @@@@@自定义clear方法结束区@@@@@
     }
 
     private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       String[] parts = value.split(",");
       List<Integer> result = new ArrayList<>();
       for (String part : parts) {
-        try {
-          result.add(Integer.parseInt(part.trim()));
-        } catch (NumberFormatException e) {
-          // 如果不是数字，则跳过
-        }
+        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
       }
       return result;
     }
 
     private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<Integer, Integer>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            try {
-              Integer key = Integer.parseInt(keyStr);
-              Integer val = Integer.parseInt(valueStr);
-              result.add(new KV<>(key, val));
-            } catch (NumberFormatException e) {
-              // 如果不是数字，则跳过
-            }
-          }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) {
+          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
         }
       }
       return result;
     }
 
     private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<String, String>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            result.add(new KV<>(keyStr, valueStr));
-          }
-        }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
       }
       return result;
     }
@@ -194,17 +182,17 @@ public class BlockBattleChallengeRewardConfigManager implements InterfaceConfigM
     public Map<Integer, BlockBattleChallengeRewardConfig> getConfigMap() {
       return configMap;
     }
+
     @Override
     public String getConfigFileName() {
       return "blockBattleChallengeReward.txt";
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
 
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

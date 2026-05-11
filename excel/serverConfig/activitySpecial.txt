@@ -1,4 +1,5 @@
-id	scheDuling	name	heroShowStyleType	rolePic	rolePicPosOffset	rolePicScaleOffset	titleResID	bgPic	holographic	trueActivityId	
+#fields	id	scheDuling	name	heroShowStyleType	rolePic	rolePicPosOffset	rolePicScaleOffset	titleResID	bgPic	holographic	trueActivityId
+#types	INT	INT	STRING	INT	INT	STRING	STRING	INT	INT	INT	INT
 1	1	超能招募（战栗的龙卷）	3	340589401	44,187	0.8,0.8	340589304	330900153	0	92
 2	2	超合金招募（超合金黑光）	1	321004201	-30,-29	1,1	340580209	330900153	0	92
 3	3	闪光招募（闪光弗莱士）	2	340589405	-16,320	0.7,0.6	340580102	330900153	0	92

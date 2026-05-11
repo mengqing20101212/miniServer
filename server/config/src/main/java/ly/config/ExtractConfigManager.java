@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import ly.utils.KV;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
+import ly.utils.KV;
 import org.slf4j.Logger;
 
 /*
@@ -20,23 +20,17 @@ import org.slf4j.Logger;
  * File: ExtractConfigManager
  */
 public class ExtractConfigManager implements InterfaceConfigManagerProxy {
-  AtomicBoolean switched = new AtomicBoolean(false);
+  private static final AtomicBoolean switched = new AtomicBoolean(false);
   private static final ExtractConfigManager instance = new ExtractConfigManager();
-  private static final ExtractConfigManagerImpl instanceImplA =
-      new ExtractConfigManagerImpl();
-  private static final ExtractConfigManagerImpl instanceImplB =
-      new ExtractConfigManagerImpl();
-
-  public boolean isSwitched() {
-    return switched.get();
-  }
+  private static final ExtractConfigManagerImpl instanceImplA = new ExtractConfigManagerImpl();
+  private static final ExtractConfigManagerImpl instanceImplB = new ExtractConfigManagerImpl();
 
   public static ExtractConfigManagerImpl getInstance() {
-    if (instance.isSwitched()) {
-      return instanceImplA;
-    } else {
-      return instanceImplB;
-    }
+    return switched.get() ? instanceImplA : instanceImplB;
+  }
+
+  private static ExtractConfigManagerImpl getStandby() {
+    return switched.get() ? instanceImplB : instanceImplA;
   }
 
   @Override
@@ -44,240 +38,253 @@ public class ExtractConfigManager implements InterfaceConfigManagerProxy {
     getInstance().reload(logger, configDir);
   }
 
+  @Override
+  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
+    getStandby().reload(logger, configDir);
+  }
+
+  @Override
+  public AbstractConfigManger switchConfig() {
+    ExtractConfigManagerImpl oldActive = getInstance();
+    switched.set(!switched.get());
+    return oldActive;
+  }
+
+  @Override
+  public String getConfigFileName() {
+    return getInstance().getConfigFileName();
+  }
+
   public static class ExtractConfigManagerImpl extends AbstractConfigManger {
-
-    List<ExtractConfig> configList = new ArrayList<ExtractConfig>();
-    Map<Integer, ExtractConfig> configMap = new HashMap<Integer, ExtractConfig>();
-
+    private List<ExtractConfig> configList = List.of();
+    private Map<Integer, ExtractConfig> configMap = Map.of();
 
     // @@@@@自定义属性开始区@@@@@
 
     // @@@@@自定义属性结束区@@@@@
 
     @Override
-    protected void reload(Logger logger, String configDir) throws ConfigLoadException {
+    public void reload(Logger logger, String configDir) throws ConfigLoadException {
       String fileName = configDir + File.separator + getConfigFileName();
       File file = new File(fileName);
-      clear();
       if (!file.exists()) {
         logger.error(fileName + " does not exist");
         throw new ConfigLoadException("Config file does not exist :" + fileName);
       }
+      ExtractConfigChecker checker = new ExtractConfigChecker();
+      checker.checkHeader(logger, configDir);
+      List<ExtractConfig> newList = new ArrayList<>();
+      Map<Integer, ExtractConfig> newMap = new HashMap<>();
       try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String line;
-        br.readLine(); //先读取一行表头 
-        while ((line = br.readLine()) != null) { // 按行读取
-          String[] arr = line.split("\t");
-          ExtractConfig config = new ExtractConfig();
+        String rowText;
+        br.readLine();
+        br.readLine();
+        while ((rowText = br.readLine()) != null) {
+          if (rowText.isBlank()) { continue; }
+          String[] arr = rowText.split("\\t", -1);
+          if (arr.length < 24) {
+            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
+          }
+          int id = 0;
+          String name = null;
+          int level = 0;
+          String ranking = null;
+          int rankNum = 0;
+          String city = null;
+          String lines = null;
+          int random = 0;
+          int bodyPic = 0;
+          String features = null;
+          String timeline = null;
+          int bg = 0;
+          String englishName = null;
+          int smallPicResId = 0;
+          String smallPicPosOffset = null;
+          String smallPicRotationOffset = null;
+          String smallPicScale = null;
+          int bodyQualityBgResId = 0;
+          int nameQualityBgResId = 0;
+          int isRepeatPlay = 0;
+          int backgroundId = 0;
+          int shareAnimation = 0;
+          String sharePicScale = null;
+          String sharePicPosOffset = null;
           try {
-            //解析 英雄
+            // 解析 英雄
             if (!arr[0].trim().isEmpty()) {
-            config.id =  Integer.parseInt(arr[0].trim());
+              id = Integer.parseInt(arr[0].trim());
             }
 
-            //解析 备注
+            // 解析 备注
             if (!arr[1].trim().isEmpty()) {
-            config.name = arr[1].trim();
+              name = arr[1].trim();
             }
 
-            //解析 等级
+            // 解析 等级
             if (!arr[2].trim().isEmpty()) {
-            config.level =  Integer.parseInt(arr[2].trim());
+              level = Integer.parseInt(arr[2].trim());
             }
 
-            //解析 排行
+            // 解析 排行
             if (!arr[3].trim().isEmpty()) {
-            config.ranking = arr[3].trim();
+              ranking = arr[3].trim();
             }
 
-            //解析 排名
+            // 解析 排名
             if (!arr[4].trim().isEmpty()) {
-            config.rankNum =  Integer.parseInt(arr[4].trim());
+              rankNum = Integer.parseInt(arr[4].trim());
             }
 
-            //解析 城市
+            // 解析 城市
             if (!arr[5].trim().isEmpty()) {
-            config.city = arr[5].trim();
+              city = arr[5].trim();
             }
 
-            //解析 宣言
+            // 解析 宣言
             if (!arr[6].trim().isEmpty()) {
-            config.lines = arr[6].trim();
+              lines = arr[6].trim();
             }
 
-            //解析 随机展示
+            // 解析 随机展示
             if (!arr[7].trim().isEmpty()) {
-            config.random =  Integer.parseInt(arr[7].trim());
+              random = Integer.parseInt(arr[7].trim());
             }
 
-            //解析 角色半身像
+            // 解析 角色半身像
             if (!arr[8].trim().isEmpty()) {
-            config.bodyPic =  Integer.parseInt(arr[8].trim());
+              bodyPic = Integer.parseInt(arr[8].trim());
             }
 
-            //解析 简短的描述
+            // 解析 简短的描述
             if (!arr[9].trim().isEmpty()) {
-            config.features = arr[9].trim();
+              features = arr[9].trim();
             }
 
-            //解析 人物招募动作
+            // 解析 人物招募动作
             if (!arr[10].trim().isEmpty()) {
-            config.timeline = arr[10].trim();
+              timeline = arr[10].trim();
             }
 
-            //解析 招募动画背景
+            // 解析 招募动画背景
             if (!arr[11].trim().isEmpty()) {
-            config.bg =  Integer.parseInt(arr[11].trim());
+              bg = Integer.parseInt(arr[11].trim());
             }
 
-            //解析 英文名
+            // 解析 英文名
             if (!arr[12].trim().isEmpty()) {
-            config.englishName = arr[12].trim();
+              englishName = arr[12].trim();
             }
 
-            //解析 角色小图片资源Id(目前不用)
+            // 解析 角色小图片资源Id(目前不用)
             if (!arr[13].trim().isEmpty()) {
-            config.smallPicResId =  Integer.parseInt(arr[13].trim());
+              smallPicResId = Integer.parseInt(arr[13].trim());
             }
 
-            //解析 招募英雄位置
+            // 解析 招募英雄位置
             if (!arr[14].trim().isEmpty()) {
-            config.smallPicPosOffset = arr[14].trim();
+              smallPicPosOffset = arr[14].trim();
             }
 
-            //解析 招募英雄角度
+            // 解析 招募英雄角度
             if (!arr[15].trim().isEmpty()) {
-            config.smallPicRotationOffset = arr[15].trim();
+              smallPicRotationOffset = arr[15].trim();
             }
 
-            //解析 招募英雄缩放
+            // 解析 招募英雄缩放
             if (!arr[16].trim().isEmpty()) {
-            config.smallPicScale = arr[16].trim();
+              smallPicScale = arr[16].trim();
             }
 
-            //解析 英雄品质底框
+            // 解析 英雄品质底框
             if (!arr[17].trim().isEmpty()) {
-            config.bodyQualityBgResId =  Integer.parseInt(arr[17].trim());
+              bodyQualityBgResId = Integer.parseInt(arr[17].trim());
             }
 
-            //解析 名字底框
+            // 解析 名字底框
             if (!arr[18].trim().isEmpty()) {
-            config.nameQualityBgResId =  Integer.parseInt(arr[18].trim());
+              nameQualityBgResId = Integer.parseInt(arr[18].trim());
             }
 
-            //解析 重复播放英雄展示动画
+            // 解析 重复播放英雄展示动画
             if (!arr[19].trim().isEmpty()) {
-            config.isRepeatPlay =  Integer.parseInt(arr[19].trim());
+              isRepeatPlay = Integer.parseInt(arr[19].trim());
             }
 
-            //解析 英雄模型背景预设
+            // 解析 英雄模型背景预设
             if (!arr[20].trim().isEmpty()) {
-            config.backgroundId =  Integer.parseInt(arr[20].trim());
+              backgroundId = Integer.parseInt(arr[20].trim());
             }
 
-            //解析 分享使用立绘
+            // 解析 分享使用立绘
             if (!arr[21].trim().isEmpty()) {
-            config.shareAnimation =  Integer.parseInt(arr[21].trim());
+              shareAnimation = Integer.parseInt(arr[21].trim());
             }
 
-            //解析 分享立绘缩放
+            // 解析 分享立绘缩放
             if (!arr[22].trim().isEmpty()) {
-            config.sharePicScale = arr[22].trim();
+              sharePicScale = arr[22].trim();
             }
 
-            //解析 分享立绘位置
+            // 解析 分享立绘位置
             if (!arr[23].trim().isEmpty()) {
-            config.sharePicPosOffset = arr[23].trim();
+              sharePicPosOffset = arr[23].trim();
             }
-
 
           } catch (Exception e) {
-            logger.error(
-                String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, line, e.getMessage()));
-            e.printStackTrace();
+            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
             throw new ConfigLoadException("Error parsing config file :" + fileName);
           }
+          ExtractConfig config = new ExtractConfig(id, name, level, ranking, rankNum, city, lines, random, bodyPic, features, timeline, bg, englishName, smallPicResId, smallPicPosOffset, smallPicRotationOffset, smallPicScale, bodyQualityBgResId, nameQualityBgResId, isRepeatPlay, backgroundId, shareAnimation, sharePicScale, sharePicPosOffset);
           config.afterLoad();
-          configList.add(config);
-          configMap.put(config.id, config);
+          newList.add(config);
+          newMap.put(config.id, config);
         }
+        checker.checkAfterParse(logger, newList);
+        configList = List.copyOf(newList);
+        configMap = Map.copyOf(newMap);
         afterLoad();
       } catch (IOException e) {
-        e.printStackTrace();
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }
     }
 
     @Override
-    protected void clear() {
-
-      configList.clear();
-      configMap.clear();
-
+    public void clear() {
+      configList = List.of();
+      configMap = Map.of();
       // @@@@@自定义clear方法开始区@@@@@
-
 
       // @@@@@自定义clear方法结束区@@@@@
     }
 
     private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       String[] parts = value.split(",");
       List<Integer> result = new ArrayList<>();
       for (String part : parts) {
-        try {
-          result.add(Integer.parseInt(part.trim()));
-        } catch (NumberFormatException e) {
-          // 如果不是数字，则跳过
-        }
+        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
       }
       return result;
     }
 
     private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<Integer, Integer>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            try {
-              Integer key = Integer.parseInt(keyStr);
-              Integer val = Integer.parseInt(valueStr);
-              result.add(new KV<>(key, val));
-            } catch (NumberFormatException e) {
-              // 如果不是数字，则跳过
-            }
-          }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) {
+          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
         }
       }
       return result;
     }
 
     private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<String, String>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            result.add(new KV<>(keyStr, valueStr));
-          }
-        }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
       }
       return result;
     }
@@ -289,17 +296,17 @@ public class ExtractConfigManager implements InterfaceConfigManagerProxy {
     public Map<Integer, ExtractConfig> getConfigMap() {
       return configMap;
     }
+
     @Override
     public String getConfigFileName() {
       return "extract.txt";
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
 
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

@@ -1,4 +1,5 @@
-id	group	groupServer	isIfGroup	groupLv	priority	firstType	secondType	name	des	missionId	point	rewardShow	dropId	index	
+#fields	id	group	groupServer	isIfGroup	groupLv	priority	firstType	secondType	name	des	missionId	point	rewardShow	dropId	index
+#types	INT	INT	INT	INT	INT	INT	INT	INT	STRING	STRING	INT	INT	STRING	INT	INT
 1010101	10101	10101	0	1	1010101	1	101	账号升级·壹	指挥等级升到10级	1010101	10	21010101	21010101	1
 1010102	10101	10101	0	2	1010102	1	101	账号升级·贰	指挥等级升到20级	1010102	10	21010102	21010102	2
 1010103	10101	10101	0	3	1010103	1	101	账号升级·叁	指挥等级升到30级	1010103	10	21010103	21010103	3

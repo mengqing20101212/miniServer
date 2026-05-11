@@ -1,4 +1,5 @@
-id	scheDuling	name	picture	holographic	activtyId	trueActivityId	
+#fields	id	scheDuling	name	picture	holographic	activtyId	trueActivityId
+#types	INT	INT	STRING	STRING	INT	INT	INT
 1	1	角色特辑（战栗的龙卷）	340580001	0	6	73
 2	2	角色特辑（超合金黑光）	340580005	0	7	73
 3	3	角色特辑（闪光弗莱士）	340580002	0	8	73

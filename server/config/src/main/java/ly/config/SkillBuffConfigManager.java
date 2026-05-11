@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import ly.utils.KV;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
+import ly.utils.KV;
 import org.slf4j.Logger;
 
 /*
@@ -20,23 +20,17 @@ import org.slf4j.Logger;
  * File: SkillBuffConfigManager
  */
 public class SkillBuffConfigManager implements InterfaceConfigManagerProxy {
-  AtomicBoolean switched = new AtomicBoolean(false);
+  private static final AtomicBoolean switched = new AtomicBoolean(false);
   private static final SkillBuffConfigManager instance = new SkillBuffConfigManager();
-  private static final SkillBuffConfigManagerImpl instanceImplA =
-      new SkillBuffConfigManagerImpl();
-  private static final SkillBuffConfigManagerImpl instanceImplB =
-      new SkillBuffConfigManagerImpl();
-
-  public boolean isSwitched() {
-    return switched.get();
-  }
+  private static final SkillBuffConfigManagerImpl instanceImplA = new SkillBuffConfigManagerImpl();
+  private static final SkillBuffConfigManagerImpl instanceImplB = new SkillBuffConfigManagerImpl();
 
   public static SkillBuffConfigManagerImpl getInstance() {
-    if (instance.isSwitched()) {
-      return instanceImplA;
-    } else {
-      return instanceImplB;
-    }
+    return switched.get() ? instanceImplA : instanceImplB;
+  }
+
+  private static SkillBuffConfigManagerImpl getStandby() {
+    return switched.get() ? instanceImplB : instanceImplA;
   }
 
   @Override
@@ -44,460 +38,517 @@ public class SkillBuffConfigManager implements InterfaceConfigManagerProxy {
     getInstance().reload(logger, configDir);
   }
 
+  @Override
+  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
+    getStandby().reload(logger, configDir);
+  }
+
+  @Override
+  public AbstractConfigManger switchConfig() {
+    SkillBuffConfigManagerImpl oldActive = getInstance();
+    switched.set(!switched.get());
+    return oldActive;
+  }
+
+  @Override
+  public String getConfigFileName() {
+    return getInstance().getConfigFileName();
+  }
+
   public static class SkillBuffConfigManagerImpl extends AbstractConfigManger {
-
-    List<SkillBuffConfig> configList = new ArrayList<SkillBuffConfig>();
-    Map<Integer, SkillBuffConfig> configMap = new HashMap<Integer, SkillBuffConfig>();
-
+    private List<SkillBuffConfig> configList = List.of();
+    private Map<Integer, SkillBuffConfig> configMap = Map.of();
 
     // @@@@@自定义属性开始区@@@@@
 
     // @@@@@自定义属性结束区@@@@@
 
     @Override
-    protected void reload(Logger logger, String configDir) throws ConfigLoadException {
+    public void reload(Logger logger, String configDir) throws ConfigLoadException {
       String fileName = configDir + File.separator + getConfigFileName();
       File file = new File(fileName);
-      clear();
       if (!file.exists()) {
         logger.error(fileName + " does not exist");
         throw new ConfigLoadException("Config file does not exist :" + fileName);
       }
+      SkillBuffConfigChecker checker = new SkillBuffConfigChecker();
+      checker.checkHeader(logger, configDir);
+      List<SkillBuffConfig> newList = new ArrayList<>();
+      Map<Integer, SkillBuffConfig> newMap = new HashMap<>();
       try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String line;
-        br.readLine(); //先读取一行表头 
-        while ((line = br.readLine()) != null) { // 按行读取
-          String[] arr = line.split("\t");
-          SkillBuffConfig config = new SkillBuffConfig();
+        String rowText;
+        br.readLine();
+        br.readLine();
+        while ((rowText = br.readLine()) != null) {
+          if (rowText.isBlank()) { continue; }
+          String[] arr = rowText.split("\\t", -1);
+          if (arr.length < 68) {
+            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
+          }
+          int id = 0;
+          int effectType = 0;
+          String targetType = null;
+          String name = null;
+          String description = null;
+          int icon = 0;
+          String suitId = null;
+          int display = 0;
+          int displayType = 0;
+          int targetTypeEx = 0;
+          String targetTypeEx2 = null;
+          int originSkillGroupId = 0;
+          int banPassiveType = 0;
+          int isPassive = 0;
+          int isCircuit = 0;
+          int isTriggerCircuit = 0;
+          int isTriggerPassiveSkill = 0;
+          int casterStrikeFlyTriggerFlag = 0;
+          int targetStrikeFlyTriggerFlag = 0;
+          int targetStrikeFlyAddFlag = 0;
+          int mutexType = 0;
+          int mutexPriority = 0;
+          int rangeType = 0;
+          String buffInfluence = null;
+          int initStack = 0;
+          int baseStack = 0;
+          int maxStack = 0;
+          int coexist = 0;
+          int refreshStack = 0;
+          int addProType = 0;
+          int addPro = 0;
+          int continuousType = 0;
+          String continuousValue = null;
+          int triggerType = 0;
+          int triggerInterval = 0;
+          int triggerPro = 0;
+          int triggerLimitPerTurn = 0;
+          int triggerConsumeStack = 0;
+          String entityTagFilters = null;
+          String breakType = null;
+          int breakEffectPro = 0;
+          String breakEffects = null;
+          String endEffects = null;
+          String consumeEffects = null;
+          int spCoa1 = 0;
+          int spCoa2 = 0;
+          String startPerformance = null;
+          String runPerformance = null;
+          String breakPerformance = null;
+          String missPerformance = null;
+          String endPerformance = null;
+          float triggerLength = 0F;
+          String param_1 = null;
+          String param_2 = null;
+          String param_3 = null;
+          String param_4 = null;
+          String param_5 = null;
+          String param_6 = null;
+          String param_7 = null;
+          String param_8 = null;
+          String param_9 = null;
+          String param_10 = null;
+          int heroId = 0;
+          int skillSequence = 0;
+          int effectSequence = 0;
+          int isReAdd = 0;
+          String effectRenew = null;
+          String modelPerformance = null;
           try {
-            //解析 编号
+            // 解析 编号
             if (!arr[0].trim().isEmpty()) {
-            config.id =  Integer.parseInt(arr[0].trim());
+              id = Integer.parseInt(arr[0].trim());
             }
 
-            //解析 效果类型
+            // 解析 效果类型
             if (!arr[1].trim().isEmpty()) {
-            config.effectType =  Integer.parseInt(arr[1].trim());
+              effectType = Integer.parseInt(arr[1].trim());
             }
 
-            //解析 作用目标类型
+            // 解析 作用目标类型
             if (!arr[2].trim().isEmpty()) {
-            config.targetType = arr[2].trim();
+              targetType = arr[2].trim();
             }
 
-            //解析 效果名称
+            // 解析 效果名称
             if (!arr[3].trim().isEmpty()) {
-            config.name = arr[3].trim();
+              name = arr[3].trim();
             }
 
-            //解析 效果描述
+            // 解析 效果描述
             if (!arr[4].trim().isEmpty()) {
-            config.description = arr[4].trim();
+              description = arr[4].trim();
             }
 
-            //解析 效果图标
+            // 解析 效果图标
             if (!arr[5].trim().isEmpty()) {
-            config.icon =  Integer.parseInt(arr[5].trim());
+              icon = Integer.parseInt(arr[5].trim());
             }
 
-            //解析 源核触发显示id
+            // 解析 源核触发显示id
             if (!arr[6].trim().isEmpty()) {
-            config.suitId = arr[6].trim();
+              suitId = arr[6].trim();
             }
 
-            //解析 是否显示
+            // 解析 是否显示
             if (!arr[7].trim().isEmpty()) {
-            config.display =  Integer.parseInt(arr[7].trim());
+              display = Integer.parseInt(arr[7].trim());
             }
 
-            //解析 显示类型
+            // 解析 显示类型
             if (!arr[8].trim().isEmpty()) {
-            config.displayType =  Integer.parseInt(arr[8].trim());
+              displayType = Integer.parseInt(arr[8].trim());
             }
 
-            //解析 对死亡目标处理
+            // 解析 对死亡目标处理
             if (!arr[9].trim().isEmpty()) {
-            config.targetTypeEx =  Integer.parseInt(arr[9].trim());
+              targetTypeEx = Integer.parseInt(arr[9].trim());
             }
 
-            //解析 目标属性筛选
+            // 解析 目标属性筛选
             if (!arr[10].trim().isEmpty()) {
-            config.targetTypeEx2 = arr[10].trim();
+              targetTypeEx2 = arr[10].trim();
             }
 
-            //解析 归属技能组
+            // 解析 归属技能组
             if (!arr[11].trim().isEmpty()) {
-            config.originSkillGroupId =  Integer.parseInt(arr[11].trim());
+              originSkillGroupId = Integer.parseInt(arr[11].trim());
             }
 
-            //解析 封被动类型
+            // 解析 封被动类型
             if (!arr[12].trim().isEmpty()) {
-            config.banPassiveType =  Integer.parseInt(arr[12].trim());
+              banPassiveType = Integer.parseInt(arr[12].trim());
             }
 
-            //解析 是否为被动
+            // 解析 是否为被动
             if (!arr[13].trim().isEmpty()) {
-            config.isPassive =  Integer.parseInt(arr[13].trim());
+              isPassive = Integer.parseInt(arr[13].trim());
             }
 
-            //解析 是否为源核
+            // 解析 是否为源核
             if (!arr[14].trim().isEmpty()) {
-            config.isCircuit =  Integer.parseInt(arr[14].trim());
+              isCircuit = Integer.parseInt(arr[14].trim());
             }
 
-            //解析 是否触发源核
+            // 解析 是否触发源核
             if (!arr[15].trim().isEmpty()) {
-            config.isTriggerCircuit =  Integer.parseInt(arr[15].trim());
+              isTriggerCircuit = Integer.parseInt(arr[15].trim());
             }
 
-            //解析 是否触发被动技能
+            // 解析 是否触发被动技能
             if (!arr[16].trim().isEmpty()) {
-            config.isTriggerPassiveSkill =  Integer.parseInt(arr[16].trim());
+              isTriggerPassiveSkill = Integer.parseInt(arr[16].trim());
             }
 
-            //解析 释放者击飞buff能否触发
+            // 解析 释放者击飞buff能否触发
             if (!arr[17].trim().isEmpty()) {
-            config.casterStrikeFlyTriggerFlag =  Integer.parseInt(arr[17].trim());
+              casterStrikeFlyTriggerFlag = Integer.parseInt(arr[17].trim());
             }
 
-            //解析 依附者击飞buff能否触发
+            // 解析 依附者击飞buff能否触发
             if (!arr[18].trim().isEmpty()) {
-            config.targetStrikeFlyTriggerFlag =  Integer.parseInt(arr[18].trim());
+              targetStrikeFlyTriggerFlag = Integer.parseInt(arr[18].trim());
             }
 
-            //解析 依附者击飞buff能否添加
+            // 解析 依附者击飞buff能否添加
             if (!arr[19].trim().isEmpty()) {
-            config.targetStrikeFlyAddFlag =  Integer.parseInt(arr[19].trim());
+              targetStrikeFlyAddFlag = Integer.parseInt(arr[19].trim());
             }
 
-            //解析 互斥类型
+            // 解析 互斥类型
             if (!arr[20].trim().isEmpty()) {
-            config.mutexType =  Integer.parseInt(arr[20].trim());
+              mutexType = Integer.parseInt(arr[20].trim());
             }
 
-            //解析 互斥优先级
+            // 解析 互斥优先级
             if (!arr[21].trim().isEmpty()) {
-            config.mutexPriority =  Integer.parseInt(arr[21].trim());
+              mutexPriority = Integer.parseInt(arr[21].trim());
             }
 
-            //解析 伤害类型
+            // 解析 伤害类型
             if (!arr[22].trim().isEmpty()) {
-            config.rangeType =  Integer.parseInt(arr[22].trim());
+              rangeType = Integer.parseInt(arr[22].trim());
             }
 
-            //解析 buff影响
+            // 解析 buff影响
             if (!arr[23].trim().isEmpty()) {
-            config.buffInfluence = arr[23].trim();
+              buffInfluence = arr[23].trim();
             }
 
-            //解析 初始层数
+            // 解析 初始层数
             if (!arr[24].trim().isEmpty()) {
-            config.initStack =  Integer.parseInt(arr[24].trim());
+              initStack = Integer.parseInt(arr[24].trim());
             }
 
-            //解析 基础层数
+            // 解析 基础层数
             if (!arr[25].trim().isEmpty()) {
-            config.baseStack =  Integer.parseInt(arr[25].trim());
+              baseStack = Integer.parseInt(arr[25].trim());
             }
 
-            //解析 最大叠加层数
+            // 解析 最大叠加层数
             if (!arr[26].trim().isEmpty()) {
-            config.maxStack =  Integer.parseInt(arr[26].trim());
+              maxStack = Integer.parseInt(arr[26].trim());
             }
 
-            //解析 是否多个共存
+            // 解析 是否多个共存
             if (!arr[27].trim().isEmpty()) {
-            config.coexist =  Integer.parseInt(arr[27].trim());
+              coexist = Integer.parseInt(arr[27].trim());
             }
 
-            //解析 是否叠层刷新
+            // 解析 是否叠层刷新
             if (!arr[28].trim().isEmpty()) {
-            config.refreshStack =  Integer.parseInt(arr[28].trim());
+              refreshStack = Integer.parseInt(arr[28].trim());
             }
 
-            //解析 效果添加类型
+            // 解析 效果添加类型
             if (!arr[29].trim().isEmpty()) {
-            config.addProType =  Integer.parseInt(arr[29].trim());
+              addProType = Integer.parseInt(arr[29].trim());
             }
 
-            //解析 效果添加几率
+            // 解析 效果添加几率
             if (!arr[30].trim().isEmpty()) {
-            config.addPro =  Integer.parseInt(arr[30].trim());
+              addPro = Integer.parseInt(arr[30].trim());
             }
 
-            //解析 效果持续类型
+            // 解析 效果持续类型
             if (!arr[31].trim().isEmpty()) {
-            config.continuousType =  Integer.parseInt(arr[31].trim());
+              continuousType = Integer.parseInt(arr[31].trim());
             }
 
-            //解析 效果持续量
+            // 解析 效果持续量
             if (!arr[32].trim().isEmpty()) {
-            config.continuousValue = arr[32].trim();
+              continuousValue = arr[32].trim();
             }
 
-            //解析 效果生效时机
+            // 解析 效果生效时机
             if (!arr[33].trim().isEmpty()) {
-            config.triggerType =  Integer.parseInt(arr[33].trim());
+              triggerType = Integer.parseInt(arr[33].trim());
             }
 
-            //解析 生效间隔
+            // 解析 生效间隔
             if (!arr[34].trim().isEmpty()) {
-            config.triggerInterval =  Integer.parseInt(arr[34].trim());
+              triggerInterval = Integer.parseInt(arr[34].trim());
             }
 
-            //解析 效果生效几率
+            // 解析 效果生效几率
             if (!arr[35].trim().isEmpty()) {
-            config.triggerPro =  Integer.parseInt(arr[35].trim());
+              triggerPro = Integer.parseInt(arr[35].trim());
             }
 
-            //解析 单回合触发上限
+            // 解析 单回合触发上限
             if (!arr[36].trim().isEmpty()) {
-            config.triggerLimitPerTurn =  Integer.parseInt(arr[36].trim());
+              triggerLimitPerTurn = Integer.parseInt(arr[36].trim());
             }
 
-            //解析 效果生效消耗层数
+            // 解析 效果生效消耗层数
             if (!arr[37].trim().isEmpty()) {
-            config.triggerConsumeStack =  Integer.parseInt(arr[37].trim());
+              triggerConsumeStack = Integer.parseInt(arr[37].trim());
             }
 
-            //解析 生效标记过滤
+            // 解析 生效标记过滤
             if (!arr[38].trim().isEmpty()) {
-            config.entityTagFilters = arr[38].trim();
+              entityTagFilters = arr[38].trim();
             }
 
-            //解析 效果中断时机
+            // 解析 效果中断时机
             if (!arr[39].trim().isEmpty()) {
-            config.breakType = arr[39].trim();
+              breakType = arr[39].trim();
             }
 
-            //解析 中断后续效果几率
+            // 解析 中断后续效果几率
             if (!arr[40].trim().isEmpty()) {
-            config.breakEffectPro =  Integer.parseInt(arr[40].trim());
+              breakEffectPro = Integer.parseInt(arr[40].trim());
             }
 
-            //解析 中断后续效果
+            // 解析 中断后续效果
             if (!arr[41].trim().isEmpty()) {
-            config.breakEffects = arr[41].trim();
+              breakEffects = arr[41].trim();
             }
 
-            //解析 结束后续效果
+            // 解析 结束后续效果
             if (!arr[42].trim().isEmpty()) {
-            config.endEffects = arr[42].trim();
+              endEffects = arr[42].trim();
             }
 
-            //解析 结束后续效果
+            // 解析 结束后续效果
             if (!arr[43].trim().isEmpty()) {
-            config.consumeEffects = arr[43].trim();
+              consumeEffects = arr[43].trim();
             }
 
-            //解析 s能量获取系数
+            // 解析 s能量获取系数
             if (!arr[44].trim().isEmpty()) {
-            config.spCoa1 =  Integer.parseInt(arr[44].trim());
+              spCoa1 = Integer.parseInt(arr[44].trim());
             }
 
-            //解析 s能量获取系数
+            // 解析 s能量获取系数
             if (!arr[45].trim().isEmpty()) {
-            config.spCoa2 =  Integer.parseInt(arr[45].trim());
+              spCoa2 = Integer.parseInt(arr[45].trim());
             }
 
-            //解析 效果开始表现
+            // 解析 效果开始表现
             if (!arr[46].trim().isEmpty()) {
-            config.startPerformance = arr[46].trim();
+              startPerformance = arr[46].trim();
             }
 
-            //解析 效果持续表现
+            // 解析 效果持续表现
             if (!arr[47].trim().isEmpty()) {
-            config.runPerformance = arr[47].trim();
+              runPerformance = arr[47].trim();
             }
 
-            //解析 效果中断表现
+            // 解析 效果中断表现
             if (!arr[48].trim().isEmpty()) {
-            config.breakPerformance = arr[48].trim();
+              breakPerformance = arr[48].trim();
             }
 
-            //解析 效果未命中表现
+            // 解析 效果未命中表现
             if (!arr[49].trim().isEmpty()) {
-            config.missPerformance = arr[49].trim();
+              missPerformance = arr[49].trim();
             }
 
-            //解析 效果结束表现
+            // 解析 效果结束表现
             if (!arr[50].trim().isEmpty()) {
-            config.endPerformance = arr[50].trim();
+              endPerformance = arr[50].trim();
             }
 
-            //解析 触发时长
+            // 解析 触发时长
             if (!arr[51].trim().isEmpty()) {
-            config.triggerLength =  Float.parseFloat(arr[51].trim());
+              triggerLength = Float.parseFloat(arr[51].trim());
             }
 
-            //解析 效果参数
+            // 解析 效果参数
             if (!arr[52].trim().isEmpty()) {
-            config.param_1 = arr[52].trim();
+              param_1 = arr[52].trim();
             }
 
-            //解析 效果参数
+            // 解析 效果参数
             if (!arr[53].trim().isEmpty()) {
-            config.param_2 = arr[53].trim();
+              param_2 = arr[53].trim();
             }
 
-            //解析 效果参数
+            // 解析 效果参数
             if (!arr[54].trim().isEmpty()) {
-            config.param_3 = arr[54].trim();
+              param_3 = arr[54].trim();
             }
 
-            //解析 效果参数
+            // 解析 效果参数
             if (!arr[55].trim().isEmpty()) {
-            config.param_4 = arr[55].trim();
+              param_4 = arr[55].trim();
             }
 
-            //解析 效果参数
+            // 解析 效果参数
             if (!arr[56].trim().isEmpty()) {
-            config.param_5 = arr[56].trim();
+              param_5 = arr[56].trim();
             }
 
-            //解析 效果参数
+            // 解析 效果参数
             if (!arr[57].trim().isEmpty()) {
-            config.param_6 = arr[57].trim();
+              param_6 = arr[57].trim();
             }
 
-            //解析 效果参数
+            // 解析 效果参数
             if (!arr[58].trim().isEmpty()) {
-            config.param_7 = arr[58].trim();
+              param_7 = arr[58].trim();
             }
 
-            //解析 效果参数
+            // 解析 效果参数
             if (!arr[59].trim().isEmpty()) {
-            config.param_8 = arr[59].trim();
+              param_8 = arr[59].trim();
             }
 
-            //解析 效果参数
+            // 解析 效果参数
             if (!arr[60].trim().isEmpty()) {
-            config.param_9 = arr[60].trim();
+              param_9 = arr[60].trim();
             }
 
-            //解析 效果参数
+            // 解析 效果参数
             if (!arr[61].trim().isEmpty()) {
-            config.param_10 = arr[61].trim();
+              param_10 = arr[61].trim();
             }
 
-            //解析 英雄id
+            // 解析 英雄id
             if (!arr[62].trim().isEmpty()) {
-            config.heroId =  Integer.parseInt(arr[62].trim());
+              heroId = Integer.parseInt(arr[62].trim());
             }
 
-            //解析 技能序列
+            // 解析 技能序列
             if (!arr[63].trim().isEmpty()) {
-            config.skillSequence =  Integer.parseInt(arr[63].trim());
+              skillSequence = Integer.parseInt(arr[63].trim());
             }
 
-            //解析 效果序列
+            // 解析 效果序列
             if (!arr[64].trim().isEmpty()) {
-            config.effectSequence =  Integer.parseInt(arr[64].trim());
+              effectSequence = Integer.parseInt(arr[64].trim());
             }
 
-            //解析 是否下次战斗保留
+            // 解析 是否下次战斗保留
             if (!arr[65].trim().isEmpty()) {
-            config.isReAdd =  Integer.parseInt(arr[65].trim());
+              isReAdd = Integer.parseInt(arr[65].trim());
             }
 
-            //解析 特效恢复信息
+            // 解析 特效恢复信息
             if (!arr[66].trim().isEmpty()) {
-            config.effectRenew = arr[66].trim();
+              effectRenew = arr[66].trim();
             }
 
-            //解析 模型展示
+            // 解析 模型展示
             if (!arr[67].trim().isEmpty()) {
-            config.modelPerformance = arr[67].trim();
+              modelPerformance = arr[67].trim();
             }
-
 
           } catch (Exception e) {
-            logger.error(
-                String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, line, e.getMessage()));
-            e.printStackTrace();
+            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
             throw new ConfigLoadException("Error parsing config file :" + fileName);
           }
+          SkillBuffConfig config = new SkillBuffConfig(id, effectType, targetType, name, description, icon, suitId, display, displayType, targetTypeEx, targetTypeEx2, originSkillGroupId, banPassiveType, isPassive, isCircuit, isTriggerCircuit, isTriggerPassiveSkill, casterStrikeFlyTriggerFlag, targetStrikeFlyTriggerFlag, targetStrikeFlyAddFlag, mutexType, mutexPriority, rangeType, buffInfluence, initStack, baseStack, maxStack, coexist, refreshStack, addProType, addPro, continuousType, continuousValue, triggerType, triggerInterval, triggerPro, triggerLimitPerTurn, triggerConsumeStack, entityTagFilters, breakType, breakEffectPro, breakEffects, endEffects, consumeEffects, spCoa1, spCoa2, startPerformance, runPerformance, breakPerformance, missPerformance, endPerformance, triggerLength, param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9, param_10, heroId, skillSequence, effectSequence, isReAdd, effectRenew, modelPerformance);
           config.afterLoad();
-          configList.add(config);
-          configMap.put(config.id, config);
+          newList.add(config);
+          newMap.put(config.id, config);
         }
+        checker.checkAfterParse(logger, newList);
+        configList = List.copyOf(newList);
+        configMap = Map.copyOf(newMap);
         afterLoad();
       } catch (IOException e) {
-        e.printStackTrace();
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }
     }
 
     @Override
-    protected void clear() {
-
-      configList.clear();
-      configMap.clear();
-
+    public void clear() {
+      configList = List.of();
+      configMap = Map.of();
       // @@@@@自定义clear方法开始区@@@@@
-
 
       // @@@@@自定义clear方法结束区@@@@@
     }
 
     private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       String[] parts = value.split(",");
       List<Integer> result = new ArrayList<>();
       for (String part : parts) {
-        try {
-          result.add(Integer.parseInt(part.trim()));
-        } catch (NumberFormatException e) {
-          // 如果不是数字，则跳过
-        }
+        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
       }
       return result;
     }
 
     private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<Integer, Integer>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            try {
-              Integer key = Integer.parseInt(keyStr);
-              Integer val = Integer.parseInt(valueStr);
-              result.add(new KV<>(key, val));
-            } catch (NumberFormatException e) {
-              // 如果不是数字，则跳过
-            }
-          }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) {
+          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
         }
       }
       return result;
     }
 
     private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<String, String>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            result.add(new KV<>(keyStr, valueStr));
-          }
-        }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
       }
       return result;
     }
@@ -509,17 +560,17 @@ public class SkillBuffConfigManager implements InterfaceConfigManagerProxy {
     public Map<Integer, SkillBuffConfig> getConfigMap() {
       return configMap;
     }
+
     @Override
     public String getConfigFileName() {
       return "skillBuff.txt";
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
 
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

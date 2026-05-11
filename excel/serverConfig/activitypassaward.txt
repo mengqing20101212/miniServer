@@ -1,4 +1,5 @@
-id	scheDuling	level	payLevel	rechargeShopId	score	freeGift	freeGiftShow	payGift	payGiftShow	redirectionId	
+#fields	id	scheDuling	level	payLevel	rechargeShopId	score	freeGift	freeGiftShow	payGift	payGiftShow	redirectionId
+#types	INT	INT	INT	INT	INT	INT	INT	INT	INT	INT	INT
 1	100	1	1120020	20109	10	20000443	20000443	20000445	20000445	0
 2	100	2	1120020	20109	24	20000443	20000443	20000444	20000444	0
 3	100	3	1120020	20109	42	20000443	20000443	20000444	20000444	0

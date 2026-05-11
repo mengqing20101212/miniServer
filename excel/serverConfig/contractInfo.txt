@@ -1,3 +1,4 @@
-id	welfareId	contractType	item	num	contractNum	dropId	sumAwardId	desc	
+#fields	id	welfareId	contractType	item	num	contractNum	dropId	sumAwardId	desc
+#types	INT	INT	INT	INT	INT	INT	INT	STRING	STRING
 1	1	1	1120110	1	1	501	 	投产1次
 2	1	1	1120110	10	10	501	 	投产10次

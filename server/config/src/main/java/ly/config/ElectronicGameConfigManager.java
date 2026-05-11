@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import ly.utils.KV;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
+import ly.utils.KV;
 import org.slf4j.Logger;
 
 /*
@@ -20,23 +20,17 @@ import org.slf4j.Logger;
  * File: ElectronicGameConfigManager
  */
 public class ElectronicGameConfigManager implements InterfaceConfigManagerProxy {
-  AtomicBoolean switched = new AtomicBoolean(false);
+  private static final AtomicBoolean switched = new AtomicBoolean(false);
   private static final ElectronicGameConfigManager instance = new ElectronicGameConfigManager();
-  private static final ElectronicGameConfigManagerImpl instanceImplA =
-      new ElectronicGameConfigManagerImpl();
-  private static final ElectronicGameConfigManagerImpl instanceImplB =
-      new ElectronicGameConfigManagerImpl();
-
-  public boolean isSwitched() {
-    return switched.get();
-  }
+  private static final ElectronicGameConfigManagerImpl instanceImplA = new ElectronicGameConfigManagerImpl();
+  private static final ElectronicGameConfigManagerImpl instanceImplB = new ElectronicGameConfigManagerImpl();
 
   public static ElectronicGameConfigManagerImpl getInstance() {
-    if (instance.isSwitched()) {
-      return instanceImplA;
-    } else {
-      return instanceImplB;
-    }
+    return switched.get() ? instanceImplA : instanceImplB;
+  }
+
+  private static ElectronicGameConfigManagerImpl getStandby() {
+    return switched.get() ? instanceImplB : instanceImplA;
   }
 
   @Override
@@ -44,315 +38,343 @@ public class ElectronicGameConfigManager implements InterfaceConfigManagerProxy 
     getInstance().reload(logger, configDir);
   }
 
+  @Override
+  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
+    getStandby().reload(logger, configDir);
+  }
+
+  @Override
+  public AbstractConfigManger switchConfig() {
+    ElectronicGameConfigManagerImpl oldActive = getInstance();
+    switched.set(!switched.get());
+    return oldActive;
+  }
+
+  @Override
+  public String getConfigFileName() {
+    return getInstance().getConfigFileName();
+  }
+
   public static class ElectronicGameConfigManagerImpl extends AbstractConfigManger {
-
-    List<ElectronicGameConfig> configList = new ArrayList<ElectronicGameConfig>();
-    Map<Integer, ElectronicGameConfig> configMap = new HashMap<Integer, ElectronicGameConfig>();
-
+    private List<ElectronicGameConfig> configList = List.of();
+    private Map<Integer, ElectronicGameConfig> configMap = Map.of();
 
     // @@@@@自定义属性开始区@@@@@
 
     // @@@@@自定义属性结束区@@@@@
 
     @Override
-    protected void reload(Logger logger, String configDir) throws ConfigLoadException {
+    public void reload(Logger logger, String configDir) throws ConfigLoadException {
       String fileName = configDir + File.separator + getConfigFileName();
       File file = new File(fileName);
-      clear();
       if (!file.exists()) {
         logger.error(fileName + " does not exist");
         throw new ConfigLoadException("Config file does not exist :" + fileName);
       }
+      ElectronicGameConfigChecker checker = new ElectronicGameConfigChecker();
+      checker.checkHeader(logger, configDir);
+      List<ElectronicGameConfig> newList = new ArrayList<>();
+      Map<Integer, ElectronicGameConfig> newMap = new HashMap<>();
       try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String line;
-        br.readLine(); //先读取一行表头 
-        while ((line = br.readLine()) != null) { // 按行读取
-          String[] arr = line.split("\t");
-          ElectronicGameConfig config = new ElectronicGameConfig();
+        String rowText;
+        br.readLine();
+        br.readLine();
+        while ((rowText = br.readLine()) != null) {
+          if (rowText.isBlank()) { continue; }
+          String[] arr = rowText.split("\\t", -1);
+          if (arr.length < 39) {
+            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
+          }
+          int id = 0;
+          String duan = null;
+          String duanBigName = null;
+          int duanBig = 0;
+          int duanSmall = 0;
+          int duanIconBig = 0;
+          int duanIconSmall = 0;
+          int starNum = 0;
+          int starCollect = 0;
+          float eloKValue = 0F;
+          int scoreMax = 0;
+          int scoreProtection = 0;
+          int isScoreProtection = 0;
+          int winningStreak = 0;
+          int dropProtection = 0;
+          int duanProtection = 0;
+          int bestMatchScore = 0;
+          int bestMatchTime = 0;
+          int bestMatchStar = 0;
+          int fuzzyMatchScore = 0;
+          int fuzzyMatchTime = 0;
+          int fuzzyMatchStar = 0;
+          int leastMatchScore = 0;
+          int leastMatchTime = 0;
+          int leastMatchStar = 0;
+          int isTimeOutRebotMatch = 0;
+          int isLoseRobotMatch = 0;
+          int isPick = 0;
+          int winReward = 0;
+          int loseReward = 0;
+          int honorLimit = 0;
+          String awardWeek = null;
+          String awardWeekPre = null;
+          String bossTimeSetting = null;
+          int robotPool = 0;
+          int fairSceneMatch1 = 0;
+          int SceneMatch3v3 = 0;
+          int drop = 0;
+          int dropShow = 0;
           try {
-            //解析 编号
+            // 解析 编号
             if (!arr[0].trim().isEmpty()) {
-            config.id =  Integer.parseInt(arr[0].trim());
+              id = Integer.parseInt(arr[0].trim());
             }
 
-            //解析 段位
+            // 解析 段位
             if (!arr[1].trim().isEmpty()) {
-            config.duan = arr[1].trim();
+              duan = arr[1].trim();
             }
 
-            //解析 大段名
+            // 解析 大段名
             if (!arr[2].trim().isEmpty()) {
-            config.duanBigName = arr[2].trim();
+              duanBigName = arr[2].trim();
             }
 
-            //解析 大段位
+            // 解析 大段位
             if (!arr[3].trim().isEmpty()) {
-            config.duanBig =  Integer.parseInt(arr[3].trim());
+              duanBig = Integer.parseInt(arr[3].trim());
             }
 
-            //解析 小段位
+            // 解析 小段位
             if (!arr[4].trim().isEmpty()) {
-            config.duanSmall =  Integer.parseInt(arr[4].trim());
+              duanSmall = Integer.parseInt(arr[4].trim());
             }
 
-            //解析 段位图标
+            // 解析 段位图标
             if (!arr[5].trim().isEmpty()) {
-            config.duanIconBig =  Integer.parseInt(arr[5].trim());
+              duanIconBig = Integer.parseInt(arr[5].trim());
             }
 
-            //解析 段位图标
+            // 解析 段位图标
             if (!arr[6].trim().isEmpty()) {
-            config.duanIconSmall =  Integer.parseInt(arr[6].trim());
+              duanIconSmall = Integer.parseInt(arr[6].trim());
             }
 
-            //解析 星级数量
+            // 解析 星级数量
             if (!arr[7].trim().isEmpty()) {
-            config.starNum =  Integer.parseInt(arr[7].trim());
+              starNum = Integer.parseInt(arr[7].trim());
             }
 
-            //解析 累积星数
+            // 解析 累积星数
             if (!arr[8].trim().isEmpty()) {
-            config.starCollect =  Integer.parseInt(arr[8].trim());
+              starCollect = Integer.parseInt(arr[8].trim());
             }
 
-            //解析 ELO分K值
+            // 解析 ELO分K值
             if (!arr[9].trim().isEmpty()) {
-            config.eloKValue =  Float.parseFloat(arr[9].trim());
+              eloKValue = Float.parseFloat(arr[9].trim());
             }
 
-            //解析 勇者积分上限
+            // 解析 勇者积分上限
             if (!arr[10].trim().isEmpty()) {
-            config.scoreMax =  Integer.parseInt(arr[10].trim());
+              scoreMax = Integer.parseInt(arr[10].trim());
             }
 
-            //解析 保星积分
+            // 解析 保星积分
             if (!arr[11].trim().isEmpty()) {
-            config.scoreProtection =  Integer.parseInt(arr[11].trim());
+              scoreProtection = Integer.parseInt(arr[11].trim());
             }
 
-            //解析 是否开启积分保星
+            // 解析 是否开启积分保星
             if (!arr[12].trim().isEmpty()) {
-            config.isScoreProtection =  Integer.parseInt(arr[12].trim());
+              isScoreProtection = Integer.parseInt(arr[12].trim());
             }
 
-            //解析 连胜加星
+            // 解析 连胜加星
             if (!arr[13].trim().isEmpty()) {
-            config.winningStreak =  Integer.parseInt(arr[13].trim());
+              winningStreak = Integer.parseInt(arr[13].trim());
             }
 
-            //解析 掉段保护
+            // 解析 掉段保护
             if (!arr[14].trim().isEmpty()) {
-            config.dropProtection =  Integer.parseInt(arr[14].trim());
+              dropProtection = Integer.parseInt(arr[14].trim());
             }
 
-            //解析 保大段
+            // 解析 保大段
             if (!arr[15].trim().isEmpty()) {
-            config.duanProtection =  Integer.parseInt(arr[15].trim());
+              duanProtection = Integer.parseInt(arr[15].trim());
             }
 
-            //解析 精确匹配分数
+            // 解析 精确匹配分数
             if (!arr[16].trim().isEmpty()) {
-            config.bestMatchScore =  Integer.parseInt(arr[16].trim());
+              bestMatchScore = Integer.parseInt(arr[16].trim());
             }
 
-            //解析 精确匹配时间
+            // 解析 精确匹配时间
             if (!arr[17].trim().isEmpty()) {
-            config.bestMatchTime =  Integer.parseInt(arr[17].trim());
+              bestMatchTime = Integer.parseInt(arr[17].trim());
             }
 
-            //解析 精确匹配星数
+            // 解析 精确匹配星数
             if (!arr[18].trim().isEmpty()) {
-            config.bestMatchStar =  Integer.parseInt(arr[18].trim());
+              bestMatchStar = Integer.parseInt(arr[18].trim());
             }
 
-            //解析 模糊匹配分数
+            // 解析 模糊匹配分数
             if (!arr[19].trim().isEmpty()) {
-            config.fuzzyMatchScore =  Integer.parseInt(arr[19].trim());
+              fuzzyMatchScore = Integer.parseInt(arr[19].trim());
             }
 
-            //解析 模糊匹配时间
+            // 解析 模糊匹配时间
             if (!arr[20].trim().isEmpty()) {
-            config.fuzzyMatchTime =  Integer.parseInt(arr[20].trim());
+              fuzzyMatchTime = Integer.parseInt(arr[20].trim());
             }
 
-            //解析 模糊匹配星数
+            // 解析 模糊匹配星数
             if (!arr[21].trim().isEmpty()) {
-            config.fuzzyMatchStar =  Integer.parseInt(arr[21].trim());
+              fuzzyMatchStar = Integer.parseInt(arr[21].trim());
             }
 
-            //解析 保底匹配分数
+            // 解析 保底匹配分数
             if (!arr[22].trim().isEmpty()) {
-            config.leastMatchScore =  Integer.parseInt(arr[22].trim());
+              leastMatchScore = Integer.parseInt(arr[22].trim());
             }
 
-            //解析 保底匹配时间
+            // 解析 保底匹配时间
             if (!arr[23].trim().isEmpty()) {
-            config.leastMatchTime =  Integer.parseInt(arr[23].trim());
+              leastMatchTime = Integer.parseInt(arr[23].trim());
             }
 
-            //解析 保底匹配星数
+            // 解析 保底匹配星数
             if (!arr[24].trim().isEmpty()) {
-            config.leastMatchStar =  Integer.parseInt(arr[24].trim());
+              leastMatchStar = Integer.parseInt(arr[24].trim());
             }
 
-            //解析 是否超时保底匹配机器人
+            // 解析 是否超时保底匹配机器人
             if (!arr[25].trim().isEmpty()) {
-            config.isTimeOutRebotMatch =  Integer.parseInt(arr[25].trim());
+              isTimeOutRebotMatch = Integer.parseInt(arr[25].trim());
             }
 
-            //解析 是否战败保底匹配机器人
+            // 解析 是否战败保底匹配机器人
             if (!arr[26].trim().isEmpty()) {
-            config.isLoseRobotMatch =  Integer.parseInt(arr[26].trim());
+              isLoseRobotMatch = Integer.parseInt(arr[26].trim());
             }
 
-            //解析 是否轮选
+            // 解析 是否轮选
             if (!arr[27].trim().isEmpty()) {
-            config.isPick =  Integer.parseInt(arr[27].trim());
+              isPick = Integer.parseInt(arr[27].trim());
             }
 
-            //解析 战斗胜利荣誉
+            // 解析 战斗胜利荣誉
             if (!arr[28].trim().isEmpty()) {
-            config.winReward =  Integer.parseInt(arr[28].trim());
+              winReward = Integer.parseInt(arr[28].trim());
             }
 
-            //解析 战斗失败荣誉
+            // 解析 战斗失败荣誉
             if (!arr[29].trim().isEmpty()) {
-            config.loseReward =  Integer.parseInt(arr[29].trim());
+              loseReward = Integer.parseInt(arr[29].trim());
             }
 
-            //解析 每周荣誉上限
+            // 解析 每周荣誉上限
             if (!arr[30].trim().isEmpty()) {
-            config.honorLimit =  Integer.parseInt(arr[30].trim());
+              honorLimit = Integer.parseInt(arr[30].trim());
             }
 
-            //解析 每周结算奖励
+            // 解析 每周结算奖励
             if (!arr[31].trim().isEmpty()) {
-            config.awardWeek = arr[31].trim();
+              awardWeek = arr[31].trim();
             }
 
-            //解析 每周结算奖励预览
+            // 解析 每周结算奖励预览
             if (!arr[32].trim().isEmpty()) {
-            config.awardWeekPre = arr[32].trim();
+              awardWeekPre = arr[32].trim();
             }
 
-            //解析 匹配服务器
+            // 解析 匹配服务器
             if (!arr[33].trim().isEmpty()) {
-            config.bossTimeSetting = arr[33].trim();
+              bossTimeSetting = arr[33].trim();
             }
 
-            //解析 对应机器人范围
+            // 解析 对应机器人范围
             if (!arr[34].trim().isEmpty()) {
-            config.robotPool =  Integer.parseInt(arr[34].trim());
+              robotPool = Integer.parseInt(arr[34].trim());
             }
 
-            //解析 对应场次
+            // 解析 对应场次
             if (!arr[35].trim().isEmpty()) {
-            config.fairSceneMatch1 =  Integer.parseInt(arr[35].trim());
+              fairSceneMatch1 = Integer.parseInt(arr[35].trim());
             }
 
-            //解析 对应场次
+            // 解析 对应场次
             if (!arr[36].trim().isEmpty()) {
-            config.SceneMatch3v3 =  Integer.parseInt(arr[36].trim());
+              SceneMatch3v3 = Integer.parseInt(arr[36].trim());
             }
 
-            //解析 段位奖励
+            // 解析 段位奖励
             if (!arr[37].trim().isEmpty()) {
-            config.drop =  Integer.parseInt(arr[37].trim());
+              drop = Integer.parseInt(arr[37].trim());
             }
 
-            //解析 段位奖励前端
+            // 解析 段位奖励前端
             if (!arr[38].trim().isEmpty()) {
-            config.dropShow =  Integer.parseInt(arr[38].trim());
+              dropShow = Integer.parseInt(arr[38].trim());
             }
-
 
           } catch (Exception e) {
-            logger.error(
-                String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, line, e.getMessage()));
-            e.printStackTrace();
+            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
             throw new ConfigLoadException("Error parsing config file :" + fileName);
           }
+          ElectronicGameConfig config = new ElectronicGameConfig(id, duan, duanBigName, duanBig, duanSmall, duanIconBig, duanIconSmall, starNum, starCollect, eloKValue, scoreMax, scoreProtection, isScoreProtection, winningStreak, dropProtection, duanProtection, bestMatchScore, bestMatchTime, bestMatchStar, fuzzyMatchScore, fuzzyMatchTime, fuzzyMatchStar, leastMatchScore, leastMatchTime, leastMatchStar, isTimeOutRebotMatch, isLoseRobotMatch, isPick, winReward, loseReward, honorLimit, awardWeek, awardWeekPre, bossTimeSetting, robotPool, fairSceneMatch1, SceneMatch3v3, drop, dropShow);
           config.afterLoad();
-          configList.add(config);
-          configMap.put(config.id, config);
+          newList.add(config);
+          newMap.put(config.id, config);
         }
+        checker.checkAfterParse(logger, newList);
+        configList = List.copyOf(newList);
+        configMap = Map.copyOf(newMap);
         afterLoad();
       } catch (IOException e) {
-        e.printStackTrace();
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }
     }
 
     @Override
-    protected void clear() {
-
-      configList.clear();
-      configMap.clear();
-
+    public void clear() {
+      configList = List.of();
+      configMap = Map.of();
       // @@@@@自定义clear方法开始区@@@@@
-
 
       // @@@@@自定义clear方法结束区@@@@@
     }
 
     private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       String[] parts = value.split(",");
       List<Integer> result = new ArrayList<>();
       for (String part : parts) {
-        try {
-          result.add(Integer.parseInt(part.trim()));
-        } catch (NumberFormatException e) {
-          // 如果不是数字，则跳过
-        }
+        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
       }
       return result;
     }
 
     private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<Integer, Integer>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            try {
-              Integer key = Integer.parseInt(keyStr);
-              Integer val = Integer.parseInt(valueStr);
-              result.add(new KV<>(key, val));
-            } catch (NumberFormatException e) {
-              // 如果不是数字，则跳过
-            }
-          }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) {
+          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
         }
       }
       return result;
     }
 
     private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<String, String>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            result.add(new KV<>(keyStr, valueStr));
-          }
-        }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
       }
       return result;
     }
@@ -364,17 +386,17 @@ public class ElectronicGameConfigManager implements InterfaceConfigManagerProxy 
     public Map<Integer, ElectronicGameConfig> getConfigMap() {
       return configMap;
     }
+
     @Override
     public String getConfigFileName() {
       return "electronicGame.txt";
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
 
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

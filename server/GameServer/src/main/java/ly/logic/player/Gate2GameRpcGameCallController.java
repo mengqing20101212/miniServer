@@ -46,9 +46,6 @@ public class Gate2GameRpcGameCallController implements IGameController {
                         }
                         GamePlayer gamePlayer = new GamePlayer(context.session());
                         gamePlayer.setPlayerId(player.getPlayerId());
-                        gamePlayer.setLastSeq(seq);
-                        gamePlayer.setLastClientCmd(cmd);
-                        gamePlayer.setLastSid(req.getSid());
                         player.setGamePlayer(gamePlayer);
                         PlayerManager.getInstance().addOnlinePlayer(player);
                         player.statPlay();

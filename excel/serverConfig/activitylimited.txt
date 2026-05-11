@@ -1,4 +1,5 @@
-id	sidebar	presetsId	picture1	picture2	mustBuy1	mustBuy2	discountResID	titleResID	
+#fields	id	sidebar	presetsId	picture1	picture2	mustBuy1	mustBuy2	discountResID	titleResID
+#types	INT	STRING	INT	STRING	STRING	STRING	STRING	STRING	INT
 90007	招募礼|18元礼包	3	340810206	340810301,340810300,340810300	必买推荐：招募必备豪礼	 	 	0
 90009	友谊礼|12元礼包	1	340810103	 	刷本必备豪礼	礼包总价值38元	 	0
 90010	升级礼1|18元礼包	3	340810206	340810301,340810300,340810300	必买推荐：升级必备豪礼	 	 	0

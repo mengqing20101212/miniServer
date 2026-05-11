@@ -476,7 +476,6 @@ public class HeroControllerTest {
         public MockGamePlayer(long playerId) {
             super(new MockGameConnectSession());
             this.setPlayerId(playerId);
-            this.setAccount("test_account");
         }
 
         public void addSentMessage(int cmd, Object message) {

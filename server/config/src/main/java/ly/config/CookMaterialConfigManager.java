@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import ly.utils.KV;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
+import ly.utils.KV;
 import org.slf4j.Logger;
 
 /*
@@ -20,23 +20,17 @@ import org.slf4j.Logger;
  * File: CookMaterialConfigManager
  */
 public class CookMaterialConfigManager implements InterfaceConfigManagerProxy {
-  AtomicBoolean switched = new AtomicBoolean(false);
+  private static final AtomicBoolean switched = new AtomicBoolean(false);
   private static final CookMaterialConfigManager instance = new CookMaterialConfigManager();
-  private static final CookMaterialConfigManagerImpl instanceImplA =
-      new CookMaterialConfigManagerImpl();
-  private static final CookMaterialConfigManagerImpl instanceImplB =
-      new CookMaterialConfigManagerImpl();
-
-  public boolean isSwitched() {
-    return switched.get();
-  }
+  private static final CookMaterialConfigManagerImpl instanceImplA = new CookMaterialConfigManagerImpl();
+  private static final CookMaterialConfigManagerImpl instanceImplB = new CookMaterialConfigManagerImpl();
 
   public static CookMaterialConfigManagerImpl getInstance() {
-    if (instance.isSwitched()) {
-      return instanceImplA;
-    } else {
-      return instanceImplB;
-    }
+    return switched.get() ? instanceImplA : instanceImplB;
+  }
+
+  private static CookMaterialConfigManagerImpl getStandby() {
+    return switched.get() ? instanceImplB : instanceImplA;
   }
 
   @Override
@@ -44,210 +38,217 @@ public class CookMaterialConfigManager implements InterfaceConfigManagerProxy {
     getInstance().reload(logger, configDir);
   }
 
+  @Override
+  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
+    getStandby().reload(logger, configDir);
+  }
+
+  @Override
+  public AbstractConfigManger switchConfig() {
+    CookMaterialConfigManagerImpl oldActive = getInstance();
+    switched.set(!switched.get());
+    return oldActive;
+  }
+
+  @Override
+  public String getConfigFileName() {
+    return getInstance().getConfigFileName();
+  }
+
   public static class CookMaterialConfigManagerImpl extends AbstractConfigManger {
-
-    List<CookMaterialConfig> configList = new ArrayList<CookMaterialConfig>();
-    Map<Integer, CookMaterialConfig> configMap = new HashMap<Integer, CookMaterialConfig>();
-
+    private List<CookMaterialConfig> configList = List.of();
+    private Map<Integer, CookMaterialConfig> configMap = Map.of();
 
     // @@@@@自定义属性开始区@@@@@
 
     // @@@@@自定义属性结束区@@@@@
 
     @Override
-    protected void reload(Logger logger, String configDir) throws ConfigLoadException {
+    public void reload(Logger logger, String configDir) throws ConfigLoadException {
       String fileName = configDir + File.separator + getConfigFileName();
       File file = new File(fileName);
-      clear();
       if (!file.exists()) {
         logger.error(fileName + " does not exist");
         throw new ConfigLoadException("Config file does not exist :" + fileName);
       }
+      CookMaterialConfigChecker checker = new CookMaterialConfigChecker();
+      checker.checkHeader(logger, configDir);
+      List<CookMaterialConfig> newList = new ArrayList<>();
+      Map<Integer, CookMaterialConfig> newMap = new HashMap<>();
       try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String line;
-        br.readLine(); //先读取一行表头 
-        while ((line = br.readLine()) != null) { // 按行读取
-          String[] arr = line.split("\t");
-          CookMaterialConfig config = new CookMaterialConfig();
+        String rowText;
+        br.readLine();
+        br.readLine();
+        while ((rowText = br.readLine()) != null) {
+          if (rowText.isBlank()) { continue; }
+          String[] arr = rowText.split("\\t", -1);
+          if (arr.length < 18) {
+            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
+          }
+          int id = 0;
+          String name = null;
+          int type = 0;
+          int classify = 0;
+          int para = 0;
+          int star = 0;
+          int showId = 0;
+          int price = 0;
+          String note = null;
+          int rewardId = 0;
+          int rewardNum = 0;
+          int friendNum = 0;
+          int critRewardNum = 0;
+          int critFriendNum = 0;
+          int exRewardNum = 0;
+          int exFriendNum = 0;
+          String qteRewardNum = null;
+          String qteFriendNum = null;
           try {
-            //解析 编号
+            // 解析 编号
             if (!arr[0].trim().isEmpty()) {
-            config.id =  Integer.parseInt(arr[0].trim());
+              id = Integer.parseInt(arr[0].trim());
             }
 
-            //解析 名称
+            // 解析 名称
             if (!arr[1].trim().isEmpty()) {
-            config.name = arr[1].trim();
+              name = arr[1].trim();
             }
 
-            //解析 类型
+            // 解析 类型
             if (!arr[2].trim().isEmpty()) {
-            config.type =  Integer.parseInt(arr[2].trim());
+              type = Integer.parseInt(arr[2].trim());
             }
 
-            //解析 种类
+            // 解析 种类
             if (!arr[3].trim().isEmpty()) {
-            config.classify =  Integer.parseInt(arr[3].trim());
+              classify = Integer.parseInt(arr[3].trim());
             }
 
-            //解析 参数
+            // 解析 参数
             if (!arr[4].trim().isEmpty()) {
-            config.para =  Integer.parseInt(arr[4].trim());
+              para = Integer.parseInt(arr[4].trim());
             }
 
-            //解析 星级
+            // 解析 星级
             if (!arr[5].trim().isEmpty()) {
-            config.star =  Integer.parseInt(arr[5].trim());
+              star = Integer.parseInt(arr[5].trim());
             }
 
-            //解析 展示顺序
+            // 解析 展示顺序
             if (!arr[6].trim().isEmpty()) {
-            config.showId =  Integer.parseInt(arr[6].trim());
+              showId = Integer.parseInt(arr[6].trim());
             }
 
-            //解析 价值量
+            // 解析 价值量
             if (!arr[7].trim().isEmpty()) {
-            config.price =  Integer.parseInt(arr[7].trim());
+              price = Integer.parseInt(arr[7].trim());
             }
 
-            //解析 作用描述
+            // 解析 作用描述
             if (!arr[8].trim().isEmpty()) {
-            config.note = arr[8].trim();
+              note = arr[8].trim();
             }
 
-            //解析 奖励id
+            // 解析 奖励id
             if (!arr[9].trim().isEmpty()) {
-            config.rewardId =  Integer.parseInt(arr[9].trim());
+              rewardId = Integer.parseInt(arr[9].trim());
             }
 
-            //解析 奖励数量
+            // 解析 奖励数量
             if (!arr[10].trim().isEmpty()) {
-            config.rewardNum =  Integer.parseInt(arr[10].trim());
+              rewardNum = Integer.parseInt(arr[10].trim());
             }
 
-            //解析 好感度值
+            // 解析 好感度值
             if (!arr[11].trim().isEmpty()) {
-            config.friendNum =  Integer.parseInt(arr[11].trim());
+              friendNum = Integer.parseInt(arr[11].trim());
             }
 
-            //解析 暴击增加奖励数量
+            // 解析 暴击增加奖励数量
             if (!arr[12].trim().isEmpty()) {
-            config.critRewardNum =  Integer.parseInt(arr[12].trim());
+              critRewardNum = Integer.parseInt(arr[12].trim());
             }
 
-            //解析 暴击好感度增加值
+            // 解析 暴击好感度增加值
             if (!arr[13].trim().isEmpty()) {
-            config.critFriendNum =  Integer.parseInt(arr[13].trim());
+              critFriendNum = Integer.parseInt(arr[13].trim());
             }
 
-            //解析 口味奖励数量
+            // 解析 口味奖励数量
             if (!arr[14].trim().isEmpty()) {
-            config.exRewardNum =  Integer.parseInt(arr[14].trim());
+              exRewardNum = Integer.parseInt(arr[14].trim());
             }
 
-            //解析 口味奖励好感度
+            // 解析 口味奖励好感度
             if (!arr[15].trim().isEmpty()) {
-            config.exFriendNum =  Integer.parseInt(arr[15].trim());
+              exFriendNum = Integer.parseInt(arr[15].trim());
             }
 
-            //解析 qte奖励数量
+            // 解析 qte奖励数量
             if (!arr[16].trim().isEmpty()) {
-            config.qteRewardNum = arr[16].trim();
+              qteRewardNum = arr[16].trim();
             }
 
-            //解析 qte奖励好感度
+            // 解析 qte奖励好感度
             if (!arr[17].trim().isEmpty()) {
-            config.qteFriendNum = arr[17].trim();
+              qteFriendNum = arr[17].trim();
             }
-
 
           } catch (Exception e) {
-            logger.error(
-                String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, line, e.getMessage()));
-            e.printStackTrace();
+            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
             throw new ConfigLoadException("Error parsing config file :" + fileName);
           }
+          CookMaterialConfig config = new CookMaterialConfig(id, name, type, classify, para, star, showId, price, note, rewardId, rewardNum, friendNum, critRewardNum, critFriendNum, exRewardNum, exFriendNum, qteRewardNum, qteFriendNum);
           config.afterLoad();
-          configList.add(config);
-          configMap.put(config.id, config);
+          newList.add(config);
+          newMap.put(config.id, config);
         }
+        checker.checkAfterParse(logger, newList);
+        configList = List.copyOf(newList);
+        configMap = Map.copyOf(newMap);
         afterLoad();
       } catch (IOException e) {
-        e.printStackTrace();
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }
     }
 
     @Override
-    protected void clear() {
-
-      configList.clear();
-      configMap.clear();
-
+    public void clear() {
+      configList = List.of();
+      configMap = Map.of();
       // @@@@@自定义clear方法开始区@@@@@
-
 
       // @@@@@自定义clear方法结束区@@@@@
     }
 
     private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       String[] parts = value.split(",");
       List<Integer> result = new ArrayList<>();
       for (String part : parts) {
-        try {
-          result.add(Integer.parseInt(part.trim()));
-        } catch (NumberFormatException e) {
-          // 如果不是数字，则跳过
-        }
+        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
       }
       return result;
     }
 
     private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<Integer, Integer>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            try {
-              Integer key = Integer.parseInt(keyStr);
-              Integer val = Integer.parseInt(valueStr);
-              result.add(new KV<>(key, val));
-            } catch (NumberFormatException e) {
-              // 如果不是数字，则跳过
-            }
-          }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) {
+          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
         }
       }
       return result;
     }
 
     private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<String, String>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            result.add(new KV<>(keyStr, valueStr));
-          }
-        }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
       }
       return result;
     }
@@ -259,17 +260,17 @@ public class CookMaterialConfigManager implements InterfaceConfigManagerProxy {
     public Map<Integer, CookMaterialConfig> getConfigMap() {
       return configMap;
     }
+
     @Override
     public String getConfigFileName() {
       return "cookMaterial.txt";
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
 
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

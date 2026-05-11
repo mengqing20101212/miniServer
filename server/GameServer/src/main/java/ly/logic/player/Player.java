@@ -6,6 +6,8 @@ import com.google.protobuf.AbstractMessage;
 
 import ly.LoggerDef;
 import ly.logic.player.event.PlayerEventManager;
+import ly.logic.player.event.PlayerEventParam;
+import ly.logic.player.event.PlayerEventSource;
 import ly.logic.player.event.PlayerEventType;
 import ly.net.GamePlayer;
 import ly.net.packet.AbstractMessagePacket;
@@ -23,6 +25,7 @@ public class Player {
     private GamePlayer gamePlayer;
     private PlayerData playerData;
     private PlayerStatusEnum status;
+    private String loginToken;
 
     private final PlayerEventManager eventManager = new PlayerEventManager();
 
@@ -123,12 +126,25 @@ public class Player {
     }
 
     public String getToken() {
-        return gamePlayer.getToken();
+        return loginToken;
     }
 
-    // TODO  玩家事件分发 需要一个异步版本
+    public void setToken(String loginToken) {
+        this.loginToken = loginToken;
+    }
+
     public void dispatchEvent(PlayerEventType playerEventType, Object... args) {
-        eventManager.dispatchEvent(this, playerEventType, args);
+        dispatchEvent(PlayerEventSource.SELF, getPlayerId(), playerEventType, args);
+    }
+
+    public void dispatchEvent(PlayerEventSource source, long sourcePlayerId, PlayerEventType playerEventType, Object... args) {
+        PlayerEventParam param =
+                PlayerEventParam.of(this, playerEventType, source, sourcePlayerId, args);
+        if (gamePlayer == null) {
+            eventManager.dispatchEvent(param);
+            return;
+        }
+        gamePlayer.addEvent(param);
     }
 
     public long getCreateTime() {
@@ -157,7 +173,8 @@ public class Player {
         this.gamePlayer = gamePlayer;
         // GamePlayer 处理队列中的业务包时需要反向拿到 Player 上下文。
         if (gamePlayer != null) {
-            gamePlayer.setPlayer(this);
+            gamePlayer.bindPlayer(this);
+            eventManager.drainPendingEvents(gamePlayer::addEvent);
         }
     }
 
@@ -171,11 +188,14 @@ public class Player {
         try {
             while (true) {
                 try {
-                    eventManager.tickEvent();
-                    gamePlayer.tickPacket();
-                    if (gamePlayer.isEmpty()) {
-                        Thread.sleep(100);
+                    if (gamePlayer == null) {
+                        Thread.sleep(100L);
+                        continue;
                     }
+                    gamePlayer.tickWorkItem();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

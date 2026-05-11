@@ -1,4 +1,5 @@
-id	beizhu	question	type	answer1	answer2	answer3	rightAnswer	
+#fields	id	beizhu	question	type	answer1	answer2	answer3	rightAnswer
+#types	INT	STRING	STRING	INT	STRING	STRING	STRING	INT
 101	火男面1	英雄协会赋予埼玉的称号是什么？	1	秃头披风侠	披风侠	秃头超人	1
 102	火男面2	银色獠牙开创的武术流派叫什么？	1	旋风斩铁拳	流水岩碎拳	轰气空裂拳	2
 103	火男面3	灾害等级由高到低，以下排列正确的是：	1	神龙鬼虎狼	鬼龙神虎狼	神鬼龙虎狼	1

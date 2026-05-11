@@ -1,4 +1,5 @@
-id	scheDuling	questId	missinType	minLevel	maxLevel	name	point	redirectionId	goundId	weights	
+#fields	id	scheDuling	questId	missinType	minLevel	maxLevel	name	point	redirectionId	goundId	weights
+#types	INT	INT	INT	INT	INT	INT	STRING	INT	INT	INT	INT
 1	100	1500	1	1	80	通关模拟训练10次	20	17	1	10
 2	100	1501	1	1	80	通关英雄试炼10次	20	18	2	11
 3	100	1502	1	1	80	料理5次	20	64	3	12

@@ -1,18 +1,18 @@
 package ly.logic.hero.module;
 
-import com.baidu.bjf.remoting.protobuf.FieldType;
-import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
-import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
-import com.baidu.bjf.remoting.protobuf.annotation.EnableZigZap;
-import ly.logic.player.AbstractModule;
-import ly.logic.player.ModuleEnum;
-
-import ly.logic.player.event.PlayerEventParam;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.annotation.EnableZigZap;
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
+
+import ly.config.HeroInfoConfig;
+import ly.config.HeroInfoConfigManager;
+import ly.logic.player.AbstractModule;
+import ly.logic.player.event.PlayerEventParam;
 import ly.logic.player.event.PlayerEventType;
 
 /**
@@ -85,6 +85,14 @@ public class HeroModule extends AbstractModule {
         if (getHero(heroUid) != null) {
             return null;
         }
+        HeroInfoConfig heroInfoConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(heroId);
+        if (heroInfoConfig == null) {
+            return null;
+        }
+        if (heroInfoConfig.id != heroId) {
+            return null;
+        }
+
         HeroBean hero = new HeroBean();
         hero.heroUid = heroUid;
         hero.heroId = heroId;

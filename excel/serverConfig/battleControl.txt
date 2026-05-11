@@ -1,4 +1,5 @@
-id	name	lineupId	isOnlineBattle	loadingTime	readyTime	changeHeroTime	isShare	chaoiceWaitTime	isSaveDate	
+#fields	id	name	lineupId	isOnlineBattle	loadingTime	readyTime	changeHeroTime	isShare	chaoiceWaitTime	isSaveDate
+#types	INT	STRING	INT	INT	INT	INT	INT	INT	INT	INT
 1	全息调查	0	1	120	40	0	0	30	0
 2	怪人研究所	31	1	120	5	0	0	30	0
 3	英雄试炼	31	1	120	5	0	0	30	0

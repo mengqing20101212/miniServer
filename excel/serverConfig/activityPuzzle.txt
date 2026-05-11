@@ -1,2 +1,3 @@
-id	Puzzleid	lossItem	poolGift	
+#fields	id	Puzzleid	lossItem	poolGift
+#types	INT	INT	STRING	INT
 1	1	1,1,1,1,1,1,1,1,1,1,1,1	20000656

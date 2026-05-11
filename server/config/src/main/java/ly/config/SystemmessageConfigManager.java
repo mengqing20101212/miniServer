@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import ly.utils.KV;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
+import ly.utils.KV;
 import org.slf4j.Logger;
 
 /*
@@ -20,23 +20,17 @@ import org.slf4j.Logger;
  * File: SystemmessageConfigManager
  */
 public class SystemmessageConfigManager implements InterfaceConfigManagerProxy {
-  AtomicBoolean switched = new AtomicBoolean(false);
+  private static final AtomicBoolean switched = new AtomicBoolean(false);
   private static final SystemmessageConfigManager instance = new SystemmessageConfigManager();
-  private static final SystemmessageConfigManagerImpl instanceImplA =
-      new SystemmessageConfigManagerImpl();
-  private static final SystemmessageConfigManagerImpl instanceImplB =
-      new SystemmessageConfigManagerImpl();
-
-  public boolean isSwitched() {
-    return switched.get();
-  }
+  private static final SystemmessageConfigManagerImpl instanceImplA = new SystemmessageConfigManagerImpl();
+  private static final SystemmessageConfigManagerImpl instanceImplB = new SystemmessageConfigManagerImpl();
 
   public static SystemmessageConfigManagerImpl getInstance() {
-    if (instance.isSwitched()) {
-      return instanceImplA;
-    } else {
-      return instanceImplB;
-    }
+    return switched.get() ? instanceImplA : instanceImplB;
+  }
+
+  private static SystemmessageConfigManagerImpl getStandby() {
+    return switched.get() ? instanceImplB : instanceImplA;
   }
 
   @Override
@@ -44,165 +38,163 @@ public class SystemmessageConfigManager implements InterfaceConfigManagerProxy {
     getInstance().reload(logger, configDir);
   }
 
+  @Override
+  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
+    getStandby().reload(logger, configDir);
+  }
+
+  @Override
+  public AbstractConfigManger switchConfig() {
+    SystemmessageConfigManagerImpl oldActive = getInstance();
+    switched.set(!switched.get());
+    return oldActive;
+  }
+
+  @Override
+  public String getConfigFileName() {
+    return getInstance().getConfigFileName();
+  }
+
   public static class SystemmessageConfigManagerImpl extends AbstractConfigManger {
-
-    List<SystemmessageConfig> configList = new ArrayList<SystemmessageConfig>();
-    Map<Integer, SystemmessageConfig> configMap = new HashMap<Integer, SystemmessageConfig>();
-
+    private List<SystemmessageConfig> configList = List.of();
+    private Map<Integer, SystemmessageConfig> configMap = Map.of();
 
     // @@@@@自定义属性开始区@@@@@
 
     // @@@@@自定义属性结束区@@@@@
 
     @Override
-    protected void reload(Logger logger, String configDir) throws ConfigLoadException {
+    public void reload(Logger logger, String configDir) throws ConfigLoadException {
       String fileName = configDir + File.separator + getConfigFileName();
       File file = new File(fileName);
-      clear();
       if (!file.exists()) {
         logger.error(fileName + " does not exist");
         throw new ConfigLoadException("Config file does not exist :" + fileName);
       }
+      SystemmessageConfigChecker checker = new SystemmessageConfigChecker();
+      checker.checkHeader(logger, configDir);
+      List<SystemmessageConfig> newList = new ArrayList<>();
+      Map<Integer, SystemmessageConfig> newMap = new HashMap<>();
       try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String line;
-        br.readLine(); //先读取一行表头 
-        while ((line = br.readLine()) != null) { // 按行读取
-          String[] arr = line.split("\t");
-          SystemmessageConfig config = new SystemmessageConfig();
+        String rowText;
+        br.readLine();
+        br.readLine();
+        while ((rowText = br.readLine()) != null) {
+          if (rowText.isBlank()) { continue; }
+          String[] arr = rowText.split("\\t", -1);
+          if (arr.length < 9) {
+            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
+          }
+          String comment = null;
+          int id = 0;
+          int type = 0;
+          int item_type = 0;
+          int speed = 0;
+          int time = 0;
+          String message1 = null;
+          String message2 = null;
+          int delayTime = 0;
           try {
-            //解析 信息内容参数注释
+            // 解析 信息内容参数注释
             if (!arr[0].trim().isEmpty()) {
-            config.comment = arr[0].trim();
+              comment = arr[0].trim();
             }
 
-            //解析 信息id
+            // 解析 信息id
             if (!arr[1].trim().isEmpty()) {
-            config.id =  Integer.parseInt(arr[1].trim());
+              id = Integer.parseInt(arr[1].trim());
             }
 
-            //解析 信息类型
+            // 解析 信息类型
             if (!arr[2].trim().isEmpty()) {
-            config.type =  Integer.parseInt(arr[2].trim());
+              type = Integer.parseInt(arr[2].trim());
             }
 
-            //解析 物品类型
+            // 解析 物品类型
             if (!arr[3].trim().isEmpty()) {
-            config.item_type =  Integer.parseInt(arr[3].trim());
+              item_type = Integer.parseInt(arr[3].trim());
             }
 
-            //解析 滚动速度
+            // 解析 滚动速度
             if (!arr[4].trim().isEmpty()) {
-            config.speed =  Integer.parseInt(arr[4].trim());
+              speed = Integer.parseInt(arr[4].trim());
             }
 
-            //解析 时间
+            // 解析 时间
             if (!arr[5].trim().isEmpty()) {
-            config.time =  Integer.parseInt(arr[5].trim());
+              time = Integer.parseInt(arr[5].trim());
             }
 
-            //解析 信息内容
+            // 解析 信息内容
             if (!arr[6].trim().isEmpty()) {
-            config.message1 = arr[6].trim();
+              message1 = arr[6].trim();
             }
 
-            //解析 信息内容
+            // 解析 信息内容
             if (!arr[7].trim().isEmpty()) {
-            config.message2 = arr[7].trim();
+              message2 = arr[7].trim();
             }
 
-            //解析 延迟播放时间
+            // 解析 延迟播放时间
             if (!arr[8].trim().isEmpty()) {
-            config.delayTime =  Integer.parseInt(arr[8].trim());
+              delayTime = Integer.parseInt(arr[8].trim());
             }
-
 
           } catch (Exception e) {
-            logger.error(
-                String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, line, e.getMessage()));
-            e.printStackTrace();
+            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
             throw new ConfigLoadException("Error parsing config file :" + fileName);
           }
+          SystemmessageConfig config = new SystemmessageConfig(comment, id, type, item_type, speed, time, message1, message2, delayTime);
           config.afterLoad();
-          configList.add(config);
-          configMap.put(config.id, config);
+          newList.add(config);
+          newMap.put(config.id, config);
         }
+        checker.checkAfterParse(logger, newList);
+        configList = List.copyOf(newList);
+        configMap = Map.copyOf(newMap);
         afterLoad();
       } catch (IOException e) {
-        e.printStackTrace();
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }
     }
 
     @Override
-    protected void clear() {
-
-      configList.clear();
-      configMap.clear();
-
+    public void clear() {
+      configList = List.of();
+      configMap = Map.of();
       // @@@@@自定义clear方法开始区@@@@@
-
 
       // @@@@@自定义clear方法结束区@@@@@
     }
 
     private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       String[] parts = value.split(",");
       List<Integer> result = new ArrayList<>();
       for (String part : parts) {
-        try {
-          result.add(Integer.parseInt(part.trim()));
-        } catch (NumberFormatException e) {
-          // 如果不是数字，则跳过
-        }
+        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
       }
       return result;
     }
 
     private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<Integer, Integer>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            try {
-              Integer key = Integer.parseInt(keyStr);
-              Integer val = Integer.parseInt(valueStr);
-              result.add(new KV<>(key, val));
-            } catch (NumberFormatException e) {
-              // 如果不是数字，则跳过
-            }
-          }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) {
+          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
         }
       }
       return result;
     }
 
     private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<String, String>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            result.add(new KV<>(keyStr, valueStr));
-          }
-        }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
       }
       return result;
     }
@@ -214,17 +206,17 @@ public class SystemmessageConfigManager implements InterfaceConfigManagerProxy {
     public Map<Integer, SystemmessageConfig> getConfigMap() {
       return configMap;
     }
+
     @Override
     public String getConfigFileName() {
       return "systemmessage.txt";
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
 
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

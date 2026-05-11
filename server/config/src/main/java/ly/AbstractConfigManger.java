@@ -24,5 +24,10 @@ public abstract class AbstractConfigManger {
 
   protected abstract void clear();
 
+  /** 释放当前 Impl 持有的配置数据。 */
+  public final void release() {
+    clear();
+  }
+
   protected abstract void afterLoad();
 }

@@ -1,75 +1,92 @@
 package ly.config;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
+import ly.utils.KV;
 
 /***
  * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
  */
-public class CookMaterialConfig { 
-  /**编号*/ 
-   public int id;
+public class CookMaterialConfig {
+  /**编号*/
+  public final int id;
 
-  /**名称*/ 
-   public String name;
+  /**名称*/
+  public final String name;
 
-  /**类型*/ 
-   public int type;
+  /**类型*/
+  public final int type;
 
-  /**种类*/ 
-   public int classify;
+  /**种类*/
+  public final int classify;
 
-  /**参数*/ 
-   public int para;
+  /**参数*/
+  public final int para;
 
-  /**星级*/ 
-   public int star;
+  /**星级*/
+  public final int star;
 
-  /**展示顺序*/ 
-   public int showId;
+  /**展示顺序*/
+  public final int showId;
 
-  /**价值量*/ 
-   public int price;
+  /**价值量*/
+  public final int price;
 
-  /**作用描述*/ 
-   public String note;
+  /**作用描述*/
+  public final String note;
 
-  /**奖励id*/ 
-   public int rewardId;
+  /**奖励id*/
+  public final int rewardId;
 
-  /**奖励数量*/ 
-   public int rewardNum;
+  /**奖励数量*/
+  public final int rewardNum;
 
-  /**好感度值*/ 
-   public int friendNum;
+  /**好感度值*/
+  public final int friendNum;
 
-  /**暴击增加奖励数量*/ 
-   public int critRewardNum;
+  /**暴击增加奖励数量*/
+  public final int critRewardNum;
 
-  /**暴击好感度增加值*/ 
-   public int critFriendNum;
+  /**暴击好感度增加值*/
+  public final int critFriendNum;
 
-  /**口味奖励数量*/ 
-   public int exRewardNum;
+  /**口味奖励数量*/
+  public final int exRewardNum;
 
-  /**口味奖励好感度*/ 
-   public int exFriendNum;
+  /**口味奖励好感度*/
+  public final int exFriendNum;
 
-  /**qte奖励数量*/ 
-   public String qteRewardNum;
+  /**qte奖励数量*/
+  public final String qteRewardNum;
 
-  /**qte奖励好感度*/ 
-   public String qteFriendNum;
+  /**qte奖励好感度*/
+  public final String qteFriendNum;
 
-// @@@@@自定义属性开始区@@@@@ 
+  // @@@@@自定义属性开始区@@@@@
 
- // @@@@@自定义属性结束区@@@@@ 
+  // @@@@@自定义属性结束区@@@@@
 
-// @@@@@自定义方法开始区@@@@@ 
+  public CookMaterialConfig(int id, String name, int type, int classify, int para, int star, int showId, int price, String note, int rewardId, int rewardNum, int friendNum, int critRewardNum, int critFriendNum, int exRewardNum, int exFriendNum, String qteRewardNum, String qteFriendNum) {
+    this.id = id;
+    this.name = name;
+    this.type = type;
+    this.classify = classify;
+    this.para = para;
+    this.star = star;
+    this.showId = showId;
+    this.price = price;
+    this.note = note;
+    this.rewardId = rewardId;
+    this.rewardNum = rewardNum;
+    this.friendNum = friendNum;
+    this.critRewardNum = critRewardNum;
+    this.critFriendNum = critFriendNum;
+    this.exRewardNum = exRewardNum;
+    this.exFriendNum = exFriendNum;
+    this.qteRewardNum = qteRewardNum;
+    this.qteFriendNum = qteFriendNum;
+  }
+
+  // @@@@@自定义方法开始区@@@@@
 public void afterLoad() {}
-
-
- // @@@@@自定义方法结束区@@@@@ 
-
- }
+  // @@@@@自定义方法结束区@@@@@
+}

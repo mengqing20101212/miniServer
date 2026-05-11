@@ -48,6 +48,7 @@ public class NacosService {
     int a = 0;
     private String currentNacosUrl;
     private String currentNamespace;
+    private ConfigService nacosConfigService;
 
     /***nacos 请求操作最大超时时间戳*/
     static final long MAX_TIME_OUT = 5000;
@@ -84,6 +85,7 @@ public class NacosService {
             properties.setProperty(PropertyKeyConst.NAMESPACE, env);
             properties.setProperty(PropertyKeyConst.CONTEXT_PATH, "/");
             ConfigService configService = NacosFactory.createConfigService(properties);
+            nacosConfigService = configService;
             // 解析 服务器配置
             getServerConfig(configService, serverType, serverId);
 
@@ -231,6 +233,36 @@ public class NacosService {
 
     public Map<String, NacosServerNode> getNodeMap() {
         return nodeMap;
+    }
+
+    /** 当前服务全部启动成功后再监听配表热更，避免端口未绑定时提前切换或回包失败。 */
+    public void startConfigHotUpdateListener() throws NacosException {
+        if (nacosConfigService == null) {
+            throw new NacosException(NacosException.CLIENT_INVALID_PARAM, "Nacos ConfigService 未初始化");
+        }
+        nacosConfigService.addListener(
+                "config-hot-update",
+                ServerContext.ENV,
+                new Listener() {
+                    @Override
+                    public Executor getExecutor() {
+                        return executorService;
+                    }
+
+                    @Override
+                    public void receiveConfigInfo(String content) {
+                        ly.config.hotupdate.ConfigHotUpdateRuntime.handle(content);
+                    }
+                });
+        logger.info("配置热更监听启动成功, dataId=config-hot-update, group={}", ServerContext.ENV);
+    }
+
+    /** GM 发布热更指令到 Nacos，业务服监听后下载指定版本配表。 */
+    public boolean publishConfigHotUpdate(String content) throws NacosException {
+        if (nacosConfigService == null) {
+            throw new NacosException(NacosException.CLIENT_INVALID_PARAM, "Nacos ConfigService 未初始化");
+        }
+        return nacosConfigService.publishConfig("config-hot-update", ServerContext.ENV, content);
     }
 
     public List<NacosServerNode> getNodeList(ServerTypeEnum serverType) {

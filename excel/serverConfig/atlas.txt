@@ -1,4 +1,5 @@
-id	sprite	atlas	des	
+#fields	id	sprite	atlas	des
+#types	INT	STRING	INT	STRING
 40200001	rolelist_bg_01	45000005	品质白底
 40200002	rolelist_bg_02	45000005	品质绿底
 40200003	rolelist_bg_03	45000005	品质蓝底

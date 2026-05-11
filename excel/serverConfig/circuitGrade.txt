@@ -1,4 +1,5 @@
-id	description	quality	lv1	lv2	lv3	lv4	lv5	lv6	lv7	lv8	lv9	lv10	lv11	lv12	lv13	lv14	lv15	
+#fields	id	description	quality	lv1	lv2	lv3	lv4	lv5	lv6	lv7	lv8	lv9	lv10	lv11	lv12	lv13	lv14	lv15
+#types	INT	STRING	INT	INT	INT	INT	INT	INT	INT	INT	INT	INT	INT	INT	INT	INT	INT	INT
 4101100	主核：幸运	1	10	15	20	0	0	0	0	0	0	0	0	0	0	0	0
 4101200	主核：幸运	2	11	17	23	29	35	41	0	0	0	0	0	0	0	0	0
 4101300	主核：幸运	3	12	22	32	42	52	62	72	82	92	0	0	0	0	0	0

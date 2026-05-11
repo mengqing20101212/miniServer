@@ -1,114 +1,144 @@
 package ly.config;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
+import ly.utils.KV;
 
 /***
  * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
  */
-public class NpcNewInfoConfig { 
-  /**编号*/ 
-   public int id;
+public class NpcNewInfoConfig {
+  /**编号*/
+  public final int id;
 
-  /**名字*/ 
-   public String beizhu;
+  /**名字*/
+  public final String beizhu;
 
-  /**源核类型*/ 
-   public String circuitName;
+  /**源核类型*/
+  public final String circuitName;
 
-  /**名字*/ 
-   public String name;
+  /**名字*/
+  public final String name;
 
-  /**类型*/ 
-   public int genType;
+  /**类型*/
+  public final int genType;
 
-  /**索引id*/ 
-   public int checkId;
+  /**索引id*/
+  public final int checkId;
 
-  /**等级*/ 
-   public int level;
+  /**等级*/
+  public final int level;
 
-  /**星级*/ 
-   public int star;
+  /**星级*/
+  public final int star;
 
-  /**进阶等级*/ 
-   public int advance;
+  /**进阶等级*/
+  public final int advance;
 
-  /**觉醒等级*/ 
-   public int awakenLv;
+  /**觉醒等级*/
+  public final int awakenLv;
 
-  /**技能等级*/ 
-   public String skillLv;
+  /**技能等级*/
+  public final String skillLv;
 
-  /**S技能等级*/ 
-   public String sSkillLv;
+  /**S技能等级*/
+  public final String sSkillLv;
 
-  /**源核等级*/ 
-   public int circuitLv;
+  /**源核等级*/
+  public final int circuitLv;
 
-  /**源核品质*/ 
-   public int circuitQuality;
+  /**源核品质*/
+  public final int circuitQuality;
 
-  /**源核模板*/ 
-   public int circuitInfo;
+  /**源核模板*/
+  public final int circuitInfo;
 
-  /**生命上限系数*/ 
-   public int maxHPCoe;
+  /**生命上限系数*/
+  public final int maxHPCoe;
 
-  /**攻击系数*/ 
-   public int attackCoe;
+  /**攻击系数*/
+  public final int attackCoe;
 
-  /**防御系数*/ 
-   public int defenceCoe;
+  /**防御系数*/
+  public final int defenceCoe;
 
-  /**速度系数*/ 
-   public int speedCoe;
+  /**速度系数*/
+  public final int speedCoe;
 
-  /**暴击系数*/ 
-   public int critCoe;
+  /**暴击系数*/
+  public final int critCoe;
 
-  /**暴击伤害系数*/ 
-   public int critRatioCoe;
+  /**暴击伤害系数*/
+  public final int critRatioCoe;
 
-  /**效果命中系数*/ 
-   public int effectHitCoe;
+  /**效果命中系数*/
+  public final int effectHitCoe;
 
-  /**效果抵抗系数*/ 
-   public int effectDodgeCoe;
+  /**效果抵抗系数*/
+  public final int effectDodgeCoe;
 
-  /**技能列表*/ 
-   public String skills;
+  /**技能列表*/
+  public final String skills;
 
-  /**S技能列表*/ 
-   public String sSkills;
+  /**S技能列表*/
+  public final String sSkills;
 
-  /**AI模板*/ 
-   public String aiName;
+  /**AI模板*/
+  public final String aiName;
 
-  /**是否boss*/ 
-   public int isBoss;
+  /**是否boss*/
+  public final int isBoss;
 
-  /**能否逃跑*/ 
-   public String canRun;
+  /**能否逃跑*/
+  public final String canRun;
 
-  /**AI技能CD*/ 
-   public String extraSkillInfo;
+  /**AI技能CD*/
+  public final String extraSkillInfo;
 
-  /**NPC类别*/ 
-   public int npcType;
+  /**NPC类别*/
+  public final int npcType;
 
-  /**NPC标记*/ 
-   public int entityTags;
+  /**NPC标记*/
+  public final int entityTags;
 
-// @@@@@自定义属性开始区@@@@@ 
+  // @@@@@自定义属性开始区@@@@@
 
- // @@@@@自定义属性结束区@@@@@ 
+  // @@@@@自定义属性结束区@@@@@
 
-// @@@@@自定义方法开始区@@@@@ 
+  public NpcNewInfoConfig(int id, String beizhu, String circuitName, String name, int genType, int checkId, int level, int star, int advance, int awakenLv, String skillLv, String sSkillLv, int circuitLv, int circuitQuality, int circuitInfo, int maxHPCoe, int attackCoe, int defenceCoe, int speedCoe, int critCoe, int critRatioCoe, int effectHitCoe, int effectDodgeCoe, String skills, String sSkills, String aiName, int isBoss, String canRun, String extraSkillInfo, int npcType, int entityTags) {
+    this.id = id;
+    this.beizhu = beizhu;
+    this.circuitName = circuitName;
+    this.name = name;
+    this.genType = genType;
+    this.checkId = checkId;
+    this.level = level;
+    this.star = star;
+    this.advance = advance;
+    this.awakenLv = awakenLv;
+    this.skillLv = skillLv;
+    this.sSkillLv = sSkillLv;
+    this.circuitLv = circuitLv;
+    this.circuitQuality = circuitQuality;
+    this.circuitInfo = circuitInfo;
+    this.maxHPCoe = maxHPCoe;
+    this.attackCoe = attackCoe;
+    this.defenceCoe = defenceCoe;
+    this.speedCoe = speedCoe;
+    this.critCoe = critCoe;
+    this.critRatioCoe = critRatioCoe;
+    this.effectHitCoe = effectHitCoe;
+    this.effectDodgeCoe = effectDodgeCoe;
+    this.skills = skills;
+    this.sSkills = sSkills;
+    this.aiName = aiName;
+    this.isBoss = isBoss;
+    this.canRun = canRun;
+    this.extraSkillInfo = extraSkillInfo;
+    this.npcType = npcType;
+    this.entityTags = entityTags;
+  }
+
+  // @@@@@自定义方法开始区@@@@@
 public void afterLoad() {}
-
-
- // @@@@@自定义方法结束区@@@@@ 
-
- }
+  // @@@@@自定义方法结束区@@@@@
+}

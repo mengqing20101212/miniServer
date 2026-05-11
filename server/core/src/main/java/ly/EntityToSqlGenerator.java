@@ -230,7 +230,10 @@ public class EntityToSqlGenerator {
     private String generateColumnDefinition(Field field) {
         DbMeta.DbField dbField = field.getAnnotation(DbMeta.DbField.class);
         String fieldName = dbField.name().isEmpty() ? field.getName() : dbField.name();
-        String fieldType = mapJavaTypeToSqlType(field.getType());
+        String fieldType =
+                dbField.columnType().isBlank()
+                        ? mapJavaTypeToSqlType(field.getType())
+                        : dbField.columnType();
         
         if (fieldType == null) {
             System.err.println("无法映射Java类型 " + field.getType() + " 到SQL类型");

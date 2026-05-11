@@ -1,4 +1,5 @@
-id	patterntype	content	beizhu	dropGroup	firstDrop	target	result	
+#fields	id	patterntype	content	beizhu	dropGroup	firstDrop	target	result
+#types	INT	INT	STRING	STRING	INT	INT	STRING	STRING
 201031	1	4,2,1	1个R品质角色	2010301	2010305	解决混混	巡逻中顺手解决了一个小混混，他哭喊着求饶并发誓不会再犯，因此获得了宝贵的经验！
 202031	1	1,7,2	2个7级角色	2020301	2020305	解决混混	巡逻中顺手解决了一个小混混，他哭喊着求饶并发誓不会再犯，因此获得了宝贵的经验！
 203031	1	1,13,2	2个13级角色	2030301	2030305	接待粉丝	偶遇粉丝，粉丝热情的与其合影，离开时留下许多礼物！

@@ -34,7 +34,15 @@ public class WebSecurityConfig {
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/admin/login", "/static/**", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                .requestMatchers(
+                    "/api/admin/login",
+                    "/api/config-hot-update/download/**",
+                    "/api/config-hot-update/report",
+                    "/static/**",
+                    "/css/**",
+                    "/js/**",
+                    "/images/**",
+                    "/favicon.ico").permitAll()
                 .requestMatchers("/gm/login", "/gm/**").permitAll()
                 .anyRequest().authenticated()
             )

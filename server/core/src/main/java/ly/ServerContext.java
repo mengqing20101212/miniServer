@@ -98,6 +98,12 @@ public class ServerContext {
         NetService.getInstance().startUp(gameObjectProvider, serverConfig.serverPort);
         // 当前服务器端口绑定完成后再补发可靠 RPC，避免目标服处理后回包找不到本服连接。
         RpcService.getInstance().replayReliableMessagesOnStartup();
+        try {
+            NacosService.getInstance().startConfigHotUpdateListener();
+        } catch (Exception e) {
+            logger.error("配置热更监听启动失败", e);
+            throw new RuntimeException("配置热更监听启动失败", e);
+        }
         logger.info("服务器 启动成功 耗时: " + (System.currentTimeMillis() - startTime) + "ms");
     }
 

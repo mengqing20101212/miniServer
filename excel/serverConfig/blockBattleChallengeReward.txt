@@ -1,4 +1,5 @@
-id	prestigeNum	des	drop	dropShow	
+#fields	id	prestigeNum	des	drop	dropShow
+#types	INT	INT	STRING	INT	INT
 1	50	区域攻防获得50点声望	4331	4331
 2	100	区域攻防获得100点声望	4332	4332
 3	200	区域攻防获得200点声望	4333	4333

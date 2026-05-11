@@ -1,2 +1,3 @@
-id	name	activityList	icon	
+#fields	id	name	activityList	icon
+#types	INT	STRING	STRING	STRING
 1	日常	2,3,12,4,49,31,28,14,11,13,52	340510001

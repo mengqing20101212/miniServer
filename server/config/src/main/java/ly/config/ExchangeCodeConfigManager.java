@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import ly.utils.KV;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
+import ly.utils.KV;
 import org.slf4j.Logger;
 
 /*
@@ -20,23 +20,17 @@ import org.slf4j.Logger;
  * File: ExchangeCodeConfigManager
  */
 public class ExchangeCodeConfigManager implements InterfaceConfigManagerProxy {
-  AtomicBoolean switched = new AtomicBoolean(false);
+  private static final AtomicBoolean switched = new AtomicBoolean(false);
   private static final ExchangeCodeConfigManager instance = new ExchangeCodeConfigManager();
-  private static final ExchangeCodeConfigManagerImpl instanceImplA =
-      new ExchangeCodeConfigManagerImpl();
-  private static final ExchangeCodeConfigManagerImpl instanceImplB =
-      new ExchangeCodeConfigManagerImpl();
-
-  public boolean isSwitched() {
-    return switched.get();
-  }
+  private static final ExchangeCodeConfigManagerImpl instanceImplA = new ExchangeCodeConfigManagerImpl();
+  private static final ExchangeCodeConfigManagerImpl instanceImplB = new ExchangeCodeConfigManagerImpl();
 
   public static ExchangeCodeConfigManagerImpl getInstance() {
-    if (instance.isSwitched()) {
-      return instanceImplA;
-    } else {
-      return instanceImplB;
-    }
+    return switched.get() ? instanceImplA : instanceImplB;
+  }
+
+  private static ExchangeCodeConfigManagerImpl getStandby() {
+    return switched.get() ? instanceImplB : instanceImplA;
   }
 
   @Override
@@ -44,166 +38,163 @@ public class ExchangeCodeConfigManager implements InterfaceConfigManagerProxy {
     getInstance().reload(logger, configDir);
   }
 
+  @Override
+  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
+    getStandby().reload(logger, configDir);
+  }
+
+  @Override
+  public AbstractConfigManger switchConfig() {
+    ExchangeCodeConfigManagerImpl oldActive = getInstance();
+    switched.set(!switched.get());
+    return oldActive;
+  }
+
+  @Override
+  public String getConfigFileName() {
+    return getInstance().getConfigFileName();
+  }
+
   public static class ExchangeCodeConfigManagerImpl extends AbstractConfigManger {
-
-    List<ExchangeCodeConfig> configList = new ArrayList<ExchangeCodeConfig>();
-
+    private List<ExchangeCodeConfig> configList = List.of();
     // @@@@@自定义属性开始区@@@@@
 
     // @@@@@自定义属性结束区@@@@@
 
     @Override
-    protected void reload(Logger logger, String configDir) throws ConfigLoadException {
+    public void reload(Logger logger, String configDir) throws ConfigLoadException {
       String fileName = configDir + File.separator + getConfigFileName();
       File file = new File(fileName);
-      clear();
       if (!file.exists()) {
         logger.error(fileName + " does not exist");
         throw new ConfigLoadException("Config file does not exist :" + fileName);
       }
+      ExchangeCodeConfigChecker checker = new ExchangeCodeConfigChecker();
+      checker.checkHeader(logger, configDir);
+      List<ExchangeCodeConfig> newList = new ArrayList<>();
       try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String line;
-        br.readLine(); //先读取一行表头 
-        while ((line = br.readLine()) != null) { // 按行读取
-          String[] arr = line.split("\t");
-          ExchangeCodeConfig config = new ExchangeCodeConfig();
+        String rowText;
+        br.readLine();
+        br.readLine();
+        while ((rowText = br.readLine()) != null) {
+          if (rowText.isBlank()) { continue; }
+          String[] arr = rowText.split("\\t", -1);
+          if (arr.length < 10) {
+            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
+          }
+          int groupId = 0;
+          String name = null;
+          String beginTime = null;
+          String endTime = null;
+          int codeNum = 0;
+          String channel = null;
+          String rewards = null;
+          int limit1 = 0;
+          int limit2 = 0;
+          String limit3 = null;
           try {
-            //解析 自增id
+            // 解析 自增id
             if (!arr[0].trim().isEmpty()) {
-            config.groupId =  Integer.parseInt(arr[0].trim());
+              groupId = Integer.parseInt(arr[0].trim());
             }
 
-            //解析 礼包名称
+            // 解析 礼包名称
             if (!arr[1].trim().isEmpty()) {
-            config.name = arr[1].trim();
+              name = arr[1].trim();
             }
 
-            //解析 开始领取时间
+            // 解析 开始领取时间
             if (!arr[2].trim().isEmpty()) {
-            config.beginTime = arr[2].trim();
+              beginTime = arr[2].trim();
             }
 
-            //解析 结束领取时间
+            // 解析 结束领取时间
             if (!arr[3].trim().isEmpty()) {
-            config.endTime = arr[3].trim();
+              endTime = arr[3].trim();
             }
 
-            //解析 生成兑换码个数
+            // 解析 生成兑换码个数
             if (!arr[4].trim().isEmpty()) {
-            config.codeNum =  Integer.parseInt(arr[4].trim());
+              codeNum = Integer.parseInt(arr[4].trim());
             }
 
-            //解析 渠道id
+            // 解析 渠道id
             if (!arr[5].trim().isEmpty()) {
-            config.channel = arr[5].trim();
+              channel = arr[5].trim();
             }
 
-            //解析 获取的奖励列表
+            // 解析 获取的奖励列表
             if (!arr[6].trim().isEmpty()) {
-            config.rewards = arr[6].trim();
+              rewards = arr[6].trim();
             }
 
-            //解析 一个礼包码可有多少个角色激活，-1表示不限
+            // 解析 一个礼包码可有多少个角色激活，-1表示不限
             if (!arr[7].trim().isEmpty()) {
-            config.limit1 =  Integer.parseInt(arr[7].trim());
+              limit1 = Integer.parseInt(arr[7].trim());
             }
 
-            //解析 一个角色可以激活同一批礼包码数量
+            // 解析 一个角色可以激活同一批礼包码数量
             if (!arr[8].trim().isEmpty()) {
-            config.limit2 =  Integer.parseInt(arr[8].trim());
+              limit2 = Integer.parseInt(arr[8].trim());
             }
 
-            //解析 该批礼包码能够被那些服务器使用，-1为所有
+            // 解析 该批礼包码能够被那些服务器使用，-1为所有
             if (!arr[9].trim().isEmpty()) {
-            config.limit3 = arr[9].trim();
+              limit3 = arr[9].trim();
             }
-
 
           } catch (Exception e) {
-            logger.error(
-                String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, line, e.getMessage()));
-            e.printStackTrace();
+            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
             throw new ConfigLoadException("Error parsing config file :" + fileName);
           }
+          ExchangeCodeConfig config = new ExchangeCodeConfig(groupId, name, beginTime, endTime, codeNum, channel, rewards, limit1, limit2, limit3);
           config.afterLoad();
-          configList.add(config);
+          newList.add(config);
         }
+        checker.checkAfterParse(logger, newList);
+        configList = List.copyOf(newList);
         afterLoad();
       } catch (IOException e) {
-        e.printStackTrace();
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }
     }
 
     @Override
-    protected void clear() {
-
-      configList.clear();
-
+    public void clear() {
+      configList = List.of();
       // @@@@@自定义clear方法开始区@@@@@
-
 
       // @@@@@自定义clear方法结束区@@@@@
     }
 
     private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       String[] parts = value.split(",");
       List<Integer> result = new ArrayList<>();
       for (String part : parts) {
-        try {
-          result.add(Integer.parseInt(part.trim()));
-        } catch (NumberFormatException e) {
-          // 如果不是数字，则跳过
-        }
+        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
       }
       return result;
     }
 
     private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<Integer, Integer>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            try {
-              Integer key = Integer.parseInt(keyStr);
-              Integer val = Integer.parseInt(valueStr);
-              result.add(new KV<>(key, val));
-            } catch (NumberFormatException e) {
-              // 如果不是数字，则跳过
-            }
-          }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) {
+          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
         }
       }
       return result;
     }
 
     private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<String, String>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            result.add(new KV<>(keyStr, valueStr));
-          }
-        }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
       }
       return result;
     }
@@ -212,18 +203,16 @@ public class ExchangeCodeConfigManager implements InterfaceConfigManagerProxy {
       return configList;
     }
 
-
     @Override
     public String getConfigFileName() {
       return "exchangeCode.txt";
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
 
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

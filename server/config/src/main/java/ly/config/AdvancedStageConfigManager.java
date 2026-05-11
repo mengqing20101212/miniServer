@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import ly.utils.KV;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
+import ly.utils.KV;
 import org.slf4j.Logger;
 
 /*
@@ -20,23 +20,17 @@ import org.slf4j.Logger;
  * File: AdvancedStageConfigManager
  */
 public class AdvancedStageConfigManager implements InterfaceConfigManagerProxy {
-  AtomicBoolean switched = new AtomicBoolean(false);
+  private static final AtomicBoolean switched = new AtomicBoolean(false);
   private static final AdvancedStageConfigManager instance = new AdvancedStageConfigManager();
-  private static final AdvancedStageConfigManagerImpl instanceImplA =
-      new AdvancedStageConfigManagerImpl();
-  private static final AdvancedStageConfigManagerImpl instanceImplB =
-      new AdvancedStageConfigManagerImpl();
-
-  public boolean isSwitched() {
-    return switched.get();
-  }
+  private static final AdvancedStageConfigManagerImpl instanceImplA = new AdvancedStageConfigManagerImpl();
+  private static final AdvancedStageConfigManagerImpl instanceImplB = new AdvancedStageConfigManagerImpl();
 
   public static AdvancedStageConfigManagerImpl getInstance() {
-    if (instance.isSwitched()) {
-      return instanceImplA;
-    } else {
-      return instanceImplB;
-    }
+    return switched.get() ? instanceImplA : instanceImplB;
+  }
+
+  private static AdvancedStageConfigManagerImpl getStandby() {
+    return switched.get() ? instanceImplB : instanceImplA;
   }
 
   @Override
@@ -44,370 +38,409 @@ public class AdvancedStageConfigManager implements InterfaceConfigManagerProxy {
     getInstance().reload(logger, configDir);
   }
 
+  @Override
+  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
+    getStandby().reload(logger, configDir);
+  }
+
+  @Override
+  public AbstractConfigManger switchConfig() {
+    AdvancedStageConfigManagerImpl oldActive = getInstance();
+    switched.set(!switched.get());
+    return oldActive;
+  }
+
+  @Override
+  public String getConfigFileName() {
+    return getInstance().getConfigFileName();
+  }
+
   public static class AdvancedStageConfigManagerImpl extends AbstractConfigManger {
-
-    List<AdvancedStageConfig> configList = new ArrayList<AdvancedStageConfig>();
-    Map<Integer, AdvancedStageConfig> configMap = new HashMap<Integer, AdvancedStageConfig>();
-
+    private List<AdvancedStageConfig> configList = List.of();
+    private Map<Integer, AdvancedStageConfig> configMap = Map.of();
 
     // @@@@@自定义属性开始区@@@@@
 
     // @@@@@自定义属性结束区@@@@@
 
     @Override
-    protected void reload(Logger logger, String configDir) throws ConfigLoadException {
+    public void reload(Logger logger, String configDir) throws ConfigLoadException {
       String fileName = configDir + File.separator + getConfigFileName();
       File file = new File(fileName);
-      clear();
       if (!file.exists()) {
         logger.error(fileName + " does not exist");
         throw new ConfigLoadException("Config file does not exist :" + fileName);
       }
+      AdvancedStageConfigChecker checker = new AdvancedStageConfigChecker();
+      checker.checkHeader(logger, configDir);
+      List<AdvancedStageConfig> newList = new ArrayList<>();
+      Map<Integer, AdvancedStageConfig> newMap = new HashMap<>();
       try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String line;
-        br.readLine(); //先读取一行表头 
-        while ((line = br.readLine()) != null) { // 按行读取
-          String[] arr = line.split("\t");
-          AdvancedStageConfig config = new AdvancedStageConfig();
+        String rowText;
+        br.readLine();
+        br.readLine();
+        while ((rowText = br.readLine()) != null) {
+          if (rowText.isBlank()) { continue; }
+          String[] arr = rowText.split("\\t", -1);
+          if (arr.length < 50) {
+            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
+          }
+          int id = 0;
+          int stageType = 0;
+          int floor = 0;
+          int cost = 0;
+          int advance = 0;
+          int sceneId = 0;
+          int dropSelection = 0;
+          String dropList = null;
+          String upIcon = null;
+          String dropGroup = null;
+          String name = null;
+          String lockTips = null;
+          int preStage = 0;
+          int nextStage = 0;
+          int needLv = 0;
+          int bossHead = 0;
+          String model = null;
+          String action = null;
+          String word = null;
+          String decorate1 = null;
+          String decorate2 = null;
+          String decorate3 = null;
+          String bossId = null;
+          String scaling = null;
+          String offset = null;
+          String offsetX = null;
+          String offsetAngle = null;
+          String showType = null;
+          String selectionDis = null;
+          String trigger = null;
+          int spineModelResId = 0;
+          int spineScale = 0;
+          String spinePosOffset = null;
+          String spineAnimation = null;
+          String dropExpect = null;
+          int recommendLv = 0;
+          int recommendtype = 0;
+          String recommendhero = null;
+          String battleTipText = null;
+          int selectionType = 0;
+          int rankType = 0;
+          int activityControlId = 0;
+          String webDes = null;
+          String dropExpectAdd = null;
+          int recommendHero1 = 0;
+          int recommendHero2 = 0;
+          int iconType = 0;
+          int noticeIcon = 0;
+          int firstDropExpect = 0;
+          int decorate2Background = 0;
           try {
-            //解析 编号
+            // 解析 编号
             if (!arr[0].trim().isEmpty()) {
-            config.id =  Integer.parseInt(arr[0].trim());
+              id = Integer.parseInt(arr[0].trim());
             }
 
-            //解析 关卡类型
+            // 解析 关卡类型
             if (!arr[1].trim().isEmpty()) {
-            config.stageType =  Integer.parseInt(arr[1].trim());
+              stageType = Integer.parseInt(arr[1].trim());
             }
 
-            //解析 层数
+            // 解析 层数
             if (!arr[2].trim().isEmpty()) {
-            config.floor =  Integer.parseInt(arr[2].trim());
+              floor = Integer.parseInt(arr[2].trim());
             }
 
-            //解析 体力消耗
+            // 解析 体力消耗
             if (!arr[3].trim().isEmpty()) {
-            config.cost =  Integer.parseInt(arr[3].trim());
+              cost = Integer.parseInt(arr[3].trim());
             }
 
-            //解析 预支体力消耗
+            // 解析 预支体力消耗
             if (!arr[4].trim().isEmpty()) {
-            config.advance =  Integer.parseInt(arr[4].trim());
+              advance = Integer.parseInt(arr[4].trim());
             }
 
-            //解析 关卡id
+            // 解析 关卡id
             if (!arr[5].trim().isEmpty()) {
-            config.sceneId =  Integer.parseInt(arr[5].trim());
+              sceneId = Integer.parseInt(arr[5].trim());
             }
 
-            //解析 倾向选择
+            // 解析 倾向选择
             if (!arr[6].trim().isEmpty()) {
-            config.dropSelection =  Integer.parseInt(arr[6].trim());
+              dropSelection = Integer.parseInt(arr[6].trim());
             }
 
-            //解析 掉落预览
+            // 解析 掉落预览
             if (!arr[7].trim().isEmpty()) {
-            config.dropList = arr[7].trim();
+              dropList = arr[7].trim();
             }
 
-            //解析 是否有up图标
+            // 解析 是否有up图标
             if (!arr[8].trim().isEmpty()) {
-            config.upIcon = arr[8].trim();
+              upIcon = arr[8].trim();
             }
 
-            //解析 关卡掉落
+            // 解析 关卡掉落
             if (!arr[9].trim().isEmpty()) {
-            config.dropGroup = arr[9].trim();
+              dropGroup = arr[9].trim();
             }
 
-            //解析 名称
+            // 解析 名称
             if (!arr[10].trim().isEmpty()) {
-            config.name = arr[10].trim();
+              name = arr[10].trim();
             }
 
-            //解析 解锁提示
+            // 解析 解锁提示
             if (!arr[11].trim().isEmpty()) {
-            config.lockTips = arr[11].trim();
+              lockTips = arr[11].trim();
             }
 
-            //解析 前置章节
+            // 解析 前置章节
             if (!arr[12].trim().isEmpty()) {
-            config.preStage =  Integer.parseInt(arr[12].trim());
+              preStage = Integer.parseInt(arr[12].trim());
             }
 
-            //解析 后置章节
+            // 解析 后置章节
             if (!arr[13].trim().isEmpty()) {
-            config.nextStage =  Integer.parseInt(arr[13].trim());
+              nextStage = Integer.parseInt(arr[13].trim());
             }
 
-            //解析 解锁等级
+            // 解析 解锁等级
             if (!arr[14].trim().isEmpty()) {
-            config.needLv =  Integer.parseInt(arr[14].trim());
+              needLv = Integer.parseInt(arr[14].trim());
             }
 
-            //解析 boss头像
+            // 解析 boss头像
             if (!arr[15].trim().isEmpty()) {
-            config.bossHead =  Integer.parseInt(arr[15].trim());
+              bossHead = Integer.parseInt(arr[15].trim());
             }
 
-            //解析 形象人物模型
+            // 解析 形象人物模型
             if (!arr[16].trim().isEmpty()) {
-            config.model = arr[16].trim();
+              model = arr[16].trim();
             }
 
-            //解析 形象人物动作
+            // 解析 形象人物动作
             if (!arr[17].trim().isEmpty()) {
-            config.action = arr[17].trim();
+              action = arr[17].trim();
             }
 
-            //解析 形象人物对话
+            // 解析 形象人物对话
             if (!arr[18].trim().isEmpty()) {
-            config.word = arr[18].trim();
+              word = arr[18].trim();
             }
 
-            //解析 中心装饰参数1
+            // 解析 中心装饰参数1
             if (!arr[19].trim().isEmpty()) {
-            config.decorate1 = arr[19].trim();
+              decorate1 = arr[19].trim();
             }
 
-            //解析 中心装饰参数2
+            // 解析 中心装饰参数2
             if (!arr[20].trim().isEmpty()) {
-            config.decorate2 = arr[20].trim();
+              decorate2 = arr[20].trim();
             }
 
-            //解析 中心装饰参数3
+            // 解析 中心装饰参数3
             if (!arr[21].trim().isEmpty()) {
-            config.decorate3 = arr[21].trim();
+              decorate3 = arr[21].trim();
             }
 
-            //解析 bossID
+            // 解析 bossID
             if (!arr[22].trim().isEmpty()) {
-            config.bossId = arr[22].trim();
+              bossId = arr[22].trim();
             }
 
-            //解析 缩放比例
+            // 解析 缩放比例
             if (!arr[23].trim().isEmpty()) {
-            config.scaling = arr[23].trim();
+              scaling = arr[23].trim();
             }
 
-            //解析 Y轴偏移位置
+            // 解析 Y轴偏移位置
             if (!arr[24].trim().isEmpty()) {
-            config.offset = arr[24].trim();
+              offset = arr[24].trim();
             }
 
-            //解析 X轴偏移位置
+            // 解析 X轴偏移位置
             if (!arr[25].trim().isEmpty()) {
-            config.offsetX = arr[25].trim();
+              offsetX = arr[25].trim();
             }
 
-            //解析 偏移角度
+            // 解析 偏移角度
             if (!arr[26].trim().isEmpty()) {
-            config.offsetAngle = arr[26].trim();
+              offsetAngle = arr[26].trim();
             }
 
-            //解析 是否特殊展示动作
+            // 解析 是否特殊展示动作
             if (!arr[27].trim().isEmpty()) {
-            config.showType = arr[27].trim();
+              showType = arr[27].trim();
             }
 
-            //解析 掉落倾向描述
+            // 解析 掉落倾向描述
             if (!arr[28].trim().isEmpty()) {
-            config.selectionDis = arr[28].trim();
+              selectionDis = arr[28].trim();
             }
 
-            //解析 突发事件触发概率
+            // 解析 突发事件触发概率
             if (!arr[29].trim().isEmpty()) {
-            config.trigger = arr[29].trim();
+              trigger = arr[29].trim();
             }
 
-            //解析 spine显示模型预设资源Id
+            // 解析 spine显示模型预设资源Id
             if (!arr[30].trim().isEmpty()) {
-            config.spineModelResId =  Integer.parseInt(arr[30].trim());
+              spineModelResId = Integer.parseInt(arr[30].trim());
             }
 
-            //解析 缩放比例
+            // 解析 缩放比例
             if (!arr[31].trim().isEmpty()) {
-            config.spineScale =  Integer.parseInt(arr[31].trim());
+              spineScale = Integer.parseInt(arr[31].trim());
             }
 
-            //解析 位置偏移(x,y)
+            // 解析 位置偏移(x,y)
             if (!arr[32].trim().isEmpty()) {
-            config.spinePosOffset = arr[32].trim();
+              spinePosOffset = arr[32].trim();
             }
 
-            //解析 spine动画
+            // 解析 spine动画
             if (!arr[33].trim().isEmpty()) {
-            config.spineAnimation = arr[33].trim();
+              spineAnimation = arr[33].trim();
             }
 
-            //解析 期望掉落数量
+            // 解析 期望掉落数量
             if (!arr[34].trim().isEmpty()) {
-            config.dropExpect = arr[34].trim();
+              dropExpect = arr[34].trim();
             }
 
-            //解析 推荐等级
+            // 解析 推荐等级
             if (!arr[35].trim().isEmpty()) {
-            config.recommendLv =  Integer.parseInt(arr[35].trim());
+              recommendLv = Integer.parseInt(arr[35].trim());
             }
 
-            //解析 推荐类型
+            // 解析 推荐类型
             if (!arr[36].trim().isEmpty()) {
-            config.recommendtype =  Integer.parseInt(arr[36].trim());
+              recommendtype = Integer.parseInt(arr[36].trim());
             }
 
-            //解析 推荐英雄
+            // 解析 推荐英雄
             if (!arr[37].trim().isEmpty()) {
-            config.recommendhero = arr[37].trim();
+              recommendhero = arr[37].trim();
             }
 
-            //解析 战斗提示
+            // 解析 战斗提示
             if (!arr[38].trim().isEmpty()) {
-            config.battleTipText = arr[38].trim();
+              battleTipText = arr[38].trim();
             }
 
-            //解析 倾向类型
+            // 解析 倾向类型
             if (!arr[39].trim().isEmpty()) {
-            config.selectionType =  Integer.parseInt(arr[39].trim());
+              selectionType = Integer.parseInt(arr[39].trim());
             }
 
-            //解析 排行榜枚举
+            // 解析 排行榜枚举
             if (!arr[40].trim().isEmpty()) {
-            config.rankType =  Integer.parseInt(arr[40].trim());
+              rankType = Integer.parseInt(arr[40].trim());
             }
 
-            //解析 对应功能ID
+            // 解析 对应功能ID
             if (!arr[41].trim().isEmpty()) {
-            config.activityControlId =  Integer.parseInt(arr[41].trim());
+              activityControlId = Integer.parseInt(arr[41].trim());
             }
 
-            //解析 GM平台描述
+            // 解析 GM平台描述
             if (!arr[42].trim().isEmpty()) {
-            config.webDes = arr[42].trim();
+              webDes = arr[42].trim();
             }
 
-            //解析 期望掉落效率提升值
+            // 解析 期望掉落效率提升值
             if (!arr[43].trim().isEmpty()) {
-            config.dropExpectAdd = arr[43].trim();
+              dropExpectAdd = arr[43].trim();
             }
 
-            //解析 推荐英雄1
+            // 解析 推荐英雄1
             if (!arr[44].trim().isEmpty()) {
-            config.recommendHero1 =  Integer.parseInt(arr[44].trim());
+              recommendHero1 = Integer.parseInt(arr[44].trim());
             }
 
-            //解析 推荐英雄2
+            // 解析 推荐英雄2
             if (!arr[45].trim().isEmpty()) {
-            config.recommendHero2 =  Integer.parseInt(arr[45].trim());
+              recommendHero2 = Integer.parseInt(arr[45].trim());
             }
 
-            //解析 图标类型
+            // 解析 图标类型
             if (!arr[46].trim().isEmpty()) {
-            config.iconType =  Integer.parseInt(arr[46].trim());
+              iconType = Integer.parseInt(arr[46].trim());
             }
 
-            //解析 获取提示图标
+            // 解析 获取提示图标
             if (!arr[47].trim().isEmpty()) {
-            config.noticeIcon =  Integer.parseInt(arr[47].trim());
+              noticeIcon = Integer.parseInt(arr[47].trim());
             }
 
-            //解析 首通期望掉落数量
+            // 解析 首通期望掉落数量
             if (!arr[48].trim().isEmpty()) {
-            config.firstDropExpect =  Integer.parseInt(arr[48].trim());
+              firstDropExpect = Integer.parseInt(arr[48].trim());
             }
 
-            //解析 英雄试炼角色背景
+            // 解析 英雄试炼角色背景
             if (!arr[49].trim().isEmpty()) {
-            config.decorate2Background =  Integer.parseInt(arr[49].trim());
+              decorate2Background = Integer.parseInt(arr[49].trim());
             }
-
 
           } catch (Exception e) {
-            logger.error(
-                String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, line, e.getMessage()));
-            e.printStackTrace();
+            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
             throw new ConfigLoadException("Error parsing config file :" + fileName);
           }
+          AdvancedStageConfig config = new AdvancedStageConfig(id, stageType, floor, cost, advance, sceneId, dropSelection, dropList, upIcon, dropGroup, name, lockTips, preStage, nextStage, needLv, bossHead, model, action, word, decorate1, decorate2, decorate3, bossId, scaling, offset, offsetX, offsetAngle, showType, selectionDis, trigger, spineModelResId, spineScale, spinePosOffset, spineAnimation, dropExpect, recommendLv, recommendtype, recommendhero, battleTipText, selectionType, rankType, activityControlId, webDes, dropExpectAdd, recommendHero1, recommendHero2, iconType, noticeIcon, firstDropExpect, decorate2Background);
           config.afterLoad();
-          configList.add(config);
-          configMap.put(config.id, config);
+          newList.add(config);
+          newMap.put(config.id, config);
         }
+        checker.checkAfterParse(logger, newList);
+        configList = List.copyOf(newList);
+        configMap = Map.copyOf(newMap);
         afterLoad();
       } catch (IOException e) {
-        e.printStackTrace();
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }
     }
 
     @Override
-    protected void clear() {
-
-      configList.clear();
-      configMap.clear();
-
+    public void clear() {
+      configList = List.of();
+      configMap = Map.of();
       // @@@@@自定义clear方法开始区@@@@@
-
 
       // @@@@@自定义clear方法结束区@@@@@
     }
 
     private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       String[] parts = value.split(",");
       List<Integer> result = new ArrayList<>();
       for (String part : parts) {
-        try {
-          result.add(Integer.parseInt(part.trim()));
-        } catch (NumberFormatException e) {
-          // 如果不是数字，则跳过
-        }
+        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
       }
       return result;
     }
 
     private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<Integer, Integer>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            try {
-              Integer key = Integer.parseInt(keyStr);
-              Integer val = Integer.parseInt(valueStr);
-              result.add(new KV<>(key, val));
-            } catch (NumberFormatException e) {
-              // 如果不是数字，则跳过
-            }
-          }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) {
+          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
         }
       }
       return result;
     }
 
     private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<String, String>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            result.add(new KV<>(keyStr, valueStr));
-          }
-        }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
       }
       return result;
     }
@@ -419,17 +452,17 @@ public class AdvancedStageConfigManager implements InterfaceConfigManagerProxy {
     public Map<Integer, AdvancedStageConfig> getConfigMap() {
       return configMap;
     }
+
     @Override
     public String getConfigFileName() {
       return "advancedStage.txt";
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
 
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

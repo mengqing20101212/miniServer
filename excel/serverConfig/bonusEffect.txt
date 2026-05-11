@@ -1,4 +1,5 @@
-id	description	icon	bonusEffect	isBonusBuff	bonusType	param_1	isVanish	group	level	
+#fields	id	description	icon	bonusEffect	isBonusBuff	bonusType	param_1	isVanish	group	level
+#types	INT	STRING	INT	INT	BOOL	STRING	STRING	STRING	INT	INT
 1	<color=#FF0000>攻击+15%</color>	340110003	10001	1	1	302021,1,1,1	0	1	1
 2	<color=#FF0000>攻击+30%</color>	340110004	10002	1	1	302031,1,1,2	0	1	6
 3	<color=#CC00FF>暴击率+15%</color>	340110007	10003	1	1	302041,1,2,1	0	2	1

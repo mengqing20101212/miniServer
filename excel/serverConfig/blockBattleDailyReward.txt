@@ -1,4 +1,5 @@
-id	grade	drop	dropShow	gradeShow	
+#fields	id	grade	drop	dropShow	gradeShow
+#types	INT	STRING	INT	INT	STRING
 1	0,1000	4321	4321	<=1000
 2	1001,1200	4322	4322	1001-1200
 3	1201,1400	4323	4323	1201-1400

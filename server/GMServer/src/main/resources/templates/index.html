@@ -70,10 +70,15 @@
         .sub-menu { list-style: none; padding: 0; overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
         .sub-menu.open { max-height: 500px; }
         .sub-menu .nav-link-side { padding-left: 3.2rem; font-size: 0.85rem; }
-        .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; padding: 1.5rem; overflow: auto; }
-        .content-frame { width: 100%; flex: 1; border: none; border-radius: 0.5rem; background: #fff; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075); min-height: 500px; }
-        .page-header { margin-bottom: 1.25rem; flex-shrink: 0; }
-        .page-header h4 { font-weight: 600; color: #5a5c69; margin: 0; }
+        .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; padding: 0; overflow: hidden; }
+        .tab-strip { display: flex; align-items: center; gap: 0.25rem; padding: 0.5rem 0.75rem 0; background: #f4f6f9; border-bottom: 1px solid #e3e6f0; overflow-x: auto; flex-shrink: 0; }
+        .page-tab { display: inline-flex; align-items: center; gap: 0.45rem; max-width: 180px; height: 34px; padding: 0 0.55rem 0 0.75rem; color: #5a5c69; background: #e9edf6; border: 1px solid #dce1ee; border-bottom: none; border-radius: 0.45rem 0.45rem 0 0; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
+        .page-tab.active { color: #4e5bd5; background: #fff; font-weight: 600; }
+        .page-tab-title { overflow: hidden; text-overflow: ellipsis; }
+        .page-tab-close { border: none; background: transparent; color: #8a90a3; width: 18px; height: 18px; border-radius: 50%; line-height: 18px; padding: 0; }
+        .page-tab-close:hover { background: #eef1f7; color: #dc3545; }
+        .content-frame { width: 100%; height: 100%; border: none; background: #fff; display: none; }
+        .content-frame.active { display: block; }
         @media (max-width: 768px) {
             .sidebar { position: fixed; top: 56px; left: 0; bottom: 0; z-index: 1030; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
             .sidebar.collapsed { left: -250px; }
@@ -83,7 +88,8 @@
         }
         .frame-loading { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #667eea; }
         .frame-loading.show { display: block; }
-        .content-container { position: relative; flex: 1; display: flex; flex-direction: column; }
+        .content-container { position: relative; flex: 1; display: flex; flex-direction: column; padding: 0.75rem; min-height: 0; }
+        .frame-stack { flex: 1; min-height: 0; background: #fff; border-radius: 0.5rem; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075); overflow: hidden; }
     </style>
 </head>
 <body>
@@ -121,10 +127,10 @@
             </ul>
         </div>
         <div class="main-content" id="mainContent">
-            <div class="page-header"><h4 id="pageTitle">Dashboard</h4></div>
+            <div class="tab-strip" id="tabStrip"></div>
             <div class="content-container">
                 <div class="frame-loading" id="frameLoading"><i class="fas fa-spinner fa-spin fa-2x"></i><p class="mt-2">Loading...</p></div>
-                <iframe class="content-frame" id="contentFrame" src="/gm/admin/dashboard" onload="onFrameLoad()"></iframe>
+                <div class="frame-stack" id="frameStack"></div>
             </div>
         </div>
     </div>
@@ -243,18 +249,74 @@
         return 'fas fa-circle';
     }
 
+    var tabs = {};
+    var activeTabKey = '';
     var currentPageTitle = 'Dashboard';
     function openPage(url, title) {
         if (!url) return;
-        var frame = document.getElementById('contentFrame');
+        var key = url;
+        if (tabs[key]) {
+            activateTab(key);
+            return;
+        }
+        var frame = document.createElement('iframe');
+        frame.className = 'content-frame';
+        frame.dataset.tabKey = key;
+        frame.onload = onFrameLoad;
+        document.getElementById('frameStack').appendChild(frame);
+        tabs[key] = { url: url, title: title || 'Page', frame: frame };
+        createTab(key, tabs[key].title);
+        activateTab(key);
         var loading = document.getElementById('frameLoading');
         loading.classList.add('show');
         frame.src = url;
         currentPageTitle = title || 'Page';
-        document.getElementById('pageTitle').textContent = currentPageTitle;
     }
 
     function onFrameLoad() { document.getElementById('frameLoading').classList.remove('show'); }
+
+    function createTab(key, title) {
+        var tab = document.createElement('div');
+        tab.className = 'page-tab';
+        tab.dataset.tabKey = key;
+        tab.innerHTML = '<span class="page-tab-title">' + escapeHtml(title) + '</span><button class="page-tab-close" title="关闭">×</button>';
+        tab.addEventListener('click', function() { activateTab(key); });
+        tab.querySelector('.page-tab-close').addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeTab(key);
+        });
+        document.getElementById('tabStrip').appendChild(tab);
+    }
+
+    function activateTab(key) {
+        if (!tabs[key]) return;
+        activeTabKey = key;
+        document.querySelectorAll('.page-tab').forEach(function(tab) {
+            tab.classList.toggle('active', tab.dataset.tabKey === key);
+        });
+        document.querySelectorAll('.content-frame').forEach(function(frame) {
+            frame.classList.toggle('active', frame.dataset.tabKey === key);
+        });
+    }
+
+    function closeTab(key) {
+        var tab = tabs[key];
+        if (!tab) return;
+        tab.frame.remove();
+        var tabEl = Array.from(document.querySelectorAll('.page-tab')).find(function(item) {
+            return item.dataset.tabKey === key;
+        });
+        if (tabEl) tabEl.remove();
+        delete tabs[key];
+        if (activeTabKey === key) {
+            var keys = Object.keys(tabs);
+            if (keys.length > 0) activateTab(keys[keys.length - 1]);
+        }
+    }
+
+    function escapeHtml(s) {
+        return (s == null ? '' : String(s)).replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
+    }
 
     function handleLogout() {
         var t = getToken();
@@ -275,6 +337,7 @@
             }
         });
         loadMenuTree();
+        openPage('/gm/admin/dashboard', 'Dashboard');
     });
     </script>
 </body>

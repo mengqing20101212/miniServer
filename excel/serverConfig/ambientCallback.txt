@@ -1,4 +1,5 @@
-id	name	callback	
+#fields	id	name	callback
+#types	INT	STRING	INT
 1	pr2_gray	1
 2	pr2_official	2
 3	weekly	3

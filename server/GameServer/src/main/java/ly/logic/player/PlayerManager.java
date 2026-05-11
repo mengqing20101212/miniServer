@@ -5,6 +5,7 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import ly.LoggerDef;
 import ly.db.entry.PlayerEntry;
 import ly.db.entry.PlayerEntryHelper;
+import ly.logic.player.event.PlayerEventSource;
 import ly.logic.player.event.PlayerEventType;
 import ly.proto.Login;
 import ly.utils.TimeUtils;
@@ -78,6 +79,21 @@ public class PlayerManager {
 
     public void addOnlinePlayer(Player player) {
         playerMap.put(player.getPlayerId(), player);
+    }
+
+    public void dispatchEventToPlayer(long playerId, PlayerEventSource source, long sourcePlayerId, PlayerEventType eventType, Object... args) {
+        Player player = getOnlinePlayer(playerId);
+        if (player == null) {
+            LoggerDef.SystemLogger.warn("dispatchEventToPlayer failed, player not online, playerId={}, eventType={}", playerId, eventType);
+            return;
+        }
+        player.dispatchEvent(source, sourcePlayerId, eventType, args);
+    }
+
+    public void dispatchGlobalEvent(PlayerEventType eventType, Object... args) {
+        for (Player player : playerMap.values()) {
+            player.dispatchEvent(PlayerEventSource.SYSTEM_GLOBAL, 0L, eventType, args);
+        }
     }
 
     private byte[] createDefaultModules() {

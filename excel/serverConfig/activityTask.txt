@@ -1,4 +1,5 @@
-id	title	name	questType	scheDuling	page	condition	rewardShow	drop	redirectionId	priority	pointType	point	startTime	endTime	titlePicId	
+#fields	id	title	name	questType	scheDuling	page	condition	rewardShow	drop	redirectionId	priority	pointType	point	startTime	endTime	titlePicId
+#types	INT	STRING	STRING	INT	INT	INT	INT	STRING	INT	INT	INT	INT	INT	STRING	STRING	INT
 2001	 	玩家等级达到6级	53	1	0	2001	80001	80001	9	1	53	1	43831	401768	0
 2002	 	玩家等级达到8级	53	1	0	2002	80002	80002	9	1	53	1	43831	401768	0
 2003	 	玩家等级达到11级	53	1	0	2003	80003	80003	9	1	53	1	43831	401768	0

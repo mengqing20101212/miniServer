@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import ly.utils.KV;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
+import ly.utils.KV;
 import org.slf4j.Logger;
 
 /*
@@ -20,23 +20,17 @@ import org.slf4j.Logger;
  * File: SceneInfoConfigManager
  */
 public class SceneInfoConfigManager implements InterfaceConfigManagerProxy {
-  AtomicBoolean switched = new AtomicBoolean(false);
+  private static final AtomicBoolean switched = new AtomicBoolean(false);
   private static final SceneInfoConfigManager instance = new SceneInfoConfigManager();
-  private static final SceneInfoConfigManagerImpl instanceImplA =
-      new SceneInfoConfigManagerImpl();
-  private static final SceneInfoConfigManagerImpl instanceImplB =
-      new SceneInfoConfigManagerImpl();
-
-  public boolean isSwitched() {
-    return switched.get();
-  }
+  private static final SceneInfoConfigManagerImpl instanceImplA = new SceneInfoConfigManagerImpl();
+  private static final SceneInfoConfigManagerImpl instanceImplB = new SceneInfoConfigManagerImpl();
 
   public static SceneInfoConfigManagerImpl getInstance() {
-    if (instance.isSwitched()) {
-      return instanceImplA;
-    } else {
-      return instanceImplB;
-    }
+    return switched.get() ? instanceImplA : instanceImplB;
+  }
+
+  private static SceneInfoConfigManagerImpl getStandby() {
+    return switched.get() ? instanceImplB : instanceImplA;
   }
 
   @Override
@@ -44,510 +38,577 @@ public class SceneInfoConfigManager implements InterfaceConfigManagerProxy {
     getInstance().reload(logger, configDir);
   }
 
+  @Override
+  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
+    getStandby().reload(logger, configDir);
+  }
+
+  @Override
+  public AbstractConfigManger switchConfig() {
+    SceneInfoConfigManagerImpl oldActive = getInstance();
+    switched.set(!switched.get());
+    return oldActive;
+  }
+
+  @Override
+  public String getConfigFileName() {
+    return getInstance().getConfigFileName();
+  }
+
   public static class SceneInfoConfigManagerImpl extends AbstractConfigManger {
-
-    List<SceneInfoConfig> configList = new ArrayList<SceneInfoConfig>();
-    Map<Integer, SceneInfoConfig> configMap = new HashMap<Integer, SceneInfoConfig>();
-
+    private List<SceneInfoConfig> configList = List.of();
+    private Map<Integer, SceneInfoConfig> configMap = Map.of();
 
     // @@@@@自定义属性开始区@@@@@
 
     // @@@@@自定义属性结束区@@@@@
 
     @Override
-    protected void reload(Logger logger, String configDir) throws ConfigLoadException {
+    public void reload(Logger logger, String configDir) throws ConfigLoadException {
       String fileName = configDir + File.separator + getConfigFileName();
       File file = new File(fileName);
-      clear();
       if (!file.exists()) {
         logger.error(fileName + " does not exist");
         throw new ConfigLoadException("Config file does not exist :" + fileName);
       }
+      SceneInfoConfigChecker checker = new SceneInfoConfigChecker();
+      checker.checkHeader(logger, configDir);
+      List<SceneInfoConfig> newList = new ArrayList<>();
+      Map<Integer, SceneInfoConfig> newMap = new HashMap<>();
       try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String line;
-        br.readLine(); //先读取一行表头 
-        while ((line = br.readLine()) != null) { // 按行读取
-          String[] arr = line.split("\t");
-          SceneInfoConfig config = new SceneInfoConfig();
+        String rowText;
+        br.readLine();
+        br.readLine();
+        while ((rowText = br.readLine()) != null) {
+          if (rowText.isBlank()) { continue; }
+          String[] arr = rowText.split("\\t", -1);
+          if (arr.length < 78) {
+            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
+          }
+          int id = 0;
+          String sceneName = null;
+          String sceneResource = null;
+          int levelRequire = 0;
+          String sceneRequire = null;
+          int returnStamina = 0;
+          String startPerformance = null;
+          int sceneBGM = 0;
+          int sceneType = 0;
+          int isClient = 0;
+          int checkBattle = 0;
+          int prepareType = 0;
+          int readyWaitTime = 0;
+          int activityId = 0;
+          int lineupNo = 0;
+          int lineupType = 0;
+          String appointedNPC = null;
+          int defaultSpEnergy = 0;
+          int spEnergyCoe = 0;
+          int defaultEnergy = 0;
+          int defaultEnergyRecover = 0;
+          int defaultEnergyRaise = 0;
+          int defaultEnergyRecoverMax = 0;
+          int defaultEnergyBar = 0;
+          int maxMember = 0;
+          int sceneControlResource = 0;
+          String bossPos = null;
+          int npcType = 0;
+          String sceneNpc_1 = null;
+          String sceneNpc_2 = null;
+          String sceneNpc_3 = null;
+          String sceneNpc_4 = null;
+          String sceneNpc_5 = null;
+          String battlePosId = null;
+          String knockPosition_a = null;
+          String knockPosition_b = null;
+          String sceneObjects = null;
+          int bonusGroup = 0;
+          int fixedBonusGroup = 0;
+          String eventIds = null;
+          int changeInfo = 0;
+          String endInfo = null;
+          int dropGroup = 0;
+          int starType = 0;
+          String starList = null;
+          String dropList = null;
+          int exp = 0;
+          int gold = 0;
+          int firstDrop = 0;
+          int summonType = 0;
+          String sceneSkills = null;
+          int triggerPro1 = 0;
+          String triggerStage1 = null;
+          int triggerPro2 = 0;
+          String triggerStage2 = null;
+          int light = 0;
+          String scenePos = null;
+          String scenePoint = null;
+          String hintType = null;
+          String sceneHint = null;
+          String hintPic = null;
+          String endShow = null;
+          int isCloseSpeed = 0;
+          String isCloseAuto = null;
+          String isClosePerformance = null;
+          int isOpenSpecialUi = 0;
+          String battleStartUiTpye = null;
+          int showSelfBlood = 0;
+          int tryAgain = 0;
+          int sceneTimeId = 0;
+          String showDetail = null;
+          int changeHeroTime = 0;
+          int isShare = 0;
+          int strategy = 0;
+          int autoSaveLineup = 0;
+          int isTryPlay = 0;
+          int isChangeSkin = 0;
+          String blockBattleConvergeId = null;
           try {
-            //解析 编号
+            // 解析 编号
             if (!arr[0].trim().isEmpty()) {
-            config.id =  Integer.parseInt(arr[0].trim());
+              id = Integer.parseInt(arr[0].trim());
             }
 
-            //解析 场景名称
+            // 解析 场景名称
             if (!arr[1].trim().isEmpty()) {
-            config.sceneName = arr[1].trim();
+              sceneName = arr[1].trim();
             }
 
-            //解析 场景资源
+            // 解析 场景资源
             if (!arr[2].trim().isEmpty()) {
-            config.sceneResource = arr[2].trim();
+              sceneResource = arr[2].trim();
             }
 
-            //解析 进入等级（作废）
+            // 解析 进入等级（作废）
             if (!arr[3].trim().isEmpty()) {
-            config.levelRequire =  Integer.parseInt(arr[3].trim());
+              levelRequire = Integer.parseInt(arr[3].trim());
             }
 
-            //解析 前置关卡（作废）
+            // 解析 前置关卡（作废）
             if (!arr[4].trim().isEmpty()) {
-            config.sceneRequire = arr[4].trim();
+              sceneRequire = arr[4].trim();
             }
 
-            //解析 失败体力返还（作废）
+            // 解析 失败体力返还（作废）
             if (!arr[5].trim().isEmpty()) {
-            config.returnStamina =  Integer.parseInt(arr[5].trim());
+              returnStamina = Integer.parseInt(arr[5].trim());
             }
 
-            //解析 进场动画
+            // 解析 进场动画
             if (!arr[6].trim().isEmpty()) {
-            config.startPerformance = arr[6].trim();
+              startPerformance = arr[6].trim();
             }
 
-            //解析 场景音乐
+            // 解析 场景音乐
             if (!arr[7].trim().isEmpty()) {
-            config.sceneBGM =  Integer.parseInt(arr[7].trim());
+              sceneBGM = Integer.parseInt(arr[7].trim());
             }
 
-            //解析 关卡类型
+            // 解析 关卡类型
             if (!arr[8].trim().isEmpty()) {
-            config.sceneType =  Integer.parseInt(arr[8].trim());
+              sceneType = Integer.parseInt(arr[8].trim());
             }
 
-            //解析 是否只是前端运算
+            // 解析 是否只是前端运算
             if (!arr[9].trim().isEmpty()) {
-            config.isClient =  Integer.parseInt(arr[9].trim());
+              isClient = Integer.parseInt(arr[9].trim());
             }
 
-            //解析 是否验证战斗
+            // 解析 是否验证战斗
             if (!arr[10].trim().isEmpty()) {
-            config.checkBattle =  Integer.parseInt(arr[10].trim());
+              checkBattle = Integer.parseInt(arr[10].trim());
             }
 
-            //解析 备战阶段类型
+            // 解析 备战阶段类型
             if (!arr[11].trim().isEmpty()) {
-            config.prepareType =  Integer.parseInt(arr[11].trim());
+              prepareType = Integer.parseInt(arr[11].trim());
             }
 
-            //解析 战前准备时间（ms）
+            // 解析 战前准备时间（ms）
             if (!arr[12].trim().isEmpty()) {
-            config.readyWaitTime =  Integer.parseInt(arr[12].trim());
+              readyWaitTime = Integer.parseInt(arr[12].trim());
             }
 
-            //解析 关联的activityid
+            // 解析 关联的activityid
             if (!arr[13].trim().isEmpty()) {
-            config.activityId =  Integer.parseInt(arr[13].trim());
+              activityId = Integer.parseInt(arr[13].trim());
             }
 
-            //解析 默认上阵阵容
+            // 解析 默认上阵阵容
             if (!arr[14].trim().isEmpty()) {
-            config.lineupNo =  Integer.parseInt(arr[14].trim());
+              lineupNo = Integer.parseInt(arr[14].trim());
             }
 
-            //解析 上阵类型
+            // 解析 上阵类型
             if (!arr[15].trim().isEmpty()) {
-            config.lineupType =  Integer.parseInt(arr[15].trim());
+              lineupType = Integer.parseInt(arr[15].trim());
             }
 
-            //解析 指定NPC列表
+            // 解析 指定NPC列表
             if (!arr[16].trim().isEmpty()) {
-            config.appointedNPC = arr[16].trim();
+              appointedNPC = arr[16].trim();
             }
 
-            //解析 初始S能量
+            // 解析 初始S能量
             if (!arr[17].trim().isEmpty()) {
-            config.defaultSpEnergy =  Integer.parseInt(arr[17].trim());
+              defaultSpEnergy = Integer.parseInt(arr[17].trim());
             }
 
-            //解析 S能量获取系数
+            // 解析 S能量获取系数
             if (!arr[18].trim().isEmpty()) {
-            config.spEnergyCoe =  Integer.parseInt(arr[18].trim());
+              spEnergyCoe = Integer.parseInt(arr[18].trim());
             }
 
-            //解析 初始能量
+            // 解析 初始能量
             if (!arr[19].trim().isEmpty()) {
-            config.defaultEnergy =  Integer.parseInt(arr[19].trim());
+              defaultEnergy = Integer.parseInt(arr[19].trim());
             }
 
-            //解析 能量点初始回复数值
+            // 解析 能量点初始回复数值
             if (!arr[20].trim().isEmpty()) {
-            config.defaultEnergyRecover =  Integer.parseInt(arr[20].trim());
+              defaultEnergyRecover = Integer.parseInt(arr[20].trim());
             }
 
-            //解析 能量点回复数值增量
+            // 解析 能量点回复数值增量
             if (!arr[21].trim().isEmpty()) {
-            config.defaultEnergyRaise =  Integer.parseInt(arr[21].trim());
+              defaultEnergyRaise = Integer.parseInt(arr[21].trim());
             }
 
-            //解析 能量点最大回复数值
+            // 解析 能量点最大回复数值
             if (!arr[22].trim().isEmpty()) {
-            config.defaultEnergyRecoverMax =  Integer.parseInt(arr[22].trim());
+              defaultEnergyRecoverMax = Integer.parseInt(arr[22].trim());
             }
 
-            //解析 初始能量进度
+            // 解析 初始能量进度
             if (!arr[23].trim().isEmpty()) {
-            config.defaultEnergyBar =  Integer.parseInt(arr[23].trim());
+              defaultEnergyBar = Integer.parseInt(arr[23].trim());
             }
 
-            //解析 最多上阵数量
+            // 解析 最多上阵数量
             if (!arr[24].trim().isEmpty()) {
-            config.maxMember =  Integer.parseInt(arr[24].trim());
+              maxMember = Integer.parseInt(arr[24].trim());
             }
 
-            //解析 使用站位布点
+            // 解析 使用站位布点
             if (!arr[25].trim().isEmpty()) {
-            config.sceneControlResource =  Integer.parseInt(arr[25].trim());
+              sceneControlResource = Integer.parseInt(arr[25].trim());
             }
 
-            //解析 BOSS位置信息
+            // 解析 BOSS位置信息
             if (!arr[26].trim().isEmpty()) {
-            config.bossPos = arr[26].trim();
+              bossPos = arr[26].trim();
             }
 
-            //解析 NPC类型
+            // 解析 NPC类型
             if (!arr[27].trim().isEmpty()) {
-            config.npcType =  Integer.parseInt(arr[27].trim());
+              npcType = Integer.parseInt(arr[27].trim());
             }
 
-            //解析 场景NPC列表
+            // 解析 场景NPC列表
             if (!arr[28].trim().isEmpty()) {
-            config.sceneNpc_1 = arr[28].trim();
+              sceneNpc_1 = arr[28].trim();
             }
 
-            //解析 场景NPC列表
+            // 解析 场景NPC列表
             if (!arr[29].trim().isEmpty()) {
-            config.sceneNpc_2 = arr[29].trim();
+              sceneNpc_2 = arr[29].trim();
             }
 
-            //解析 场景NPC列表
+            // 解析 场景NPC列表
             if (!arr[30].trim().isEmpty()) {
-            config.sceneNpc_3 = arr[30].trim();
+              sceneNpc_3 = arr[30].trim();
             }
 
-            //解析 场景NPC列表
+            // 解析 场景NPC列表
             if (!arr[31].trim().isEmpty()) {
-            config.sceneNpc_4 = arr[31].trim();
+              sceneNpc_4 = arr[31].trim();
             }
 
-            //解析 场景NPC列表
+            // 解析 场景NPC列表
             if (!arr[32].trim().isEmpty()) {
-            config.sceneNpc_5 = arr[32].trim();
+              sceneNpc_5 = arr[32].trim();
             }
 
-            //解析 角色站位信息
+            // 解析 角色站位信息
             if (!arr[33].trim().isEmpty()) {
-            config.battlePosId = arr[33].trim();
+              battlePosId = arr[33].trim();
             }
 
-            //解析 击飞位置
+            // 解析 击飞位置
             if (!arr[34].trim().isEmpty()) {
-            config.knockPosition_a = arr[34].trim();
+              knockPosition_a = arr[34].trim();
             }
 
-            //解析 击飞位置
+            // 解析 击飞位置
             if (!arr[35].trim().isEmpty()) {
-            config.knockPosition_b = arr[35].trim();
+              knockPosition_b = arr[35].trim();
             }
 
-            //解析 场景交互物列表
+            // 解析 场景交互物列表
             if (!arr[36].trim().isEmpty()) {
-            config.sceneObjects = arr[36].trim();
+              sceneObjects = arr[36].trim();
             }
 
-            //解析 Bonus组
+            // 解析 Bonus组
             if (!arr[37].trim().isEmpty()) {
-            config.bonusGroup =  Integer.parseInt(arr[37].trim());
+              bonusGroup = Integer.parseInt(arr[37].trim());
             }
 
-            //解析 固定Bonus组
+            // 解析 固定Bonus组
             if (!arr[38].trim().isEmpty()) {
-            config.fixedBonusGroup =  Integer.parseInt(arr[38].trim());
+              fixedBonusGroup = Integer.parseInt(arr[38].trim());
             }
 
-            //解析 战场事件id
+            // 解析 战场事件id
             if (!arr[39].trim().isEmpty()) {
-            config.eventIds = arr[39].trim();
+              eventIds = arr[39].trim();
             }
 
-            //解析 换波处理
+            // 解析 换波处理
             if (!arr[40].trim().isEmpty()) {
-            config.changeInfo =  Integer.parseInt(arr[40].trim());
+              changeInfo = Integer.parseInt(arr[40].trim());
             }
 
-            //解析 结束条件
+            // 解析 结束条件
             if (!arr[41].trim().isEmpty()) {
-            config.endInfo = arr[41].trim();
+              endInfo = arr[41].trim();
             }
 
-            //解析 关卡掉落
+            // 解析 关卡掉落
             if (!arr[42].trim().isEmpty()) {
-            config.dropGroup =  Integer.parseInt(arr[42].trim());
+              dropGroup = Integer.parseInt(arr[42].trim());
             }
 
-            //解析 关卡评分类型
+            // 解析 关卡评分类型
             if (!arr[43].trim().isEmpty()) {
-            config.starType =  Integer.parseInt(arr[43].trim());
+              starType = Integer.parseInt(arr[43].trim());
             }
 
-            //解析 关卡评分list
+            // 解析 关卡评分list
             if (!arr[44].trim().isEmpty()) {
-            config.starList = arr[44].trim();
+              starList = arr[44].trim();
             }
 
-            //解析 关卡掉落list
+            // 解析 关卡掉落list
             if (!arr[45].trim().isEmpty()) {
-            config.dropList = arr[45].trim();
+              dropList = arr[45].trim();
             }
 
-            //解析 关卡经验
+            // 解析 关卡经验
             if (!arr[46].trim().isEmpty()) {
-            config.exp =  Integer.parseInt(arr[46].trim());
+              exp = Integer.parseInt(arr[46].trim());
             }
 
-            //解析 关卡金币
+            // 解析 关卡金币
             if (!arr[47].trim().isEmpty()) {
-            config.gold =  Integer.parseInt(arr[47].trim());
+              gold = Integer.parseInt(arr[47].trim());
             }
 
-            //解析 首通掉落
+            // 解析 首通掉落
             if (!arr[48].trim().isEmpty()) {
-            config.firstDrop =  Integer.parseInt(arr[48].trim());
+              firstDrop = Integer.parseInt(arr[48].trim());
             }
 
-            //解析 埼玉召唤类型
+            // 解析 埼玉召唤类型
             if (!arr[49].trim().isEmpty()) {
-            config.summonType =  Integer.parseInt(arr[49].trim());
+              summonType = Integer.parseInt(arr[49].trim());
             }
 
-            //解析 场景技能
+            // 解析 场景技能
             if (!arr[50].trim().isEmpty()) {
-            config.sceneSkills = arr[50].trim();
+              sceneSkills = arr[50].trim();
             }
 
-            //解析 限时挑战触发概率
+            // 解析 限时挑战触发概率
             if (!arr[51].trim().isEmpty()) {
-            config.triggerPro1 =  Integer.parseInt(arr[51].trim());
+              triggerPro1 = Integer.parseInt(arr[51].trim());
             }
 
-            //解析 限时挑战触发事件
+            // 解析 限时挑战触发事件
             if (!arr[52].trim().isEmpty()) {
-            config.triggerStage1 = arr[52].trim();
+              triggerStage1 = arr[52].trim();
             }
 
-            //解析 大体力玩法触发概率
+            // 解析 大体力玩法触发概率
             if (!arr[53].trim().isEmpty()) {
-            config.triggerPro2 =  Integer.parseInt(arr[53].trim());
+              triggerPro2 = Integer.parseInt(arr[53].trim());
             }
 
-            //解析 限时挑战触发事件
+            // 解析 限时挑战触发事件
             if (!arr[54].trim().isEmpty()) {
-            config.triggerStage2 = arr[54].trim();
+              triggerStage2 = arr[54].trim();
             }
 
-            //解析 光照方向
+            // 解析 光照方向
             if (!arr[55].trim().isEmpty()) {
-            config.light =  Integer.parseInt(arr[55].trim());
+              light = Integer.parseInt(arr[55].trim());
             }
 
-            //解析 场景偏移
+            // 解析 场景偏移
             if (!arr[56].trim().isEmpty()) {
-            config.scenePos = arr[56].trim();
+              scenePos = arr[56].trim();
             }
 
-            //解析 关卡提示tips
+            // 解析 关卡提示tips
             if (!arr[57].trim().isEmpty()) {
-            config.scenePoint = null;
+              scenePoint = arr[57].trim();
             }
 
-            //解析 关卡机制提示类型
+            // 解析 关卡机制提示类型
             if (!arr[58].trim().isEmpty()) {
-            config.hintType = arr[58].trim();
+              hintType = arr[58].trim();
             }
 
-            //解析 关卡机制提示
+            // 解析 关卡机制提示
             if (!arr[59].trim().isEmpty()) {
-            config.sceneHint = arr[59].trim();
+              sceneHint = arr[59].trim();
             }
 
-            //解析 关卡提示图片
+            // 解析 关卡提示图片
             if (!arr[60].trim().isEmpty()) {
-            config.hintPic = arr[60].trim();
+              hintPic = arr[60].trim();
             }
 
-            //解析 是否有关卡结算展示
+            // 解析 是否有关卡结算展示
             if (!arr[61].trim().isEmpty()) {
-            config.endShow = null;
+              endShow = arr[61].trim();
             }
 
-            //解析 是否强制N倍速
+            // 解析 是否强制N倍速
             if (!arr[62].trim().isEmpty()) {
-            config.isCloseSpeed =  Integer.parseInt(arr[62].trim());
+              isCloseSpeed = Integer.parseInt(arr[62].trim());
             }
 
-            //解析 是否强制手动战斗
+            // 解析 是否强制手动战斗
             if (!arr[63].trim().isEmpty()) {
-            config.isCloseAuto = null;
+              isCloseAuto = arr[63].trim();
             }
 
-            //解析 是否强制开启演出
+            // 解析 是否强制开启演出
             if (!arr[64].trim().isEmpty()) {
-            config.isClosePerformance = null;
+              isClosePerformance = arr[64].trim();
             }
 
-            //解析 是否开启特殊UI边缘
+            // 解析 是否开启特殊UI边缘
             if (!arr[65].trim().isEmpty()) {
-            config.isOpenSpecialUi =  Integer.parseInt(arr[65].trim());
+              isOpenSpecialUi = Integer.parseInt(arr[65].trim());
             }
 
-            //解析 开始战斗的特殊UI展示类型（波次,UI类型|波次,UI类型）
+            // 解析 开始战斗的特殊UI展示类型（波次,UI类型|波次,UI类型）
             if (!arr[66].trim().isEmpty()) {
-            config.battleStartUiTpye = arr[66].trim();
+              battleStartUiTpye = arr[66].trim();
             }
 
-            //解析 是否显示我方血条
+            // 解析 是否显示我方血条
             if (!arr[67].trim().isEmpty()) {
-            config.showSelfBlood =  Integer.parseInt(arr[67].trim());
+              showSelfBlood = Integer.parseInt(arr[67].trim());
             }
 
-            //解析 失败是否再次挑战
+            // 解析 失败是否再次挑战
             if (!arr[68].trim().isEmpty()) {
-            config.tryAgain =  Integer.parseInt(arr[68].trim());
+              tryAgain = Integer.parseInt(arr[68].trim());
             }
 
-            //解析 等待时间管理id
+            // 解析 等待时间管理id
             if (!arr[69].trim().isEmpty()) {
-            config.sceneTimeId =  Integer.parseInt(arr[69].trim());
+              sceneTimeId = Integer.parseInt(arr[69].trim());
             }
 
-            //解析 是否显示战斗详情
+            // 解析 是否显示战斗详情
             if (!arr[70].trim().isEmpty()) {
-            config.showDetail = arr[70].trim();
+              showDetail = arr[70].trim();
             }
 
-            //解析 战前换阵容时间限制（单位ms）
+            // 解析 战前换阵容时间限制（单位ms）
             if (!arr[71].trim().isEmpty()) {
-            config.changeHeroTime =  Integer.parseInt(arr[71].trim());
+              changeHeroTime = Integer.parseInt(arr[71].trim());
             }
 
-            //解析 时间是否共用
+            // 解析 时间是否共用
             if (!arr[72].trim().isEmpty()) {
-            config.isShare =  Integer.parseInt(arr[72].trim());
+              isShare = Integer.parseInt(arr[72].trim());
             }
 
-            //解析 攻略ID
+            // 解析 攻略ID
             if (!arr[73].trim().isEmpty()) {
-            config.strategy =  Integer.parseInt(arr[73].trim());
+              strategy = Integer.parseInt(arr[73].trim());
             }
 
-            //解析 是否自动保存阵容
+            // 解析 是否自动保存阵容
             if (!arr[74].trim().isEmpty()) {
-            config.autoSaveLineup =  Integer.parseInt(arr[74].trim());
+              autoSaveLineup = Integer.parseInt(arr[74].trim());
             }
 
-            //解析 是否试玩关卡
+            // 解析 是否试玩关卡
             if (!arr[75].trim().isEmpty()) {
-            config.isTryPlay =  Integer.parseInt(arr[75].trim());
+              isTryPlay = Integer.parseInt(arr[75].trim());
             }
 
-            //解析 是否试玩关卡
+            // 解析 是否试玩关卡
             if (!arr[76].trim().isEmpty()) {
-            config.isChangeSkin =  Integer.parseInt(arr[76].trim());
+              isChangeSkin = Integer.parseInt(arr[76].trim());
             }
 
-            //解析 托管默认集火目标
+            // 解析 托管默认集火目标
             if (!arr[77].trim().isEmpty()) {
-            config.blockBattleConvergeId = arr[77].trim();
+              blockBattleConvergeId = arr[77].trim();
             }
-
 
           } catch (Exception e) {
-            logger.error(
-                String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, line, e.getMessage()));
-            e.printStackTrace();
+            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
             throw new ConfigLoadException("Error parsing config file :" + fileName);
           }
+          SceneInfoConfig config = new SceneInfoConfig(id, sceneName, sceneResource, levelRequire, sceneRequire, returnStamina, startPerformance, sceneBGM, sceneType, isClient, checkBattle, prepareType, readyWaitTime, activityId, lineupNo, lineupType, appointedNPC, defaultSpEnergy, spEnergyCoe, defaultEnergy, defaultEnergyRecover, defaultEnergyRaise, defaultEnergyRecoverMax, defaultEnergyBar, maxMember, sceneControlResource, bossPos, npcType, sceneNpc_1, sceneNpc_2, sceneNpc_3, sceneNpc_4, sceneNpc_5, battlePosId, knockPosition_a, knockPosition_b, sceneObjects, bonusGroup, fixedBonusGroup, eventIds, changeInfo, endInfo, dropGroup, starType, starList, dropList, exp, gold, firstDrop, summonType, sceneSkills, triggerPro1, triggerStage1, triggerPro2, triggerStage2, light, scenePos, scenePoint, hintType, sceneHint, hintPic, endShow, isCloseSpeed, isCloseAuto, isClosePerformance, isOpenSpecialUi, battleStartUiTpye, showSelfBlood, tryAgain, sceneTimeId, showDetail, changeHeroTime, isShare, strategy, autoSaveLineup, isTryPlay, isChangeSkin, blockBattleConvergeId);
           config.afterLoad();
-          configList.add(config);
-          configMap.put(config.id, config);
+          newList.add(config);
+          newMap.put(config.id, config);
         }
+        checker.checkAfterParse(logger, newList);
+        configList = List.copyOf(newList);
+        configMap = Map.copyOf(newMap);
         afterLoad();
       } catch (IOException e) {
-        e.printStackTrace();
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }
     }
 
     @Override
-    protected void clear() {
-
-      configList.clear();
-      configMap.clear();
-
+    public void clear() {
+      configList = List.of();
+      configMap = Map.of();
       // @@@@@自定义clear方法开始区@@@@@
-
 
       // @@@@@自定义clear方法结束区@@@@@
     }
 
     private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       String[] parts = value.split(",");
       List<Integer> result = new ArrayList<>();
       for (String part : parts) {
-        try {
-          result.add(Integer.parseInt(part.trim()));
-        } catch (NumberFormatException e) {
-          // 如果不是数字，则跳过
-        }
+        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
       }
       return result;
     }
 
     private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<Integer, Integer>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            try {
-              Integer key = Integer.parseInt(keyStr);
-              Integer val = Integer.parseInt(valueStr);
-              result.add(new KV<>(key, val));
-            } catch (NumberFormatException e) {
-              // 如果不是数字，则跳过
-            }
-          }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) {
+          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
         }
       }
       return result;
     }
 
     private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) {
-        return new ArrayList<>();
-      }
+      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
       List<KV<String, String>> result = new ArrayList<>();
-      String[] pairs = value.split(",");
-      for (String pair : pairs) {
-        pair = pair.trim();
-        if (!pair.isEmpty()) {
-          int idx = pair.indexOf(":");
-          if (idx > 0) {
-            String keyStr = pair.substring(0, idx).trim();
-            String valueStr = pair.substring(idx + 1).trim();
-            result.add(new KV<>(keyStr, valueStr));
-          }
-        }
+      for (String pair : value.split(",")) {
+        int idx = pair.indexOf(":");
+        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
       }
       return result;
     }
@@ -559,17 +620,17 @@ public class SceneInfoConfigManager implements InterfaceConfigManagerProxy {
     public Map<Integer, SceneInfoConfig> getConfigMap() {
       return configMap;
     }
+
     @Override
     public String getConfigFileName() {
       return "sceneInfo.txt";
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
 
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

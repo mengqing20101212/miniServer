@@ -1,4 +1,5 @@
-id	itemId	name	decomposeItemId	
+#fields	id	itemId	name	decomposeItemId
+#types	INT	INT	STRING	STRING
 1	1410001	演算装置	1120109,10
 2	1410002	动力装置	1120109,10
 3	1410003	传感装置	1120109,10

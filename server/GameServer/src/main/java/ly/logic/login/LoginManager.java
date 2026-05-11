@@ -126,9 +126,7 @@ public class LoginManager {
             PlayerManager.getInstance().addOnlinePlayer(onlinePlayer);
 
             GamePlayer gamePlayer = new GamePlayer(task.session);
-            gamePlayer.setAccount(task.request.getAccount());
             gamePlayer.setPlayerId(onlinePlayer.getPlayerId());
-            gamePlayer.setToken(task.request.getToken());
             gamePlayer.setLastSeq(task.packet.getSeq());
             gamePlayer.setLastClientCmd(task.packet.getCmd());
             gamePlayer.setLastSid(task.packet.getSid());
@@ -142,6 +140,7 @@ public class LoginManager {
         }
         // 设置玩家为游戏中状态
         onlinePlayer.setStatus(PlayerStatusEnum.PLAYING);
+        onlinePlayer.setToken(task.request.getToken());
 
         // 6. 派发登录完成事件
         onlinePlayer.dispatchEvent(PlayerEventType.PLAYER_LOGIN_COMPLETE);

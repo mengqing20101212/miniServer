@@ -1,4 +1,5 @@
-id	type	outPutId	
+#fields	id	type	outPutId
+#types	INT	INT	INT
 1	2	1
 2	2	2
 3	2	9999

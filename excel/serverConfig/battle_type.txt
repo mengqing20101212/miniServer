@@ -1,4 +1,2 @@
-name	ms	timeout	battle_time	battle_type	sceneid	preparetimeout	checktimeoutinterval	accounttimeout	
-	0	0	0	0	0	0	0	0
-	0	0	0	0	0	0	0	0
-	0	0	0	0	0	0	0	0
+#fields	name	ms	timeout	battle_time	battle_type	sceneid	preparetimeout	checktimeoutinterval	accounttimeout
+#types	STRING	INT	INT	INT	INT	INT	INT	INT	INT
