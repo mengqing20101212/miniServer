@@ -8,6 +8,7 @@ import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 import ly.proto.Server;
+import ly.security.SecurityBanService;
 
 /**
  * 游戏服协议控制器，负责注册并处理对应业务消息。
@@ -27,6 +28,12 @@ public class Gate2GameRpcGameCallController implements IGameController {
                     AbstractMessagePacket clientPacket = new AbstractMessagePacket(guid, cmd, req.getSid(), seq, data);
                     if (cmd == Cmd.CMD.CS_Login_VALUE) {// 登录
                         HandlerRouterManager.execute(context.session(), clientPacket);
+                        return;
+                    }
+                    if (SecurityBanService.getInstance().isPlayerBanned(guid)) {
+                        SecurityBanService.getInstance()
+                                .writeRejectEvent(null, null, null, guid, cmd, req.getSid(), seq, "Game 角色封禁");
+                        context.session().sendErrorMsg(guid, ErrorMsg.ErrorCode.SYSTEM_ERROR, seq, cmd);
                         return;
                     }
                     Player player = PlayerManager.getInstance().getOnlinePlayer(guid);

@@ -3,6 +3,8 @@ package ly.net;
 import io.netty.channel.ChannelHandlerContext;
 import ly.net.packet.AbstractMessagePacket;
 
+import java.net.InetSocketAddress;
+
 import static ly.LoggerDef.NetLogger;
 
 /**
@@ -55,6 +57,16 @@ public class Connector {
 
     public int getSessionId() {
         return sessionId;
+    }
+
+    public String getRemoteIp() {
+        if (socketChannel == null || socketChannel.channel() == null) {
+            return "";
+        }
+        if (socketChannel.channel().remoteAddress() instanceof InetSocketAddress address) {
+            return address.getAddress() != null ? address.getAddress().getHostAddress() : address.getHostString();
+        }
+        return String.valueOf(socketChannel.channel().remoteAddress());
     }
 
    /* public void write(byte[] msg) throws Exception {

@@ -12,6 +12,7 @@ import ly.net.IController;
 import ly.net.NetService;
 import ly.redis.RedisUtils;
 import ly.rpc.RpcService;
+import ly.security.SecurityBanService;
 import ly.startup.StartupSkillLoader;
 import ly.db.AutoTableService;
 import org.slf4j.Logger;
@@ -90,6 +91,9 @@ public class ServerContext {
         
         // 启动自动建表服务
         AutoTableService.getInstance().startAutoTableService();
+
+        // 表结构补齐后加载封禁数据，运行期拦截只读 Redis，避免每个客户端包打到 MySQL。
+        SecurityBanService.getInstance().loadActiveBansFromDb();
         
         NetService.getInstance().startUp(gameObjectProvider, serverConfig.serverPort);
         // 当前服务器端口绑定完成后再补发可靠 RPC，避免目标服处理后回包找不到本服连接。

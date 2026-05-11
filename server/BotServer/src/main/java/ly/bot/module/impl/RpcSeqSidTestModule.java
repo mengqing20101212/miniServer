@@ -53,9 +53,21 @@ public class RpcSeqSidTestModule implements RobotModule {
             long responseTimeoutMs,
             String account,
             String tokenOverride) {
+        return runReliableReplayStandalone(
+                loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, account, tokenOverride, null);
+    }
+
+    public static boolean runReliableReplayStandalone(
+            String loginHost,
+            int loginHttpPort,
+            long delayBeforeHeroMs,
+            long responseTimeoutMs,
+            String account,
+            String tokenOverride,
+            Long playerIdOverride) {
         RpcSeqSidTestModule module = new RpcSeqSidTestModule();
         return module.runFullTest(
-                loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, true, account, tokenOverride);
+                loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, true, account, tokenOverride, playerIdOverride);
     }
 
     @Override
@@ -153,6 +165,26 @@ public class RpcSeqSidTestModule implements RobotModule {
             boolean reliableReplayMode,
             String accountOverride,
             String tokenOverride) {
+        return runFullTest(
+                loginHost,
+                loginHttpPort,
+                delayBeforeHeroMs,
+                responseTimeoutMs,
+                reliableReplayMode,
+                accountOverride,
+                tokenOverride,
+                null);
+    }
+
+    private boolean runFullTest(
+            String loginHost,
+            int loginHttpPort,
+            long delayBeforeHeroMs,
+            long responseTimeoutMs,
+            boolean reliableReplayMode,
+            String accountOverride,
+            String tokenOverride,
+            Long playerIdOverride) {
         String account =
                 accountOverride != null && !accountOverride.isBlank()
                         ? accountOverride
@@ -191,13 +223,13 @@ public class RpcSeqSidTestModule implements RobotModule {
                     Login.csLogin.newBuilder()
                             .setAccount(account)
                             .setAccountId(accountId)
-                            .setPlayerId(0)
+                            .setPlayerId(playerIdOverride != null ? playerIdOverride : 0)
                             .setPlayerName("SeqSidBot")
                             .setChannel("bot")
                             .setGameServerId(gameServerId)
                             .setToken(token)
                             .setDeviceId("rpc-seq-sid-test")
-                            .setIsReconnect(false)
+                            .setIsReconnect(playerIdOverride != null && playerIdOverride > 0)
                             .build();
             AbstractMessagePacket loginPacket =
                     MessagePacketFactory.createAbstractMessagePacket(

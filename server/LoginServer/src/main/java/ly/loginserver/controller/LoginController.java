@@ -7,6 +7,8 @@ import ly.loginserver.result.ServerListResult;
 import ly.loginserver.service.LoginService;
 import ly.redis.RedisKeys;
 import ly.redis.RedisUtils;
+import ly.security.SecurityBanService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,9 +42,12 @@ public class LoginController {
      * @return 网关、游戏服列表、角色列表以及账号登录凭证
      */
     @GetMapping("serverList")
-    public LoginResult<ServerListResult> getServerList(String account) {
+    public LoginResult<ServerListResult> getServerList(String account, HttpServletRequest request) {
         if (!StringUtils.hasText(account)) {
             return new LoginResult<>(ErrorCode.PARAM_ERROR);
+        }
+        if (isBlocked(account, request)) {
+            return blockedResult(account, request);
         }
         ServerListResult result = new ServerListResult();
         result.setPlayers(loginService.getPlayers(account));
@@ -75,12 +80,15 @@ public class LoginController {
      * @return 新账号信息，包含账号 id、token、渠道和网关
      */
     @GetMapping("register")
-    public LoginResult<Map<String, Object>> register(String account, String channel) {
+    public LoginResult<Map<String, Object>> register(String account, String channel, HttpServletRequest request) {
         if (!StringUtils.hasText(account)) {
             return new LoginResult<>(ErrorCode.PARAM_ERROR);
         }
         if (!StringUtils.hasText(channel)) {
             return new LoginResult<>(ErrorCode.PARAM_ERROR);
+        }
+        if (isBlocked(account, request)) {
+            return new LoginResult<>(blockedError(account, request));
         }
         if (RedisUtils.exists(RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account))) {
             return new LoginResult<>(ErrorCode.ACCOUNT_HAS_EXISTS);
@@ -97,5 +105,41 @@ public class LoginController {
         } else {
             return new LoginResult<>(ErrorCode.SYSTEM_ERROR);
         }
+    }
+
+    private boolean isBlocked(String account, HttpServletRequest request) {
+        SecurityBanService securityBanService = SecurityBanService.getInstance();
+        return securityBanService.isIpBanned(clientIp(request))
+                || securityBanService.isAccountBanned(account);
+    }
+
+    private <T> LoginResult<T> blockedResult(String account, HttpServletRequest request) {
+        return new LoginResult<>(blockedError(account, request));
+    }
+
+    private ErrorCode blockedError(String account, HttpServletRequest request) {
+        SecurityBanService securityBanService = SecurityBanService.getInstance();
+        String ip = clientIp(request);
+        if (securityBanService.isIpBanned(ip)) {
+            securityBanService.writeRejectEvent(ip, account, null, null, null, null, null, "登录入口IP封禁");
+            return ErrorCode.IP_BANNED;
+        }
+        securityBanService.writeRejectEvent(ip, account, null, null, null, null, null, "登录入口账号封禁");
+        return ErrorCode.ACCOUNT_BANNED;
+    }
+
+    private String clientIp(HttpServletRequest request) {
+        if (request == null) {
+            return "";
+        }
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        if (StringUtils.hasText(forwardedFor)) {
+            return forwardedFor.split(",")[0].trim();
+        }
+        String realIp = request.getHeader("X-Real-IP");
+        if (StringUtils.hasText(realIp)) {
+            return realIp.trim();
+        }
+        return request.getRemoteAddr();
     }
 }

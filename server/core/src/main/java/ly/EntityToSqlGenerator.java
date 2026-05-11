@@ -5,8 +5,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.JarURLConnection;
+import java.net.URLDecoder;
 import java.sql.*;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * 数据库实体到建表 SQL 的生成器。
@@ -94,6 +98,8 @@ public class EntityToSqlGenerator {
                 if (directory.exists()) {
                     scanDirectory(directory, packageName, classes);
                 }
+            } else if (resource.getProtocol().equals("jar")) {
+                scanJar(resource, packagePath, classes);
             }
         }
         
@@ -112,6 +118,34 @@ public class EntityToSqlGenerator {
                 scanDirectory(file, packageName + "." + file.getName(), classes);
             } else if (file.getName().endsWith(".class")) {
                 String className = packageName + "." + file.getName().substring(0, file.getName().length() - 6);
+                Class<?> clazz = Class.forName(className);
+                if (clazz.isAnnotationPresent(DbMeta.DbTable.class)) {
+                    classes.add(clazz);
+                }
+            }
+        }
+    }
+
+    /**
+     * 扫描依赖 jar 中的实体类。
+     *
+     * <p>服务通过 Maven 或打包产物启动时，core 模块通常以 jar 形式出现在 classpath 中。
+     * 如果只扫描 file 目录，启动自动建表会漏掉 core 里的公共 Entity。
+     */
+    private void scanJar(java.net.URL resource, String packagePath, Set<Class<?>> classes)
+            throws IOException, ClassNotFoundException {
+        JarURLConnection connection = (JarURLConnection) resource.openConnection();
+        try (JarFile jarFile = connection.getJarFile()) {
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                String name = entry.getName();
+                if (entry.isDirectory() || !name.startsWith(packagePath) || !name.endsWith(".class")) {
+                    continue;
+                }
+                String classFileName = URLDecoder.decode(name, java.nio.charset.StandardCharsets.UTF_8)
+                        .replace('/', '.');
+                String className = classFileName.substring(0, classFileName.length() - 6);
                 Class<?> clazz = Class.forName(className);
                 if (clazz.isAnnotationPresent(DbMeta.DbTable.class)) {
                     classes.add(clazz);

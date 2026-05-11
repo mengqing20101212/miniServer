@@ -9,6 +9,8 @@ public enum ErrorCode {
   SYSTEM_ERROR(2, "系统错误"),
   PARAM_ERROR(3, "参数错误"),
   ACCOUNT_HAS_EXISTS(4, "该账号已经存在，不可在次注册"),
+  ACCOUNT_BANNED(5, "账号已被封禁"),
+  IP_BANNED(6, "IP已被封禁"),
   ;
   private int code;
   private String message;

@@ -69,3 +69,8 @@ INSERT IGNORE INTO gm_role (id, name, description) VALUES (4, '只读', '仅查�
 
 -- 默认管理员: admin / admin123（需手动插入时使用bcrypt密码）
 INSERT IGNORE INTO gm_admin (id, username, password, role_id, status) VALUES (1, 'admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 1, 1);
+
+-- 安全管理菜单。表结构由 Entry 自动建表链路生成，这里只补默认菜单数据。
+INSERT IGNORE INTO gm_menu (id, name, permission, parent_id, path, icon, sort_order) VALUES (900, '安全管理', 'security:view', 0, '', 'fas fa-shield-alt', 900);
+INSERT IGNORE INTO gm_menu (id, name, permission, parent_id, path, icon, sort_order) VALUES (901, '封禁管理', 'security:ban', 900, '/gm/security/ban', 'fas fa-ban', 901);
+INSERT IGNORE INTO gm_menu (id, name, permission, parent_id, path, icon, sort_order) VALUES (902, '安全日志', 'security:event', 900, '/gm/security/event', 'fas fa-clipboard-list', 902);

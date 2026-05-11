@@ -8,6 +8,7 @@ import ly.ProtoMessageFactory;
 import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Server;
+import ly.security.SecurityBanService;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -17,6 +18,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GateConnectSession extends ConnectSession {
     private final AtomicBoolean receiveWorkerStarted = new AtomicBoolean();
     private volatile Thread receiveWorker;
+    private long rateSecond;
+    private int rateCount;
+    private int rateViolationCount;
 
     public GateConnectSession(long guid) {
         super(guid);
@@ -67,6 +71,9 @@ public class GateConnectSession extends ConnectSession {
 
     private void handleReceivePacket(AbstractMessagePacket packet) {
         LoggerDef.LogProto("receive {}|{}|{}|{}", getGuid(), packet.getSid(), packet.getCmd(), packet.getLength());
+        if (shouldRejectPacket(packet)) {
+            return;
+        }
 
         boolean serverInnerCmd =
                 packet.getCmd() > Cmd.CMD.CS_Server2Server_VALUE
@@ -115,6 +122,57 @@ public class GateConnectSession extends ConnectSession {
                 }
             }
         }
+    }
+
+    private boolean shouldRejectPacket(AbstractMessagePacket packet) {
+        SecurityBanService securityBanService = SecurityBanService.getInstance();
+        String ip = getConnector() != null ? getConnector().getRemoteIp() : "";
+        GateClient client = GateClientManager.getInstance().getClient(getGuid());
+        if (client == null && packet != null) {
+            client = GateClientManager.getInstance().getClientBySid(packet.getSid());
+        }
+        String account = client != null ? client.getAccount() : null;
+        Long accountId = client != null && client.getAccountId() > 0 ? client.getAccountId() : null;
+        Long playerId = client != null && client.getPlayerId() > 0 ? client.getPlayerId() : null;
+        Integer cmd = packet != null ? packet.getCmd() : null;
+        Integer sid = packet != null ? packet.getSid() : null;
+        Integer seq = packet != null ? packet.getSeq() : null;
+
+        if (securityBanService.isIpBanned(ip)) {
+            securityBanService.writeRejectEvent(ip, account, accountId, playerId, cmd, sid, seq, "Gate IP封禁");
+            closeChannel();
+            return true;
+        }
+        if (account != null && securityBanService.isAccountBanned(account)) {
+            securityBanService.writeRejectEvent(ip, account, accountId, playerId, cmd, sid, seq, "Gate 账号封禁");
+            closeChannel();
+            return true;
+        }
+        if (playerId != null && securityBanService.isPlayerBanned(playerId)) {
+            securityBanService.writeRejectEvent(ip, account, accountId, playerId, cmd, sid, seq, "Gate 角色封禁");
+            closeChannel();
+            return true;
+        }
+        if (isRateLimited()) {
+            securityBanService.writeRateLimitEvent(ip, account, accountId, playerId, cmd, sid, seq, "Gate 发包频率过高");
+            closeChannel();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isRateLimited() {
+        long second = System.currentTimeMillis() / 1000;
+        if (second != rateSecond) {
+            rateSecond = second;
+            rateCount = 0;
+        }
+        rateCount++;
+        if (rateCount <= 80) {
+            return false;
+        }
+        rateViolationCount++;
+        return rateViolationCount >= 3;
     }
 
     public void sendClientMsg(int cmd, Message msg) {

@@ -68,6 +68,16 @@ public class PageController {
         return "log/list";
     }
 
+    @GetMapping("/security/ban")
+    public String securityBan() {
+        return "security/ban";
+    }
+
+    @GetMapping("/security/event")
+    public String securityEvent() {
+        return "security/event";
+    }
+
     @GetMapping("/admin/dashboard")
     public String dashboard() {
         return "admin/list";

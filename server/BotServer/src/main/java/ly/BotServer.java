@@ -26,10 +26,21 @@ public class BotServer {
             long delayBeforeHeroMs = args.length >= 4 ? Long.parseLong(args[3]) : 10_000L;
             long responseTimeoutMs = args.length >= 5 ? Long.parseLong(args[4]) : 90_000L;
             String account = args.length >= 6 ? args[5] : null;
-            String token = args.length >= 7 ? args[6] : null;
+            String token = null;
+            Long playerId = null;
+            if (args.length >= 7) {
+                if (isLong(args[6])) {
+                    playerId = Long.parseLong(args[6]);
+                } else {
+                    token = args[6];
+                }
+            }
+            if (args.length >= 8) {
+                playerId = Long.parseLong(args[7]);
+            }
             boolean success =
                     RpcSeqSidTestModule.runReliableReplayStandalone(
-                            loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, account, token);
+                            loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, account, token, playerId);
             System.exit(success ? 0 : 1);
         }
 
@@ -80,6 +91,18 @@ public class BotServer {
                 System.out.println("未知命令: " + command);
                 System.out.println("可用命令: --test-protocol, --run-bots, --test-rpc-seq-sid, --test-rpc-reliable-replay");
                 break;
+        }
+    }
+
+    private static boolean isLong(String value) {
+        if (value == null || value.isBlank()) {
+            return false;
+        }
+        try {
+            Long.parseLong(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 }

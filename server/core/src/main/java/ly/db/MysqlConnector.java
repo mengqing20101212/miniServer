@@ -288,7 +288,13 @@ public class MysqlConnector {
     try (Connection connection = dataSource.getConnection();
         PreparedStatement st = connection.prepareStatement(sql)) {
       addSqlParams(params, st);
-      result = st.executeUpdate() > 0;
+      if (isDdlSql(sql)) {
+        // DDL 语句执行成功时通常返回 0 行影响，不能用影响行数判断成败。
+        st.execute();
+        result = true;
+      } else {
+        result = st.executeUpdate() > 0;
+      }
       if (logger.isDebugEnabled()) {
         logger.debug(
             String.format(
@@ -308,6 +314,17 @@ public class MysqlConnector {
       logger.warn(String.format("execute SQL cost too long, check %s, %s", sql, getParamStr(params)));
     }
     return result;
+  }
+
+  private boolean isDdlSql(String sql) {
+    if (sql == null) {
+      return false;
+    }
+    String normalized = sql.stripLeading().toLowerCase();
+    return normalized.startsWith("create ")
+        || normalized.startsWith("alter ")
+        || normalized.startsWith("drop ")
+        || normalized.startsWith("truncate ");
   }
 
   public Number executeInsertReturnKey(String sql, Object... params) {
