@@ -164,9 +164,12 @@ public class ConfigHotUpdateService {
         GmConfigFileEntryHelper.listByVersion(version).stream()
             .map(GmConfigFileEntry::getFileName)
             .collect(Collectors.toSet());
-    expected.removeAll(uploaded);
-    if (!expected.isEmpty()) {
-      throw new IllegalStateException("版本缺少配表文件，不能发布: " + expected);
+    if (uploaded.isEmpty()) {
+      throw new IllegalStateException("版本没有上传任何配表文件，不能发布");
+    }
+    uploaded.removeAll(expected);
+    if (!uploaded.isEmpty()) {
+      throw new IllegalStateException("版本包含未知配表文件，不能发布: " + uploaded);
     }
   }
 

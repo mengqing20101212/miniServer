@@ -1,5 +1,7 @@
 package ly.gmserver.config;
 
+import java.util.Comparator;
+import java.util.List;
 import ly.LoggerDef;
 import ly.db.entry.GmMenuEntry;
 import ly.db.entry.GmMenuEntryHelper;
@@ -12,12 +14,16 @@ import org.springframework.stereotype.Component;
 public class GmConfigHotUpdateMenuInitializer implements ApplicationRunner {
   @Override
   public void run(ApplicationArguments args) {
-    ensureMenu(950, "配置管理", "config:view", 0, "", "fas fa-cog", 950);
-    ensureMenu(951, "配表热更", "config:hot-update", 950, "/gm/config/hot-update", "fas fa-upload", 951);
+    GmMenuEntry configRoot =
+        ensureMenu("配置管理", "config:view", 0, "", "fas fa-cog", 950);
+    if (configRoot == null || configRoot.getId() == null) {
+      LoggerDef.SystemLogger.error("初始化GM配表热更菜单失败，配置管理父菜单不存在");
+      return;
+    }
+    ensureMenu("配表热更", "config:hot-update", configRoot.getId(), "/gm/config/hot-update", "fas fa-upload", 951);
   }
 
-  private void ensureMenu(
-      Integer id,
+  private GmMenuEntry ensureMenu(
       String name,
       String permission,
       Integer parentId,
@@ -25,12 +31,36 @@ public class GmConfigHotUpdateMenuInitializer implements ApplicationRunner {
       String icon,
       Integer sortOrder) {
     try {
-      GmMenuEntry old = GmMenuEntryHelper.getGmMenuEntryById(id);
+      GmMenuEntry old = findExistingMenu(permission, path);
       if (old != null) {
-        return;
+        boolean changed = false;
+        if (!name.equals(old.getName())) {
+          old.setName(name);
+          changed = true;
+        }
+        if (!parentId.equals(old.getParentId())) {
+          old.setParentId(parentId);
+          changed = true;
+        }
+        if (!path.equals(old.getPath())) {
+          old.setPath(path);
+          changed = true;
+        }
+        if (!icon.equals(old.getIcon())) {
+          old.setIcon(icon);
+          changed = true;
+        }
+        if (!sortOrder.equals(old.getSortOrder())) {
+          old.setSortOrder(sortOrder);
+          changed = true;
+        }
+        if (changed) {
+          GmMenuEntryHelper.update(old, "name", "parent_id", "path", "icon", "sort_order");
+        }
+        return old;
       }
+
       GmMenuEntry menu = new GmMenuEntry();
-      menu.setId(id);
       menu.setName(name);
       menu.setPermission(permission);
       menu.setParentId(parentId);
@@ -38,8 +68,23 @@ public class GmConfigHotUpdateMenuInitializer implements ApplicationRunner {
       menu.setIcon(icon);
       menu.setSortOrder(sortOrder);
       GmMenuEntryHelper.save(menu);
+      return findExistingMenu(permission, path);
     } catch (Exception e) {
-      LoggerDef.SystemLogger.error("初始化GM配置热更菜单失败，menuId={}", id, e);
+      LoggerDef.SystemLogger.error("初始化GM配表热更菜单失败，permission={}", permission, e);
+      return null;
     }
+  }
+
+  private GmMenuEntry findExistingMenu(String permission, String path) {
+    List<GmMenuEntry> byPermission = GmMenuEntryHelper.select(new String[] {"permission"}, permission);
+    if (path != null && !path.isBlank()) {
+      return byPermission.stream()
+          .filter(menu -> path.equals(menu.getPath()))
+          .min(Comparator.comparingInt(GmMenuEntry::getId))
+          .orElse(null);
+    }
+    return byPermission.stream()
+        .min(Comparator.comparingInt(GmMenuEntry::getId))
+        .orElse(null);
   }
 }

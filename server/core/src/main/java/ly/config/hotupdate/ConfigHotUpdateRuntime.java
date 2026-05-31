@@ -7,19 +7,27 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import ly.ConfigLoadException;
 import ly.ConfigService;
 import ly.LoggerDef;
 import ly.ServerContext;
 
-/** 业务服收到 GM 热更指令后的本地执行器。 */
+/** 业务服收到 GM 配置热更指令后的本地执行器。 */
 public class ConfigHotUpdateRuntime {
   private static final ObjectMapper MAPPER = new ObjectMapper();
   private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
+  private static final String CHANGE_MANIFEST = "__changed_files.manifest";
+
   private static volatile boolean running;
   private static volatile ConfigHotUpdateCommand preparedCommand;
   private static volatile Path preparedDir;
@@ -55,18 +63,25 @@ public class ConfigHotUpdateRuntime {
       validate(command);
       report(command, "RECEIVED", "");
       Path configDir = Path.of(ServerContext.serverConfig.configPath);
-      Path stagingDir = configDir.resolveSibling(".config-hot-update-staging").resolve(command.version);
-      Files.createDirectories(stagingDir);
+      Path stagingDir =
+          configDir
+              .resolveSibling(".config-hot-update-staging")
+              .resolve(command.version)
+              .resolve(ServerContext.getServerId());
+      resetDirectory(stagingDir);
+      // 热更版本只需要包含本次变更的表，服务端用当前线上配置做基线，再用 GM 上传文件覆盖。
+      copyCurrentConfigAsBaseline(configDir, stagingDir);
       JsonNode files = downloadFiles(command.downloadUrl).path("data");
       if (!files.isArray()) {
         throw new ConfigLoadException("配置热更下载结果格式错误");
       }
+      List<String> changedFiles = new ArrayList<>();
       for (JsonNode file : files) {
-        Files.writeString(
-            stagingDir.resolve(file.path("fileName").asText()),
-            file.path("content").asText(),
-            StandardCharsets.UTF_8);
+        String fileName = file.path("fileName").asText();
+        Files.writeString(stagingDir.resolve(fileName), file.path("content").asText(), StandardCharsets.UTF_8);
+        changedFiles.add(fileName);
       }
+      Files.write(stagingDir.resolve(CHANGE_MANIFEST), changedFiles, StandardCharsets.UTF_8);
       report(command, "DOWNLOADED", "");
       ConfigService.getInstance()
           .loadAllConfigToStandby(LoggerDef.SystemLogger, stagingDir.toString(), command.version);
@@ -76,6 +91,30 @@ public class ConfigHotUpdateRuntime {
     } catch (Exception e) {
       report(command, "FAILED", e.getMessage());
       throw e;
+    }
+  }
+
+  private static void resetDirectory(Path dir) throws Exception {
+    if (Files.exists(dir)) {
+      try (var stream = Files.walk(dir)) {
+        for (Path path : stream.sorted(Comparator.reverseOrder()).toList()) {
+          Files.delete(path);
+        }
+      }
+    }
+    Files.createDirectories(dir);
+  }
+
+  private static void copyCurrentConfigAsBaseline(Path configDir, Path stagingDir) throws Exception {
+    if (!Files.isDirectory(configDir)) {
+      throw new ConfigLoadException("当前配置目录不存在，不能执行配置热更:" + configDir);
+    }
+    try (var stream = Files.list(configDir)) {
+      for (Path file : stream.toList()) {
+        if (Files.isRegularFile(file) && file.getFileName().toString().endsWith(".txt")) {
+          Files.copy(file, stagingDir.resolve(file.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+        }
+      }
     }
   }
 
@@ -89,17 +128,37 @@ public class ConfigHotUpdateRuntime {
       }
       Path configDir = Path.of(ServerContext.serverConfig.configPath);
       Files.createDirectories(configDir);
-      try (var stream = Files.list(preparedDir)) {
-        for (Path file : stream.toList()) {
-          Files.copy(file, configDir.resolve(file.getFileName()), StandardCopyOption.REPLACE_EXISTING);
-        }
-      }
+      copyChangedFilesToConfigDir(configDir, preparedDir);
       ConfigService.getInstance()
           .schedulePreparedSwitch(LoggerDef.SystemLogger, command.version, command.switchAtMillis, 60_000L);
       report(command, "SWITCH_SCHEDULED", "");
     } catch (Exception e) {
       report(command, "FAILED", e.getMessage());
       throw e;
+    }
+  }
+
+  private static void copyChangedFilesToConfigDir(Path configDir, Path preparedDir) throws Exception {
+    Path manifest = preparedDir.resolve(CHANGE_MANIFEST);
+    if (!Files.exists(manifest)) {
+      throw new ConfigLoadException("配置热更缺少变更文件清单:" + manifest);
+    }
+    List<String> changedFiles = Files.readAllLines(manifest, StandardCharsets.UTF_8);
+    Path lockFile = configDir.resolve(".config-hot-update.lock");
+    // 本地开发时多个服务可能共用同一个 configDir，文件锁用于串行化覆盖动作，避免 Windows 文件占用冲突。
+    try (FileChannel channel =
+            FileChannel.open(lockFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        FileLock ignored = channel.lock()) {
+      for (String fileName : changedFiles) {
+        if (fileName == null || fileName.isBlank()) {
+          continue;
+        }
+        Path src = preparedDir.resolve(fileName);
+        if (!Files.isRegularFile(src)) {
+          throw new ConfigLoadException("配置热更变更文件不存在:" + src);
+        }
+        Files.copy(src, configDir.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+      }
     }
   }
 
