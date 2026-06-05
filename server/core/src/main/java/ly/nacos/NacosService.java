@@ -1,23 +1,5 @@
 package ly.nacos;
 
-import com.alibaba.nacos.api.NacosFactory;
-import com.alibaba.nacos.api.PropertyKeyConst;
-import com.alibaba.nacos.api.config.ConfigService;
-import com.alibaba.nacos.api.config.listener.Listener;
-import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.naming.NamingService;
-import com.alibaba.nacos.api.naming.listener.EventListener;
-import com.alibaba.nacos.api.naming.pojo.Instance;
-import com.alibaba.nacos.client.naming.listener.AbstractNamingChangeListener;
-import com.alibaba.nacos.client.naming.listener.NamingChangeEvent;
-import ly.LoggerDef;
-import ly.ServerContext;
-import ly.config.ServerConfig;
-import ly.config.ServerTypeEnum;
-import ly.rpc.RpcService;
-import ly.utils.CommonUtils;
-import org.slf4j.Logger;
-
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -32,6 +14,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.slf4j.Logger;
+
+import com.alibaba.nacos.api.NacosFactory;
+import com.alibaba.nacos.api.PropertyKeyConst;
+import com.alibaba.nacos.api.config.ConfigService;
+import com.alibaba.nacos.api.config.listener.Listener;
+import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.naming.NamingService;
+import com.alibaba.nacos.api.naming.listener.EventListener;
+import com.alibaba.nacos.api.naming.pojo.Instance;
+import com.alibaba.nacos.client.naming.listener.AbstractNamingChangeListener;
+import com.alibaba.nacos.client.naming.listener.NamingChangeEvent;
+
+import ly.LoggerDef;
+import ly.ServerContext;
+import ly.config.ServerConfig;
+import ly.config.ServerTypeEnum;
+import ly.rpc.RpcService;
+import ly.utils.CommonUtils;
 
 /**
  * Nacos 服务发现组件，负责节点注册、监听、配置订阅和本节点元数据管理。
@@ -50,7 +52,7 @@ public class NacosService {
     private String currentNamespace;
     private ConfigService nacosConfigService;
 
-    /***nacos 请求操作最大超时时间戳*/
+    /*** nacos 请求操作最大超时时间戳 */
     static final long MAX_TIME_OUT = 5000;
 
     /**
@@ -111,41 +113,40 @@ public class NacosService {
      * 转换为 {@link NacosServerNode} 后写入本地缓存。
      */
     private void subscribeServerNode(NamingService namingService) throws NacosException {
-        EventListener serviceListener =
-                new AbstractNamingChangeListener() {
-                    @Override
-                    public void onChange(NamingChangeEvent event) {
-                        if (event.isAdded()) {
-                            event
-                                    .getAddedInstances()
-                                    .forEach(
-                                            data -> {
-                                                addNewNode(data);
-                                            });
-                        }
-                        if (event.isRemoved()) {
-                            event
-                                    .getRemovedInstances()
-                                    .forEach(
-                                            data -> {
-                                                delNode(data.getInstanceId());
-                                            });
-                        }
-                        if (event.isModified()) {
-                            event
-                                    .getModifiedInstances()
-                                    .forEach(
-                                            data -> {
-                                                updateNode(data);
-                                            });
-                        }
-                    }
+        EventListener serviceListener = new AbstractNamingChangeListener() {
+            @Override
+            public void onChange(NamingChangeEvent event) {
+                if (event.isAdded()) {
+                    event
+                            .getAddedInstances()
+                            .forEach(
+                                    data -> {
+                                        addNewNode(data);
+                                    });
+                }
+                if (event.isRemoved()) {
+                    event
+                            .getRemovedInstances()
+                            .forEach(
+                                    data -> {
+                                        delNode(data.getInstanceId());
+                                    });
+                }
+                if (event.isModified()) {
+                    event
+                            .getModifiedInstances()
+                            .forEach(
+                                    data -> {
+                                        updateNode(data);
+                                    });
+                }
+            }
 
-                    @Override
-                    public Executor getExecutor() {
-                        return executorService;
-                    }
-                };
+            @Override
+            public Executor getExecutor() {
+                return executorService;
+            }
+        };
 
         namingService.subscribe(RPC_NODE_LIST_SERVICE, ServerContext.ENV, serviceListener);
     }
@@ -195,13 +196,12 @@ public class NacosService {
      * 让本地 Nacos 刚启动或网络短暂抖动时不至于直接退出。
      */
     private void registerServerNode(NamingService namingService) throws NacosException {
-        NacosServerNode curNode =
-                NacosServerNode.createNacosServerNode(
-                        ServerContext.getServerId(),
-                        ServerContext.serverType,
-                        ServerContext.serverConfig.serverIp,
-                        ServerContext.serverConfig.getServerPort(),
-                        new HashMap<>());
+        NacosServerNode curNode = NacosServerNode.createNacosServerNode(
+                ServerContext.getServerId(),
+                ServerContext.serverType,
+                ServerContext.serverConfig.serverIp,
+                ServerContext.serverConfig.getServerPort(),
+                new HashMap<>());
         curNode.setLoadNum(0);
         NacosException lastException = null;
         for (int i = 0; i < 10; i++) {
@@ -291,7 +291,7 @@ public class NacosService {
         if (serverId == null || serverId.trim().isEmpty()) {
             throw new RuntimeException("ServerId 不能为 null 或空字符串");
         }
-        
+
         String configStr = configService.getConfig(serverId, serverType.getType(), MAX_TIME_OUT);
         if (configStr == null || configStr.isBlank()) {
             configStr = fetchConfigByHttp(serverId, serverType.getType());
@@ -307,7 +307,8 @@ public class NacosService {
             if (configStr != null && !configStr.isBlank()) {
                 parserServerConfig(configStr);
             } else {
-                throw new RuntimeException("获取nacos 配置失败，serverId=" + serverId + ", serverType=" + serverType.getType());
+                throw new RuntimeException(
+                        "获取nacos 配置失败，serverId=" + serverId + ", serverType=" + serverType.getType());
             }
         }
 
@@ -352,26 +353,23 @@ public class NacosService {
             return null;
         }
         try {
-            String baseUrl =
-                    currentNacosUrl.startsWith("http://") || currentNacosUrl.startsWith("https://")
-                            ? currentNacosUrl
-                            : "http://" + currentNacosUrl;
+            String baseUrl = currentNacosUrl.startsWith("http://") || currentNacosUrl.startsWith("https://")
+                    ? currentNacosUrl
+                    : "http://" + currentNacosUrl;
             if (baseUrl.endsWith("/")) {
                 baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
             }
-            String url =
-                    String.format(
-                            "%s/nacos/v1/cs/configs?dataId=%s&group=%s&tenant=%s",
-                            baseUrl,
-                            URLEncoder.encode(dataId, StandardCharsets.UTF_8),
-                            URLEncoder.encode(group, StandardCharsets.UTF_8),
-                            URLEncoder.encode(
-                                    currentNamespace == null ? "" : currentNamespace,
-                                    StandardCharsets.UTF_8));
+            String url = String.format(
+                    "%s/nacos/v1/cs/configs?dataId=%s&group=%s&tenant=%s",
+                    baseUrl,
+                    URLEncoder.encode(dataId, StandardCharsets.UTF_8),
+                    URLEncoder.encode(group, StandardCharsets.UTF_8),
+                    URLEncoder.encode(
+                            currentNamespace == null ? "" : currentNamespace,
+                            StandardCharsets.UTF_8));
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
-            HttpResponse<String> response =
-                    HttpClient.newHttpClient()
-                            .send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            HttpResponse<String> response = HttpClient.newHttpClient()
+                    .send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             if (response.statusCode() == 200
                     && response.body() != null
                     && !response.body().isBlank()) {

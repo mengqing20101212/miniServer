@@ -1,6 +1,7 @@
 package ly.bot.session;
 
 import io.netty.channel.EventLoopGroup;
+import com.google.protobuf.AbstractMessage;
 import ly.LoggerDef;
 import ly.bot.command.RobotCommand;
 import ly.bot.factory.RobotCommandFactory;
@@ -12,7 +13,9 @@ import ly.bot.state.impl.LoggedInState;
 import ly.net.NetClient;
 import ly.net.NetService;
 import ly.proto.Cmd;
+import ly.proto.Login;
 import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacketFactory;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -176,7 +179,31 @@ public class RobotSession {
             logger.error("机器人 #{} 获取服务器列表失败", botId, e);
         }
     }
-    
+
+    private PlayerInfo buildPlayerInfoFromLoginResponse(AbstractMessagePacket response) {
+        try {
+            Login.scLogin login = Login.scLogin.parseFrom(response.getData());
+            return new PlayerInfo(
+                login.getPlayerId(),
+                accountId,
+                account,
+                account,
+                1,
+                login.getToken()
+            );
+        } catch (Exception e) {
+            logger.error("解析登录响应失败，使用账号信息兜底 playerInfo", e);
+            return new PlayerInfo(
+                accountId,
+                accountId,
+                account,
+                "RobotPlayer" + botId,
+                1,
+                token
+            );
+        }
+    }
+
     /**
      * 连接到GateServer
      */
@@ -296,7 +323,7 @@ public class RobotSession {
     /**
      * 处理登录响应
      */
-    private void handleLoginResponse(AbstractMessagePacket response) {
+    public void handleLoginResponse(AbstractMessagePacket response) {
         logger.info("机器人 #{} 收到登录响应: {}", botId, response);
         
         // 根据响应内容判断登录是否成功
@@ -306,14 +333,7 @@ public class RobotSession {
             
             // 创建玩家信息对象（这里需要从响应数据中提取实际的玩家信息）
             // 暂时使用默认值，实际应用中应从响应包中解析
-            this.playerInfo = new PlayerInfo(
-                1000000L + botId,  // playerId
-                accountId,         // accountId
-                account,           // account
-                "RobotPlayer" + botId, // nickname
-                1,                 // level
-                token              // token
-            );
+            this.playerInfo = buildPlayerInfoFromLoginResponse(response);
             
             logger.info("机器人 #{} 玩家信息已保存: {}", botId, playerInfo);
             
@@ -338,6 +358,7 @@ public class RobotSession {
     private void initializeModuleManager() {
         // 创建模块列表
         List<RobotModule> modules = List.of(
+            new ly.bot.module.impl.HeroModule(),
             new HeartbeatModule(),
             new MovementModule(),
             new ly.bot.module.impl.CombatModule(),
@@ -471,6 +492,34 @@ public class RobotSession {
     public boolean isGateConnected() {
         return isGateConnected;
     }
+
+    /**
+     * 获取当前玩家 ID。
+     *
+     * <p>游戏业务 Action 只会在登录成功后执行，此时 playerInfo 一定已经初始化。</p>
+     */
+    public long getPlayerId() {
+        return playerInfo.getPlayerId();
+    }
+
+    /**
+     * 按当前会话状态创建上行协议包。
+     *
+     * <p>登录前还没有 playerId，guid 使用账号 ID；登录成功后自动切换为 playerId。
+     * seq 和 sid 都由当前 Gate 连接统一维护，Action 不再重复拼这些公共字段。</p>
+     */
+    public AbstractMessagePacket createPacket(int cmd, AbstractMessage message) {
+        if (gateClient == null) {
+            throw new IllegalStateException("Gate 连接尚未初始化，不能创建协议包");
+        }
+        long guid = playerInfo != null ? playerInfo.getPlayerId() : accountId;
+        return MessagePacketFactory.createAbstractMessagePacket(
+                guid,
+                cmd,
+                message,
+                gateClient.getSendSeq(),
+                gateClient.isReady() ? gateClient.getSid() : 0);
+    }
     
     public int getBotId() {
         return botId;
@@ -530,9 +579,8 @@ public class RobotSession {
             ly.bot.command.RobotCommand command = null;
             switch (response.getCmd()) {
                 case ly.proto.Cmd.CMD.SC_Login_VALUE:
-                    command = ly.bot.factory.RobotCommandFactory.createCommand(ly.bot.factory.RobotCommandFactory.CommandType.LOGIN,
-                        account, token, accountId, "robot_channel", "robot_device_" + botId);
-                    break;
+                    handleLoginResponse(response);
+                    return;
                 case ly.proto.Cmd.CMD.SC_RpcPing_VALUE: // RPC心跳响应
                     command = ly.bot.factory.RobotCommandFactory.createCommand(ly.bot.factory.RobotCommandFactory.CommandType.HEARTBEAT);
                     break;
