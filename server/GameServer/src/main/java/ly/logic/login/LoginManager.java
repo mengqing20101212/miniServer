@@ -130,6 +130,7 @@ public class LoginManager {
             gamePlayer.setLastSeq(task.packet.getSeq());
             gamePlayer.setLastClientCmd(task.packet.getCmd());
             gamePlayer.setLastSid(task.packet.getSid());
+            gamePlayer.bindPlayer(onlinePlayer);  // 绑定 Player，否则 tickWorkItem 会丢弃包
             onlinePlayer.setGamePlayer(gamePlayer);
         }
 

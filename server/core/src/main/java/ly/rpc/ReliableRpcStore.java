@@ -89,7 +89,9 @@ public class ReliableRpcStore {
       }
       if (message.getNextRetryAt() > now) {
         // 临时：强制重置退避，让旧消息立即重试
+        RedisUtils.listRemove(key, message);
         message.resetRetryForForceReplay();
+        RedisUtils.listAdd(key, message);
         LoggerDef.NetLogger.info(
             "reliable rpc force reset backoff, msgId={}, target={}, cmd={}, retryCount={}",
             message.getMsgId(),

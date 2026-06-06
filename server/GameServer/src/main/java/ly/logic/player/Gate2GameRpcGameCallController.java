@@ -53,6 +53,7 @@ public class Gate2GameRpcGameCallController implements IGameController {
                         ly.LoggerDef.NetLogger.info("[Gate2GameRpc] player loaded from DB for lazy init, guid={}", guid);
                         GamePlayer gamePlayer = new GamePlayer(context.session());
                         gamePlayer.setPlayerId(player.getPlayerId());
+                        gamePlayer.bindPlayer(player);  // 绑定 Player，否则 tickWorkItem 会丢弃包
                         player.setGamePlayer(gamePlayer);
                         PlayerManager.getInstance().addOnlinePlayer(player);
                         player.statPlay();

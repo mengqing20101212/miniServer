@@ -209,7 +209,29 @@ public class Player {
         ErrorMsg.scErrorCode.Builder res = ErrorMsg.scErrorCode.newBuilder();
         res.setMsgId(cmd.getNumber());
         res.setErrorCode(errorCode);
-        sendMsg(Cmd.CMD.SC_ErrorCode, res.build());
+        long callId = getGamePlayer().getLastCallId();
+        if (callId > 0) {
+            // 可靠 RPC 补发：错误码封装到 SC_Gate2GameRpcGameCall，携带 callId
+            Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
+            builder.setCmd(Cmd.CMD.SC_ErrorCode_VALUE);
+            builder.setSid(gamePlayer.getLastSid());
+            builder.setSeq(getGamePlayer().getLastSeq() + 1);
+            builder.setData(res.build().toByteString());
+            builder.setCallId(callId);
+            AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(
+                    getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(),
+                    getGamePlayer().getLastSeq() + 1, gamePlayer.getLastSid());
+            getGamePlayer().getSession().addSendPacket(sendPacket);
+            LoggerDef.NetLogger.info(
+                    "[Gate2GameRpc] sending SC_ErrorCode wrapped in SC_Gate2GameRpcGameCall, playerId={}, errorCode={}, callId={}",
+                    getPlayerId(), errorCode, callId);
+            getGamePlayer().setLastClientCmd(0);
+            getGamePlayer().setLastSeq(0);
+            getGamePlayer().setLastSid(0);
+            getGamePlayer().setLastCallId(0);
+        } else {
+            sendMsg(Cmd.CMD.SC_ErrorCode, res.build());
+        }
     }
 
     public void sendMsg(Cmd.CMD cmd, AbstractMessage message) {

@@ -130,6 +130,7 @@ public class GamePlayer {
 
     public void tickWorkItem() throws InterruptedException {
         GamePlayerWorkItem workItem = workQueue.poll(100, TimeUnit.MILLISECONDS);
+        LoggerDef.SystemLogger.info("[tickWorkItem] polling, queueSize={}", workQueue.size());
         if (workItem == null) {
             return;
         }
