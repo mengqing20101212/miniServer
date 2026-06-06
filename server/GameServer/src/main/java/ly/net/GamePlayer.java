@@ -202,31 +202,49 @@ public class GamePlayer {
     }
 
     /**
-     * 统一错误码发送：根据 callId 决定封装方式。
-     * callId > 0: 封装到 scGate2GameRpcGameCall（Gate 通过 callId 匹配删除 Redis 消息）
-     * callId == 0: 直接发 scErrorCode
+     * 统一消息发送：根据 lastClientCmd 和 lastCallId 决定封装方式。
+     * lastClientCmd == 0: 无请求上下文，直接发
+     * cmd == lastClientCmd + 1: 请求对应的响应，封装到 scGate2GameRpcGameCall
+     * 其他: 主动推送，封装到 scGate2GameRpcGameCall（不消耗 seq）
      */
+    public void sendMsg(int cmd, com.google.protobuf.AbstractMessage message) {
+        if (lastClientCmd == 0) {
+            AbstractMessagePacket packet = ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(
+                    playerId, cmd, message, 0, 0);
+            session.addSendPacket(packet);
+        } else if (cmd == lastClientCmd + 1) {
+            ly.proto.Server.scGate2GameRpcGameCall.Builder builder = ly.proto.Server.scGate2GameRpcGameCall.newBuilder();
+            builder.setCmd(cmd);
+            builder.setSid(lastSid);
+            builder.setSeq(lastSeq + 1);
+            builder.setData(message.toByteString());
+            builder.setCallId(lastCallId);
+            AbstractMessagePacket packet = ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(
+                    playerId, ly.proto.Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), lastSeq + 1, lastSid);
+            session.addSendPacket(packet);
+            LoggerDef.NetLogger.info("[Gate2GameRpc] response, playerId={}, cmd={}, seq={}, sid={}, callId={}",
+                    playerId, cmd, lastSeq + 1, lastSid, lastCallId);
+            clearRequestContext();
+        } else {
+            ly.proto.Server.scGate2GameRpcGameCall.Builder builder = ly.proto.Server.scGate2GameRpcGameCall.newBuilder();
+            builder.setCmd(cmd);
+            builder.setSid(lastSid);
+            builder.setSeq(lastSeq);
+            builder.setData(message.toByteString());
+            builder.setCallId(lastCallId);
+            AbstractMessagePacket packet = ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(
+                    playerId, ly.proto.Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), lastSeq, lastSid);
+            session.addSendPacket(packet);
+            LoggerDef.NetLogger.info("[Gate2GameRpc] push, playerId={}, cmd={}, seq={}, sid={}, callId={}",
+                    playerId, cmd, lastSeq, lastSid, lastCallId);
+        }
+    }
+
     public void sendErrorCode(int cmd, ly.proto.ErrorMsg.ErrorCode errorCode) {
         ly.proto.ErrorMsg.scErrorCode errorMsg = ly.proto.ErrorMsg.scErrorCode.newBuilder()
                 .setErrorCode(errorCode)
                 .setMsgId(cmd)
                 .build();
-        if (lastCallId > 0) {
-            ly.proto.Server.scGate2GameRpcGameCall.Builder builder = ly.proto.Server.scGate2GameRpcGameCall.newBuilder();
-            builder.setCmd(ly.proto.Cmd.CMD.SC_ErrorCode_VALUE);
-            builder.setSid(lastSid);
-            builder.setSeq(lastSeq + 1);
-            builder.setData(errorMsg.toByteString());
-            builder.setCallId(lastCallId);
-            AbstractMessagePacket packet = ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(
-                    playerId, ly.proto.Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), lastSeq + 1, lastSid);
-            session.addSendPacket(packet);
-            LoggerDef.NetLogger.info("[Gate2GameRpc] sending SC_ErrorCode wrapped, playerId={}, errorCode={}, callId={}", playerId, errorCode, lastCallId);
-            clearRequestContext();
-        } else {
-            ly.net.packet.AbstractMessagePacket packet = ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(
-                    playerId, ly.proto.Cmd.CMD.SC_ErrorCode_VALUE, errorMsg, lastSeq + 1, lastSid);
-            session.addSendPacket(packet);
-        }
+        sendMsg(ly.proto.Cmd.CMD.SC_ErrorCode_VALUE, errorMsg);
     }
 }

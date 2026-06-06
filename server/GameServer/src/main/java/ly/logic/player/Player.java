@@ -10,11 +10,8 @@ import ly.logic.player.event.PlayerEventParam;
 import ly.logic.player.event.PlayerEventSource;
 import ly.logic.player.event.PlayerEventType;
 import ly.net.GamePlayer;
-import ly.net.packet.AbstractMessagePacket;
-import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
-import ly.proto.Server;
 import ly.utils.TimeStatisticsUtils;
 import ly.utils.TimeUtils;
 
@@ -212,42 +209,6 @@ public class Player {
     }
 
     public void sendMsg(Cmd.CMD cmd, AbstractMessage message) {
-        long callId = getGamePlayer().getLastCallId();
-        if (getGamePlayer().getLastClientCmd() == 0) {
-            AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), cmd.getNumber(), message, 0, 0);
-            getGamePlayer().getSession().addSendPacket(sendPacket);
-        } else {
-            if (cmd.getNumber() == getGamePlayer().getLastClientCmd() + 1) {
-                Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
-                // 当前请求对应的响应由 GameServer 统一确定客户端下行 cmd/seq/sid。
-                builder.setCmd(cmd.getNumber());
-                builder.setSid(gamePlayer.getLastSid());
-                builder.setSeq(getGamePlayer().getLastSeq() + 1);
-                builder.setData(message.toByteString());
-                builder.setCallId(callId);
-                AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), getGamePlayer().getLastSeq() + 1, gamePlayer.getLastSid());
-                getGamePlayer().getSession().addSendPacket(sendPacket);
-                LoggerDef.NetLogger.info(
-                        "[Gate2GameRpc] sending SC_Gate2GameRpcGameCall response, playerId={}, respCmd={}, respSeq={}, respSid={}, lastClientCmd={}, lastSeq={}, callId={}",
-                        getPlayerId(), cmd.getNumber(), getGamePlayer().getLastSeq() + 1, gamePlayer.getLastSid(), getGamePlayer().getLastClientCmd(), getGamePlayer().getLastSeq(), callId);
-                getGamePlayer().setLastClientCmd(0);
-                getGamePlayer().setLastSeq(0);
-                getGamePlayer().setLastSid(0);
-                getGamePlayer().setLastCallId(0);
-            } else {
-                Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
-                // 主动推送不消耗客户端请求序号，保持最近一次客户端 seq，便于 Gate 按 sid 定位连接。
-                builder.setCmd(cmd.getNumber());
-                builder.setSid(gamePlayer.getLastSid());
-                builder.setSeq(gamePlayer.getLastSeq());
-                builder.setData(message.toByteString());
-                builder.setCallId(callId);
-                AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), gamePlayer.getLastSeq(), gamePlayer.getLastSid());
-                getGamePlayer().getSession().addSendPacket(sendPacket);
-                LoggerDef.NetLogger.info(
-                        "[Gate2GameRpc] sending SC_Gate2GameRpcGameCall push, playerId={}, respCmd={}, respSeq={}, respSid={}, lastClientCmd={}, callId={}",
-                        getPlayerId(), cmd.getNumber(), gamePlayer.getLastSeq(), gamePlayer.getLastSid(), getGamePlayer().getLastClientCmd(), callId);
-            }
-        }
+        gamePlayer.sendMsg(cmd.getNumber(), message);
     }
 }
