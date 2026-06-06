@@ -62,7 +62,7 @@ public class ConfigHotUpdateRuntime {
     try {
       validate(command);
       report(command, "RECEIVED", "");
-      Path configDir = Path.of(ServerContext.serverConfig.configPath);
+      Path configDir = Path.of(ServerContext.serverConfig.configPath.replace('\\', '/'));
       Path stagingDir =
           configDir
               .resolveSibling(".config-hot-update-staging")
@@ -126,7 +126,7 @@ public class ConfigHotUpdateRuntime {
           || !preparedCommand.publishId.equals(command.publishId)) {
         throw new ConfigLoadException("当前服务器没有该版本的 READY 配置:" + command.version);
       }
-      Path configDir = Path.of(ServerContext.serverConfig.configPath);
+      Path configDir = Path.of(ServerContext.serverConfig.configPath.replace('\\', '/'));
       Files.createDirectories(configDir);
       copyChangedFilesToConfigDir(configDir, preparedDir);
       ConfigService.getInstance()

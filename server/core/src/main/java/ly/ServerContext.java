@@ -85,7 +85,9 @@ public class ServerContext {
         
         // 配置校验通过后再初始化外部依赖，避免以错误端口或错误数据库参数启动。
         StartupSkillLoader.validateServerConfig(serverType, serverConfig);
-        ConfigService.getInstance().loadAllConfig(logger, serverConfig.configPath);
+        // 标准化路径分隔符，兼容 Nacos 中使用 Windows 路径格式（D:\WORK\...）在 Linux 下运行
+        String configPath = serverConfig.configPath.replace('\\', '/');
+        ConfigService.getInstance().loadAllConfig(logger, configPath);
         RedisUtils.init();
         MysqlService.getInstance().init(serverConfig.db.jdbcUrl, serverConfig.db.userName, serverConfig.db.passWord, 0, 0, 0, 0);
         

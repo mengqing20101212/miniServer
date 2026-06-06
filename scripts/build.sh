@@ -1,0 +1,26 @@
+#!/bin/bash
+# 构建整个项目 (纯 Linux)
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+SERVER_DIR="$PROJECT_ROOT/server"
+
+JAVA="/usr/lib/jvm/java-21-openjdk-amd64/bin/java"
+MVN="/mnt/d/Soft/env/apache-maven-3.9.15/bin/mvn"
+
+export JAVA_HOME="/usr/lib/jvm/java-21-openjdk-amd64"
+export LANG="zh_CN.UTF-8"
+export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8"
+
+echo "=== 构建 miniServer ==="
+echo "Java: $($JAVA -version 2>&1 | head -1)"
+echo "目录: $SERVER_DIR"
+
+cd "$SERVER_DIR"
+
+$MVN -DskipTests install
+
+echo ""
+echo "=== 构建完成 ==="
