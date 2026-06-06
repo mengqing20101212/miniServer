@@ -23938,3 +23938,375 @@ java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessa
 2026-06-06 21:30:42.571 INFO  - ===================
 2026-06-06 21:31:04.990 INFO  - 英雄模块执行动作成功: HeroListAction
 2026-06-06 21:31:09.003 INFO  - 英雄模块执行动作成功: HeroAddAction
+2026-06-06 21:31:11.689 INFO  - 英雄模块执行动作成功: HeroListAction
+2026-06-06 21:31:12.571 INFO  - 机器人 #1 延迟统计:
+2026-06-06 21:31:12.571 INFO  - === 网络延迟统计报告 ===
+2026-06-06 21:31:12.572 INFO  - 总请求数: 25
+2026-06-06 21:31:12.572 INFO  - 平均延迟: 0ms
+2026-06-06 21:31:12.573 INFO  - 慢请求数 (>200ms): 0
+2026-06-06 21:31:12.573 INFO  - 慢请求比例: {:.2%}
+2026-06-06 21:31:12.573 INFO  - ===================
+2026-06-06 21:31:15.297 ERROR - 英雄模块执行动作失败: HeroLevelUpAction, reason: 没有可升级的英雄 uid
+2026-06-06 21:31:19.814 ERROR - 英雄模块执行动作失败: HeroStarUpAction, reason: 没有可升星的英雄 uid
+2026-06-06 21:31:22.208 ERROR - 执行心跳命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.HeartbeatCommand.execute(HeartbeatCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.HeartbeatModule.executeStep(HeartbeatModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:25.487 ERROR - 执行心跳命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.HeartbeatCommand.execute(HeartbeatCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.HeartbeatModule.executeStep(HeartbeatModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:28.759 ERROR - 执行心跳命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.HeartbeatCommand.execute(HeartbeatCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.HeartbeatModule.executeStep(HeartbeatModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:31.055 ERROR - 执行心跳命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.HeartbeatCommand.execute(HeartbeatCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.HeartbeatModule.executeStep(HeartbeatModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:33.128 ERROR - 执行心跳命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.HeartbeatCommand.execute(HeartbeatCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.HeartbeatModule.executeStep(HeartbeatModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:35.644 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.MovementModule.executeStep(MovementModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:38.974 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.MovementModule.executeStep(MovementModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:42.572 INFO  - 机器人 #1 延迟统计:
+2026-06-06 21:31:42.573 INFO  - === 网络延迟统计报告 ===
+2026-06-06 21:31:42.573 INFO  - 总请求数: 32
+2026-06-06 21:31:42.574 INFO  - 平均延迟: 0ms
+2026-06-06 21:31:42.574 INFO  - 慢请求数 (>200ms): 0
+2026-06-06 21:31:42.574 INFO  - 慢请求比例: {:.2%}
+2026-06-06 21:31:42.575 INFO  - ===================
+2026-06-06 21:31:42.809 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.MovementModule.executeStep(MovementModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:45.891 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:48.138 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:50.216 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:53.432 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:57.630 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:32:01.029 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:32:03.503 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:55.741 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:31:58.427 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:32:00.762 INFO  - 机器人 #1 延迟统计:
+2026-06-06 21:32:00.763 INFO  - === 网络延迟统计报告 ===
+2026-06-06 21:32:00.763 INFO  - 总请求数: 42
+2026-06-06 21:32:00.763 INFO  - 平均延迟: 0ms
+2026-06-06 21:32:00.764 INFO  - 慢请求数 (>200ms): 0
+2026-06-06 21:32:00.765 INFO  - 慢请求比例: {:.2%}
+2026-06-06 21:32:00.765 INFO  - ===================
+2026-06-06 21:32:01.389 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:32:42.577 INFO  - 机器人 #1 延迟统计:
+2026-06-06 21:32:42.578 INFO  - === 网络延迟统计报告 ===
+2026-06-06 21:32:42.578 INFO  - 总请求数: 43
+2026-06-06 21:32:42.578 INFO  - 平均延迟: 0ms
+2026-06-06 21:32:42.579 INFO  - 慢请求数 (>200ms): 0
+2026-06-06 21:32:42.580 INFO  - 慢请求比例: {:.2%}
+2026-06-06 21:32:42.580 INFO  - ===================
+2026-06-06 21:32:43.130 INFO  - 英雄模块执行动作成功: HeroListAction
+2026-06-06 21:32:46.975 INFO  - 英雄模块执行动作成功: HeroAddAction
+2026-06-06 21:32:50.701 INFO  - 英雄模块执行动作成功: HeroListAction
+2026-06-06 21:32:55.434 ERROR - 英雄模块执行动作失败: HeroLevelUpAction, reason: 没有可升级的英雄 uid
+2026-06-06 21:32:59.864 ERROR - 英雄模块执行动作失败: HeroStarUpAction, reason: 没有可升星的英雄 uid
+2026-06-06 21:33:03.085 ERROR - 执行心跳命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.HeartbeatCommand.execute(HeartbeatCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.HeartbeatModule.executeStep(HeartbeatModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:06.313 ERROR - 执行心跳命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.HeartbeatCommand.execute(HeartbeatCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.HeartbeatModule.executeStep(HeartbeatModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:10.071 ERROR - 执行心跳命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.HeartbeatCommand.execute(HeartbeatCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.HeartbeatModule.executeStep(HeartbeatModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:12.580 INFO  - 机器人 #1 延迟统计:
+2026-06-06 21:33:12.580 INFO  - === 网络延迟统计报告 ===
+2026-06-06 21:33:12.581 INFO  - 总请求数: 49
+2026-06-06 21:33:12.582 INFO  - 平均延迟: 0ms
+2026-06-06 21:33:12.582 INFO  - 慢请求数 (>200ms): 0
+2026-06-06 21:33:12.582 INFO  - 慢请求比例: {:.2%}
+2026-06-06 21:33:12.583 INFO  - ===================
+2026-06-06 21:33:12.866 ERROR - 执行心跳命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.HeartbeatCommand.execute(HeartbeatCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.HeartbeatModule.executeStep(HeartbeatModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:16.762 ERROR - 执行心跳命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.HeartbeatCommand.execute(HeartbeatCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.HeartbeatModule.executeStep(HeartbeatModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:19.915 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.MovementModule.executeStep(MovementModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:22.265 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.MovementModule.executeStep(MovementModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:27.033 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.MovementModule.executeStep(MovementModule.java:23) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:31.471 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:35.472 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:27.318 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:30.757 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:30.796 INFO  - 机器人 #1 延迟统计:
+2026-06-06 21:33:30.796 INFO  - === 网络延迟统计报告 ===
+2026-06-06 21:33:30.797 INFO  - 总请求数: 58
+2026-06-06 21:33:30.797 INFO  - 平均延迟: 0ms
+2026-06-06 21:33:30.797 INFO  - 慢请求数 (>200ms): 0
+2026-06-06 21:33:30.797 INFO  - 慢请求比例: {:.2%}
+2026-06-06 21:33:30.798 INFO  - ===================
+2026-06-06 21:33:34.892 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:36.992 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:41.243 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:45.364 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:33:49.165 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:34:04.440 ERROR - 执行移动命令失败
+java.lang.NullPointerException: Cannot invoke "com.google.protobuf.AbstractMessage.toByteArray()" because "protoData" is null
+	at ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(MessagePacketFactory.java:25) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.command.impl.MoveCommand.execute(MoveCommand.java:32) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.impl.CombatModule.executeStep(CombatModule.java:27) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.module.ModuleManager.executeStep(ModuleManager.java:42) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at ly.bot.session.RobotSession.lambda$startGameActions$2(RobotSession.java:413) ~[BotServer-1.0-SNAPSHOT.jar:?]
+	at java.lang.VirtualThread.run(VirtualThread.java:329) ~[?:?]
+2026-06-06 21:37:11.033 INFO  - 开始启动 1 个机器人
+2026-06-06 21:37:11.098 INFO  - 机器人 #1 开始登录流程
+2026-06-06 21:37:11.099 INFO  - 机器人 #1 通过HTTP获取服务器列表 127.0.0.1:8889
+2026-06-06 21:37:11.099 INFO  - 机器人 #1 正在通过HTTP获取服务器列表
+2026-06-06 21:37:11.148 INFO  - 机器人启动完成，总数: 1
+2026-06-06 21:37:11.660 INFO  - success get login server result, gate=127.0.0.1:9001 accountId=1020936180 tokenPresent=true
+2026-06-06 21:37:11.660 INFO  - 机器人 #1 成功获取服务器列表
+2026-06-06 21:37:11.661 INFO  - 机器人 #1 获取到GateServer信息: 127.0.0.1:9001
+2026-06-06 21:37:11.661 INFO  - 机器人 #1 正在连接GateServer 127.0.0.1:9001
+2026-06-06 21:37:11.904 INFO  - ClientHandler channelActive 客户端连接成功 00155dfffe2e3545-00003834-00000000-fa42e70932a2e280-ec384c25, remote: /127.0.0.1:9001
+2026-06-06 21:37:11.912 INFO  - addNewClient NetClient{host='127.0.0.1', port=9001, sid=0, sendSeq=0, channelId=00155dfffe2e3545-00003834-00000000-fa42e70932a2e280-ec384c25}, Channel:[id: 0xec384c25, L:/127.0.0.1:37438 - R:/127.0.0.1:9001], canUse:false
+2026-06-06 21:37:11.955 INFO  - 机器人 #1 成功连接到GateServer
+2026-06-06 21:37:11.972 INFO  - 机器人 #1 正在向GateServer发送登录请求
+2026-06-06 21:37:12.026 INFO  - 机器人 #1 登录请求已发送
+2026-06-06 21:37:12.027 INFO  - 机器人 #1 等待登录响应
+2026-06-06 21:37:13.411 INFO  - 机器人 #1 收到登录响应: MessagePacket{cmd=102, sid=4, seq=1, guid=4, time=1780753033, data=[10, 12, 114, 111, 98, 111, 116, 95, 117, 115, 101, 114, 95, 49, 16, 71, 26, 47, 45, 53, 52, 50, 55, 48, 53, 53, 49, 55, 95, 49, 55, 56, 48, 55, 53, 48, 48, 51, 54, 48, 49, 53, 95, 115, 48, 113, -24, -77, -127, 107, 104, 78, 110, 117, 56, -24, -118, -76, 56, 53, 122, 72, -23, -66, -126, 34, 8, 103, 97, 109, 101, 49, 48, 48, 49, 42, 36, 8, 71, 18, 9, 80, 108, 97, 121, 101, 114, 95, 55, 49, 24, 1, 40, -37, -50, -101, -23, -23, 51, 48, -37, -50, -101, -23, -23, 51, 56, -37, -50, -101, -23, -23, 51]}
+2026-06-06 21:37:13.428 INFO  - 机器人 #1 玩家信息已保存: PlayerInfo{playerId=71, accountId=1000001, account='robot_user_1', nickname='robot_user_1', level=1}
+2026-06-06 21:37:13.430 INFO  - 机器人 1 状态变更为: LoggedInState
+2026-06-06 21:37:13.430 INFO  - 机器人 #1 登录成功
+2026-06-06 21:37:13.430 INFO  - 机器人 1 登录成功
+2026-06-06 21:37:13.431 INFO  - 机器人 #1 启动延迟统计报告线程
+2026-06-06 21:37:13.432 INFO  - 机器人 #1 开始执行游戏行为
+2026-06-06 21:37:15.751 INFO  - 英雄模块执行动作成功: HeroListAction
+2026-06-06 21:37:20.258 INFO  - 英雄模块执行动作成功: HeroAddAction
+2026-06-06 21:37:23.907 INFO  - 英雄模块执行动作成功: HeroListAction
+2026-06-06 21:37:27.996 ERROR - 英雄模块执行动作失败: HeroLevelUpAction, reason: 没有可升级的英雄 uid
+2026-06-06 21:37:30.629 ERROR - 英雄模块执行动作失败: HeroStarUpAction, reason: 没有可升星的英雄 uid
+2026-06-06 21:37:43.431 INFO  - 机器人 #1 延迟统计:
+2026-06-06 21:37:43.432 INFO  - === 网络延迟统计报告 ===
+2026-06-06 21:37:43.433 INFO  - 总请求数: 7
+2026-06-06 21:37:43.433 INFO  - 平均延迟: 0ms
+2026-06-06 21:37:43.433 INFO  - 慢请求数 (>200ms): 0
+2026-06-06 21:37:43.434 INFO  - 慢请求比例: {:.2%}
+2026-06-06 21:37:43.434 INFO  - ===================

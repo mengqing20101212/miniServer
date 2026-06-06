@@ -30,11 +30,7 @@ public class HeartbeatCommand implements RobotCommand {
             
             // 创建空的RPC Ping请求（心跳包）
             ly.net.packet.AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
-                0, // guid - 心跳包可能不需要特定guid
-                Cmd.CMD.CS_RpcPing_VALUE, // RPC心跳命令
-                null, // protobuf数据 - 心跳可能不需要数据
-                seq, // 序列号
-                sid // sid
+                Cmd.CMD.CS_RpcPing_VALUE, seq, new byte[0]
             );
             
             boolean sent = client.send(packet);

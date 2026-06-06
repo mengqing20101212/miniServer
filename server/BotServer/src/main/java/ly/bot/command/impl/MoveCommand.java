@@ -28,13 +28,9 @@ public class MoveCommand implements RobotCommand {
             int seq = client.getSendSeq(); // 获取并增加序列号
             int sid = client.isReady() ? client.getSid() : 0; // 使用正确的SID
             
-            // 创建移动请求包（这里我们使用一个占位符命令，实际游戏中应使用真实的移动协议）
+            // 创建移动请求包（使用 ResourceQuery 作为占位命令，因为 proto 中没有移动命令）
             ly.net.packet.AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
-                0, // guid
-                1000, // 假设的移动命令ID
-                null, // protobuf数据
-                seq, // 序列号
-                sid // sid
+                Cmd.CMD.CS_ResourceQuery_VALUE, seq, new byte[0]
             );
             
             boolean sent = client.send(packet);

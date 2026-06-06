@@ -89,19 +89,6 @@ CREATE TABLE IF NOT EXISTS `security_event_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `login` (
-  `id` INT NOT NULL,
-  `account` VARCHAR(255) DEFAULT NULL,
-  `create_time` DATETIME DEFAULT NULL,
-  `last_login_time` DATETIME DEFAULT NULL,
-  `last_logout_time` DATETIME DEFAULT NULL,
-  `token` VARCHAR(255) DEFAULT NULL,
-  `channel` VARCHAR(255) DEFAULT NULL,
-  `players` VARCHAR(255) DEFAULT NULL
-,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS `share_month` (
   `id` INT AUTO_INCREMENT NOT NULL,
   `code` VARCHAR(255) DEFAULT NULL,
@@ -116,6 +103,19 @@ CREATE TABLE IF NOT EXISTS `share_month` (
   `adjustflag` INT DEFAULT NULL,
   `turn` VARCHAR(255) DEFAULT NULL,
   `pctChg` VARCHAR(255) DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `login` (
+  `id` INT NOT NULL,
+  `account` VARCHAR(255) DEFAULT NULL,
+  `create_time` DATETIME DEFAULT NULL,
+  `last_login_time` DATETIME DEFAULT NULL,
+  `last_logout_time` DATETIME DEFAULT NULL,
+  `token` VARCHAR(255) DEFAULT NULL,
+  `channel` VARCHAR(255) DEFAULT NULL,
+  `players` VARCHAR(255) DEFAULT NULL
 ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
