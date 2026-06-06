@@ -103,9 +103,6 @@ public class RobotSession {
         
         // 启动响应处理线程
         startResponseHandlingThread();
-        
-        // 初始化模块管理器
-        initializeModuleManager();
     }
     
     /**
@@ -228,6 +225,9 @@ public class RobotSession {
                 
                 // 更新机器人上下文的客户端
                 robotContext = new RobotContext(botId, gateClient, this);
+                
+                // 初始化模块管理器（gateClient 已就绪）
+                initializeModuleManager();
                 
                 // 发送登录请求到GateServer，使用从服务器获取的所有必要信息
                 sendLoginToGateServer(accountId, token, gameServerId);

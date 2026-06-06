@@ -43,6 +43,7 @@ message csGate2GameRpcGameCall{
   int64 guid = 3;// client 发送给gate 请求 玩家id
   int32 seq = 4;// client 发送给gate 请求 序列id
   bytes data = 5;// client 发送给gate 请求 数据
+  int64 callId = 6;// 可靠RPC补发唯一标识，普通转发为0，大于0表示补发包，Game需原样带回
 }
 // 网关调用游戏服务器Rpc方法响应
 message scGate2GameRpcGameCall{
@@ -50,4 +51,5 @@ message scGate2GameRpcGameCall{
   int32 sid = 2;// game 发送给gate 的客户端会话id
   int32 seq = 3;// game 发送给gate 的客户端下行序列id
   bytes data = 4;// game 发送给gate 响应 数据
+  int64 callId = 5;// 从请求中原样带回，用于可靠RPC补发匹配，普通转发为0
 }

@@ -22,6 +22,8 @@ public class GamePlayer {
     private int lastSeq;
     private int lastClientCmd;
     private int lastSid;
+    /** 当前请求携带的可靠 RPC callId，普通转发为 0，大于 0 时回包必须带上。 */
+    private long lastCallId;
 
     private static final int WORK_QUEUE_CAPACITY = 1024;
 
@@ -109,6 +111,14 @@ public class GamePlayer {
         this.lastSeq = lastSeq;
     }
 
+    public long getLastCallId() {
+        return lastCallId;
+    }
+
+    public void setLastCallId(long lastCallId) {
+        this.lastCallId = lastCallId;
+    }
+
     /** 绑定所属 Player，队列执行 packet/event 时需要回到玩家业务上下文。 */
     public void bindPlayer(Player player) {
         this.player = player;
@@ -187,5 +197,6 @@ public class GamePlayer {
         setLastSeq(0);
         setLastClientCmd(0);
         setLastSid(0);
+        setLastCallId(0);
     }
 }

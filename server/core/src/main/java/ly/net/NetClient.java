@@ -215,6 +215,45 @@ public class NetClient {
         return receivePacketQueue.size();
     }
 
+    /**
+     * 从接收队列中查找指定 callId 和 cmd 的响应包。
+     * <p>
+     * 用于可靠 RPC 补发匹配：replay 发送时写入 callId，回包由 GameServer 原样带回，
+     * 这里按 callId + cmd 精确匹配，避免 seq 不一致导致的误匹配。
+     */
+    public AbstractMessagePacket getReceiveMsgByCallId(long callId, int cmd) {
+        Iterator<AbstractMessagePacket> iterator = receivePacketQueue.iterator();
+        while (iterator.hasNext()) {
+            AbstractMessagePacket packet = iterator.next();
+            if (packet.getCmd() == cmd) {
+                // 解析 scGate2GameRpcGameCall 提取 callId
+                try {
+                    com.google.protobuf.AbstractMessage msg = ly.ProtoMessageFactory.createProtoMessage(cmd, packet.getData());
+                    if (msg instanceof ly.proto.Server.scGate2GameRpcGameCall resp) {
+                        if (resp.getCallId() == callId) {
+                            iterator.remove();
+                            return packet;
+                        }
+                    }
+                } catch (Exception ignored) {
+                    // 解析失败，跳过
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 将误取出的包放回接收队列头部。
+     * <p>
+     * 当 getReceiveMsgByCallId 取出包后发现 callId 不匹配时，调用此方法放回。
+     */
+    public void putBackPacket(AbstractMessagePacket packet) {
+        if (packet != null) {
+            receivePacketQueue.add(packet);
+        }
+    }
+
     @Override
     public String toString() {
         return "NetClient{"

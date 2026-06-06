@@ -113,8 +113,15 @@ public class ReliableRpcStore {
 
       sleepForReplayRateLimit(lastReplayAt);
       lastReplayAt = System.currentTimeMillis();
-      if (connector.sendPacket(message.toPacket())) {
-        if (requiresReplayResponse(message) && !waitAndHandleReplayResponse(connector, message)) {
+      // 为补发包生成唯一 callId，用于匹配回包
+      long callId = System.nanoTime() ^ Thread.currentThread().threadId();
+      AbstractMessagePacket replayPacket = buildReplayPacket(message, callId);
+      if (replayPacket == null) {
+        LoggerDef.NetLogger.error("build replay packet failed, msgId={}", message.getMsgId());
+        continue;
+      }
+      if (connector.sendPacket(replayPacket)) {
+        if (requiresReplayResponse(message) && !waitAndHandleReplayResponse(connector, message, callId)) {
           RedisUtils.listRemove(key, message);
           message.increaseRetryCount(System.currentTimeMillis() + calculateRetryDelayMillis(message.getRetryCount() + 1));
           RedisUtils.listAdd(key, message);
@@ -150,34 +157,43 @@ public class ReliableRpcStore {
     return message.getCmd() == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE;
   }
 
-  private boolean waitAndHandleReplayResponse(RpcNodeConnector connector, ReliableRpcMessage message) {
-    Server.csGate2GameRpcGameCall request =
-        (Server.csGate2GameRpcGameCall)
-            ProtoMessageFactory.createProtoMessage(Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE, message.toPacket().getData());
-    if (request == null) {
-      LoggerDef.NetLogger.error("parse reliable rpc replay request failed, msgId={}", message.getMsgId());
-      return false;
-    }
-
-    int expectedSeq = request.getSeq() + 1;
+  private boolean waitAndHandleReplayResponse(RpcNodeConnector connector, ReliableRpcMessage message, long callId) {
     int expectedCmd = Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE;
     LoggerDef.NetLogger.info(
-        "[ReplayWait] waiting for response, msgId={}, innerSeq={}, expecting seq={}, cmd=SC_Gate2GameRpcGameCall, queueSize={}",
-        message.getMsgId(), request.getSeq(), expectedSeq, connector.getClient().getReceivePacketQueueSize());
+        "[ReplayWait] waiting for response, msgId={}, callId={}, cmd=SC_Gate2GameRpcGameCall, queueSize={}",
+        message.getMsgId(), callId, connector.getClient().getReceivePacketQueueSize());
 
     long deadline = System.currentTimeMillis() + 10_000L;
     while (System.currentTimeMillis() < deadline) {
       AbstractMessagePacket response =
-          connector
-              .getClient()
-              .getReceiveMsgBySeq(expectedSeq, expectedCmd);
+          connector.getClient().getReceiveMsgByCallId(callId, expectedCmd);
       if (response != null) {
-        LoggerDef.NetLogger.info("[ReplayWait] response found, msgId={}, seq={}, cmd={}", message.getMsgId(), response.getSeq(), response.getCmd());
-        boolean handled = RpcService.getInstance().handleReliableReplayResponse(message, response);
-        if (!handled) {
-          LoggerDef.NetLogger.warn("reliable rpc replay response no handler, msgId={}", message.getMsgId());
+        // 校验 callId
+        Server.scGate2GameRpcGameCall resp =
+            (Server.scGate2GameRpcGameCall)
+                ProtoMessageFactory.createProtoMessage(expectedCmd, response.getData());
+        if (resp == null || resp.getCallId() != callId) {
+          // callId 不匹配，放回队列继续等
+          LoggerDef.NetLogger.warn(
+              "[ReplayWait] callId mismatch, expected={}, got={}, put back",
+              callId, resp != null ? resp.getCallId() : "null");
+          connector.getClient().putBackPacket(response);
+          continue;
         }
-        return handled;
+        // 校验内层 cmd
+        int innerCmd = resp.getCmd();
+        if (innerCmd == Cmd.CMD.SC_ErrorCode_VALUE) {
+          // 错误码回包，Game 已处理，算送达成功
+          LoggerDef.NetLogger.info(
+              "[ReplayWait] received SC_ErrorCode via SC_Gate2GameRpcGameCall, callId={}, treating as delivered",
+              callId);
+        } else {
+          // 正常业务回包
+          LoggerDef.NetLogger.info(
+              "[ReplayWait] received normal response, callId={}, innerCmd={}, treating as delivered",
+              callId, innerCmd);
+        }
+        return true;
       }
       try {
         Thread.sleep(10L);
@@ -186,8 +202,39 @@ public class ReliableRpcStore {
         return false;
       }
     }
-    LoggerDef.NetLogger.warn("[ReplayWait] response TIMEOUT after 10s, msgId={}, innerSeq={}, expectedSeq={}", message.getMsgId(), request.getSeq(), expectedSeq);
+    LoggerDef.NetLogger.warn("[ReplayWait] response TIMEOUT after 10s, msgId={}, callId={}", message.getMsgId(), callId);
     return false;
+  }
+
+  /**
+   * 构建补发包：从原始消息重建 csGate2GameRpcGameCall，写入 callId。
+   */
+  private AbstractMessagePacket buildReplayPacket(ReliableRpcMessage message, long callId) {
+    if (message.getCmd() != Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) {
+      return message.toPacket();
+    }
+    try {
+      Server.csGate2GameRpcGameCall original =
+          (Server.csGate2GameRpcGameCall)
+              ProtoMessageFactory.createProtoMessage(Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE, message.toPacket().getData());
+      if (original == null) {
+        return message.toPacket();
+      }
+      Server.csGate2GameRpcGameCall withCallId =
+          Server.csGate2GameRpcGameCall.newBuilder(original)
+              .setCallId(callId)
+              .build();
+      AbstractMessagePacket packet =
+          new AbstractMessagePacket(
+              message.toPacket().getGuid(),
+              Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE,
+              0, 0,
+              withCallId.toByteArray());
+      return packet;
+    } catch (Exception e) {
+      LoggerDef.NetLogger.error("buildReplayPacket failed, msgId={}", message.getMsgId(), e);
+      return message.toPacket();
+    }
   }
 
   public void replayAllAvailableTargets() {
