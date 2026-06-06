@@ -35,8 +35,8 @@ public class ProtoMessageFactory {
         case Cmd.CMD.CS_HeroStarUp_VALUE ->{return Hero.CS_HeroStarUp.parseFrom(data);}
         case Cmd.CMD.SC_HeroStarUp_VALUE ->{return Hero.SC_HeroStarUp.parseFrom(data);}
         // 移动模块
-        case Cmd.CMD.CS_Move_VALUE ->{return Move.CS_Move.parseFrom(data);}
-        case Cmd.CMD.SC_Move_VALUE ->{return Move.SC_Move.parseFrom(data);}
+        case Cmd.CMD.CS_Move_VALUE ->{return Move.csMove.parseFrom(data);}
+        case Cmd.CMD.SC_Move_VALUE ->{return Move.scMove.parseFrom(data);}
       }
     } catch (InvalidProtocolBufferException e) {
       e.printStackTrace();

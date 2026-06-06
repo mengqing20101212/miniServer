@@ -12,7 +12,6 @@ import ly.proto.Move;
  */
 public class MoveController implements IGameController {
 
-    // 玩家坐标缓存（简单实现，存内存）
     private static final java.util.concurrent.ConcurrentHashMap<Long, int[]> playerPositions = new java.util.concurrent.ConcurrentHashMap<>();
 
     @Override
@@ -20,25 +19,16 @@ public class MoveController implements IGameController {
         gameHandlerRegister(Cmd.CMD.CS_Move, this::handleMove);
     }
 
-    /**
-     * 处理移动请求
-     */
-    public void handleMove(GameHandlerContext context, Move.CS_Move request) {
+    public void handleMove(GameHandlerContext context, Move.csMove request) {
         Player player = context.player();
         long playerId = player.getPlayerId();
         int targetX = request.getTargetX();
         int targetY = request.getTargetY();
 
-        // 获取旧坐标
         int[] oldPos = playerPositions.getOrDefault(playerId, new int[]{0, 0});
-        int oldX = oldPos[0];
-        int oldY = oldPos[1];
-
-        // 更新坐标
         playerPositions.put(playerId, new int[]{targetX, targetY});
 
-        // 发送响应
-        Move.SC_Move.Builder builder = Move.SC_Move.newBuilder();
+        Move.scMove.Builder builder = Move.scMove.newBuilder();
         builder.setResult(ErrorMsg.ErrorCode.Ok);
         builder.setCurrentX(targetX);
         builder.setCurrentY(targetY);
@@ -46,12 +36,9 @@ public class MoveController implements IGameController {
         player.sendMsg(Cmd.CMD.SC_Move, builder.build());
 
         ly.LoggerDef.SystemLogger.info("Player {} moved from ({},{}) to ({},{})",
-                playerId, oldX, oldY, targetX, targetY);
+                playerId, oldPos[0], oldPos[1], targetX, targetY);
     }
 
-    /**
-     * 获取玩家坐标
-     */
     public static int[] getPlayerPosition(long playerId) {
         return playerPositions.getOrDefault(playerId, new int[]{0, 0});
     }

@@ -14,8 +14,8 @@ public final class Move {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
-  public interface CS_MoveOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:CS_Move)
+  public interface csMoveOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:csMove)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -43,25 +43,25 @@ public final class Move {
    * 移动请求
    * </pre>
    *
-   * Protobuf type {@code CS_Move}
+   * Protobuf type {@code csMove}
    */
-  public static final class CS_Move extends
+  public static final class csMove extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:CS_Move)
-      CS_MoveOrBuilder {
+      // @@protoc_insertion_point(message_implements:csMove)
+      csMoveOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use CS_Move.newBuilder() to construct.
-    private CS_Move(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use csMove.newBuilder() to construct.
+    private csMove(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private CS_Move() {
+    private csMove() {
     }
 
     @java.lang.Override
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(
         UnusedPrivateParameter unused) {
-      return new CS_Move();
+      return new csMove();
     }
 
     @java.lang.Override
@@ -69,7 +69,7 @@ public final class Move {
     getUnknownFields() {
       return this.unknownFields;
     }
-    private CS_Move(
+    private csMove(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -118,15 +118,15 @@ public final class Move {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return ly.proto.Move.internal_static_CS_Move_descriptor;
+      return ly.proto.Move.internal_static_csMove_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return ly.proto.Move.internal_static_CS_Move_fieldAccessorTable
+      return ly.proto.Move.internal_static_csMove_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              ly.proto.Move.CS_Move.class, ly.proto.Move.CS_Move.Builder.class);
+              ly.proto.Move.csMove.class, ly.proto.Move.csMove.Builder.class);
     }
 
     public static final int TARGET_X_FIELD_NUMBER = 1;
@@ -206,10 +206,10 @@ public final class Move {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof ly.proto.Move.CS_Move)) {
+      if (!(obj instanceof ly.proto.Move.csMove)) {
         return super.equals(obj);
       }
-      ly.proto.Move.CS_Move other = (ly.proto.Move.CS_Move) obj;
+      ly.proto.Move.csMove other = (ly.proto.Move.csMove) obj;
 
       if (getTargetX()
           != other.getTargetX()) return false;
@@ -235,69 +235,69 @@ public final class Move {
       return hash;
     }
 
-    public static ly.proto.Move.CS_Move parseFrom(
+    public static ly.proto.Move.csMove parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static ly.proto.Move.CS_Move parseFrom(
+    public static ly.proto.Move.csMove parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static ly.proto.Move.CS_Move parseFrom(
+    public static ly.proto.Move.csMove parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static ly.proto.Move.CS_Move parseFrom(
+    public static ly.proto.Move.csMove parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static ly.proto.Move.CS_Move parseFrom(byte[] data)
+    public static ly.proto.Move.csMove parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static ly.proto.Move.CS_Move parseFrom(
+    public static ly.proto.Move.csMove parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static ly.proto.Move.CS_Move parseFrom(java.io.InputStream input)
+    public static ly.proto.Move.csMove parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static ly.proto.Move.CS_Move parseFrom(
+    public static ly.proto.Move.csMove parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static ly.proto.Move.CS_Move parseDelimitedFrom(java.io.InputStream input)
+    public static ly.proto.Move.csMove parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static ly.proto.Move.CS_Move parseDelimitedFrom(
+    public static ly.proto.Move.csMove parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static ly.proto.Move.CS_Move parseFrom(
+    public static ly.proto.Move.csMove parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static ly.proto.Move.CS_Move parseFrom(
+    public static ly.proto.Move.csMove parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -310,7 +310,7 @@ public final class Move {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(ly.proto.Move.CS_Move prototype) {
+    public static Builder newBuilder(ly.proto.Move.csMove prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -330,26 +330,26 @@ public final class Move {
      * 移动请求
      * </pre>
      *
-     * Protobuf type {@code CS_Move}
+     * Protobuf type {@code csMove}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:CS_Move)
-        ly.proto.Move.CS_MoveOrBuilder {
+        // @@protoc_insertion_point(builder_implements:csMove)
+        ly.proto.Move.csMoveOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return ly.proto.Move.internal_static_CS_Move_descriptor;
+        return ly.proto.Move.internal_static_csMove_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return ly.proto.Move.internal_static_CS_Move_fieldAccessorTable
+        return ly.proto.Move.internal_static_csMove_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                ly.proto.Move.CS_Move.class, ly.proto.Move.CS_Move.Builder.class);
+                ly.proto.Move.csMove.class, ly.proto.Move.csMove.Builder.class);
       }
 
-      // Construct using ly.proto.Move.CS_Move.newBuilder()
+      // Construct using ly.proto.Move.csMove.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -377,17 +377,17 @@ public final class Move {
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return ly.proto.Move.internal_static_CS_Move_descriptor;
+        return ly.proto.Move.internal_static_csMove_descriptor;
       }
 
       @java.lang.Override
-      public ly.proto.Move.CS_Move getDefaultInstanceForType() {
-        return ly.proto.Move.CS_Move.getDefaultInstance();
+      public ly.proto.Move.csMove getDefaultInstanceForType() {
+        return ly.proto.Move.csMove.getDefaultInstance();
       }
 
       @java.lang.Override
-      public ly.proto.Move.CS_Move build() {
-        ly.proto.Move.CS_Move result = buildPartial();
+      public ly.proto.Move.csMove build() {
+        ly.proto.Move.csMove result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -395,8 +395,8 @@ public final class Move {
       }
 
       @java.lang.Override
-      public ly.proto.Move.CS_Move buildPartial() {
-        ly.proto.Move.CS_Move result = new ly.proto.Move.CS_Move(this);
+      public ly.proto.Move.csMove buildPartial() {
+        ly.proto.Move.csMove result = new ly.proto.Move.csMove(this);
         result.targetX_ = targetX_;
         result.targetY_ = targetY_;
         onBuilt();
@@ -437,16 +437,16 @@ public final class Move {
       }
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof ly.proto.Move.CS_Move) {
-          return mergeFrom((ly.proto.Move.CS_Move)other);
+        if (other instanceof ly.proto.Move.csMove) {
+          return mergeFrom((ly.proto.Move.csMove)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(ly.proto.Move.CS_Move other) {
-        if (other == ly.proto.Move.CS_Move.getDefaultInstance()) return this;
+      public Builder mergeFrom(ly.proto.Move.csMove other) {
+        if (other == ly.proto.Move.csMove.getDefaultInstance()) return this;
         if (other.getTargetX() != 0) {
           setTargetX(other.getTargetX());
         }
@@ -468,11 +468,11 @@ public final class Move {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        ly.proto.Move.CS_Move parsedMessage = null;
+        ly.proto.Move.csMove parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (ly.proto.Move.CS_Move) e.getUnfinishedMessage();
+          parsedMessage = (ly.proto.Move.csMove) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -580,48 +580,48 @@ public final class Move {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:CS_Move)
+      // @@protoc_insertion_point(builder_scope:csMove)
     }
 
-    // @@protoc_insertion_point(class_scope:CS_Move)
-    private static final ly.proto.Move.CS_Move DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:csMove)
+    private static final ly.proto.Move.csMove DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new ly.proto.Move.CS_Move();
+      DEFAULT_INSTANCE = new ly.proto.Move.csMove();
     }
 
-    public static ly.proto.Move.CS_Move getDefaultInstance() {
+    public static ly.proto.Move.csMove getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<CS_Move>
-        PARSER = new com.google.protobuf.AbstractParser<CS_Move>() {
+    private static final com.google.protobuf.Parser<csMove>
+        PARSER = new com.google.protobuf.AbstractParser<csMove>() {
       @java.lang.Override
-      public CS_Move parsePartialFrom(
+      public csMove parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CS_Move(input, extensionRegistry);
+        return new csMove(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<CS_Move> parser() {
+    public static com.google.protobuf.Parser<csMove> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<CS_Move> getParserForType() {
+    public com.google.protobuf.Parser<csMove> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public ly.proto.Move.CS_Move getDefaultInstanceForType() {
+    public ly.proto.Move.csMove getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
   }
 
-  public interface SC_MoveOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:SC_Move)
+  public interface scMoveOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:scMove)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -660,18 +660,18 @@ public final class Move {
    * 移动响应
    * </pre>
    *
-   * Protobuf type {@code SC_Move}
+   * Protobuf type {@code scMove}
    */
-  public static final class SC_Move extends
+  public static final class scMove extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:SC_Move)
-      SC_MoveOrBuilder {
+      // @@protoc_insertion_point(message_implements:scMove)
+      scMoveOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use SC_Move.newBuilder() to construct.
-    private SC_Move(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use scMove.newBuilder() to construct.
+    private scMove(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private SC_Move() {
+    private scMove() {
       result_ = 0;
     }
 
@@ -679,7 +679,7 @@ public final class Move {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(
         UnusedPrivateParameter unused) {
-      return new SC_Move();
+      return new scMove();
     }
 
     @java.lang.Override
@@ -687,7 +687,7 @@ public final class Move {
     getUnknownFields() {
       return this.unknownFields;
     }
-    private SC_Move(
+    private scMove(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -742,15 +742,15 @@ public final class Move {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return ly.proto.Move.internal_static_SC_Move_descriptor;
+      return ly.proto.Move.internal_static_scMove_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return ly.proto.Move.internal_static_SC_Move_fieldAccessorTable
+      return ly.proto.Move.internal_static_scMove_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              ly.proto.Move.SC_Move.class, ly.proto.Move.SC_Move.Builder.class);
+              ly.proto.Move.scMove.class, ly.proto.Move.scMove.Builder.class);
     }
 
     public static final int RESULT_FIELD_NUMBER = 1;
@@ -856,10 +856,10 @@ public final class Move {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof ly.proto.Move.SC_Move)) {
+      if (!(obj instanceof ly.proto.Move.scMove)) {
         return super.equals(obj);
       }
-      ly.proto.Move.SC_Move other = (ly.proto.Move.SC_Move) obj;
+      ly.proto.Move.scMove other = (ly.proto.Move.scMove) obj;
 
       if (result_ != other.result_) return false;
       if (getCurrentX()
@@ -888,69 +888,69 @@ public final class Move {
       return hash;
     }
 
-    public static ly.proto.Move.SC_Move parseFrom(
+    public static ly.proto.Move.scMove parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static ly.proto.Move.SC_Move parseFrom(
+    public static ly.proto.Move.scMove parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static ly.proto.Move.SC_Move parseFrom(
+    public static ly.proto.Move.scMove parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static ly.proto.Move.SC_Move parseFrom(
+    public static ly.proto.Move.scMove parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static ly.proto.Move.SC_Move parseFrom(byte[] data)
+    public static ly.proto.Move.scMove parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static ly.proto.Move.SC_Move parseFrom(
+    public static ly.proto.Move.scMove parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static ly.proto.Move.SC_Move parseFrom(java.io.InputStream input)
+    public static ly.proto.Move.scMove parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static ly.proto.Move.SC_Move parseFrom(
+    public static ly.proto.Move.scMove parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static ly.proto.Move.SC_Move parseDelimitedFrom(java.io.InputStream input)
+    public static ly.proto.Move.scMove parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static ly.proto.Move.SC_Move parseDelimitedFrom(
+    public static ly.proto.Move.scMove parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static ly.proto.Move.SC_Move parseFrom(
+    public static ly.proto.Move.scMove parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static ly.proto.Move.SC_Move parseFrom(
+    public static ly.proto.Move.scMove parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -963,7 +963,7 @@ public final class Move {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(ly.proto.Move.SC_Move prototype) {
+    public static Builder newBuilder(ly.proto.Move.scMove prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -983,26 +983,26 @@ public final class Move {
      * 移动响应
      * </pre>
      *
-     * Protobuf type {@code SC_Move}
+     * Protobuf type {@code scMove}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:SC_Move)
-        ly.proto.Move.SC_MoveOrBuilder {
+        // @@protoc_insertion_point(builder_implements:scMove)
+        ly.proto.Move.scMoveOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return ly.proto.Move.internal_static_SC_Move_descriptor;
+        return ly.proto.Move.internal_static_scMove_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return ly.proto.Move.internal_static_SC_Move_fieldAccessorTable
+        return ly.proto.Move.internal_static_scMove_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                ly.proto.Move.SC_Move.class, ly.proto.Move.SC_Move.Builder.class);
+                ly.proto.Move.scMove.class, ly.proto.Move.scMove.Builder.class);
       }
 
-      // Construct using ly.proto.Move.SC_Move.newBuilder()
+      // Construct using ly.proto.Move.scMove.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -1032,17 +1032,17 @@ public final class Move {
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return ly.proto.Move.internal_static_SC_Move_descriptor;
+        return ly.proto.Move.internal_static_scMove_descriptor;
       }
 
       @java.lang.Override
-      public ly.proto.Move.SC_Move getDefaultInstanceForType() {
-        return ly.proto.Move.SC_Move.getDefaultInstance();
+      public ly.proto.Move.scMove getDefaultInstanceForType() {
+        return ly.proto.Move.scMove.getDefaultInstance();
       }
 
       @java.lang.Override
-      public ly.proto.Move.SC_Move build() {
-        ly.proto.Move.SC_Move result = buildPartial();
+      public ly.proto.Move.scMove build() {
+        ly.proto.Move.scMove result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -1050,8 +1050,8 @@ public final class Move {
       }
 
       @java.lang.Override
-      public ly.proto.Move.SC_Move buildPartial() {
-        ly.proto.Move.SC_Move result = new ly.proto.Move.SC_Move(this);
+      public ly.proto.Move.scMove buildPartial() {
+        ly.proto.Move.scMove result = new ly.proto.Move.scMove(this);
         result.result_ = result_;
         result.currentX_ = currentX_;
         result.currentY_ = currentY_;
@@ -1093,16 +1093,16 @@ public final class Move {
       }
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof ly.proto.Move.SC_Move) {
-          return mergeFrom((ly.proto.Move.SC_Move)other);
+        if (other instanceof ly.proto.Move.scMove) {
+          return mergeFrom((ly.proto.Move.scMove)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(ly.proto.Move.SC_Move other) {
-        if (other == ly.proto.Move.SC_Move.getDefaultInstance()) return this;
+      public Builder mergeFrom(ly.proto.Move.scMove other) {
+        if (other == ly.proto.Move.scMove.getDefaultInstance()) return this;
         if (other.result_ != 0) {
           setResultValue(other.getResultValue());
         }
@@ -1127,11 +1127,11 @@ public final class Move {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        ly.proto.Move.SC_Move parsedMessage = null;
+        ly.proto.Move.scMove parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (ly.proto.Move.SC_Move) e.getUnfinishedMessage();
+          parsedMessage = (ly.proto.Move.scMove) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -1293,56 +1293,56 @@ public final class Move {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:SC_Move)
+      // @@protoc_insertion_point(builder_scope:scMove)
     }
 
-    // @@protoc_insertion_point(class_scope:SC_Move)
-    private static final ly.proto.Move.SC_Move DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:scMove)
+    private static final ly.proto.Move.scMove DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new ly.proto.Move.SC_Move();
+      DEFAULT_INSTANCE = new ly.proto.Move.scMove();
     }
 
-    public static ly.proto.Move.SC_Move getDefaultInstance() {
+    public static ly.proto.Move.scMove getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<SC_Move>
-        PARSER = new com.google.protobuf.AbstractParser<SC_Move>() {
+    private static final com.google.protobuf.Parser<scMove>
+        PARSER = new com.google.protobuf.AbstractParser<scMove>() {
       @java.lang.Override
-      public SC_Move parsePartialFrom(
+      public scMove parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new SC_Move(input, extensionRegistry);
+        return new scMove(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<SC_Move> parser() {
+    public static com.google.protobuf.Parser<scMove> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<SC_Move> getParserForType() {
+    public com.google.protobuf.Parser<scMove> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public ly.proto.Move.SC_Move getDefaultInstanceForType() {
+    public ly.proto.Move.scMove getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_CS_Move_descriptor;
+    internal_static_csMove_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_CS_Move_fieldAccessorTable;
+      internal_static_csMove_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_SC_Move_descriptor;
+    internal_static_scMove_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_SC_Move_fieldAccessorTable;
+      internal_static_scMove_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1352,28 +1352,28 @@ public final class Move {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\nMove.proto\032\016ErrorMsg.proto\"-\n\007CS_Move\022" +
-      "\020\n\010target_x\030\001 \001(\005\022\020\n\010target_y\030\002 \001(\005\"K\n\007S" +
-      "C_Move\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\021\n\tcu" +
-      "rrent_x\030\002 \001(\005\022\021\n\tcurrent_y\030\003 \001(\005B\n\n\010ly.p" +
-      "rotob\006proto3"
+      "\n\nMove.proto\032\016ErrorMsg.proto\",\n\006csMove\022\020" +
+      "\n\010target_x\030\001 \001(\005\022\020\n\010target_y\030\002 \001(\005\"J\n\006sc" +
+      "Move\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\021\n\tcurr" +
+      "ent_x\030\002 \001(\005\022\021\n\tcurrent_y\030\003 \001(\005B\n\n\010ly.pro" +
+      "tob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           ly.proto.ErrorMsg.getDescriptor(),
         });
-    internal_static_CS_Move_descriptor =
+    internal_static_csMove_descriptor =
       getDescriptor().getMessageTypes().get(0);
-    internal_static_CS_Move_fieldAccessorTable = new
+    internal_static_csMove_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_CS_Move_descriptor,
+        internal_static_csMove_descriptor,
         new java.lang.String[] { "TargetX", "TargetY", });
-    internal_static_SC_Move_descriptor =
+    internal_static_scMove_descriptor =
       getDescriptor().getMessageTypes().get(1);
-    internal_static_SC_Move_fieldAccessorTable = new
+    internal_static_scMove_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_SC_Move_descriptor,
+        internal_static_scMove_descriptor,
         new java.lang.String[] { "Result", "CurrentX", "CurrentY", });
     ly.proto.ErrorMsg.getDescriptor();
   }

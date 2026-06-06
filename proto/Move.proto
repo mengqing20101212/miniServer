@@ -4,13 +4,13 @@ option java_package = "ly.proto";
 import "ErrorMsg.proto";
 
 // 移动请求
-message CS_Move {
+message csMove {
   int32 target_x = 1;  // 目标X坐标
   int32 target_y = 2;  // 目标Y坐标
 }
 
 // 移动响应
-message SC_Move {
+message scMove {
   ErrorCode result = 1;
   int32 current_x = 2;  // 当前X坐标
   int32 current_y = 3;  // 当前Y坐标
