@@ -978,3 +978,269 @@
 2026-06-06 22:35:22.012 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1010, sid=4, seq=3, guid=1020936180, time=1780756522, data=[18, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
 2026-06-06 22:35:25.351 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=3, guid=77, time=1780756525, data=[]}
 2026-06-06 22:35:25.497 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=4, guid=1020936180, time=1780756525, data=[10, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:35:35.814 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=4, guid=0, time=1780756535, data=[]}
+2026-06-06 22:35:35.885 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=4, guid=0, time=1780756535, data=[]}
+2026-06-06 22:35:28.668 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=5, guid=0, time=1780756528, data=[]}
+2026-06-06 22:35:28.741 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=5, guid=0, time=1780756528, data=[]}
+2026-06-06 22:35:43.588 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=6, guid=0, time=1780756543, data=[]}
+2026-06-06 22:35:31.712 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=6, guid=0, time=1780756543, data=[]}
+2026-06-06 22:35:34.665 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=7, guid=0, time=1780756534, data=[]}
+2026-06-06 22:35:46.974 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=7, guid=0, time=1780756534, data=[]}
+2026-06-06 22:35:38.593 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=8, guid=0, time=1780756538, data=[]}
+2026-06-06 22:35:38.666 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=8, guid=0, time=1780756538, data=[]}
+2026-06-06 22:35:41.770 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=9, guid=77, time=1780756541, data=[8, 47, 16, 13]}
+2026-06-06 22:35:41.913 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=10, guid=1020936180, time=1780756541, data=[16, 47, 24, 13]}
+2026-06-06 22:35:45.421 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=10, guid=77, time=1780756545, data=[8, 26, 16, 9]}
+2026-06-06 22:35:45.544 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=11, guid=1020936180, time=1780756545, data=[16, 26, 24, 9]}
+2026-06-06 22:35:48.284 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=11, guid=77, time=1780756548, data=[8, 85, 16, 53]}
+2026-06-06 22:35:48.398 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=12, guid=1020936180, time=1780756548, data=[16, 85, 24, 53]}
+2026-06-06 22:35:50.556 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=12, guid=77, time=1780756550, data=[8, 85, 16, 33]}
+2026-06-06 22:35:50.686 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=13, guid=1020936180, time=1780756550, data=[16, 85, 24, 33]}
+2026-06-06 22:35:54.597 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=13, guid=77, time=1780756554, data=[8, 78, 16, 3]}
+2026-06-06 22:35:54.723 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=14, guid=1020936180, time=1780756554, data=[16, 78, 24, 3]}
+2026-06-06 22:35:58.430 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=14, guid=77, time=1780756558, data=[8, 76, 16, 36]}
+2026-06-06 22:35:58.579 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=15, guid=1020936180, time=1780756558, data=[16, 76, 24, 36]}
+2026-06-06 22:36:02.517 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=15, guid=77, time=1780756562, data=[8, 35, 16, 97]}
+2026-06-06 22:36:02.646 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=16, guid=1020936180, time=1780756562, data=[16, 35, 24, 97]}
+2026-06-06 22:36:06.533 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=16, guid=77, time=1780756566, data=[8, 32, 16, 29]}
+2026-06-06 22:36:06.647 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=17, guid=1020936180, time=1780756566, data=[16, 32, 24, 29]}
+2026-06-06 22:36:08.731 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=17, guid=77, time=1780756568, data=[8, 51, 16, 70]}
+2026-06-06 22:36:08.860 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=18, guid=1020936180, time=1780756568, data=[16, 51, 24, 70]}
+2026-06-06 22:36:11.480 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=18, guid=77, time=1780756571, data=[8, 58, 16, 43]}
+2026-06-06 22:36:11.609 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=19, guid=1020936180, time=1780756571, data=[16, 58, 24, 43]}
+2026-06-06 22:36:14.461 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=19, guid=77, time=1780756574, data=[8, 53, 16, 42]}
+2026-06-06 22:36:14.572 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=20, guid=1020936180, time=1780756574, data=[16, 53, 24, 42]}
+2026-06-06 22:36:18.357 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=20, guid=77, time=1780756578, data=[8, 9, 16, 56]}
+2026-06-06 22:36:18.487 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=21, guid=1020936180, time=1780756578, data=[16, 9, 24, 56]}
+2026-06-06 22:36:21.755 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=21, guid=77, time=1780756581, data=[8, 94, 16, 85]}
+2026-06-06 22:36:22.135 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=22, guid=1020936180, time=1780756582, data=[16, 94, 24, 85]}
+2026-06-06 22:37:02.808 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=22, guid=77, time=1780756622, data=[]}
+2026-06-06 22:37:02.936 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=23, guid=1020936180, time=1780756622, data=[10, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:37:07.131 DEBUG - sid:4 send packet:MessagePacket{cmd=1009, sid=4, seq=23, guid=77, time=1780756627, data=[8, 2, 16, 1]}
+2026-06-06 22:36:58.210 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=24, guid=77, time=1780756618, data=[]}
+2026-06-06 22:37:05.479 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=25, guid=1020936180, time=1780756625, data=[10, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:37:07.574 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=25, guid=0, time=1780756627, data=[]}
+2026-06-06 22:37:07.651 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=25, guid=0, time=1780756627, data=[]}
+2026-06-06 22:37:10.687 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=26, guid=0, time=1780756630, data=[]}
+2026-06-06 22:37:10.757 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=26, guid=0, time=1780756630, data=[]}
+2026-06-06 22:37:14.887 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=27, guid=0, time=1780756634, data=[]}
+2026-06-06 22:37:14.956 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=27, guid=0, time=1780756634, data=[]}
+2026-06-06 22:37:18.170 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=28, guid=0, time=1780756638, data=[]}
+2026-06-06 22:37:18.244 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=28, guid=0, time=1780756638, data=[]}
+2026-06-06 22:37:21.481 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=29, guid=0, time=1780756641, data=[]}
+2026-06-06 22:37:21.555 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=29, guid=0, time=1780756641, data=[]}
+2026-06-06 22:37:23.568 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=30, guid=77, time=1780756643, data=[8, 44, 16, 68]}
+2026-06-06 22:37:23.698 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=31, guid=1020936180, time=1780756643, data=[16, 44, 24, 68]}
+2026-06-06 22:37:26.405 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=31, guid=77, time=1780756646, data=[16, 52]}
+2026-06-06 22:37:26.528 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=32, guid=1020936180, time=1780756646, data=[24, 52]}
+2026-06-06 22:37:29.692 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=32, guid=77, time=1780756649, data=[8, 93, 16, 48]}
+2026-06-06 22:37:29.827 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=33, guid=1020936180, time=1780756649, data=[16, 93, 24, 48]}
+2026-06-06 22:37:45.833 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=33, guid=77, time=1780756665, data=[8, 88, 16, 42]}
+2026-06-06 22:37:45.981 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=34, guid=1020936180, time=1780756665, data=[16, 88, 24, 42]}
+2026-06-06 22:37:49.511 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=34, guid=77, time=1780756669, data=[8, 19, 16, 68]}
+2026-06-06 22:37:49.646 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=35, guid=1020936180, time=1780756669, data=[16, 19, 24, 68]}
+2026-06-06 22:37:52.195 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=35, guid=77, time=1780756672, data=[8, 56, 16, 43]}
+2026-06-06 22:37:52.313 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=36, guid=1020936180, time=1780756672, data=[16, 56, 24, 43]}
+2026-06-06 22:37:55.658 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=36, guid=77, time=1780756675, data=[8, 57, 16, 3]}
+2026-06-06 22:37:55.780 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=37, guid=1020936180, time=1780756675, data=[16, 57, 24, 3]}
+2026-06-06 22:37:59.404 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=37, guid=77, time=1780756679, data=[8, 30, 16, 81]}
+2026-06-06 22:37:59.534 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=38, guid=1020936180, time=1780756679, data=[16, 30, 24, 81]}
+2026-06-06 22:38:03.084 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=38, guid=77, time=1780756683, data=[8, 23, 16, 38]}
+2026-06-06 22:38:03.214 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=39, guid=1020936180, time=1780756683, data=[16, 23, 24, 38]}
+2026-06-06 22:38:06.567 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=39, guid=77, time=1780756686, data=[8, 60, 16, 23]}
+2026-06-06 22:38:06.708 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=40, guid=1020936180, time=1780756686, data=[16, 60, 24, 23]}
+2026-06-06 22:38:09.048 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=40, guid=77, time=1780756689, data=[8, 36, 16, 39]}
+2026-06-06 22:38:09.176 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=41, guid=1020936180, time=1780756689, data=[16, 36, 24, 39]}
+2026-06-06 22:38:12.235 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=41, guid=77, time=1780756692, data=[8, 17, 16, 19]}
+2026-06-06 22:38:12.361 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=42, guid=1020936180, time=1780756692, data=[16, 17, 24, 19]}
+2026-06-06 22:38:04.051 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=42, guid=77, time=1780756684, data=[8, 51, 16, 76]}
+2026-06-06 22:38:04.173 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=43, guid=1020936180, time=1780756684, data=[16, 51, 24, 76]}
+2026-06-06 22:38:33.642 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=43, guid=77, time=1780756713, data=[]}
+2026-06-06 22:38:33.771 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=44, guid=1020936180, time=1780756713, data=[10, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:38:35.962 DEBUG - sid:4 send packet:MessagePacket{cmd=1009, sid=4, seq=44, guid=77, time=1780756715, data=[8, 2, 16, 1]}
+2026-06-06 22:38:39.059 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=45, guid=77, time=1780756719, data=[]}
+2026-06-06 22:38:52.361 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=46, guid=1020936180, time=1780756732, data=[10, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:38:48.785 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=46, guid=0, time=1780756728, data=[]}
+2026-06-06 22:38:48.858 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=46, guid=0, time=1780756728, data=[]}
+2026-06-06 22:38:52.201 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=47, guid=0, time=1780756732, data=[]}
+2026-06-06 22:38:52.274 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=47, guid=0, time=1780756732, data=[]}
+2026-06-06 22:38:56.871 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=48, guid=0, time=1780756736, data=[]}
+2026-06-06 22:38:56.940 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=48, guid=0, time=1780756736, data=[]}
+2026-06-06 22:39:00.148 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=49, guid=0, time=1780756740, data=[]}
+2026-06-06 22:39:00.219 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=49, guid=0, time=1780756740, data=[]}
+2026-06-06 22:39:02.542 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=50, guid=0, time=1780756742, data=[]}
+2026-06-06 22:39:02.619 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=50, guid=0, time=1780756742, data=[]}
+2026-06-06 22:39:07.439 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=51, guid=77, time=1780756747, data=[8, 6, 16, 29]}
+2026-06-06 22:39:07.561 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=52, guid=1020936180, time=1780756747, data=[16, 6, 24, 29]}
+2026-06-06 22:39:10.612 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=52, guid=77, time=1780756750, data=[8, 22, 16, 27]}
+2026-06-06 22:39:10.745 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=53, guid=1020936180, time=1780756750, data=[16, 22, 24, 27]}
+2026-06-06 22:39:14.720 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=53, guid=77, time=1780756754, data=[8, 19, 16, 22]}
+2026-06-06 22:39:14.842 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=54, guid=1020936180, time=1780756754, data=[16, 19, 24, 22]}
+2026-06-06 22:39:17.525 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=54, guid=77, time=1780756757, data=[8, 36, 16, 24]}
+2026-06-06 22:39:17.649 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=55, guid=1020936180, time=1780756757, data=[16, 36, 24, 24]}
+2026-06-06 22:39:20.139 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=55, guid=77, time=1780756760, data=[8, 64, 16, 88]}
+2026-06-06 22:39:23.345 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=56, guid=77, time=1780756763, data=[8, 94, 16, 52]}
+2026-06-06 22:39:23.469 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=57, guid=1020936180, time=1780756763, data=[16, 94, 24, 52]}
+2026-06-06 22:39:26.852 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=57, guid=77, time=1780756766, data=[8, 10, 16, 54]}
+2026-06-06 22:39:26.976 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=58, guid=1020936180, time=1780756766, data=[16, 10, 24, 54]}
+2026-06-06 22:39:29.845 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=58, guid=77, time=1780756769, data=[8, 43, 16, 39]}
+2026-06-06 22:39:29.968 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=59, guid=1020936180, time=1780756769, data=[16, 43, 24, 39]}
+2026-06-06 22:39:33.089 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=59, guid=77, time=1780756773, data=[16, 70]}
+2026-06-06 22:39:33.211 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=60, guid=1020936180, time=1780756773, data=[24, 70]}
+2026-06-06 22:39:37.385 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=60, guid=77, time=1780756777, data=[8, 31, 16, 55]}
+2026-06-06 22:39:37.512 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=61, guid=1020936180, time=1780756777, data=[16, 31, 24, 55]}
+2026-06-06 22:39:54.159 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=61, guid=77, time=1780756794, data=[8, 74, 16, 71]}
+2026-06-06 22:39:54.280 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=62, guid=1020936180, time=1780756794, data=[16, 74, 24, 71]}
+2026-06-06 22:39:58.018 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=62, guid=77, time=1780756798, data=[8, 27, 16, 51]}
+2026-06-06 22:39:58.145 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=63, guid=1020936180, time=1780756798, data=[16, 27, 24, 51]}
+2026-06-06 22:40:00.788 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=63, guid=77, time=1780756800, data=[8, 35, 16, 3]}
+2026-06-06 22:40:00.912 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=64, guid=1020936180, time=1780756800, data=[16, 35, 24, 3]}
+2026-06-06 22:40:17.162 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=64, guid=77, time=1780756817, data=[]}
+2026-06-06 22:40:17.282 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=65, guid=1020936180, time=1780756817, data=[10, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:40:21.976 DEBUG - sid:4 send packet:MessagePacket{cmd=1009, sid=4, seq=65, guid=77, time=1780756821, data=[8, 2, 16, 1]}
+2026-06-06 22:40:24.614 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=66, guid=77, time=1780756824, data=[]}
+2026-06-06 22:40:37.514 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=67, guid=1020936180, time=1780756837, data=[10, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:40:47.935 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=67, guid=0, time=1780756847, data=[]}
+2026-06-06 22:40:48.009 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=67, guid=0, time=1780756847, data=[]}
+2026-06-06 22:40:50.968 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=68, guid=0, time=1780756850, data=[]}
+2026-06-06 22:40:51.041 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=68, guid=0, time=1780756850, data=[]}
+2026-06-06 22:40:53.304 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=69, guid=0, time=1780756853, data=[]}
+2026-06-06 22:40:53.380 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=69, guid=0, time=1780756853, data=[]}
+2026-06-06 22:40:56.788 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=70, guid=0, time=1780756856, data=[]}
+2026-06-06 22:40:56.991 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=70, guid=0, time=1780756856, data=[]}
+2026-06-06 22:41:01.763 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=71, guid=0, time=1780756861, data=[]}
+2026-06-06 22:41:01.836 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=71, guid=0, time=1780756861, data=[]}
+2026-06-06 22:40:53.543 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=72, guid=77, time=1780756853, data=[8, 99, 16, 49]}
+2026-06-06 22:40:53.664 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=73, guid=1020936180, time=1780756853, data=[16, 99, 24, 49]}
+2026-06-06 22:40:56.123 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=73, guid=77, time=1780756856, data=[8, 90, 16, 61]}
+2026-06-06 22:40:56.247 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=74, guid=1020936180, time=1780756856, data=[16, 90, 24, 61]}
+2026-06-06 22:41:00.235 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=74, guid=77, time=1780756860, data=[8, 56, 16, 40]}
+2026-06-06 22:41:00.348 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=75, guid=1020936180, time=1780756860, data=[16, 56, 24, 40]}
+2026-06-06 22:41:02.415 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=75, guid=77, time=1780756862, data=[8, 67, 16, 63]}
+2026-06-06 22:41:02.538 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=76, guid=1020936180, time=1780756862, data=[16, 67, 24, 63]}
+2026-06-06 22:41:05.216 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=76, guid=77, time=1780756865, data=[8, 77, 16, 18]}
+2026-06-06 22:41:05.336 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=77, guid=1020936180, time=1780756865, data=[16, 77, 24, 18]}
+2026-06-06 22:41:07.950 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=77, guid=77, time=1780756867, data=[8, 82, 16, 46]}
+2026-06-06 22:41:08.077 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=78, guid=1020936180, time=1780756868, data=[16, 82, 24, 46]}
+2026-06-06 22:41:10.437 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=78, guid=77, time=1780756870, data=[8, 92, 16, 21]}
+2026-06-06 22:41:22.474 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=79, guid=1020936180, time=1780756882, data=[16, 92, 24, 21]}
+2026-06-06 22:41:14.342 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=79, guid=77, time=1780756874, data=[8, 27, 16, 71]}
+2026-06-06 22:41:14.453 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=80, guid=1020936180, time=1780756874, data=[16, 27, 24, 71]}
+2026-06-06 22:41:17.460 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=80, guid=77, time=1780756877, data=[8, 83, 16, 43]}
+2026-06-06 22:41:17.570 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=81, guid=1020936180, time=1780756877, data=[16, 83, 24, 43]}
+2026-06-06 22:41:20.820 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=81, guid=77, time=1780756880, data=[8, 86, 16, 81]}
+2026-06-06 22:41:20.948 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=82, guid=1020936180, time=1780756880, data=[16, 86, 24, 81]}
+2026-06-06 22:41:23.557 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=82, guid=77, time=1780756883, data=[8, 74, 16, 22]}
+2026-06-06 22:41:23.680 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=83, guid=1020936180, time=1780756883, data=[16, 74, 24, 22]}
+2026-06-06 22:41:26.000 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=83, guid=77, time=1780756886, data=[8, 61, 16, 48]}
+2026-06-06 22:41:26.123 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=84, guid=1020936180, time=1780756886, data=[16, 61, 24, 48]}
+2026-06-06 22:41:29.224 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=84, guid=77, time=1780756889, data=[8, 5, 16, 12]}
+2026-06-06 22:41:29.352 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=85, guid=1020936180, time=1780756889, data=[16, 5, 24, 12]}
+2026-06-06 22:42:13.460 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=85, guid=77, time=1780756933, data=[]}
+2026-06-06 22:42:01.690 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=86, guid=1020936180, time=1780756921, data=[10, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:42:17.623 DEBUG - sid:4 send packet:MessagePacket{cmd=1009, sid=4, seq=86, guid=77, time=1780756937, data=[8, 2, 16, 1]}
+2026-06-06 22:42:10.005 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=87, guid=77, time=1780756930, data=[]}
+2026-06-06 22:42:16.208 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=88, guid=1020936180, time=1780756936, data=[10, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:42:21.312 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=88, guid=0, time=1780756941, data=[]}
+2026-06-06 22:42:21.381 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=88, guid=0, time=1780756941, data=[]}
+2026-06-06 22:42:24.786 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=89, guid=0, time=1780756944, data=[]}
+2026-06-06 22:42:24.857 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=89, guid=0, time=1780756944, data=[]}
+2026-06-06 22:42:27.525 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=90, guid=0, time=1780756947, data=[]}
+2026-06-06 22:42:27.598 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=90, guid=0, time=1780756947, data=[]}
+2026-06-06 22:42:43.649 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=91, guid=0, time=1780756963, data=[]}
+2026-06-06 22:42:43.720 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=91, guid=0, time=1780756963, data=[]}
+2026-06-06 22:42:47.148 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=92, guid=0, time=1780756967, data=[]}
+2026-06-06 22:42:47.216 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=92, guid=0, time=1780756967, data=[]}
+2026-06-06 22:42:49.272 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=93, guid=77, time=1780756969, data=[8, 48, 16, 39]}
+2026-06-06 22:42:49.405 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=94, guid=1020936180, time=1780756969, data=[16, 48, 24, 39]}
+2026-06-06 22:42:52.434 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=94, guid=77, time=1780756972, data=[8, 65, 16, 97]}
+2026-06-06 22:42:52.547 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=95, guid=1020936180, time=1780756972, data=[16, 65, 24, 97]}
+2026-06-06 22:42:55.740 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=95, guid=77, time=1780756975, data=[8, 55, 16, 14]}
+2026-06-06 22:42:55.862 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=96, guid=1020936180, time=1780756975, data=[16, 55, 24, 14]}
+2026-06-06 22:42:58.516 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=96, guid=77, time=1780756978, data=[8, 51]}
+2026-06-06 22:42:58.636 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=97, guid=1020936180, time=1780756978, data=[16, 51]}
+2026-06-06 22:43:00.852 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=97, guid=77, time=1780756980, data=[8, 80, 16, 56]}
+2026-06-06 22:43:00.985 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=98, guid=1020936180, time=1780756980, data=[16, 80, 24, 56]}
+2026-06-06 22:43:05.239 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=98, guid=77, time=1780756985, data=[8, 36, 16, 10]}
+2026-06-06 22:43:05.361 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=99, guid=1020936180, time=1780756985, data=[16, 36, 24, 10]}
+2026-06-06 22:43:08.285 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=99, guid=77, time=1780756988, data=[8, 37, 16, 44]}
+2026-06-06 22:43:08.403 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=100, guid=1020936180, time=1780756988, data=[16, 37, 24, 44]}
+2026-06-06 22:43:11.808 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=100, guid=77, time=1780756991, data=[8, 82, 16, 47]}
+2026-06-06 22:43:11.936 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=101, guid=1020936180, time=1780756991, data=[16, 82, 24, 47]}
+2026-06-06 22:43:04.335 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=101, guid=77, time=1780756984, data=[8, 34, 16, 69]}
+2026-06-06 22:43:04.467 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=102, guid=1020936180, time=1780756984, data=[16, 34, 24, 69]}
+2026-06-06 22:43:06.833 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=102, guid=77, time=1780756986, data=[8, 13, 16, 77]}
+2026-06-06 22:43:06.955 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=103, guid=1020936180, time=1780756986, data=[16, 13, 24, 77]}
+2026-06-06 22:43:09.712 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=103, guid=77, time=1780756989, data=[8, 33, 16, 94]}
+2026-06-06 22:43:09.837 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=104, guid=1020936180, time=1780756989, data=[16, 33, 24, 94]}
+2026-06-06 22:43:13.364 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=104, guid=77, time=1780756993, data=[8, 70, 16, 46]}
+2026-06-06 22:43:13.484 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=105, guid=1020936180, time=1780756993, data=[16, 70, 24, 46]}
+2026-06-06 22:43:18.305 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=105, guid=77, time=1780756998, data=[8, 60, 16, 80]}
+2026-06-06 22:43:18.426 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=106, guid=1020936180, time=1780756998, data=[16, 60, 24, 80]}
+2026-06-06 22:43:59.139 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=106, guid=77, time=1780757039, data=[]}
+2026-06-06 22:43:59.258 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=107, guid=1020936180, time=1780757039, data=[10, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:44:01.537 DEBUG - sid:4 send packet:MessagePacket{cmd=1009, sid=4, seq=107, guid=77, time=1780757041, data=[8, 2, 16, 1]}
+2026-06-06 22:44:06.012 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=108, guid=77, time=1780757046, data=[]}
+2026-06-06 22:44:11.791 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=109, guid=1020936180, time=1780757051, data=[10, 13, 8, -62, -38, -37, 36, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:44:15.663 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=109, guid=0, time=1780757055, data=[]}
+2026-06-06 22:44:15.736 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=109, guid=0, time=1780757055, data=[]}
+2026-06-06 22:44:17.688 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=110, guid=0, time=1780757057, data=[]}
+2026-06-06 22:44:17.765 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=110, guid=0, time=1780757057, data=[]}
+2026-06-06 22:44:22.534 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=111, guid=0, time=1780757062, data=[]}
+2026-06-06 22:44:22.655 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=111, guid=0, time=1780757062, data=[]}
+2026-06-06 22:44:26.118 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=112, guid=0, time=1780757066, data=[]}
+2026-06-06 22:44:26.195 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=112, guid=0, time=1780757066, data=[]}
+2026-06-06 22:44:18.520 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=113, guid=0, time=1780757058, data=[]}
+2026-06-06 22:44:18.589 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=113, guid=0, time=1780757058, data=[]}
+2026-06-06 22:44:22.491 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=114, guid=77, time=1780757062, data=[8, 5, 16, 54]}
+2026-06-06 22:44:22.614 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=115, guid=1020936180, time=1780757062, data=[16, 5, 24, 54]}
+2026-06-06 22:44:27.399 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=115, guid=77, time=1780757067, data=[8, 60, 16, 75]}
+2026-06-06 22:44:27.521 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=116, guid=1020936180, time=1780757067, data=[16, 60, 24, 75]}
+2026-06-06 22:44:29.412 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=116, guid=77, time=1780757069, data=[8, 21, 16, 32]}
+2026-06-06 22:44:29.535 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=117, guid=1020936180, time=1780757069, data=[16, 21, 24, 32]}
+2026-06-06 22:44:32.715 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=117, guid=77, time=1780757072, data=[8, 59, 16, 28]}
+2026-06-06 22:44:32.843 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=118, guid=1020936180, time=1780757072, data=[16, 59, 24, 28]}
+2026-06-06 22:44:37.525 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=118, guid=77, time=1780757077, data=[8, 87, 16, 18]}
+2026-06-06 22:44:37.659 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=119, guid=1020936180, time=1780757077, data=[16, 87, 24, 18]}
+2026-06-06 22:44:42.496 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=119, guid=77, time=1780757082, data=[8, 73, 16, 42]}
+2026-06-06 22:44:42.616 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=120, guid=1020936180, time=1780757082, data=[16, 73, 24, 42]}
+2026-06-06 22:44:44.822 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=120, guid=77, time=1780757084, data=[8, 33, 16, 36]}
+2026-06-06 22:44:44.937 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=121, guid=1020936180, time=1780757084, data=[16, 33, 24, 36]}
+2026-06-06 22:44:49.404 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=121, guid=77, time=1780757089, data=[8, 62, 16, 54]}
+2026-06-06 22:44:49.519 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=122, guid=1020936180, time=1780757089, data=[16, 62, 24, 54]}
+2026-06-06 22:44:53.080 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=122, guid=77, time=1780757093, data=[8, 14, 16, 52]}
+2026-06-06 22:44:53.208 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=123, guid=1020936180, time=1780757093, data=[16, 14, 24, 52]}
+2026-06-06 22:44:57.254 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=123, guid=77, time=1780757097, data=[8, 12, 16, 13]}
+2026-06-06 22:44:57.381 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=124, guid=1020936180, time=1780757097, data=[16, 12, 24, 13]}
+2026-06-06 22:45:01.140 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=124, guid=77, time=1780757101, data=[8, 93, 16, 38]}
+2026-06-06 22:45:01.267 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=125, guid=1020936180, time=1780757101, data=[16, 93, 24, 38]}
+2026-06-06 22:45:05.443 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=125, guid=77, time=1780757105, data=[8, 86, 16, 75]}
+2026-06-06 22:45:05.556 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=126, guid=1020936180, time=1780757105, data=[16, 86, 24, 75]}
+2026-06-06 22:45:08.296 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=126, guid=77, time=1780757108, data=[8, 79, 16, 62]}
+2026-06-06 22:45:08.409 DEBUG - 客户端(sid:a37a2114, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=127, guid=1020936180, time=1780757108, data=[16, 79, 24, 62]}
+2026-06-06 22:48:48.136 INFO  - Netty 客户端连接成功： channelId:00155dfffe2e3545-000083ae-00000000-a5b8eebce6cc420a-0bf034bd,  127.0.0.1:9001,  耗时:12049毫秒
+2026-06-06 22:48:48.177 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=0, sid=4, seq=0, guid=0, time=1780757328, data=[]}
+2026-06-06 22:48:48.250 DEBUG - sid:4 send packet:MessagePacket{cmd=101, sid=4, seq=0, guid=1020936180, time=1780757328, data=[10, 12, 114, 111, 98, 111, 116, 95, 117, 115, 101, 114, 95, 49, 16, -12, -1, -24, -26, 3, 34, 13, 114, 111, 98, 111, 116, 95, 99, 104, 97, 110, 110, 101, 108, 42, 8, 103, 97, 109, 101, 49, 48, 48, 49, 50, 47, 45, 53, 52, 50, 55, 48, 53, 53, 49, 55, 95, 49, 55, 56, 48, 55, 53, 48, 48, 51, 54, 48, 49, 53, 95, 115, 48, 113, -24, -77, -127, 107, 104, 78, 110, 117, 56, -24, -118, -76, 56, 53, 122, 72, -23, -66, -126, 58, 14, 114, 111, 98, 111, 116, 95, 100, 101, 118, 105, 99, 101, 95, 49]}
+2026-06-06 22:48:37.418 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=102, sid=4, seq=1, guid=4, time=1780757317, data=[10, 12, 114, 111, 98, 111, 116, 95, 117, 115, 101, 114, 95, 49, 16, 78, 26, 47, 45, 53, 52, 50, 55, 48, 53, 53, 49, 55, 95, 49, 55, 56, 48, 55, 53, 48, 48, 51, 54, 48, 49, 53, 95, 115, 48, 113, -24, -77, -127, 107, 104, 78, 110, 117, 56, -24, -118, -76, 56, 53, 122, 72, -23, -66, -126, 34, 8, 103, 97, 109, 101, 49, 48, 48, 49, 42, 36, 8, 78, 18, 9, 80, 108, 97, 121, 101, 114, 95, 55, 56, 24, 1, 40, -55, -117, -95, -21, -23, 51, 48, -55, -117, -95, -21, -23, 51, 56, -55, -117, -95, -21, -23, 51]}
+2026-06-06 22:48:42.251 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=1, guid=78, time=1780757322, data=[]}
+2026-06-06 22:48:42.374 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=2, guid=1020936180, time=1780757322, data=[]}
+2026-06-06 22:48:44.420 DEBUG - sid:4 send packet:MessagePacket{cmd=1009, sid=4, seq=2, guid=78, time=1780757324, data=[8, 2, 16, 1]}
+2026-06-06 22:48:44.553 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1010, sid=4, seq=3, guid=1020936180, time=1780757324, data=[18, 13, 8, -126, -33, -104, 37, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:48:46.926 DEBUG - sid:4 send packet:MessagePacket{cmd=1001, sid=4, seq=3, guid=78, time=1780757326, data=[]}
+2026-06-06 22:48:47.053 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1002, sid=4, seq=4, guid=1020936180, time=1780757327, data=[10, 13, 8, -126, -33, -104, 37, 16, 2, 24, 1, 32, 1, 56, 50]}
+2026-06-06 22:48:56.522 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=4, guid=0, time=1780757336, data=[]}
+2026-06-06 22:48:56.599 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=4, guid=0, time=1780757336, data=[]}
+2026-06-06 22:48:59.329 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=5, guid=0, time=1780757339, data=[]}
+2026-06-06 22:48:59.406 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=5, guid=0, time=1780757339, data=[]}
+2026-06-06 22:49:15.875 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=6, guid=0, time=1780757355, data=[]}
+2026-06-06 22:49:15.950 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=6, guid=0, time=1780757355, data=[]}
+2026-06-06 22:49:18.828 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=7, guid=0, time=1780757358, data=[]}
+2026-06-06 22:49:18.902 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=7, guid=0, time=1780757358, data=[]}
+2026-06-06 22:49:22.903 DEBUG - sid:4 send packet:MessagePacket{cmd=10003, sid=4, seq=8, guid=0, time=1780757362, data=[]}
+2026-06-06 22:49:22.985 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=10003, sid=4, seq=8, guid=0, time=1780757362, data=[]}
+2026-06-06 22:49:25.330 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=9, guid=78, time=1780757365, data=[8, 48, 16, 16]}
+2026-06-06 22:49:25.463 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=10, guid=1020936180, time=1780757365, data=[16, 48, 24, 16]}
+2026-06-06 22:49:27.430 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=10, guid=78, time=1780757367, data=[8, 20, 16, 3]}
+2026-06-06 22:49:27.557 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=11, guid=1020936180, time=1780757367, data=[16, 20, 24, 3]}
+2026-06-06 22:49:19.318 DEBUG - sid:4 send packet:MessagePacket{cmd=1011, sid=4, seq=11, guid=78, time=1780757359, data=[8, 22, 16, 27]}
+2026-06-06 22:49:19.443 DEBUG - 客户端(sid:0bf034bd, remote:/127.0.0.1:9001), 收到消息：MessagePacket{cmd=1012, sid=4, seq=12, guid=1020936180, time=1780757359, data=[16, 22, 24, 27]}

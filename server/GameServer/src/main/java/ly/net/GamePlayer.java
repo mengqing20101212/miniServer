@@ -200,4 +200,33 @@ public class GamePlayer {
         setLastSid(0);
         setLastCallId(0);
     }
+
+    /**
+     * 统一错误码发送：根据 callId 决定封装方式。
+     * callId > 0: 封装到 scGate2GameRpcGameCall（Gate 通过 callId 匹配删除 Redis 消息）
+     * callId == 0: 直接发 scErrorCode
+     */
+    public void sendErrorCode(int cmd, ly.proto.ErrorMsg.ErrorCode errorCode) {
+        ly.proto.ErrorMsg.scErrorCode errorMsg = ly.proto.ErrorMsg.scErrorCode.newBuilder()
+                .setErrorCode(errorCode)
+                .setMsgId(cmd)
+                .build();
+        if (lastCallId > 0) {
+            ly.proto.Server.scGate2GameRpcGameCall.Builder builder = ly.proto.Server.scGate2GameRpcGameCall.newBuilder();
+            builder.setCmd(ly.proto.Cmd.CMD.SC_ErrorCode_VALUE);
+            builder.setSid(lastSid);
+            builder.setSeq(lastSeq + 1);
+            builder.setData(errorMsg.toByteString());
+            builder.setCallId(lastCallId);
+            AbstractMessagePacket packet = ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(
+                    playerId, ly.proto.Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), lastSeq + 1, lastSid);
+            session.addSendPacket(packet);
+            LoggerDef.NetLogger.info("[Gate2GameRpc] sending SC_ErrorCode wrapped, playerId={}, errorCode={}, callId={}", playerId, errorCode, lastCallId);
+            clearRequestContext();
+        } else {
+            ly.net.packet.AbstractMessagePacket packet = ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(
+                    playerId, ly.proto.Cmd.CMD.SC_ErrorCode_VALUE, errorMsg, lastSeq + 1, lastSid);
+            session.addSendPacket(packet);
+        }
+    }
 }
