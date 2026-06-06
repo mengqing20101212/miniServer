@@ -28,6 +28,12 @@ public class ProtoMessageFactory {
         // 英雄模块协议需要在 GameServer 路由层反序列化，BotServer 的 RPC seq/sid 测试会覆盖该链路。
         case Cmd.CMD.CS_HeroList_VALUE ->{return Hero.CS_HeroList.parseFrom(data);}
         case Cmd.CMD.SC_HeroList_VALUE ->{return Hero.SC_HeroList.parseFrom(data);}
+        case Cmd.CMD.CS_HeroAdd_VALUE ->{return Hero.CS_HeroAdd.parseFrom(data);}
+        case Cmd.CMD.SC_HeroAdd_VALUE ->{return Hero.SC_HeroAdd.parseFrom(data);}
+        case Cmd.CMD.CS_HeroLevelUp_VALUE ->{return Hero.CS_HeroLevelUp.parseFrom(data);}
+        case Cmd.CMD.SC_HeroLevelUp_VALUE ->{return Hero.SC_HeroLevelUp.parseFrom(data);}
+        case Cmd.CMD.CS_HeroStarUp_VALUE ->{return Hero.CS_HeroStarUp.parseFrom(data);}
+        case Cmd.CMD.SC_HeroStarUp_VALUE ->{return Hero.SC_HeroStarUp.parseFrom(data);}
       }
     } catch (InvalidProtocolBufferException e) {
       e.printStackTrace();

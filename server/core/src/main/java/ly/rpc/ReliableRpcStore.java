@@ -88,15 +88,14 @@ public class ReliableRpcStore {
         continue;
       }
       if (message.getNextRetryAt() > now) {
-        LoggerDef.NetLogger.debug(
-            "reliable rpc in backoff, msgId={}, target={}, cmd={}, retryCount={}, nextRetryAt={}, waitMs={}",
+        // 临时：强制重置退避，让旧消息立即重试
+        message.resetRetryForForceReplay();
+        LoggerDef.NetLogger.info(
+            "reliable rpc force reset backoff, msgId={}, target={}, cmd={}, retryCount={}",
             message.getMsgId(),
             targetServerId,
             message.getCmd(),
-            message.getRetryCount(),
-            message.getNextRetryAt(),
-            message.getNextRetryAt() - now);
-        continue;
+            message.getRetryCount());
       }
       // 超过保留时间或重试次数后不再补发，避免永远占用 Redis 队列。
       if (now - message.getCreatedAt() > MESSAGE_EXPIRE_MILLIS

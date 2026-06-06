@@ -57,7 +57,7 @@ public class Gate2GameRpcGameCallController implements IGameController {
                         PlayerManager.getInstance().addOnlinePlayer(player);
                         player.statPlay();
                     }
-                    // 设置 callId，回包时需要带上
+                    // 设置 callId，回包时需要带上（必须在获取 player 之后，因为 DB 加载会创建新 GamePlayer）
                     player.getGamePlayer().setLastCallId(callId);
                     // Game 后续业务只看客户端原始包，seq/sid 保持 Gate 收到客户端时的值。
                     ly.LoggerDef.NetLogger.info("[Gate2GameRpc] dispatching to player queue, guid={}, innerCmd={}, innerSeq={}, callId={}", guid, cmd, seq, callId);

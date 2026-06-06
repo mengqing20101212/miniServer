@@ -83,6 +83,15 @@ public class ReliableRpcMessage implements Serializable {
     this.nextRetryAt = nextRetryAt;
   }
 
+  /**
+   * 临时方法：强制重置退避，让旧消息立即重试。
+   * 用于 Redis 中积压的高退避消息，在代码修复后强制重试。
+   */
+  public void resetRetryForForceReplay() {
+    retryCount = 0;
+    nextRetryAt = 0;
+  }
+
   public long getNextRetryAt() {
     return nextRetryAt;
   }
