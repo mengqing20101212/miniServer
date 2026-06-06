@@ -179,12 +179,14 @@ public class Player {
     }
 
     public void statPlay() {
+        LoggerDef.SystemLogger.info("[statPlay] starting tick thread, playerId={}, account={}", getPlayerId(), getAccount());
         Thread.ofVirtual().name(String.format("Player-%s-%d", getAccount(), getPlayerId())).start(() -> {
             tick();
         });
     }
 
     private void tick() {
+        LoggerDef.SystemLogger.info("[Player-tick] thread started, playerId={}, gamePlayer={}", getPlayerId(), gamePlayer != null);
         try {
             while (true) {
                 try {
