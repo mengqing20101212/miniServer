@@ -1,6 +1,6 @@
 # MiniServer AI 项目索引
 
-更新时间：2026-05-09
+更新时间：2026-06-06
 
 ## 当前可信入口
 
@@ -23,7 +23,7 @@
 - 仓库根目录：`miniServer`
 - Maven 聚合工程：`server/pom.xml`
 - 当前 Maven 模块数：9
-- 当前 Java 源码文件数：924 个，不包含 `target/`
+- 当前 Java 源码文件数：1656 个，不包含 `target/`
 
 当前聚合模块：
 
