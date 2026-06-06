@@ -226,6 +226,9 @@ public class Player {
                 builder.setData(message.toByteString());
                 AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), getGamePlayer().getLastSeq() + 1, gamePlayer.getLastSid());
                 getGamePlayer().getSession().addSendPacket(sendPacket);
+                LoggerDef.NetLogger.info(
+                        "[Gate2GameRpc] sending SC_Gate2GameRpcGameCall response, playerId={}, respCmd={}, respSeq={}, respSid={}, lastClientCmd={}, lastSeq={}",
+                        getPlayerId(), cmd.getNumber(), getGamePlayer().getLastSeq() + 1, gamePlayer.getLastSid(), getGamePlayer().getLastClientCmd(), getGamePlayer().getLastSeq());
                 getGamePlayer().setLastClientCmd(0);
                 getGamePlayer().setLastSeq(0);
                 getGamePlayer().setLastSid(0);
@@ -238,6 +241,9 @@ public class Player {
                 builder.setData(message.toByteString());
                 AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), gamePlayer.getLastSeq(), gamePlayer.getLastSid());
                 getGamePlayer().getSession().addSendPacket(sendPacket);
+                LoggerDef.NetLogger.info(
+                        "[Gate2GameRpc] sending SC_Gate2GameRpcGameCall push, playerId={}, respCmd={}, respSeq={}, respSid={}, lastClientCmd={}",
+                        getPlayerId(), cmd.getNumber(), gamePlayer.getLastSeq(), gamePlayer.getLastSid(), getGamePlayer().getLastClientCmd());
             }
         }
     }

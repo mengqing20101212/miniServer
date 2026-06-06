@@ -23,6 +23,9 @@ public class Gate2GameRpcGameCallController implements IGameController {
                     final int seq = req.getSeq();
                     final long guid = req.getGuid();
                     final byte[] data = req.getData().toByteArray();
+                    ly.LoggerDef.NetLogger.info(
+                            "[Gate2GameRpc] received CS_Gate2GameRpcGameCall, innerCmd={}, innerSeq={}, guid={}, sid={}",
+                            cmd, seq, guid, req.getSid());
                     // Gate 已经把客户端原始包的 cmd/seq/sid/data 放进 RPC 载荷，这里只还原包头。
                     // 具体业务 proto 由后续路由层按 cmd 反序列化，避免工厂漏映射时在转发入口丢包。
                     AbstractMessagePacket clientPacket = new AbstractMessagePacket(guid, cmd, req.getSid(), seq, data);
@@ -34,6 +37,7 @@ public class Gate2GameRpcGameCallController implements IGameController {
                         SecurityBanService.getInstance()
                                 .writeRejectEvent(null, null, null, guid, cmd, req.getSid(), seq, "Game 角色封禁");
                         context.session().sendErrorMsg(guid, ErrorMsg.ErrorCode.SYSTEM_ERROR, seq, cmd);
+                        ly.LoggerDef.NetLogger.warn("[Gate2GameRpc] player banned, guid={}, innerCmd={}", guid, cmd);
                         return;
                     }
                     Player player = PlayerManager.getInstance().getOnlinePlayer(guid);
@@ -42,8 +46,10 @@ public class Gate2GameRpcGameCallController implements IGameController {
                         player = PlayerManager.getInstance().getPlayerByDB(guid);
                         if (player == null) {
                             context.session().sendErrorMsg(guid, ErrorMsg.ErrorCode.PLAYER_NOT_EXIST, seq, cmd);
+                            ly.LoggerDef.NetLogger.warn("[Gate2GameRpc] player not found in DB, guid={}, innerCmd={}, sending SC_ErrorCode instead of SC_Gate2GameRpcGameCall", guid, cmd);
                             return;
                         }
+                        ly.LoggerDef.NetLogger.info("[Gate2GameRpc] player loaded from DB for lazy init, guid={}", guid);
                         GamePlayer gamePlayer = new GamePlayer(context.session());
                         gamePlayer.setPlayerId(player.getPlayerId());
                         player.setGamePlayer(gamePlayer);
@@ -51,6 +57,7 @@ public class Gate2GameRpcGameCallController implements IGameController {
                         player.statPlay();
                     }
                     // Game 后续业务只看客户端原始包，seq/sid 保持 Gate 收到客户端时的值。
+                    ly.LoggerDef.NetLogger.info("[Gate2GameRpc] dispatching to player queue, guid={}, innerCmd={}, innerSeq={}", guid, cmd, seq);
                     player.getGamePlayer().addPacket(clientPacket);
 //                    AbstractMessage clientReq = ProtoMessageFactory.createProtoMessage(cmd, data);
 //                    assert clientReq != null;

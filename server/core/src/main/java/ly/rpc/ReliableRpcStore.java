@@ -88,6 +88,14 @@ public class ReliableRpcStore {
         continue;
       }
       if (message.getNextRetryAt() > now) {
+        LoggerDef.NetLogger.debug(
+            "reliable rpc in backoff, msgId={}, target={}, cmd={}, retryCount={}, nextRetryAt={}, waitMs={}",
+            message.getMsgId(),
+            targetServerId,
+            message.getCmd(),
+            message.getRetryCount(),
+            message.getNextRetryAt(),
+            message.getNextRetryAt() - now);
         continue;
       }
       // 超过保留时间或重试次数后不再补发，避免永远占用 Redis 队列。
@@ -151,13 +159,20 @@ public class ReliableRpcStore {
       return false;
     }
 
+    int expectedSeq = request.getSeq() + 1;
+    int expectedCmd = Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE;
+    LoggerDef.NetLogger.info(
+        "[ReplayWait] waiting for response, msgId={}, innerSeq={}, expecting seq={}, cmd=SC_Gate2GameRpcGameCall, queueSize={}",
+        message.getMsgId(), request.getSeq(), expectedSeq, connector.getClient().getReceivePacketQueueSize());
+
     long deadline = System.currentTimeMillis() + 10_000L;
     while (System.currentTimeMillis() < deadline) {
       AbstractMessagePacket response =
           connector
               .getClient()
-              .getReceiveMsgBySeq(request.getSeq() + 1, Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE);
+              .getReceiveMsgBySeq(expectedSeq, expectedCmd);
       if (response != null) {
+        LoggerDef.NetLogger.info("[ReplayWait] response found, msgId={}, seq={}, cmd={}", message.getMsgId(), response.getSeq(), response.getCmd());
         boolean handled = RpcService.getInstance().handleReliableReplayResponse(message, response);
         if (!handled) {
           LoggerDef.NetLogger.warn("reliable rpc replay response no handler, msgId={}", message.getMsgId());
@@ -171,6 +186,7 @@ public class ReliableRpcStore {
         return false;
       }
     }
+    LoggerDef.NetLogger.warn("[ReplayWait] response TIMEOUT after 10s, msgId={}, innerSeq={}, expectedSeq={}", message.getMsgId(), request.getSeq(), expectedSeq);
     return false;
   }
 

@@ -211,6 +211,10 @@ public class NetClient {
         return channel;
     }
 
+    public int getReceivePacketQueueSize() {
+        return receivePacketQueue.size();
+    }
+
     @Override
     public String toString() {
         return "NetClient{"
