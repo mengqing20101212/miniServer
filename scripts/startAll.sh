@@ -55,7 +55,8 @@ echo "  GateServer PID: $GATE_PID"
 echo "  等待 GateServer 就绪..."
 for i in $(seq 1 30); do
     if ss -tlnp 2>/dev/null | grep -q ":9001 "; then
-        echo "  GateServer 已就绪"
+        echo "  GateServer 端口已就绪，等待初始化..."
+        sleep 3
         break
     fi
     sleep 2
@@ -70,7 +71,8 @@ echo "  GameServer PID: $GAME_PID"
 echo "  等待 GameServer 就绪..."
 for i in $(seq 1 30); do
     if ss -tlnp 2>/dev/null | grep -q ":9002 "; then
-        echo "  GameServer 已就绪"
+        echo "  GameServer 端口已就绪，等待初始化..."
+        sleep 5
         break
     fi
     sleep 2
