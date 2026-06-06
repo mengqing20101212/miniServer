@@ -23,6 +23,10 @@ enum CMD{
   CS_HeroAdd = 1009;                                                                //添加英雄请求
   SC_HeroAdd = 1010;                                                                //添加英雄响应
 
+  // 移动相关协议 1011-1019
+  CS_Move = 1011;                                                                   //移动请求
+  SC_Move = 1012;                                                                   //移动响应
+
   // 资源相关协议 1100-1199
   CS_ResourceQuery = 1101;                                                         //资源查询请求
   SC_ResourceQuery = 1102;                                                         //资源查询响应

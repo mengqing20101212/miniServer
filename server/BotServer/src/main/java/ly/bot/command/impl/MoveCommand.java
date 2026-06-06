@@ -1,9 +1,11 @@
 package ly.bot.command.impl;
 
 import ly.bot.command.RobotCommand;
+import ly.bot.session.RobotSession;
 import ly.net.NetClient;
-import ly.net.packet.MessagePacketFactory;
+import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
+import ly.proto.Move;
 import org.slf4j.Logger;
 import ly.LoggerDef;
 
@@ -12,30 +14,27 @@ import ly.LoggerDef;
  */
 public class MoveCommand implements RobotCommand {
     private static final Logger logger = LoggerDef.SystemLogger;
-    
-    private String commandId; // 用于延迟统计的命令ID
-    
+    private String commandId;
+
     @Override
-    public void execute(NetClient client, ly.bot.session.RobotSession session) {
+    public void execute(NetClient client, RobotSession session) {
         try {
-            // 创建命令ID用于延迟统计
             this.commandId = "move_" + System.currentTimeMillis();
-            
-            // 记录请求发送时间
-            session.getLatencyStats().recordRequestSent(commandId, 1000); // 使用一个假设的移动命令ID
-            
-            // 发送移动指令 - 这里使用一个假设的移动命令
-            int seq = client.getSendSeq(); // 获取并增加序列号
-            int sid = client.isReady() ? client.getSid() : 0; // 使用正确的SID
-            
-            // 创建移动请求包（使用 ResourceQuery 作为占位命令，因为 proto 中没有移动命令）
-            ly.net.packet.AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
-                Cmd.CMD.CS_ResourceQuery_VALUE, seq, new byte[0]
-            );
-            
+            session.getLatencyStats().recordRequestSent(commandId, Cmd.CMD.CS_Move_VALUE);
+
+            int targetX = (int) (Math.random() * 100);
+            int targetY = (int) (Math.random() * 100);
+
+            Move.CS_Move.Builder builder = Move.CS_Move.newBuilder();
+            builder.setTargetX(targetX);
+            builder.setTargetY(targetY);
+
+            // 使用 session.createPacket 确保 guid 正确
+            AbstractMessagePacket packet = session.createPacket(Cmd.CMD.CS_Move_VALUE, builder.build());
+
             boolean sent = client.send(packet);
             if (sent) {
-                logger.debug("移动命令已发送");
+                logger.debug("移动命令已发送: ({},{})", targetX, targetY);
             } else {
                 logger.error("移动命令发送失败");
             }
@@ -43,25 +42,20 @@ public class MoveCommand implements RobotCommand {
             logger.error("执行移动命令失败", e);
         }
     }
-    
+
     @Override
     public String getCommandId() {
-        return commandId != null ? commandId : "move_" + System.currentTimeMillis();
+        return commandId;
     }
-    
+
     @Override
-    public void onResponse(ly.net.packet.AbstractMessagePacket response, ly.net.NetClient client, ly.bot.session.RobotSession session) {
-        // 处理移动相关的响应
-        logger.debug("收到移动响应: " + response.getCmd());
-        
-        // 记录响应接收时间
-        if (commandId != null) {
-            session.getLatencyStats().recordResponseReceived(commandId, response.getCmd());
-        }
+    public void onResponse(AbstractMessagePacket response, NetClient client, RobotSession session) {
+        session.getLatencyStats().recordResponseReceived(commandId, response.getCmd());
+        logger.debug("收到移动响应");
     }
-    
+
     @Override
     public String getName() {
-        return "MoveCommand";
+        return "Move";
     }
 }

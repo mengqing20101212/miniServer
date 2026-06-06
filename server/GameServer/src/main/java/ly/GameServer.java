@@ -4,6 +4,7 @@ import ly.config.ServerTypeEnum;
 import ly.logic.hero.HeroController;
 import ly.logic.login.GameLogoutController;
 import ly.logic.login.GamePlayerLoginController;
+import ly.logic.move.MoveController;
 import ly.logic.ping.PingController;
 import ly.logic.player.Gate2GameRpcGameCallController;
 import ly.net.GameConnectSessionProvider;
@@ -21,7 +22,8 @@ public class GameServer {
                 new GameLogoutController(),
                 new Gate2GameRpcGameCallController(),
                 new PingController(),
-                new HeroController());
+                new HeroController(),
+                new MoveController());
         ServerContext.startUp(resolved.nacosUrl, ServerTypeEnum.GAME.getType(), resolved.serverId, resolved.env, new GameConnectSessionProvider());
 
     }
