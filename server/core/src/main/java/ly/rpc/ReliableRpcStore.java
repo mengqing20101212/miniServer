@@ -173,7 +173,7 @@ public class ReliableRpcStore {
           continue;
         }
         // 校验内层 cmd
-        int innerCmd = resp.getCmd();
+        int innerCmd = resp.getClientCmd();
         if (innerCmd == Cmd.CMD.SC_ErrorCode_VALUE) {
           // 错误码回包，Game 已处理，算送达成功
           LoggerDef.NetLogger.info(
@@ -185,7 +185,8 @@ public class ReliableRpcStore {
               "[ReplayWait] received normal response, callId={}, innerCmd={}, treating as delivered",
               callId, innerCmd);
         }
-        return true;
+        // 重放等待会从 RPC 连接队列里消费回包，这里必须交给业务处理器继续转发。
+        return RpcService.getInstance().handleReliableReplayResponse(message, response);
       }
       try {
         Thread.sleep(10L);

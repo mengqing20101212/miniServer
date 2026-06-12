@@ -1,22 +1,24 @@
 package ly.net;
 
 import com.google.protobuf.ByteString;
+import java.util.concurrent.atomic.AtomicInteger;
+import ly.ProtoMessageFactory;
 import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.MessagePacketFactory;
-import ly.ProtoMessageFactory;
 import ly.proto.Cmd;
 import ly.proto.Server;
+import ly.rpc.ReliableRpcStore;
 import ly.rpc.RpcNodeConnector;
 import ly.rpc.RpcService;
-import ly.rpc.ReliableRpcStore;
 
 /**
- * 网关客户端对象，保存账号、token、目标游戏服和长连接上下文。
+ * Gate 侧客户端上下文，保存账号、目标 GameServer、客户端连接 sid 和下行 seq。
  */
 public class GateClient {
     private static final int LOGIN_RPC_TIMEOUT_MS = 10_000;
 
     private final GateConnectSession session;
+    private final AtomicInteger clientDownSeq = new AtomicInteger();
     private String account;
     private long playerId;
     private long accountId;
@@ -37,6 +39,10 @@ public class GateClient {
 
     public int getClientSid() {
         return session.getConnector().getSessionId();
+    }
+
+    public int nextClientDownSeq() {
+        return clientDownSeq.incrementAndGet();
     }
 
     public long getAccountId() {
@@ -80,7 +86,7 @@ public class GateClient {
     }
 
     public void sendPacketToGameServer(AbstractMessagePacket csPacket) {
-        // 普通客户端业务包已经通过登录态，Gate 不适合自行补偿业务失败；RPC 失败时保存给 Game 恢复后补发。
+        // 普通业务包失败后保存到可靠 RPC outbox，等目标 GameServer 恢复后补发。
         Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket, true);
         if (resp != null) {
             sendGameResponseToClient(resp);
@@ -94,36 +100,38 @@ public class GateClient {
     /**
      * 同步转发客户端包到 GameServer。
      *
-     * <p>登录流程调用默认不保存，普通业务转发可开启 saveOnFailOrTimeout，把包装后的 RPC
-     * 请求保存到可靠 outbox，等目标 GameServer 恢复后补发。
+     * <p>RPC 外层 seq 只属于 Gate 和 Game 的 socket；客户端 sid/上行 seq 保存在内层协议里。
+     * 等待响应时必须使用 callId，不能再用客户端 seq 推导响应包。
      */
     public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(
             AbstractMessagePacket csPacket, boolean saveOnFailOrTimeout) {
         RpcNodeConnector rpcNodeConnector = RpcService.getInstance().getRpcNodeConnector(gameServerId);
+        long callId = newCallId();
         if (rpcNodeConnector == null || rpcNodeConnector.getClient() == null) {
             saveReliableRpcIfNeeded(csPacket, null, saveOnFailOrTimeout, "connector unavailable");
             return null;
         }
 
         int rpcSeq = rpcNodeConnector.getClient().getSendSeq();
-        Server.csGate2GameRpcGameCall.Builder req = Server.csGate2GameRpcGameCall.newBuilder();
-        req.setCmd(csPacket.getCmd());
-        req.setSid(csPacket.getSid());
-        // 非登录业务包的 guid 是玩家 id，必须原样转给 GameServer 才能定位在线玩家。
-        req.setGuid(csPacket.getGuid());
-        // 内层请求必须保留客户端原始 seq，Game 回对应响应时会使用 seq + 1。
-        req.setSeq(csPacket.getSeq());
-        req.setData(ByteString.copyFrom(csPacket.getData()));
+        Server.csGate2GameRpcGameCall req =
+                Server.csGate2GameRpcGameCall.newBuilder()
+                        .setClientCmd(csPacket.getCmd())
+                        .setClientSid(csPacket.getSid())
+                        .setGuid(csPacket.getGuid())
+                        .setClientReqSeq(csPacket.getSeq())
+                        .setData(ByteString.copyFrom(csPacket.getData()))
+                        .setCallId(callId)
+                        .build();
 
         AbstractMessagePacket rpcPacket =
                 MessagePacketFactory.createAbstractMessagePacket(
                         req.getGuid(),
                         Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE,
-                        req.build(),
+                        req,
                         rpcSeq,
                         rpcNodeConnector.getClient().getSid());
         if (!rpcNodeConnector.sendPacket(rpcPacket)) {
-            saveReliableRpcIfNeeded(csPacket, req.build(), saveOnFailOrTimeout, "send failed");
+            saveReliableRpcIfNeeded(csPacket, req, saveOnFailOrTimeout, "send failed");
             return null;
         }
 
@@ -132,7 +140,7 @@ public class GateClient {
             AbstractMessagePacket response =
                     rpcNodeConnector
                             .getClient()
-                            .getReceiveMsgBySeq(csPacket.getSeq() + 1, Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE);
+                            .getReceiveMsgByCallId(callId, Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE);
             if (response != null) {
                 return (Server.scGate2GameRpcGameCall)
                         ProtoMessageFactory.createProtoMessage(
@@ -146,7 +154,7 @@ public class GateClient {
                 return null;
             }
         }
-        saveReliableRpcIfNeeded(csPacket, req.build(), saveOnFailOrTimeout, "response timeout");
+        saveReliableRpcIfNeeded(csPacket, req, saveOnFailOrTimeout, "response timeout");
         return null;
     }
 
@@ -160,13 +168,13 @@ public class GateClient {
         }
         Server.csGate2GameRpcGameCall request = wrappedRequest;
         if (request == null) {
-            // 连接器不可用时还没有分配 RPC seq，这里只保留客户端原始 cmd/data，补发时重新走 RPC 发送。
+            // 连接不可用时还没有 RPC 外层 seq，这里只保存客户端原始包，补发时重新走 RPC 发送。
             request =
                     Server.csGate2GameRpcGameCall.newBuilder()
-                            .setCmd(csPacket.getCmd())
-                            .setSid(csPacket.getSid())
+                            .setClientCmd(csPacket.getCmd())
+                            .setClientSid(csPacket.getSid())
                             .setGuid(csPacket.getGuid())
-                            .setSeq(csPacket.getSeq())
+                            .setClientReqSeq(csPacket.getSeq())
                             .setData(ByteString.copyFrom(csPacket.getData()))
                             .build();
         }
@@ -188,15 +196,19 @@ public class GateClient {
         if (resp == null) {
             return;
         }
-        // Gate 只按 GameServer 已经判定好的客户端 cmd/seq/sid 转发，不在网关侧推导协议序号。
+        // 客户端下行 seq 只在 Gate 连接维度递增，Game 不参与生成。
         AbstractMessagePacket s2cPacket =
                 PacketCompat.createPacket(
                         getSessionGuid(),
-                        resp.getCmd(),
-                        resp.getSid(),
-                        resp.getSeq(),
+                        resp.getClientCmd(),
+                        resp.getClientSid(),
+                        nextClientDownSeq(),
                         resp.getData().toByteArray());
         sendPacketToClient(s2cPacket);
+    }
+
+    private long newCallId() {
+        return System.nanoTime() ^ Thread.currentThread().threadId();
     }
 
     public void closeConnection() {

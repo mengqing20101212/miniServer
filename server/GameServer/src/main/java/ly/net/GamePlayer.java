@@ -6,28 +6,31 @@ import ly.LoggerDef;
 import ly.logic.player.Player;
 import ly.logic.player.event.PlayerEventParam;
 import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacketFactory;
+import ly.proto.Cmd;
+import ly.proto.ErrorMsg;
+import ly.proto.Server;
 
 /**
  * 玩家网络上下文和串行执行队列。
  *
- * <p>GamePlayer 只负责玩家连接态、当前请求上下文、以及 packet/event 的 FIFO 执行队列。
- * 持久化数据和业务模块数据属于 Player/PlayerData。
+ * <p>GamePlayer 只保存玩家连接状态、当前请求上下文，以及 packet/event 的 FIFO 执行队列。
+ * 客户端下行 seq 由 Gate 维护，Game 只把目标 clientSid 和业务数据返回给 Gate。
  */
 public class GamePlayer {
+    private static final int WORK_QUEUE_CAPACITY = 1024;
+
     private final GameConnectSession session;
+    private final ArrayBlockingQueue<GamePlayerWorkItem> workQueue = new ArrayBlockingQueue<>(WORK_QUEUE_CAPACITY);
     private long playerId;
     private Player player;
 
     /** 当前正在处理的客户端请求上下文，只在玩家协程执行某个 packet 期间有效。 */
-    private int lastSeq;
+    private int lastClientReqSeq;
     private int lastClientCmd;
-    private int lastSid;
-    /** 当前请求携带的可靠 RPC callId，普通转发为 0，大于 0 时回包必须带上。 */
+    private int lastClientSid;
+    /** 当前请求携带的 RPC callId，Game 回包必须原样带回，Gate 用它匹配等待中的 RPC。 */
     private long lastCallId;
-
-    private static final int WORK_QUEUE_CAPACITY = 1024;
-
-    private final ArrayBlockingQueue<GamePlayerWorkItem> workQueue = new ArrayBlockingQueue<>(WORK_QUEUE_CAPACITY);
 
     public GamePlayer(GameConnectSession session) {
         this.session = session;
@@ -50,11 +53,11 @@ public class GamePlayer {
     }
 
     public int getLastSid() {
-        return lastSid;
+        return lastClientSid;
     }
 
     public void setLastSid(int lastSid) {
-        this.lastSid = lastSid;
+        this.lastClientSid = lastSid;
     }
 
     public void closeConnection() {
@@ -104,11 +107,11 @@ public class GamePlayer {
     }
 
     public int getLastSeq() {
-        return lastSeq;
+        return lastClientReqSeq;
     }
 
     public void setLastSeq(int lastSeq) {
-        this.lastSeq = lastSeq;
+        this.lastClientReqSeq = lastSeq;
     }
 
     public long getLastCallId() {
@@ -158,7 +161,6 @@ public class GamePlayer {
                         cost);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             LoggerDef.SystemLogger.error(
                     "GamePlayer tickWorkItem error, playerId={}, type={}, cmd={}, eventType={}",
                     playerId,
@@ -202,49 +204,49 @@ public class GamePlayer {
     }
 
     /**
-     * 统一消息发送：根据 lastClientCmd 和 lastCallId 决定封装方式。
-     * lastClientCmd == 0: 无请求上下文，直接发
-     * cmd == lastClientCmd + 1: 请求对应的响应，封装到 scGate2GameRpcGameCall
-     * 其他: 主动推送，封装到 scGate2GameRpcGameCall（不消耗 seq）
+     * 统一消息发送。
+     *
+     * <p>有客户端请求上下文时，Game 只封装 clientCmd/clientSid/data/callId 返回 Gate。
+     * 客户端下行 seq 由 Gate 在真正写回客户端连接前生成。
      */
     public void sendMsg(int cmd, com.google.protobuf.AbstractMessage message) {
         if (lastClientCmd == 0) {
-            AbstractMessagePacket packet = ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(
-                    playerId, cmd, message, 0, 0);
+            AbstractMessagePacket packet =
+                    MessagePacketFactory.createAbstractMessagePacket(playerId, cmd, message, 0, 0);
             session.addSendPacket(packet);
-        } else if (cmd == lastClientCmd + 1) {
-            ly.proto.Server.scGate2GameRpcGameCall.Builder builder = ly.proto.Server.scGate2GameRpcGameCall.newBuilder();
-            builder.setCmd(cmd);
-            builder.setSid(lastSid);
-            builder.setSeq(lastSeq + 1);
-            builder.setData(message.toByteString());
-            builder.setCallId(lastCallId);
-            AbstractMessagePacket packet = ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(
-                    playerId, ly.proto.Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), lastSeq + 1, lastSid);
-            session.addSendPacket(packet);
-            LoggerDef.NetLogger.info("[Gate2GameRpc] response, playerId={}, cmd={}, seq={}, sid={}, callId={}",
-                    playerId, cmd, lastSeq + 1, lastSid, lastCallId);
-            clearRequestContext();
-        } else {
-            ly.proto.Server.scGate2GameRpcGameCall.Builder builder = ly.proto.Server.scGate2GameRpcGameCall.newBuilder();
-            builder.setCmd(cmd);
-            builder.setSid(lastSid);
-            builder.setSeq(lastSeq);
-            builder.setData(message.toByteString());
-            builder.setCallId(lastCallId);
-            AbstractMessagePacket packet = ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(
-                    playerId, ly.proto.Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), lastSeq, lastSid);
-            session.addSendPacket(packet);
-            LoggerDef.NetLogger.info("[Gate2GameRpc] push, playerId={}, cmd={}, seq={}, sid={}, callId={}",
-                    playerId, cmd, lastSeq, lastSid, lastCallId);
+            return;
         }
+
+        Server.scGate2GameRpcGameCall builder =
+                Server.scGate2GameRpcGameCall.newBuilder()
+                        .setClientCmd(cmd)
+                        .setClientSid(lastClientSid)
+                        .setData(message.toByteString())
+                        .setCallId(lastCallId)
+                        .build();
+        AbstractMessagePacket packet =
+                MessagePacketFactory.createAbstractMessagePacket(
+                        playerId,
+                        Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE,
+                        builder,
+                        0,
+                        0);
+        session.addSendPacket(packet);
+        LoggerDef.NetLogger.info(
+                "[Gate2GameRpc] send to gate, playerId={}, cmd={}, clientReqSeq={}, clientSid={}, callId={}",
+                playerId,
+                cmd,
+                lastClientReqSeq,
+                lastClientSid,
+                lastCallId);
     }
 
-    public void sendErrorCode(int cmd, ly.proto.ErrorMsg.ErrorCode errorCode) {
-        ly.proto.ErrorMsg.scErrorCode errorMsg = ly.proto.ErrorMsg.scErrorCode.newBuilder()
-                .setErrorCode(errorCode)
-                .setMsgId(cmd)
-                .build();
-        sendMsg(ly.proto.Cmd.CMD.SC_ErrorCode_VALUE, errorMsg);
+    public void sendErrorCode(int cmd, ErrorMsg.ErrorCode errorCode) {
+        ErrorMsg.scErrorCode errorMsg =
+                ErrorMsg.scErrorCode.newBuilder()
+                        .setErrorCode(errorCode)
+                        .setMsgId(cmd)
+                        .build();
+        sendMsg(Cmd.CMD.SC_ErrorCode_VALUE, errorMsg);
     }
 }

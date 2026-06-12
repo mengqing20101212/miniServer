@@ -2,6 +2,7 @@ package ly.net;
 
 import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.Message;
+import java.util.concurrent.atomic.AtomicBoolean;
 import ly.GateClientManager;
 import ly.LoggerDef;
 import ly.ProtoMessageFactory;
@@ -10,10 +11,8 @@ import ly.proto.Cmd;
 import ly.proto.Server;
 import ly.security.SecurityBanService;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
- * 网关连接会话，封装客户端连接、收发队列和网关转发所需状态。
+ * Gate 连接会话，封装客户端连接、收发队列和 Gate 转发所需状态。
  */
 public class GateConnectSession extends ConnectSession {
     private final AtomicBoolean receiveWorkerStarted = new AtomicBoolean();
@@ -80,47 +79,61 @@ public class GateConnectSession extends ConnectSession {
                         && packet.getCmd() <= Cmd.CMD.MaxServeMsgId_VALUE;
 
         if (!serverInnerCmd && packet.getCmd() != Cmd.CMD.SC_Logout_VALUE) {
-            AbstractMessagePacket csPacket = packet;
-            GateClient client = GateClientManager.getInstance().getClient(getGuid());
-            if (client == null) {
-                // 登录后的客户端业务包可能携带 playerId 作为 guid，Gate 连接定位必须按 sid 兜底。
-                client = GateClientManager.getInstance().getClientBySid(csPacket.getSid());
-            }
+            handleClientPacket(packet);
+            return;
+        }
 
-            if (client == null) {
-                try {
-                    // Login is handled asynchronously. Keep the channel open for the response.
-                    HandlerRouterManager.execute(this, csPacket);
-                } catch (Exception e) {
-                    LoggerDef.SystemLogger.error(
-                            "GateConnectSession addReceivePacket error, cmd={}", csPacket.getCmd(), e);
-                    e.printStackTrace();
-                }
-            } else {
-                client.sendPacketToGameServer(csPacket);
+        handleServerPacket(packet);
+    }
+
+    private void handleClientPacket(AbstractMessagePacket csPacket) {
+        GateClient client = GateClientManager.getInstance().getClient(getGuid());
+        if (client == null) {
+            // 登录后的客户端业务包可能携带 playerId 作为 guid，Gate 连接定位必须按 sid 兜底。
+            client = GateClientManager.getInstance().getClientBySid(csPacket.getSid());
+        }
+
+        if (client == null) {
+            try {
+                // 登录异步处理，保持连接打开等待后续响应。
+                HandlerRouterManager.execute(this, csPacket);
+            } catch (Exception e) {
+                LoggerDef.SystemLogger.error(
+                        "GateConnectSession addReceivePacket error, cmd={}", csPacket.getCmd(), e);
             }
         } else {
-            AbstractMessagePacket s2sPacket = packet;
-            if (s2sPacket.getCmd() == Cmd.CMD.SC_Logout_VALUE) {
-                HandlerRouterManager.execute(this, s2sPacket);
-            } else {
-                GateClient client = GateClientManager.getInstance().getClient(getGuid());
-                if (client == null) {
-                    client = GateClientManager.getInstance().getClientBySid(s2sPacket.getSid());
-                }
-                if (client != null) {
-                    if (s2sPacket.getCmd() == Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE) {
-                        // GameServer 包装给客户端的消息时已经写入真实 cmd/seq/sid，Gate 只负责解包转发。
-                        Server.scGate2GameRpcGameCall resp =
-                                (Server.scGate2GameRpcGameCall)
-                                        ProtoMessageFactory.createProtoMessage(
-                                                Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, s2sPacket.getData());
-                        client.sendGameResponseToClient(resp);
-                    } else {
-                        client.sendPacketToClient(s2sPacket);
-                    }
-                }
+            client.sendPacketToGameServer(csPacket);
+        }
+    }
+
+    private void handleServerPacket(AbstractMessagePacket s2sPacket) {
+        if (s2sPacket.getCmd() == Cmd.CMD.SC_Logout_VALUE) {
+            HandlerRouterManager.execute(this, s2sPacket);
+            return;
+        }
+
+        if (s2sPacket.getCmd() == Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE) {
+            // RPC 外层 sid 是 Gate/Game 连接 sid，客户端 sid 必须以内层协议为准。
+            Server.scGate2GameRpcGameCall resp =
+                    (Server.scGate2GameRpcGameCall)
+                            ProtoMessageFactory.createProtoMessage(
+                                    Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, s2sPacket.getData());
+            if (resp == null) {
+                return;
             }
+            GateClient client = GateClientManager.getInstance().getClientBySid(resp.getClientSid());
+            if (client != null) {
+                client.sendGameResponseToClient(resp);
+            }
+            return;
+        }
+
+        GateClient client = GateClientManager.getInstance().getClient(getGuid());
+        if (client == null) {
+            client = GateClientManager.getInstance().getClientBySid(s2sPacket.getSid());
+        }
+        if (client != null) {
+            client.sendPacketToClient(s2sPacket);
         }
     }
 

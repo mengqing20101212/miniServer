@@ -8,7 +8,6 @@ import ly.net.GateClient;
 import ly.net.GateConnectSession;
 import ly.net.HandlerContext;
 import ly.net.IGateController;
-import ly.net.PacketCompat;
 import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
@@ -16,13 +15,13 @@ import ly.proto.Login;
 import ly.proto.Server;
 import ly.redis.RedisKeys;
 import ly.redis.RedisUtils;
+import ly.rpc.RpcFailSavePolicy;
 import ly.rpc.RpcNodeConnector;
 import ly.rpc.RpcService;
-import ly.rpc.RpcFailSavePolicy;
 import ly.rpc.RpcUtils;
 
 /**
- * 网关侧协议控制器，处理客户端登录/登出并转发到后端游戏服。
+ * Gate 侧登录控制器，负责校验 token、绑定 GateClient，并把登录包转发到目标 GameServer。
  */
 public class GateLoginController implements IGateController {
 
@@ -74,7 +73,7 @@ public class GateLoginController implements IGateController {
                                         .setGameServerId(oldGameServerId)
                                         .setLogoutReason("player login by other node server")
                                         .build();
-                        // 旧游戏服下线是状态修正类 RPC，超时也要保存，避免玩家同时挂在两个 GameServer。
+                        // 旧 Game 下线是状态修正类 RPC，超时也要保存，避免玩家同时挂在两个 GameServer。
                         Login.scLogout logoutRes =
                                 RpcUtils.syncRequestOrSaveOnFail(
                                         oldGameServerId,
@@ -102,7 +101,7 @@ public class GateLoginController implements IGateController {
                     client.setGameServerId(request.getGameServerId());
                     GateClientManager.getInstance().addClient(client);
 
-                    // 登录主流程不能超时后补发；客户端已经收到失败时，Game 延迟登录成功会产生幽灵在线状态。
+                    // 登录主流程仍然同步等待 Game 回包；失败后不能异步补发，避免客户端已失败但 Game 后续登录成功。
                     Server.scGate2GameRpcGameCall resp = client.sendPacketToGameServerSync(packet);
                     if (resp == null) {
                         LoggerDef.SystemLogger.error(
@@ -128,14 +127,8 @@ public class GateLoginController implements IGateController {
                         return;
                     }
 
-                    // 登录响应也使用 GameServer 写入的客户端 cmd/seq/sid，避免 Gate 侧重新推导。
-                    session.addSendPacket(
-                            PacketCompat.createPacket(
-                                    session.getGuid(),
-                                    resp.getCmd(),
-                                    resp.getSid(),
-                                    resp.getSeq(),
-                                    scLogin.toByteArray()));
+                    // 登录响应解析成功后仍走统一转发入口，由 Gate 分配客户端下行 seq。
+                    client.sendGameResponseToClient(resp);
                 } finally {
                     RedisUtils.unlock(
                             RedisKeys.LOCK_LOGIN_ACCOUNT_ID_KEY.getKey(request.getAccount()));

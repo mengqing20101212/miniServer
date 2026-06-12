@@ -1,6 +1,10 @@
 package ly;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,83 +29,107 @@ public class ParserProto {
 
   void parser() {
     long startTime = System.currentTimeMillis();
+    List<String> cmdList = readCmdList();
+    List<MessageProto> protoList = readProtoList(cmdList);
+    createMessageFactoryJavaFile(protoList);
+    long endTime = System.currentTimeMillis();
+    System.out.println("解析 生成 ProtoMessageFactory 耗时: " + (endTime - startTime) + "ms");
+  }
+
+  private List<String> readCmdList() {
     List<String> cmdList = new ArrayList<>();
     File cmdFile = new File(cmdFileName);
     try (BufferedReader bufferedReader = new BufferedReader(new FileReader(cmdFile))) {
       String line;
       boolean begin = false;
       while ((line = bufferedReader.readLine()) != null) {
-        if (line.startsWith("enum CMD{")) {
+        String trimmed = line.trim();
+        if (trimmed.startsWith("enum CMD{") || trimmed.startsWith("enum CMD {")) {
           begin = true;
           continue;
         }
-        if (line.startsWith("}") && begin) {
+        if (trimmed.startsWith("}") && begin) {
           break;
         }
-        if (begin) {
-          if (!line.trim().startsWith("//")) {
-            String[] strs = line.split("=");
-            if (strs[0].contains("_")) {
-              cmdList.add(strs[0]);
-            }
+        if (begin && !trimmed.startsWith("//")) {
+          String[] strs = trimmed.split("=");
+          if (strs.length > 1 && strs[0].contains("_")) {
+            cmdList.add(strs[0].trim());
           }
         }
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
+    return cmdList;
+  }
 
+  private List<MessageProto> readProtoList(List<String> cmdList) {
     List<MessageProto> protoList = new ArrayList<>();
     File dir = new File(dirFileName);
     if (!dir.isDirectory()) {
-      System.out.println("该路径不是: " + dirFileName + " 目录, 请检查");
-      return;
+      System.out.println("该路径不是目录: " + dirFileName + "，请检查");
+      return protoList;
     }
     File[] files = dir.listFiles();
+    if (files == null) {
+      return protoList;
+    }
     for (File file : files) {
-      if (file.isFile()
-          && (file.getName().endsWith(".proto") && !file.getName().equals("Cmd.proto"))) {
-        MessageProto messageProto = new MessageProto();
-        messageProto.cmdFileName = file.getName().split(".proto")[0];
-        String score = ParserExcelConfig.ExcelConfig.readFile(file);
-        final String score1 = score.replaceAll("\n", "");
-        protoList.add(messageProto);
-        cmdList.forEach(
-            cmdStr -> {
-              String[] args = cmdStr.split("_");
-              if (args.length == 2) {
-                String mes = args[0].toLowerCase() + args[1];
-                String cos = "message " + mes.trim() + "{";
-                if (score1.contains(cos)) {
-                  messageProto.cmdList.add(cmdStr);
-                }
-              }
-            });
+      if (!file.isFile() || !file.getName().endsWith(".proto") || file.getName().equals("Cmd.proto")) {
+        continue;
+      }
+      MessageProto messageProto = new MessageProto();
+      messageProto.protoClassName = file.getName().replaceFirst("\\.proto$", "");
+      String source = ParserExcelConfig.ExcelConfig.readFile(file).replaceAll("\\s+", "");
+      cmdList.forEach(
+          cmdStr -> {
+            String messageName = findMessageName(source, cmdStr);
+            if (messageName != null) {
+              messageProto.cmdList.add(new CmdMessage(cmdStr, messageName));
+            }
+          });
+      protoList.add(messageProto);
+    }
+    return protoList;
+  }
+
+  private String findMessageName(String protoSource, String cmdStr) {
+    for (String messageName : candidateMessageNames(cmdStr)) {
+      if (protoSource.contains("message" + messageName + "{")) {
+        return messageName;
       }
     }
-    createMessageFactoryJavaFile(protoList);
-    long endTime = System.currentTimeMillis();
-    System.out.println("解析 生成 ProtoMessageFactory 耗时: " + (endTime - startTime) + "ms");
+    return null;
+  }
+
+  private List<String> candidateMessageNames(String cmdStr) {
+    List<String> names = new ArrayList<>();
+    names.add(cmdStr);
+    String[] args = cmdStr.split("_", 2);
+    if (args.length == 2) {
+      names.add(args[0].toLowerCase() + args[1]);
+    }
+    return names;
   }
 
   private void createMessageFactoryJavaFile(List<MessageProto> protoList) {
-    StringBuffer caseStr = new StringBuffer();
+    StringBuilder caseStr = new StringBuilder();
     protoList.forEach(
         protoMes -> {
           protoMes.cmdList.forEach(
-              cmd -> {
-                if (cmd.equals("CMD_null") || cmd.equals("MaxServeMsgId")) {
+              cmdMessage -> {
+                if (cmdMessage.cmd.equals("CMD_null") || cmdMessage.cmd.equals("MaxServeMsgId")) {
                   return;
                 }
                 caseStr
-                    .append(
-                        "        case Cmd.CMD."
-                            + cmd.trim()
-                            + "_VALUE ->{return "
-                            + protoMes.cmdFileName.trim()
-                            + ".")
-                    .append(cmd.split("_")[0].toLowerCase().trim() + cmd.split("_")[1].trim())
-                    .append(".parseFrom(data);" + "}\n");
+                    .append("        case Cmd.CMD.")
+                    .append(cmdMessage.cmd.trim())
+                    .append("_VALUE ->{return ")
+                    .append(protoMes.protoClassName.trim())
+                    .append(".")
+                    .append(cmdMessage.messageName.trim())
+                    .append(".parseFrom(data);}\n");
               });
         });
 
@@ -133,25 +161,30 @@ public class ParserProto {
 
     System.out.println(score);
     File dstFile = new File(descFactoryFileName);
-    if (!dstFile.getParentFile().exists()) {
-      dstFile.getParentFile().mkdirs();
-    } else {
-      dstFile.delete();
+    if (!dstFile.getParentFile().exists() && !dstFile.getParentFile().mkdirs()) {
+      throw new RuntimeException("创建目录失败: " + dstFile.getParent());
     }
-    FileWriter fileWriter = null;
-    try {
-      fileWriter = new FileWriter(dstFile);
+    try (FileWriter fileWriter = new FileWriter(dstFile)) {
       fileWriter.write(score);
       fileWriter.flush();
-      fileWriter.close();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   static class MessageProto {
-    String cmdFileName;
-    List<String> cmdList = new ArrayList<>();
+    String protoClassName;
+    List<CmdMessage> cmdList = new ArrayList<>();
+  }
+
+  static class CmdMessage {
+    String cmd;
+    String messageName;
+
+    CmdMessage(String cmd, String messageName) {
+      this.cmd = cmd;
+      this.messageName = messageName;
+    }
   }
 
   public static void main(String[] args) {

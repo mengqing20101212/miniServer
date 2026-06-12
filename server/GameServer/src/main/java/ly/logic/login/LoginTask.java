@@ -6,16 +6,26 @@ import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Login;
 
 /**
- * 游戏服登录任务对象，记录一次登录流程中跨线程处理所需的上下文。
+ * 游戏服登录任务，保存一次登录在异步登录协程中需要的上下文。
  */
 public class LoginTask {
     final GameConnectSession session;
     final AbstractMessagePacket packet;
     final Login.csLogin request;
+    final long callId;
 
     public LoginTask(HandlerContext<GameConnectSession, AbstractMessagePacket> context, Login.csLogin request) {
-        this.session = context.session();
-        this.packet = (AbstractMessagePacket) context.packet();
+        this(context.session(), context.packet(), request, 0);
+    }
+
+    public LoginTask(
+            GameConnectSession session,
+            AbstractMessagePacket packet,
+            Login.csLogin request,
+            long callId) {
+        this.session = session;
+        this.packet = packet;
         this.request = request;
+        this.callId = callId;
     }
 }
