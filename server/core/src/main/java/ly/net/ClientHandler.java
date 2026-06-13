@@ -18,13 +18,15 @@ public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePa
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, AbstractMessagePacket msg)
             throws Exception {
-        if (LoggerDef.NetLogger.isDebugEnabled()) {
-            LoggerDef.NetLogger.debug("客户端(sid:{}, remote:{}), 收到消息：{}", ctx.channel().id(), ctx.channel().remoteAddress(), msg);
-        }
+        // if (LoggerDef.NetLogger.isDebugEnabled()) {
+        // LoggerDef.NetLogger.debug("客户端(sid:{}, remote:{}), 收到消息：{}",
+        // ctx.channel().id(), ctx.channel().remoteAddress(), msg);
+        // }
         NetClient netClient = ctx.channel().attr(NetClient.SELF_ATTR_KEY).get();
         if (netClient == null) {
             ctx.channel().close();
-            LoggerDef.NetLogger.info("客户端(sid:{}, remote:{}), 连接异常, 关闭连接", ctx.channel().id(), ctx.channel().remoteAddress());
+            LoggerDef.NetLogger.info("客户端(sid:{}, remote:{}), 连接异常, 关闭连接", ctx.channel().id(),
+                    ctx.channel().remoteAddress());
         } else {
             netClient.addReceivePacket(msg);
         }
@@ -32,7 +34,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePa
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("客户端发生异常 sid: {}, remote:{}", ctx.channel().id().asLongText(), ctx.channel().remoteAddress(), cause);
+        logger.error("客户端发生异常 sid: {}, remote:{}", ctx.channel().id().asLongText(), ctx.channel().remoteAddress(),
+                cause);
         NetClient netClient = ctx.channel().attr(NetClient.SELF_ATTR_KEY).get();
         NetClientManager.getInstance().delNetClient(netClient);
     }
@@ -57,7 +60,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePa
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-        logger.info("ClientHandler channelActive 客户端连接成功 {}, remote: {}", ctx.channel().id().asLongText(), ctx.channel().remoteAddress());
+        logger.info("ClientHandler channelActive 客户端连接成功 {}, remote: {}", ctx.channel().id().asLongText(),
+                ctx.channel().remoteAddress());
         // 连接成功后先发送 ACK 握手包，请求服务端分配 sid。
         ctx.channel().writeAndFlush(new AbstractMessagePacket(0));
     }

@@ -2,6 +2,7 @@ package ly.net;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
 import ly.LoggerDef;
 import ly.logic.player.Player;
 import ly.logic.player.event.PlayerEventParam;
@@ -10,11 +11,13 @@ import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 import ly.proto.Server;
+import ly.utils.CommonUtils;
 
 /**
  * 玩家网络上下文和串行执行队列。
  *
- * <p>GamePlayer 只保存玩家连接状态、当前请求上下文，以及 packet/event 的 FIFO 执行队列。
+ * <p>
+ * GamePlayer 只保存玩家连接状态、当前请求上下文，以及 packet/event 的 FIFO 执行队列。
  * 客户端下行 seq 由 Gate 维护，Game 只把目标 clientSid 和业务数据返回给 Gate。
  */
 public class GamePlayer {
@@ -78,6 +81,7 @@ public class GamePlayer {
         if (packet == null) {
             return;
         }
+
         if (!workQueue.offer(GamePlayerWorkItem.packet(packet))) {
             LoggerDef.SystemLogger.error(
                     "GamePlayer work queue full, drop packet playerId={}, cmd={}, seq={}, sid={}, queueSize={}, queueCapacity={}",
@@ -133,7 +137,8 @@ public class GamePlayer {
 
     public void tickWorkItem() throws InterruptedException {
         GamePlayerWorkItem workItem = workQueue.poll(100, TimeUnit.MILLISECONDS);
-        LoggerDef.SystemLogger.info("[tickWorkItem] polling, queueSize={}", workQueue.size());
+        // LoggerDef.SystemLogger.info("[tickWorkItem] polling, queueSize={}",
+        // workQueue.size());
         if (workItem == null) {
             return;
         }
@@ -206,31 +211,32 @@ public class GamePlayer {
     /**
      * 统一消息发送。
      *
-     * <p>有客户端请求上下文时，Game 只封装 clientCmd/clientSid/data/callId 返回 Gate。
+     * <p>
+     * 有客户端请求上下文时，Game 只封装 clientCmd/clientSid/data/callId 返回 Gate。
      * 客户端下行 seq 由 Gate 在真正写回客户端连接前生成。
      */
     public void sendMsg(int cmd, com.google.protobuf.AbstractMessage message) {
+        LoggerDef.LogProto("send {}|{}|{}|{}", playerId, getAccount(), Cmd.CMD.forNumber(cmd).name(),
+                CommonUtils.logProto(message));
         if (lastClientCmd == 0) {
-            AbstractMessagePacket packet =
-                    MessagePacketFactory.createAbstractMessagePacket(playerId, cmd, message, 0, 0);
+            AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(playerId, cmd, message, 0,
+                    0);
             session.addSendPacket(packet);
             return;
         }
 
-        Server.scGate2GameRpcGameCall builder =
-                Server.scGate2GameRpcGameCall.newBuilder()
-                        .setClientCmd(cmd)
-                        .setClientSid(lastClientSid)
-                        .setData(message.toByteString())
-                        .setCallId(lastCallId)
-                        .build();
-        AbstractMessagePacket packet =
-                MessagePacketFactory.createAbstractMessagePacket(
-                        playerId,
-                        Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE,
-                        builder,
-                        0,
-                        0);
+        Server.scGate2GameRpcGameCall builder = Server.scGate2GameRpcGameCall.newBuilder()
+                .setClientCmd(cmd)
+                .setClientSid(lastClientSid)
+                .setData(message.toByteString())
+                .setCallId(lastCallId)
+                .build();
+        AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
+                playerId,
+                Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE,
+                builder,
+                0,
+                0);
         session.addSendPacket(packet);
         LoggerDef.NetLogger.info(
                 "[Gate2GameRpc] send to gate, playerId={}, cmd={}, clientReqSeq={}, clientSid={}, callId={}",
@@ -241,12 +247,15 @@ public class GamePlayer {
                 lastCallId);
     }
 
+    private Object getAccount() {
+        return player == null ? null : player.getAccount();
+    }
+
     public void sendErrorCode(int cmd, ErrorMsg.ErrorCode errorCode) {
-        ErrorMsg.scErrorCode errorMsg =
-                ErrorMsg.scErrorCode.newBuilder()
-                        .setErrorCode(errorCode)
-                        .setMsgId(cmd)
-                        .build();
+        ErrorMsg.scErrorCode errorMsg = ErrorMsg.scErrorCode.newBuilder()
+                .setErrorCode(errorCode)
+                .setMsgId(cmd)
+                .build();
         sendMsg(Cmd.CMD.SC_ErrorCode_VALUE, errorMsg);
     }
 }

@@ -173,6 +173,16 @@ public final class Server {
      * @return The data.
      */
     com.google.protobuf.ByteString getData();
+
+    /**
+     * <pre>
+     * RPC 请求匹配 id，响应必须原样带回
+     * </pre>
+     *
+     * <code>int64 callId = 4;</code>
+     * @return The callId.
+     */
+    long getCallId();
   }
   /**
    * <pre>
@@ -259,6 +269,21 @@ public final class Server {
       return data_;
     }
 
+    public static final int CALLID_FIELD_NUMBER = 4;
+    private long callId_ = 0L;
+    /**
+     * <pre>
+     * RPC 请求匹配 id，响应必须原样带回
+     * </pre>
+     *
+     * <code>int64 callId = 4;</code>
+     * @return The callId.
+     */
+    @java.lang.Override
+    public long getCallId() {
+      return callId_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -282,6 +307,9 @@ public final class Server {
       if (!data_.isEmpty()) {
         output.writeBytes(3, data_);
       }
+      if (callId_ != 0L) {
+        output.writeInt64(4, callId_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -303,6 +331,10 @@ public final class Server {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, data_);
       }
+      if (callId_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(4, callId_);
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -323,6 +355,8 @@ public final class Server {
           != other.getCmd()) return false;
       if (!getData()
           .equals(other.getData())) return false;
+      if (getCallId()
+          != other.getCallId()) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -340,6 +374,9 @@ public final class Server {
       hash = (53 * hash) + getCmd();
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
+      hash = (37 * hash) + CALLID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getCallId());
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -478,6 +515,7 @@ public final class Server {
         type_ = 0;
         cmd_ = 0;
         data_ = com.google.protobuf.ByteString.EMPTY;
+        callId_ = 0L;
         return this;
       }
 
@@ -519,6 +557,9 @@ public final class Server {
         }
         if (((from_bitField0_ & 0x00000004) != 0)) {
           result.data_ = data_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.callId_ = callId_;
         }
       }
 
@@ -575,6 +616,9 @@ public final class Server {
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
         }
+        if (other.getCallId() != 0L) {
+          setCallId(other.getCallId());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -616,6 +660,11 @@ public final class Server {
                 bitField0_ |= 0x00000004;
                 break;
               } // case 26
+              case 32: {
+                callId_ = input.readInt64();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -761,6 +810,50 @@ public final class Server {
         onChanged();
         return this;
       }
+
+      private long callId_ ;
+      /**
+       * <pre>
+       * RPC 请求匹配 id，响应必须原样带回
+       * </pre>
+       *
+       * <code>int64 callId = 4;</code>
+       * @return The callId.
+       */
+      @java.lang.Override
+      public long getCallId() {
+        return callId_;
+      }
+      /**
+       * <pre>
+       * RPC 请求匹配 id，响应必须原样带回
+       * </pre>
+       *
+       * <code>int64 callId = 4;</code>
+       * @param value The callId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCallId(long value) {
+
+        callId_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * RPC 请求匹配 id，响应必须原样带回
+       * </pre>
+       *
+       * <code>int64 callId = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCallId() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        callId_ = 0L;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -855,6 +948,16 @@ public final class Server {
      * @return The data.
      */
     com.google.protobuf.ByteString getData();
+
+    /**
+     * <pre>
+     * 从请求中原样带回，用于发送方匹配 RPC 响应
+     * </pre>
+     *
+     * <code>int64 callId = 4;</code>
+     * @return The callId.
+     */
+    long getCallId();
   }
   /**
    * <pre>
@@ -941,6 +1044,21 @@ public final class Server {
       return data_;
     }
 
+    public static final int CALLID_FIELD_NUMBER = 4;
+    private long callId_ = 0L;
+    /**
+     * <pre>
+     * 从请求中原样带回，用于发送方匹配 RPC 响应
+     * </pre>
+     *
+     * <code>int64 callId = 4;</code>
+     * @return The callId.
+     */
+    @java.lang.Override
+    public long getCallId() {
+      return callId_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -964,6 +1082,9 @@ public final class Server {
       if (!data_.isEmpty()) {
         output.writeBytes(3, data_);
       }
+      if (callId_ != 0L) {
+        output.writeInt64(4, callId_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -985,6 +1106,10 @@ public final class Server {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, data_);
       }
+      if (callId_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(4, callId_);
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -1005,6 +1130,8 @@ public final class Server {
           != other.getCmd()) return false;
       if (!getData()
           .equals(other.getData())) return false;
+      if (getCallId()
+          != other.getCallId()) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -1022,6 +1149,9 @@ public final class Server {
       hash = (53 * hash) + getCmd();
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
+      hash = (37 * hash) + CALLID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getCallId());
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1160,6 +1290,7 @@ public final class Server {
         type_ = 0;
         cmd_ = 0;
         data_ = com.google.protobuf.ByteString.EMPTY;
+        callId_ = 0L;
         return this;
       }
 
@@ -1201,6 +1332,9 @@ public final class Server {
         }
         if (((from_bitField0_ & 0x00000004) != 0)) {
           result.data_ = data_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.callId_ = callId_;
         }
       }
 
@@ -1257,6 +1391,9 @@ public final class Server {
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
         }
+        if (other.getCallId() != 0L) {
+          setCallId(other.getCallId());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -1298,6 +1435,11 @@ public final class Server {
                 bitField0_ |= 0x00000004;
                 break;
               } // case 26
+              case 32: {
+                callId_ = input.readInt64();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -1440,6 +1582,50 @@ public final class Server {
       public Builder clearData() {
         bitField0_ = (bitField0_ & ~0x00000004);
         data_ = getDefaultInstance().getData();
+        onChanged();
+        return this;
+      }
+
+      private long callId_ ;
+      /**
+       * <pre>
+       * 从请求中原样带回，用于发送方匹配 RPC 响应
+       * </pre>
+       *
+       * <code>int64 callId = 4;</code>
+       * @return The callId.
+       */
+      @java.lang.Override
+      public long getCallId() {
+        return callId_;
+      }
+      /**
+       * <pre>
+       * 从请求中原样带回，用于发送方匹配 RPC 响应
+       * </pre>
+       *
+       * <code>int64 callId = 4;</code>
+       * @param value The callId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCallId(long value) {
+
+        callId_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 从请求中原样带回，用于发送方匹配 RPC 响应
+       * </pre>
+       *
+       * <code>int64 callId = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCallId() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        callId_ = 0L;
         onChanged();
         return this;
       }
@@ -4405,20 +4591,21 @@ public final class Server {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\014Server.proto\"J\n\017csServer2Server\022\034\n\004typ" +
+      "\n\014Server.proto\"Z\n\017csServer2Server\022\034\n\004typ" +
       "e\030\001 \001(\0162\016.ServerMsgType\022\013\n\003cmd\030\002 \001(\005\022\014\n\004" +
-      "data\030\003 \001(\014\"J\n\017scServer2Server\022\034\n\004type\030\001 " +
-      "\001(\0162\016.ServerMsgType\022\013\n\003cmd\030\002 \001(\005\022\014\n\004data" +
-      "\030\003 \001(\014\"+\n\tcsRpcPing\022\014\n\004time\030\001 \001(\003\022\020\n\010ser" +
-      "verId\030\002 \001(\t\"\031\n\tscRpcPing\022\014\n\004time\030\001 \001(\003\"\200" +
-      "\001\n\026csGate2GameRpcGameCall\022\021\n\tclientCmd\030\001" +
-      " \001(\005\022\021\n\tclientSid\030\002 \001(\005\022\014\n\004guid\030\003 \001(\003\022\024\n" +
-      "\014clientReqSeq\030\004 \001(\005\022\014\n\004data\030\005 \001(\014\022\016\n\006cal" +
-      "lId\030\006 \001(\003\"b\n\026scGate2GameRpcGameCall\022\021\n\tc" +
-      "lientCmd\030\001 \001(\005\022\021\n\tclientSid\030\002 \001(\005\022\014\n\004dat" +
-      "a\030\004 \001(\014\022\016\n\006callId\030\005 \001(\003J\004\010\003\020\004*/\n\rServerM" +
-      "sgType\022\017\n\013protobufMsg\020\000\022\r\n\tstructMsg\020\001B\n" +
-      "\n\010ly.protob\006proto3"
+      "data\030\003 \001(\014\022\016\n\006callId\030\004 \001(\003\"Z\n\017scServer2S" +
+      "erver\022\034\n\004type\030\001 \001(\0162\016.ServerMsgType\022\013\n\003c" +
+      "md\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\022\016\n\006callId\030\004 \001(\003\"+" +
+      "\n\tcsRpcPing\022\014\n\004time\030\001 \001(\003\022\020\n\010serverId\030\002 " +
+      "\001(\t\"\031\n\tscRpcPing\022\014\n\004time\030\001 \001(\003\"\200\001\n\026csGat" +
+      "e2GameRpcGameCall\022\021\n\tclientCmd\030\001 \001(\005\022\021\n\t" +
+      "clientSid\030\002 \001(\005\022\014\n\004guid\030\003 \001(\003\022\024\n\014clientR" +
+      "eqSeq\030\004 \001(\005\022\014\n\004data\030\005 \001(\014\022\016\n\006callId\030\006 \001(" +
+      "\003\"b\n\026scGate2GameRpcGameCall\022\021\n\tclientCmd" +
+      "\030\001 \001(\005\022\021\n\tclientSid\030\002 \001(\005\022\014\n\004data\030\004 \001(\014\022" +
+      "\016\n\006callId\030\005 \001(\003J\004\010\003\020\004*/\n\rServerMsgType\022\017" +
+      "\n\013protobufMsg\020\000\022\r\n\tstructMsg\020\001B\n\n\010ly.pro" +
+      "tob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -4429,13 +4616,13 @@ public final class Server {
     internal_static_csServer2Server_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csServer2Server_descriptor,
-        new java.lang.String[] { "Type", "Cmd", "Data", });
+        new java.lang.String[] { "Type", "Cmd", "Data", "CallId", });
     internal_static_scServer2Server_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_scServer2Server_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scServer2Server_descriptor,
-        new java.lang.String[] { "Type", "Cmd", "Data", });
+        new java.lang.String[] { "Type", "Cmd", "Data", "CallId", });
     internal_static_csRpcPing_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_csRpcPing_fieldAccessorTable = new

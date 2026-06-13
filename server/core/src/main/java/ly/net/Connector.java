@@ -69,13 +69,16 @@ public class Connector {
         return String.valueOf(socketChannel.channel().remoteAddress());
     }
 
-   /* public void write(byte[] msg) throws Exception {
-        if (isConnected()) {
-            socketChannel.channel().writeAndFlush(msg);
-        } else {
-            NetLogger.error("该连接未准备好,不可使用 sid:{},remoteAddress:{}", sessionId, socketChannel.channel().remoteAddress());
-        }
-    }*/
+    /*
+     * public void write(byte[] msg) throws Exception {
+     * if (isConnected()) {
+     * socketChannel.channel().writeAndFlush(msg);
+     * } else {
+     * NetLogger.error("该连接未准备好,不可使用 sid:{},remoteAddress:{}", sessionId,
+     * socketChannel.channel().remoteAddress());
+     * }
+     * }
+     */
 
     /**
      * 写出协议包。
@@ -89,9 +92,9 @@ public class Connector {
         }
 
         if (isConnected()) {
-            if (NetLogger.isDebugEnabled()) {
-                NetLogger.debug("send packet:{}", packet);
-            }
+            // if (NetLogger.isDebugEnabled()) {
+            // NetLogger.debug("send packet:{}", packet);
+            // }
             socketChannel.channel().writeAndFlush(packet);
             return true;
         } else {

@@ -1,8 +1,10 @@
 package ly.net;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.Message;
-import java.util.concurrent.atomic.AtomicBoolean;
+
 import ly.GateClientManager;
 import ly.LoggerDef;
 import ly.ProtoMessageFactory;
@@ -69,21 +71,29 @@ public class GateConnectSession extends ConnectSession {
     }
 
     private void handleReceivePacket(AbstractMessagePacket packet) {
-        LoggerDef.LogProto("receive {}|{}|{}|{}", getGuid(), packet.getSid(), packet.getCmd(), packet.getLength());
+        LoggerDef.LogNet(String.format("<<%s: guid:%d, sid:%d, cmd:%s, seq:%d,len:%d",
+                getReceiveServerLogName(packet.getCmd()), getGuid(),
+                packet.getSid(), Cmd.CMD.forNumber(packet.getCmd()).name(), packet.getSeq(), packet.getLength()));
         if (shouldRejectPacket(packet)) {
             return;
         }
-
-        boolean serverInnerCmd =
-                packet.getCmd() > Cmd.CMD.CS_Server2Server_VALUE
-                        && packet.getCmd() <= Cmd.CMD.MaxServeMsgId_VALUE;
+        boolean serverInnerCmd = packet.getCmd() > Cmd.CMD.CS_Server2Server_VALUE
+                && packet.getCmd() <= Cmd.CMD.MaxServeMsgId_VALUE;
 
         if (!serverInnerCmd && packet.getCmd() != Cmd.CMD.SC_Logout_VALUE) {
-            handleClientPacket(packet);
+            handleClientPacket(packet);// 不是登录包，直接转发到后端游戏服，登录包由 HandlerRouterManager 执行，保持连接打开等待后续响应。
             return;
         }
+        handleServerPacket(packet);// 登录包和服务器内部包由 HandlerRouterManager 执行，保持连接打开等待后续响应。
+    }
 
-        handleServerPacket(packet);
+    private Object getReceiveServerLogName(int cmd) {
+        if (cmd <= Cmd.CMD.CS_Server2Server_VALUE) {
+            return "client";
+        } else if (cmd > Cmd.CMD.CS_Server2Server_VALUE && cmd <= Cmd.CMD.MaxServeMsgId_VALUE) {
+            return "server";
+        }
+        return "UNKNOWN";
     }
 
     private void handleClientPacket(AbstractMessagePacket csPacket) {
@@ -114,10 +124,8 @@ public class GateConnectSession extends ConnectSession {
 
         if (s2sPacket.getCmd() == Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE) {
             // RPC 外层 sid 是 Gate/Game 连接 sid，客户端 sid 必须以内层协议为准。
-            Server.scGate2GameRpcGameCall resp =
-                    (Server.scGate2GameRpcGameCall)
-                            ProtoMessageFactory.createProtoMessage(
-                                    Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, s2sPacket.getData());
+            Server.scGate2GameRpcGameCall resp = (Server.scGate2GameRpcGameCall) ProtoMessageFactory.createProtoMessage(
+                    Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, s2sPacket.getData());
             if (resp == null) {
                 return;
             }
@@ -192,8 +200,8 @@ public class GateConnectSession extends ConnectSession {
         if (!(msg instanceof AbstractMessage abstractMessage)) {
             throw new IllegalArgumentException("msg must extend AbstractMessage");
         }
-        AbstractMessagePacket s2cPacket =
-                PacketCompat.createPacket(getGuid(), cmd, 0, 0, abstractMessage.toByteArray());
+        AbstractMessagePacket s2cPacket = PacketCompat.createPacket(getGuid(), cmd, 0, 0,
+                abstractMessage.toByteArray());
         addSendPacket(s2cPacket);
     }
 }

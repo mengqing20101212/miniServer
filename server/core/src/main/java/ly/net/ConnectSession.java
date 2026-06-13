@@ -79,16 +79,16 @@ public class ConnectSession {
             logger.error("Can't add receive packet, packet is null");
             return false;
         }
-        if (packet.getSeq() != 0 && lastReceivedSeq != packet.getSeq() - 1) {
-            logger.error(
-                    String.format(
-                            "sid[%s : %d]  丢包了，上一个包的序列号:%d, 当前包序列号:%d",
-                            connector.socketChannel.channel().id(),
-                            connector.sessionId,
-                            lastReceivedSeq,
-                            packet.getSeq()));
-            return false;
-        }
+        // if (packet.getSeq() != 0 && lastReceivedSeq != packet.getSeq() - 1) {
+        // logger.error(
+        // String.format(
+        // "sid[%s : %d] 丢包了，上一个包的序列号:%d, 当前包序列号:%d",
+        // connector.socketChannel.channel().id(),
+        // connector.sessionId,
+        // lastReceivedSeq,
+        // packet.getSeq()));
+        // return false;
+        // }
         return checkAddReceivePacket(packet);
     }
 
@@ -106,6 +106,7 @@ public class ConnectSession {
      * @return 是否添加成功
      */
     public boolean addSendPacket(AbstractMessagePacket packet) {
+        packet = Server2ServerRpcContext.wrapResponseIfNeeded(packet);
         return sendPacketQueue.add(packet);
     }
 

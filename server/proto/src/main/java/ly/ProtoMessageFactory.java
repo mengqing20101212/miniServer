@@ -48,4 +48,18 @@ public class ProtoMessageFactory {
     }
     return null;
   }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends AbstractMessage> T createProtoMessage(int cmd, byte[] data, Class<T> clazz) {
+    AbstractMessage msg = createProtoMessage(cmd, data);
+    if (msg == null) {
+      return null;
+    }
+    try {
+      return (T) msg;
+    } catch (ClassCastException e) {
+      // Return null if type doesn't match
+      return null;
+    }
+  }
 }

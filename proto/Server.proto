@@ -14,6 +14,7 @@ message csServer2Server
   ServerMsgType  type = 1;
   int32 cmd = 2;    // protobufMsg 为消息号，structMsg 为结构体定义的枚举号
   bytes data = 3;
+  int64 callId = 4; // RPC 请求匹配 id，响应必须原样带回
 }
 
 // 服务器间通信响应
@@ -22,6 +23,7 @@ message scServer2Server
   ServerMsgType  type = 1;
   int32 cmd = 2;    // protobufMsg 为消息号，structMsg 为结构体定义的枚举号
   bytes data = 3;
+  int64 callId = 4; // 从请求中原样带回，用于发送方匹配 RPC 响应
 }
 
 // 心跳包

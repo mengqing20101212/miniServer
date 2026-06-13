@@ -146,20 +146,27 @@ public class ReliableRpcStore {
   }
 
   private boolean requiresReplayResponse(ReliableRpcMessage message) {
-    return message.getCmd() == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE;
+    return message.getCmd() == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE
+        || message.getCmd() == Cmd.CMD.CS_Server2Server_VALUE;
   }
 
   private boolean waitAndHandleReplayResponse(RpcNodeConnector connector, ReliableRpcMessage message, long callId) {
-    int expectedCmd = Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE;
+    int expectedCmd = getReplayResponseCmd(message.getCmd());
+    if (expectedCmd <= 0) {
+      return true;
+    }
     LoggerDef.NetLogger.info(
-        "[ReplayWait] waiting for response, msgId={}, callId={}, cmd=SC_Gate2GameRpcGameCall, queueSize={}",
-        message.getMsgId(), callId, connector.getClient().getReceivePacketQueueSize());
+        "[ReplayWait] waiting for response, msgId={}, callId={}, cmd={}, queueSize={}",
+        message.getMsgId(), callId, expectedCmd, connector.getClient().getReceivePacketQueueSize());
 
     long deadline = System.currentTimeMillis() + 10_000L;
     while (System.currentTimeMillis() < deadline) {
       AbstractMessagePacket response =
           connector.getClient().getReceiveMsgByCallId(callId, expectedCmd);
       if (response != null) {
+        if (message.getCmd() == Cmd.CMD.CS_Server2Server_VALUE) {
+          return handleServer2ServerReplayResponse(response, callId);
+        }
         // 校验 callId
         Server.scGate2GameRpcGameCall resp =
             (Server.scGate2GameRpcGameCall)
@@ -199,10 +206,41 @@ public class ReliableRpcStore {
     return false;
   }
 
+  private int getReplayResponseCmd(int requestCmd) {
+    if (requestCmd == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) {
+      return Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE;
+    }
+    if (requestCmd == Cmd.CMD.CS_Server2Server_VALUE) {
+      return Cmd.CMD.SC_Server2Server_VALUE;
+    }
+    return 0;
+  }
+
+  private boolean handleServer2ServerReplayResponse(AbstractMessagePacket response, long callId) {
+    Server.scServer2Server resp =
+        (Server.scServer2Server)
+            ProtoMessageFactory.createProtoMessage(Cmd.CMD.SC_Server2Server_VALUE, response.getData());
+    if (resp == null || resp.getCallId() != callId) {
+      LoggerDef.NetLogger.warn(
+          "[ReplayWait] S2S callId mismatch, expected={}, got={}",
+          callId,
+          resp != null ? resp.getCallId() : "null");
+      return false;
+    }
+    LoggerDef.NetLogger.info(
+        "[ReplayWait] received S2S response, callId={}, innerCmd={}, treating as delivered",
+        callId,
+        resp.getCmd());
+    return true;
+  }
+
   /**
-   * 构建补发包：从原始消息重建 csGate2GameRpcGameCall，写入 callId。
+   * 构建补发包：从原始消息重建 RPC 外壳，写入本轮补发使用的 callId。
    */
   private AbstractMessagePacket buildReplayPacket(ReliableRpcMessage message, long callId) {
+    if (message.getCmd() == Cmd.CMD.CS_Server2Server_VALUE) {
+      return buildServer2ServerReplayPacket(message, callId);
+    }
     if (message.getCmd() != Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) {
       return message.toPacket();
     }
@@ -226,6 +264,30 @@ public class ReliableRpcStore {
       return packet;
     } catch (Exception e) {
       LoggerDef.NetLogger.error("buildReplayPacket failed, msgId={}", message.getMsgId(), e);
+      return message.toPacket();
+    }
+  }
+
+  private AbstractMessagePacket buildServer2ServerReplayPacket(ReliableRpcMessage message, long callId) {
+    try {
+      Server.csServer2Server original =
+          (Server.csServer2Server)
+              ProtoMessageFactory.createProtoMessage(Cmd.CMD.CS_Server2Server_VALUE, message.toPacket().getData());
+      if (original == null) {
+        return message.toPacket();
+      }
+      Server.csServer2Server withCallId =
+          Server.csServer2Server.newBuilder(original)
+              .setCallId(callId)
+              .build();
+      return new AbstractMessagePacket(
+          message.toPacket().getGuid(),
+          Cmd.CMD.CS_Server2Server_VALUE,
+          0,
+          0,
+          withCallId.toByteArray());
+    } catch (Exception e) {
+      LoggerDef.NetLogger.error("buildServer2ServerReplayPacket failed, msgId={}", message.getMsgId(), e);
       return message.toPacket();
     }
   }

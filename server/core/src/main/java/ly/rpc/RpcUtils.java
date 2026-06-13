@@ -80,9 +80,10 @@ public class RpcUtils {
             return (R) rpcNodeConnector.syncSendProtoMessage(guid, cmd, protoData, timeout, failSavePolicy);
         }
         if (failSavePolicy != null && failSavePolicy != RpcFailSavePolicy.NONE) {
-            // 连连接器都创建失败时，说明目标节点当前不可达；如果调用方要求可靠保存，直接写入 outbox。
+            // 连连接器都创建失败时，说明目标节点当前不可达；保存时也必须使用 S2S RPC 外壳。
             ly.net.packet.AbstractMessagePacket packet =
-                    ly.net.packet.MessagePacketFactory.createAbstractMessagePacket(guid, cmd, protoData, 0, 0);
+                    RpcNodeConnector.createServer2ServerRpcPacket(
+                            guid, cmd, protoData, 0, 0, System.nanoTime() ^ Thread.currentThread().threadId());
             ReliableRpcStore.getInstance().save(serverId, packet, "connector unavailable");
         }
         return null;

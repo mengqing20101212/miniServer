@@ -1,6 +1,7 @@
 package ly.logic.login;
 
 import java.util.concurrent.TimeUnit;
+
 import ly.GateClientManager;
 import ly.LoggerDef;
 import ly.ProtoMessageFactory;
@@ -42,7 +43,7 @@ public class GateLoginController implements IGateController {
                             "GateLoginController invalid token {} for account {}",
                             request.getToken(),
                             request.getAccount());
-                    sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.PARAM_ERROR);
+                    sendClientErrorCode(context, ErrorMsg.ErrorCode.PARAM_ERROR);
                     return;
                 }
 
@@ -52,35 +53,32 @@ public class GateLoginController implements IGateController {
                             10,
                             TimeUnit.SECONDS);
 
-                    RpcNodeConnector targetGameServer =
-                            RpcService.getInstance().getRpcNodeConnector(request.getGameServerId());
+                    RpcNodeConnector targetGameServer = RpcService.getInstance()
+                            .getRpcNodeConnector(request.getGameServerId());
                     if (targetGameServer == null) {
                         LoggerDef.SystemLogger.error(
                                 "GateLoginController getRpcNodeConnector failed, serverId={}",
                                 request.getGameServerId());
-                        sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.SYSTEM_ERROR);
+                        sendClientErrorCode(context, ErrorMsg.ErrorCode.SYSTEM_ERROR);
                         return;
                     }
 
-                    String oldGameServerId =
-                            RedisUtils.get(
-                                    RedisKeys.ACCOUNT_GAME_SERVER_ID_KEY.getKey(request.getAccount()));
+                    String oldGameServerId = RedisUtils.get(
+                            RedisKeys.ACCOUNT_GAME_SERVER_ID_KEY.getKey(request.getAccount()));
                     if (oldGameServerId != null && !oldGameServerId.equals(request.getGameServerId())) {
-                        Login.csLogout csLogout =
-                                Login.csLogout.newBuilder()
-                                        .setAccount(request.getAccount())
-                                        .setAccountId(request.getAccountId())
-                                        .setGameServerId(oldGameServerId)
-                                        .setLogoutReason("player login by other node server")
-                                        .build();
+                        Login.csLogout csLogout = Login.csLogout.newBuilder()
+                                .setAccount(request.getAccount())
+                                .setAccountId(request.getAccountId())
+                                .setGameServerId(oldGameServerId)
+                                .setLogoutReason("player login by other node server")
+                                .build();
                         // 旧 Game 下线是状态修正类 RPC，超时也要保存，避免玩家同时挂在两个 GameServer。
-                        Login.scLogout logoutRes =
-                                RpcUtils.syncRequestOrSaveOnFail(
-                                        oldGameServerId,
-                                        session.getGuid(),
-                                        Cmd.CMD.CS_Logout_VALUE,
-                                        csLogout,
-                                        RpcFailSavePolicy.SEND_FAILED_OR_TIMEOUT);
+                        Login.scLogout logoutRes = RpcUtils.syncRequestOrSaveOnFail(
+                                oldGameServerId,
+                                session.getGuid(),
+                                Cmd.CMD.CS_Logout_VALUE,
+                                csLogout,
+                                RpcFailSavePolicy.SEND_FAILED_OR_TIMEOUT);
                         if (logoutRes != null) {
                             LoggerDef.SystemLogger.info(
                                     "player {} logout success, reason: {}",
@@ -109,21 +107,19 @@ public class GateLoginController implements IGateController {
                                 request.getAccount(),
                                 request.getGameServerId());
                         GateClientManager.getInstance().removeClient(request.getAccountId());
-                        sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.SYSTEM_ERROR);
+                        sendClientErrorCode(context, ErrorMsg.ErrorCode.SYSTEM_ERROR);
                         return;
                     }
 
-                    Login.scLogin scLogin =
-                            (Login.scLogin)
-                                    ProtoMessageFactory.createProtoMessage(
-                                            Cmd.CMD.SC_Login_VALUE, resp.getData().toByteArray());
+                    Login.scLogin scLogin = (Login.scLogin) ProtoMessageFactory.createProtoMessage(
+                            Cmd.CMD.SC_Login_VALUE, resp.getData().toByteArray());
                     if (scLogin == null) {
                         LoggerDef.SystemLogger.error(
                                 "GateLoginController parse scLogin failed, account={}, gameServerId={}",
                                 request.getAccount(),
                                 request.getGameServerId());
                         GateClientManager.getInstance().removeClient(request.getAccountId());
-                        sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.SYSTEM_ERROR);
+                        sendClientErrorCode(context, ErrorMsg.ErrorCode.SYSTEM_ERROR);
                         return;
                     }
 
@@ -138,7 +134,7 @@ public class GateLoginController implements IGateController {
                         "GateLoginController handleLogin failed, account={}",
                         request.getAccount(),
                         e);
-                sendClientErrorCode(session, packet.getCmd(), ErrorMsg.ErrorCode.SYSTEM_ERROR);
+                sendClientErrorCode(context, ErrorMsg.ErrorCode.SYSTEM_ERROR);
             }
         });
     }

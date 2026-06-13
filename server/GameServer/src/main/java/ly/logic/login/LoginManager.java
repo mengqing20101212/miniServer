@@ -1,6 +1,7 @@
 package ly.logic.login;
 
 import java.util.concurrent.ArrayBlockingQueue;
+
 import ly.LoggerDef;
 import ly.ServerContext;
 import ly.logic.player.Player;
@@ -21,7 +22,8 @@ import ly.redis.RedisUtils;
 /**
  * 登录管理器。
  *
- * <p>登录流程涉及 DB/Redis 等同步 IO，统一放在独立登录协程里处理，避免阻塞 RPC 入站线程。
+ * <p>
+ * 登录流程涉及 DB/Redis 等同步 IO，统一放在独立登录协程里处理，避免阻塞 RPC 入站线程。
  */
 public class LoginManager {
     private static final LoginManager instance = new LoginManager();
@@ -80,7 +82,8 @@ public class LoginManager {
         if (onlinePlayer == null) {
             onlinePlayer = PlayerManager.getInstance().getPlayerByDB(playerId);
             if (onlinePlayer == null) {
-                boolean lock = RedisUtils.lock(RedisKeys.LOCK_CREATE_PLAYER_NAME_KEY.getKey(task.request.getPlayerName()));
+                boolean lock = RedisUtils
+                        .lock(RedisKeys.LOCK_CREATE_PLAYER_NAME_KEY.getKey(task.request.getPlayerName()));
                 if (lock) {
                     try {
                         onlinePlayer = PlayerManager.getInstance().createNewPlayer(task.request);
@@ -118,29 +121,27 @@ public class LoginManager {
         // TODO: 首次登录逻辑待实现。
         onlinePlayer.dispatchEvent(PlayerEventType.PLAYER_LOGIN_IS_RECONNECT, task.request.getIsReconnect());
 
-        Login.scLogin response =
-                Login.scLogin.newBuilder()
-                        .setAccount(onlinePlayer.getAccount())
-                        .setPlayerId(onlinePlayer.getPlayerId())
-                        .setToken(onlinePlayer.getToken())
-                        .setGameServerId(ServerContext.getServerId())
-                        .setPlayerInfo(PlayerUtils.genPlayerInfo(onlinePlayer))
-                        .build();
+        Login.scLogin response = Login.scLogin.newBuilder()
+                .setAccount(onlinePlayer.getAccount())
+                .setPlayerId(onlinePlayer.getPlayerId())
+                .setToken(onlinePlayer.getToken())
+                .setGameServerId(ServerContext.getServerId())
+                .setPlayerInfo(PlayerUtils.genPlayerInfo(onlinePlayer))
+                .build();
         sendLoginResponse(task, onlinePlayer, response);
         onlinePlayer.statPlay();
     }
 
     private void sendErrorMsg(LoginTask task, ErrorMsg.ErrorCode errorCode) {
-        ErrorMsg.scErrorCode errorMsg =
-                ErrorMsg.scErrorCode.newBuilder()
-                        .setMsgId(task.packet.getCmd())
-                        .setErrorCode(errorCode)
-                        .build();
+        ErrorMsg.scErrorCode errorMsg = ErrorMsg.scErrorCode.newBuilder()
+                .setMsgId(task.packet.getCmd())
+                .setErrorCode(errorCode)
+                .build();
         if (task.packet.getSid() != 0) {
             sendWrappedGateResponse(task, task.packet.getGuid(), Cmd.CMD.SC_ErrorCode_VALUE, errorMsg);
             return;
         }
-        task.session.sendClientMsg(Cmd.CMD.CS_ErrorCode_VALUE, task.packet.getSeq() + 1, 0, errorMsg);
+        task.session.sendClientMsg(Cmd.CMD.CS_ErrorCode_VALUE, 0, errorMsg);
     }
 
     private void sendLoginResponse(LoginTask task, Player onlinePlayer, Login.scLogin response) {
@@ -165,20 +166,18 @@ public class LoginManager {
             long guid,
             int clientCmd,
             com.google.protobuf.AbstractMessage response) {
-        Server.scGate2GameRpcGameCall builder =
-                Server.scGate2GameRpcGameCall.newBuilder()
-                        .setClientCmd(clientCmd)
-                        .setClientSid(task.packet.getSid())
-                        .setData(response.toByteString())
-                        .setCallId(task.callId)
-                        .build();
-        AbstractMessagePacket packet =
-                MessagePacketFactory.createAbstractMessagePacket(
-                        guid,
-                        Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE,
-                        builder,
-                        0,
-                        0);
+        Server.scGate2GameRpcGameCall builder = Server.scGate2GameRpcGameCall.newBuilder()
+                .setClientCmd(clientCmd)
+                .setClientSid(task.packet.getSid())
+                .setData(response.toByteString())
+                .setCallId(task.callId)
+                .build();
+        AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
+                guid,
+                Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE,
+                builder,
+                0,
+                0);
         task.session.addSendPacket(packet);
     }
 

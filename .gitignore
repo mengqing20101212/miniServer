@@ -11,3 +11,5 @@ runlogs/
 **/target/
 *.LCKpom.xml~
 dependency-reduced-pom.xml
+logs/system.log
+logs/net.log

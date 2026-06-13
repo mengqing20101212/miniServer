@@ -157,6 +157,20 @@ public class ParserProto {
             + "    }\n"
             + "    return null;\n"
             + "  }\n"
+            + "\n"
+            + "  @SuppressWarnings(\"unchecked\")\n"
+            + "  public static <T extends AbstractMessage> T createProtoMessage(int cmd, byte[] data, Class<T> clazz) {\n"
+            + "    AbstractMessage msg = createProtoMessage(cmd, data);\n"
+            + "    if (msg == null) {\n"
+            + "      return null;\n"
+            + "    }\n"
+            + "    try {\n"
+            + "      return (T) msg;\n"
+            + "    } catch (ClassCastException e) {\n"
+            + "      // Return null if type doesn't match\n"
+            + "      return null;\n"
+            + "    }\n"
+            + "  }\n"
             + "}\n";
 
     System.out.println(score);

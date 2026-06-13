@@ -103,7 +103,8 @@ public class NetClient {
             if (future.isSuccess()) {
                 channel = future.channel();
                 NetClientManager.getInstance().addNewClient(this);
-                logger.info("Netty 客户端连接成功： channelId:{},  {}:{},  耗时:{}毫秒", channel.id().asLongText(), host, port, System.currentTimeMillis() - begin);
+                logger.info("Netty 客户端连接成功： channelId:{},  {}:{},  耗时:{}毫秒", channel.id().asLongText(), host, port,
+                        System.currentTimeMillis() - begin);
                 int maxTimeOut = 1000;
                 while (!isReady() && maxTimeOut > 0) {
                     Thread.sleep(3);
@@ -124,12 +125,10 @@ public class NetClient {
      */
     public int sendS2SMessage(long guid, int cmd, AbstractMessage protoData) {
         final int seq = sendSeq.getAndIncrement();
-        AbstractMessagePacket messagePacket =
-                MessagePacketFactory.createAbstractMessagePacket(
-                        guid, cmd, protoData, seq, sid);
+        AbstractMessagePacket messagePacket = MessagePacketFactory.createAbstractMessagePacket(
+                guid, cmd, protoData, seq, sid);
         return send(messagePacket) ? seq : -1;
     }
-
 
     public void setSid(int sid) {
         if (this.sid == 0) {
@@ -192,9 +191,10 @@ public class NetClient {
         if (packet.getSid() == 0) {
             packet.setSid(sid);
         }
-        if (LoggerDef.NetLogger.isDebugEnabled()) {
-            LoggerDef.NetLogger.debug(String.format("sid:%d send packet:%s", sid, packet));
-        }
+        // if (LoggerDef.NetLogger.isDebugEnabled()) {
+        // LoggerDef.NetLogger.debug(String.format("sid:%d send packet:%s", sid,
+        // packet));
+        // }
         channel.writeAndFlush(packet);
         return true;
     }
@@ -216,31 +216,39 @@ public class NetClient {
     }
 
     /**
-     * 从接收队列中查找指定 callId 和 cmd 的响应包。
-     * <p>
-     * 用于可靠 RPC 补发匹配：replay 发送时写入 callId，回包由 GameServer 原样带回，
-     * 这里按 callId + cmd 精确匹配，避免 seq 不一致导致的误匹配。
+     * 从接收队列中查找指定 callId 和外层 cmd 的 RPC 响应包。
+     *
+     * <p>Gate2Game 专用 RPC 和通用 Server2Server RPC 都必须使用 callId 匹配，
+     * 不能再依赖 TCP 连接上的 seq。seq 只保留给链路日志和客户端包顺序排查。
      */
     public AbstractMessagePacket getReceiveMsgByCallId(long callId, int cmd) {
         Iterator<AbstractMessagePacket> iterator = receivePacketQueue.iterator();
         while (iterator.hasNext()) {
             AbstractMessagePacket packet = iterator.next();
             if (packet.getCmd() == cmd) {
-                // 解析 scGate2GameRpcGameCall 提取 callId
                 try {
-                    com.google.protobuf.AbstractMessage msg = ly.ProtoMessageFactory.createProtoMessage(cmd, packet.getData());
-                    if (msg instanceof ly.proto.Server.scGate2GameRpcGameCall resp) {
-                        if (resp.getCallId() == callId) {
-                            iterator.remove();
-                            return packet;
-                        }
+                    com.google.protobuf.AbstractMessage msg = ly.ProtoMessageFactory.createProtoMessage(cmd,
+                            packet.getData());
+                    if (matchRpcCallId(msg, callId)) {
+                        iterator.remove();
+                        return packet;
                     }
                 } catch (Exception ignored) {
-                    // 解析失败，跳过
+                    // 解析失败时跳过该包，让其他读取逻辑继续处理。
                 }
             }
         }
         return null;
+    }
+
+    private boolean matchRpcCallId(com.google.protobuf.AbstractMessage msg, long callId) {
+        if (msg instanceof ly.proto.Server.scGate2GameRpcGameCall resp) {
+            return resp.getCallId() == callId;
+        }
+        if (msg instanceof ly.proto.Server.scServer2Server resp) {
+            return resp.getCallId() == callId;
+        }
+        return false;
     }
 
     /**
@@ -295,6 +303,5 @@ public class NetClient {
         }
         return null;
     }
-
 
 }
