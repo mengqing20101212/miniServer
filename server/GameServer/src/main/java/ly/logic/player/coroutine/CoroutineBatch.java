@@ -13,8 +13,15 @@ import java.util.function.Function;
 import ly.logic.player.Player;
 import ly.net.GamePlayer;
 
-/** 批量玩家协程调用构建器。 */
+/**
+ * 批量玩家协程调用构建器。
+ *
+ * <p>用于当前业务一次性向多个玩家队列投递同一段逻辑，并等待所有玩家返回。典型场景是队伍、房间、
+ * 公会这类跨玩家聚合逻辑。调用方可以通过 {@link #onFailure(CoroutineFailureHandler)}
+ * 决定单个玩家失败后继续等、取消剩余任务，还是直接抛异常。
+ */
 public class CoroutineBatch {
+    /** 目标玩家快照，构造时复制一份，避免调用方集合后续变化影响本次批量调用。 */
     private final List<Player> players;
     private long timeoutMillis = CoroutineUtils.DEFAULT_TIMEOUT_MILLIS;
     private CoroutineFailureHandler failureHandler =
@@ -35,15 +42,22 @@ public class CoroutineBatch {
         return this;
     }
 
+    /** 设置单个目标失败后的处理策略，不设置时默认直接把失败抛给调用方。 */
     public CoroutineBatch onFailure(CoroutineFailureHandler failureHandler) {
         this.failureHandler = Objects.requireNonNull(failureHandler, "failureHandler");
         return this;
     }
 
+    /**
+     * 向所有目标玩家队列投递有返回值任务，并等待结果。
+     *
+     * <p>返回值中同时保存成功和失败，除非失败策略选择 {@code THROW} 导致方法提前抛出。
+     */
     public <T> CoroutineBatchResult<T> call(Function<Player, T> action) {
         Objects.requireNonNull(action, "action");
         long sourcePlayerId = PlayerThreadContext.currentPlayerId();
         CoroutineWaitGraph waitGraph = CoroutineWaitGraph.getInstance();
+        // 批量调用也要一次性登记等待关系，先检查是否会形成等待环。
         waitGraph.addEdges(sourcePlayerId, players);
 
         List<PlayerCoroutineTask<T>> tasks = new ArrayList<>();
@@ -75,6 +89,7 @@ public class CoroutineBatch {
         for (Player player : players) {
             validatePlayer(player);
             long targetPlayerId = player.getPlayerId();
+            // 当前玩家调用自己时直接执行，不投递到队列，避免自己等自己。
             if (sourcePlayerId == targetPlayerId) {
                 result.addSuccess(targetPlayerId, action.apply(player));
                 continue;
@@ -90,6 +105,7 @@ public class CoroutineBatch {
                 result.addFailure(targetPlayerId, error);
                 continue;
             }
+            // 已成功进入目标队列，后续统一在 waitAll 中等待 future。
             tasks.add(task);
         }
     }
@@ -123,6 +139,7 @@ public class CoroutineBatch {
                 result.addFailure(task.getTargetPlayerId(), timeout);
                 failureCount++;
                 if (handleFailure(task, timeout, successCount, failureCount) != CoroutineFailureDecision.CONTINUE) {
+                    // 调用方不想继续等时，取消尚未完成的任务；已开始执行的任务由目标队列自然结束。
                     cancelRemain(tasks, timeout);
                     return;
                 }
@@ -160,6 +177,7 @@ public class CoroutineBatch {
                 new CoroutineBatchContext(
                         task.getSourcePlayerId(), players.size(), successCount, failureCount, timeoutMillis);
         CoroutineFailureDecision decision = failureHandler.onFailure(player, error, context);
+        // 回调返回 null 视为保守处理：直接抛异常，避免静默吞掉业务错误。
         return decision == null ? CoroutineFailureDecision.THROW : decision;
     }
 
@@ -175,6 +193,7 @@ public class CoroutineBatch {
     private void cancelRemain(List<? extends PlayerCoroutineTask<?>> tasks, Throwable cause) {
         for (PlayerCoroutineTask<?> task : tasks) {
             if (!task.future().isDone()) {
+                // 这里只是标记 future 失败并释放引用；任务如果已经在目标队列里，执行时会看到取消标记并跳过。
                 task.cancel(cause);
             }
         }

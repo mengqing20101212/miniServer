@@ -7,10 +7,16 @@ import java.util.Map;
 import java.util.Set;
 import ly.logic.player.Player;
 
-/** 玩家协程同步等待关系图，用于在阻塞前发现互相等待。 */
+/**
+ * 玩家协程同步等待关系图，用于在阻塞前发现互相等待。
+ *
+ * <p>例如玩家 A 的队列正在等待玩家 B，玩家 B 又准备等待玩家 A，如果不提前拦截，
+ * 两个玩家队列都会阻塞到超时。这里用 playerId 记录等待边，不保存 Player 引用，避免玩家下线后被等待图持有。
+ */
 final class CoroutineWaitGraph {
     private static final CoroutineWaitGraph INSTANCE = new CoroutineWaitGraph();
 
+    /** key 是发起等待的玩家 id，value 是它正在等待的目标玩家 id 集合。 */
     private final Map<Long, Set<Long>> waits = new HashMap<>();
 
     private CoroutineWaitGraph() {
@@ -24,6 +30,7 @@ final class CoroutineWaitGraph {
         if (sourcePlayerId <= 0 || targetPlayerId <= 0 || sourcePlayerId == targetPlayerId) {
             return;
         }
+        // 如果 target 已经能沿等待关系走回 source，再加 source -> target 就会形成环。
         if (hasPath(targetPlayerId, sourcePlayerId, new HashSet<>())) {
             throw new CoroutineDeadlockException(
                     "player coroutine deadlock detected, source="
@@ -44,6 +51,7 @@ final class CoroutineWaitGraph {
             if (target == null || target.getPlayerId() == sourcePlayerId) {
                 continue;
             }
+            // 批量调用先只检测，不立刻写入，避免检测到一半失败后留下部分等待边。
             if (hasPath(target.getPlayerId(), sourcePlayerId, new HashSet<>())) {
                 throw new CoroutineDeadlockException(
                         "player coroutine batch deadlock detected, source="
@@ -84,6 +92,7 @@ final class CoroutineWaitGraph {
     }
 
     private boolean hasPath(long fromPlayerId, long toPlayerId, Set<Long> visited) {
+        // 深度优先搜索等待链：from -> ... -> to。
         if (fromPlayerId == toPlayerId) {
             return true;
         }
