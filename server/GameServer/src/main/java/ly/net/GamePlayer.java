@@ -1,10 +1,14 @@
 package ly.net;
 
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import ly.LoggerDef;
 import ly.logic.player.Player;
+import ly.logic.player.coroutine.PlayerCoroutineTask;
+import ly.logic.player.coroutine.PlayerThreadContext;
 import ly.logic.player.event.PlayerEventParam;
 import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.MessagePacketFactory;
@@ -25,6 +29,9 @@ public class GamePlayer {
 
     private final GameConnectSession session;
     private final ArrayBlockingQueue<GamePlayerWorkItem> workQueue = new ArrayBlockingQueue<>(WORK_QUEUE_CAPACITY);
+    private final AtomicBoolean offlineDraining = new AtomicBoolean();
+    private final Object drainLock = new Object();
+    private int runningWorkCount;
     private long playerId;
     private Player player;
 
@@ -81,6 +88,15 @@ public class GamePlayer {
         if (packet == null) {
             return;
         }
+        if (offlineDraining.get()) {
+            LoggerDef.SystemLogger.error(
+                    "GamePlayer is offline draining, reject packet playerId={}, cmd={}, seq={}, sid={}",
+                    playerId,
+                    packet.getCmd(),
+                    packet.getSeq(),
+                    packet.getSid());
+            return;
+        }
 
         if (!workQueue.offer(GamePlayerWorkItem.packet(packet))) {
             LoggerDef.SystemLogger.error(
@@ -98,6 +114,15 @@ public class GamePlayer {
         if (event == null) {
             return;
         }
+        if (offlineDraining.get()) {
+            LoggerDef.SystemLogger.error(
+                    "GamePlayer is offline draining, reject event playerId={}, eventType={}, source={}, sourcePlayerId={}",
+                    playerId,
+                    event.getEventType(),
+                    event.getSource(),
+                    event.getSourcePlayerId());
+            return;
+        }
         if (!workQueue.offer(GamePlayerWorkItem.event(event))) {
             LoggerDef.SystemLogger.error(
                     "GamePlayer work queue full, drop event playerId={}, eventType={}, source={}, sourcePlayerId={}, queueSize={}, queueCapacity={}",
@@ -107,6 +132,46 @@ public class GamePlayer {
                     event.getSourcePlayerId(),
                     workQueue.size(),
                     WORK_QUEUE_CAPACITY);
+        }
+    }
+
+    public boolean addCoroutineTask(PlayerCoroutineTask<?> task) {
+        if (task == null) {
+            return false;
+        }
+        if (offlineDraining.get()) {
+            LoggerDef.SystemLogger.error(
+                    "GamePlayer is offline draining, reject coroutine playerId={}, sourcePlayerId={}, desc={}",
+                    playerId,
+                    task.getSourcePlayerId(),
+                    task.getDescription());
+            return false;
+        }
+        boolean success = workQueue.offer(GamePlayerWorkItem.coroutine(task));
+        if (!success) {
+            LoggerDef.SystemLogger.error(
+                    "GamePlayer work queue full, drop coroutine playerId={}, sourcePlayerId={}, desc={}, queueSize={}, queueCapacity={}",
+                    playerId,
+                    task.getSourcePlayerId(),
+                    task.getDescription(),
+                    workQueue.size(),
+                    WORK_QUEUE_CAPACITY);
+        }
+        return success;
+    }
+
+    public int getWorkQueueSize() {
+        return workQueue.size();
+    }
+
+    public void cancelPendingCoroutineTasks(Throwable cause) {
+        Iterator<GamePlayerWorkItem> iterator = workQueue.iterator();
+        while (iterator.hasNext()) {
+            GamePlayerWorkItem item = iterator.next();
+            if (item.getType() == GamePlayerWorkItem.Type.COROUTINE && item.getCoroutineTask() != null) {
+                item.getCoroutineTask().cancel(cause);
+                iterator.remove();
+            }
         }
     }
 
@@ -135,13 +200,51 @@ public class GamePlayer {
         return workQueue.isEmpty();
     }
 
+    public void beginOfflineDrain() {
+        offlineDraining.set(true);
+        notifyDrainIfComplete();
+    }
+
+    public boolean isOfflineDraining() {
+        return offlineDraining.get();
+    }
+
+    public boolean awaitOfflineDrain(long timeoutMillis) throws InterruptedException {
+        if (PlayerThreadContext.currentPlayerId() == playerId) {
+            throw new IllegalStateException(
+                    "cannot await offline drain in current player queue, playerId=" + playerId);
+        }
+        if (timeoutMillis <= 0) {
+            throw new IllegalArgumentException("timeoutMillis must be positive");
+        }
+        beginOfflineDrain();
+        long deadline = System.currentTimeMillis() + timeoutMillis;
+        synchronized (drainLock) {
+            while (!isDrainCompleteLocked()) {
+                long waitMillis = deadline - System.currentTimeMillis();
+                if (waitMillis <= 0) {
+                    LoggerDef.SystemLogger.error(
+                            "GamePlayer offline drain timeout, playerId={}, queueSize={}, runningWorkCount={}",
+                            playerId,
+                            workQueue.size(),
+                            runningWorkCount);
+                    return false;
+                }
+                drainLock.wait(waitMillis);
+            }
+            return true;
+        }
+    }
+
     public void tickWorkItem() throws InterruptedException {
         GamePlayerWorkItem workItem = workQueue.poll(100, TimeUnit.MILLISECONDS);
         // LoggerDef.SystemLogger.info("[tickWorkItem] polling, queueSize={}",
         // workQueue.size());
         if (workItem == null) {
+            notifyDrainIfComplete();
             return;
         }
+        markWorkStarted();
         try {
             if (player == null) {
                 LoggerDef.SystemLogger.error(
@@ -153,10 +256,17 @@ public class GamePlayer {
                 return;
             }
             long now = System.currentTimeMillis();
-            if (workItem.getType() == GamePlayerWorkItem.Type.PACKET) {
-                processPacket(workItem.getPacket());
-            } else if (workItem.getType() == GamePlayerWorkItem.Type.EVENT) {
-                processEvent(workItem.getEvent());
+            PlayerThreadContext.enter(player.getPlayerId());
+            try {
+                if (workItem.getType() == GamePlayerWorkItem.Type.PACKET) {
+                    processPacket(workItem.getPacket());
+                } else if (workItem.getType() == GamePlayerWorkItem.Type.EVENT) {
+                    processEvent(workItem.getEvent());
+                } else if (workItem.getType() == GamePlayerWorkItem.Type.COROUTINE) {
+                    processCoroutine(workItem.getCoroutineTask());
+                }
+            } finally {
+                PlayerThreadContext.exit();
             }
             long cost = System.currentTimeMillis() - now;
             if (cost > 100) {
@@ -173,7 +283,39 @@ public class GamePlayer {
                     workItem.getPacket() == null ? null : workItem.getPacket().getCmd(),
                     workItem.getEvent() == null ? null : workItem.getEvent().getEventType(),
                     e);
+        } finally {
+            markWorkFinished();
         }
+    }
+
+    private void markWorkStarted() {
+        synchronized (drainLock) {
+            runningWorkCount++;
+        }
+    }
+
+    private void markWorkFinished() {
+        synchronized (drainLock) {
+            runningWorkCount--;
+            if (runningWorkCount < 0) {
+                runningWorkCount = 0;
+            }
+            if (isDrainCompleteLocked()) {
+                drainLock.notifyAll();
+            }
+        }
+    }
+
+    private void notifyDrainIfComplete() {
+        synchronized (drainLock) {
+            if (isDrainCompleteLocked()) {
+                drainLock.notifyAll();
+            }
+        }
+    }
+
+    private boolean isDrainCompleteLocked() {
+        return offlineDraining.get() && runningWorkCount == 0 && workQueue.isEmpty();
     }
 
     private void processPacket(AbstractMessagePacket packet) {
@@ -193,6 +335,13 @@ public class GamePlayer {
             return;
         }
         player.getEventManager().handleEvent(event);
+    }
+
+    private void processCoroutine(PlayerCoroutineTask<?> task) {
+        if (task == null) {
+            return;
+        }
+        task.execute(player);
     }
 
     private void beginRequestContext(AbstractMessagePacket packet) {

@@ -7,6 +7,7 @@ import "ErrorMsg.proto";
 message csMove {
   int32 target_x = 1;  // 目标X坐标
   int32 target_y = 2;  // 目标Y坐标
+  int64 observe_player_id = 3; // 协程测试用：需要在本次移动处理中读取的目标玩家
 }
 
 // 移动响应
@@ -14,4 +15,6 @@ message scMove {
   ErrorCode result = 1;
   int32 current_x = 2;  // 当前X坐标
   int32 current_y = 3;  // 当前Y坐标
+  int64 observed_player_id = 4; // 协程测试返回：被读取的目标玩家
+  int32 observed_level = 5; // 协程测试返回：通过目标玩家队列读取到的等级
 }

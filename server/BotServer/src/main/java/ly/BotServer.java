@@ -1,6 +1,7 @@
 package ly;
 
 import ly.bot.RobotManager;
+import ly.bot.module.impl.CoroutinePlayerCallTestModule;
 import ly.bot.module.impl.RpcSeqSidTestModule;
 import ly.bot.util.ProtocolTester;
 import ly.startup.StartupSkillLoader;
@@ -41,6 +42,12 @@ public class BotServer {
             boolean success =
                     RpcSeqSidTestModule.runReliableReplayStandalone(
                             loginHost, loginHttpPort, delayBeforeHeroMs, responseTimeoutMs, account, token, playerId);
+            System.exit(success ? 0 : 1);
+        }
+        if (args != null && args.length > 0 && "--test-coroutine-player-call".equals(args[0])) {
+            String loginHost = args.length >= 2 ? args[1] : "127.0.0.1";
+            int loginHttpPort = args.length >= 3 ? Integer.parseInt(args[2]) : 8889;
+            boolean success = CoroutinePlayerCallTestModule.runStandalone(loginHost, loginHttpPort);
             System.exit(success ? 0 : 1);
         }
 
@@ -89,7 +96,7 @@ public class BotServer {
 
             default:
                 System.out.println("未知命令: " + command);
-                System.out.println("可用命令: --test-protocol, --run-bots, --test-rpc-seq-sid, --test-rpc-reliable-replay");
+                System.out.println("可用命令: --test-protocol, --run-bots, --test-rpc-seq-sid, --test-rpc-reliable-replay, --test-coroutine-player-call");
                 break;
         }
     }
