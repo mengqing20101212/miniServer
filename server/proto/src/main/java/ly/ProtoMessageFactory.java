@@ -41,6 +41,10 @@ public class ProtoMessageFactory {
         case Cmd.CMD.SC_RpcPing_VALUE ->{return Server.scRpcPing.parseFrom(data);}
         case Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE ->{return Server.csGate2GameRpcGameCall.parseFrom(data);}
         case Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE ->{return Server.scGate2GameRpcGameCall.parseFrom(data);}
+        case Cmd.CMD.CS_GmPlayerDetail_VALUE ->{return GmPlayer.csGmPlayerDetail.parseFrom(data);}
+        case Cmd.CMD.SC_GmPlayerDetail_VALUE ->{return GmPlayer.scGmPlayerDetail.parseFrom(data);}
+        case Cmd.CMD.CS_GmUpdatePlayerModule_VALUE ->{return GmPlayer.csGmUpdatePlayerModule.parseFrom(data);}
+        case Cmd.CMD.SC_GmUpdatePlayerModule_VALUE ->{return GmPlayer.scGmUpdatePlayerModule.parseFrom(data);}
       }
     } catch (InvalidProtocolBufferException e) {
       e.printStackTrace();

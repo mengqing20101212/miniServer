@@ -1,6 +1,7 @@
 package ly;
 
 import ly.config.ServerTypeEnum;
+import ly.logic.gm.GmPlayerController;
 import ly.logic.hero.HeroController;
 import ly.logic.login.GameLogoutController;
 import ly.logic.login.GamePlayerLoginController;
@@ -21,6 +22,7 @@ public class GameServer {
                 new GamePlayerLoginController(),
                 new GameLogoutController(),
                 new Gate2GameRpcGameCallController(),
+                new GmPlayerController(),
                 new PingController(),
                 new HeroController(),
                 new MoveController());

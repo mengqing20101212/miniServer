@@ -40,6 +40,10 @@ enum CMD{
   SC_RpcPing = 10004;                                                               //rpcPing 心跳包响应
   CS_Gate2GameRpcGameCall = 10005;                                                  // 网关调用游戏服务器Rpc方法 请求
   SC_Gate2GameRpcGameCall = 10006;                                                  // 网关调用游戏服务器Rpc方法 响应
+  CS_GmPlayerDetail = 10007;                                                        // GM 查询在线玩家详情 请求
+  SC_GmPlayerDetail = 10008;                                                        // GM 查询在线玩家详情 响应
+  CS_GmUpdatePlayerModule = 10009;                                                  // GM 修改在线玩家模块字段 请求
+  SC_GmUpdatePlayerModule = 10010;                                                  // GM 修改在线玩家模块字段 响应
   MaxServeMsgId = 20000;                                                         //maxServeMsgId 服务器之间通信消息号最大值
 
   ///////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用////////////////////////////////////////

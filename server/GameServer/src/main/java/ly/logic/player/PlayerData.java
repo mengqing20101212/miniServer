@@ -53,5 +53,19 @@ public class PlayerData {
         return playerEntry;
     }
 
+    /**
+     * 写回单个模块的 protobuf 数据，并重新序列化 PlayerModuleData 到 PlayerEntry.modules。
+     *
+     * <p>这里只调用 PlayerEntry.setModules 标记脏数据，不主动执行 DB update；后续仍交给现有保存流程处理。
+     */
+    public void markModuleDirty(ModuleEnum moduleType, byte[] moduleBytes) {
+        moduleData.addModuleData(moduleType.getName(), moduleBytes);
+        try {
+            Codec<PlayerModuleData> moduleDataCodec = ProtobufProxy.create(PlayerModuleData.class);
+            playerEntry.setModules(moduleDataCodec.encode(moduleData));
+        } catch (Exception e) {
+            throw new IllegalStateException("serialize player module data failed, module=" + moduleType.name(), e);
+        }
+    }
 
 }

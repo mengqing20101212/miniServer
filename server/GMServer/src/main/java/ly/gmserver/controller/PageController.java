@@ -83,6 +83,11 @@ public class PageController {
         return "config/hot-update";
     }
 
+    @GetMapping("/player/detail")
+    public String playerDetail() {
+        return "player/detail";
+    }
+
     @GetMapping("/admin/dashboard")
     public String dashboard() {
         return "admin/list";

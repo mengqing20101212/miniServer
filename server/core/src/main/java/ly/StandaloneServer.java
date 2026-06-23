@@ -4,6 +4,7 @@ import ly.config.DbConfig;
 import ly.config.RedisConfig;
 import ly.config.ServerConfig;
 import ly.db.MysqlService;
+import ly.monitor.DeadlockDetector;
 import ly.redis.RedisUtils;
 
 /**
@@ -43,6 +44,7 @@ public class StandaloneServer {
         ServerContext.serverConfig = serverConfig;
         ServerContext.ENV = "prod";
         ServerContext.serverType = ly.config.ServerTypeEnum.GATE;
+        DeadlockDetector.start();
 
         try {
             // 初始化数据库服务

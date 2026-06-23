@@ -5,6 +5,7 @@ import ly.config.RunModuleEnum;
 import ly.config.ServerConfig;
 import ly.config.ServerTypeEnum;
 import ly.db.MysqlService;
+import ly.monitor.DeadlockDetector;
 import ly.nacos.NacosService;
 import ly.net.ConnectSession;
 import ly.net.GameObjectProvider;
@@ -74,6 +75,9 @@ public class ServerContext {
         // 服务器唯一 id 会写入后续注册到 Nacos 的节点元数据。
         SERVER_ID = serverId;
         ENV = env;
+
+        // 尽早启动 JVM 死锁检测器，覆盖后续 Nacos、配置表、Redis、MySQL、Netty 等所有线程。
+        DeadlockDetector.start();
         
         // Nacos 启动会加载当前 serverId 对应的 ServerConfig，并注册服务发现实例。
         NacosService.getInstance().startUp(nacosUrl, serverType, serverId, env);
