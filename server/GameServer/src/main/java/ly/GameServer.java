@@ -8,6 +8,7 @@ import ly.logic.login.GamePlayerLoginController;
 import ly.logic.move.MoveController;
 import ly.logic.ping.PingController;
 import ly.logic.player.Gate2GameRpcGameCallController;
+import ly.logic.rank.GameRankBootstrap;
 import ly.net.GameConnectSessionProvider;
 import ly.startup.StartupSkillLoader;
 
@@ -27,6 +28,7 @@ public class GameServer {
                 new HeroController(),
                 new MoveController());
         ServerContext.startUp(resolved.nacosUrl, ServerTypeEnum.GAME.getType(), resolved.serverId, resolved.env, new GameConnectSessionProvider());
+        GameRankBootstrap.start();
 
     }
 }
