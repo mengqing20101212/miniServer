@@ -1,26 +1,26 @@
 package ly.logic.player.coroutine;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
 import ly.db.entry.PlayerEntry;
 import ly.logic.player.Player;
 import ly.logic.player.PlayerData;
 import ly.net.GamePlayer;
-import org.junit.Test;
 
 public class CoroutineUtilsTest {
 
     @Test
     public void shouldRunProxyMethodOnTargetPlayerQueue() throws Exception {
         Player target = newPlayer(2L, 20);
-        CompletableFuture<Integer> result =
-                CompletableFuture.supplyAsync(() -> CoroutineUtils.on(target).getLevel());
+        CompletableFuture<Integer> result = CompletableFuture.supplyAsync(() -> CoroutineUtils.on(target).getLevel());
 
         waitQueue(target, 1);
         target.getGamePlayer().tickWorkItem();
@@ -32,12 +32,11 @@ public class CoroutineUtilsTest {
     public void shouldSupportPlayerToPlayerBlockingCall() throws Exception {
         Player source = newPlayer(1L, 10);
         Player target = newPlayer(2L, 30);
-        PlayerCoroutineTask<Integer> sourceTask =
-                new PlayerCoroutineTask<>(
-                        0L,
-                        source.getPlayerId(),
-                        "source-call-target",
-                        player -> CoroutineUtils.on(target).getLevel());
+        PlayerCoroutineTask<Integer> sourceTask = new PlayerCoroutineTask<>(
+                0L,
+                source.getPlayerId(),
+                "source-call-target",
+                player -> CoroutineUtils.on(target).getLevel());
         source.getGamePlayer().addCoroutineTask(sourceTask);
 
         Thread sourceThread = Thread.ofVirtual().start(() -> tickOnce(source));
@@ -67,11 +66,10 @@ public class CoroutineUtilsTest {
     public void shouldBatchCallPlayersAndWaitAllSuccess() throws Exception {
         Player player2 = newPlayer(2L, 20);
         Player player3 = newPlayer(3L, 30);
-        CompletableFuture<CoroutineBatchResult<Integer>> result =
-                CompletableFuture.supplyAsync(
-                        () -> CoroutineUtils.batch(List.of(player2, player3))
-                                .timeout(1000)
-                                .call(Player::getLevel));
+        CompletableFuture<CoroutineBatchResult<Integer>> result = CompletableFuture.supplyAsync(
+                () -> CoroutineUtils.batch(List.of(player2, player3))
+                        .timeout(1000)
+                        .call(Player::getLevel));
 
         waitQueue(player2, 1);
         waitQueue(player3, 1);
@@ -87,8 +85,8 @@ public class CoroutineUtilsTest {
     @Test(expected = ExecutionException.class)
     public void shouldCancelPendingCoroutineTasksWhenPlayerLeaves() throws Exception {
         Player target = newPlayer(2L, 20);
-        PlayerCoroutineTask<Integer> task =
-                new PlayerCoroutineTask<>(1L, target.getPlayerId(), "pending", Player::getLevel);
+        PlayerCoroutineTask<Integer> task = new PlayerCoroutineTask<>(1L, target.getPlayerId(), "pending",
+                Player::getLevel);
         target.getGamePlayer().addCoroutineTask(task);
 
         target.getGamePlayer().cancelPendingCoroutineTasks(new IllegalStateException("player offline"));
@@ -100,27 +98,25 @@ public class CoroutineUtilsTest {
     public void shouldAwaitOfflineDrainUntilQueuedTasksFinished() throws Exception {
         Player target = newPlayer(2L, 20);
         AtomicBoolean executed = new AtomicBoolean();
-        PlayerCoroutineTask<Void> task =
-                new PlayerCoroutineTask<>(
-                        1L,
-                        target.getPlayerId(),
-                        "offline-drain",
-                        player -> {
-                            executed.set(true);
-                            return null;
-                        });
+        PlayerCoroutineTask<Void> task = new PlayerCoroutineTask<>(
+                1L,
+                target.getPlayerId(),
+                "offline-drain",
+                player -> {
+                    executed.set(true);
+                    return null;
+                });
         target.getGamePlayer().addCoroutineTask(task);
 
-        CompletableFuture<Boolean> drainResult =
-                CompletableFuture.supplyAsync(
-                        () -> {
-                            try {
-                                return target.getGamePlayer().awaitOfflineDrain(1000);
-                            } catch (InterruptedException e) {
-                                Thread.currentThread().interrupt();
-                                return false;
-                            }
-                        });
+        CompletableFuture<Boolean> drainResult = CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        return target.getGamePlayer().awaitOfflineDrain(1000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return false;
+                    }
+                });
 
         Thread.sleep(50L);
         assertTrue(!drainResult.isDone());
@@ -135,8 +131,8 @@ public class CoroutineUtilsTest {
         Player target = newPlayer(2L, 20);
         target.getGamePlayer().beginOfflineDrain();
 
-        PlayerCoroutineTask<Integer> task =
-                new PlayerCoroutineTask<>(1L, target.getPlayerId(), "reject-after-drain", Player::getLevel);
+        PlayerCoroutineTask<Integer> task = new PlayerCoroutineTask<>(1L, target.getPlayerId(), "reject-after-drain",
+                Player::getLevel);
 
         assertTrue(!target.getGamePlayer().addCoroutineTask(task));
     }

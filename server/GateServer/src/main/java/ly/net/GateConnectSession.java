@@ -71,8 +71,8 @@ public class GateConnectSession extends ConnectSession {
     }
 
     private void handleReceivePacket(AbstractMessagePacket packet) {
-        LoggerDef.LogNet(String.format("<<%s: guid:%d, sid:%d, cmd:%s, seq:%d,len:%d",
-                getReceiveServerLogName(packet.getCmd()), getGuid(),
+        LoggerDef.LogNet(String.format("<<%s: sessionGuid:%d, packetGuid:%d, sid:%d, cmd:%s, seq:%d,len:%d",
+                getReceiveServerLogName(packet.getCmd()), getGuid(), packet.getGuid(),
                 packet.getSid(), Cmd.CMD.forNumber(packet.getCmd()).name(), packet.getSeq(), packet.getLength()));
         if (shouldRejectPacket(packet)) {
             return;

@@ -18,6 +18,7 @@ public class LoginCommand implements RobotCommand {
     private final String account;
     private final String token;
     private final long accountId;
+    private final long playerId;
     private final String channel;
     private final String deviceId;
     private final String gameServerId;
@@ -26,6 +27,7 @@ public class LoginCommand implements RobotCommand {
         this.account = account;
         this.token = token;
         this.accountId = accountId;
+        this.playerId = 0;
         this.channel = channel;
         this.deviceId = deviceId;
         this.gameServerId = null; // 默认为空
@@ -35,6 +37,17 @@ public class LoginCommand implements RobotCommand {
         this.account = account;
         this.token = token;
         this.accountId = accountId;
+        this.playerId = 0;
+        this.channel = channel;
+        this.deviceId = deviceId;
+        this.gameServerId = gameServerId;
+    }
+
+    public LoginCommand(String account, String token, long accountId, String channel, String deviceId, String gameServerId, long playerId) {
+        this.account = account;
+        this.token = token;
+        this.accountId = accountId;
+        this.playerId = playerId;
         this.channel = channel;
         this.deviceId = deviceId;
         this.gameServerId = gameServerId;
@@ -58,7 +71,8 @@ public class LoginCommand implements RobotCommand {
             loginBuilder.setChannel(channel);
             loginBuilder.setToken(token);
             loginBuilder.setDeviceId(deviceId);
-            loginBuilder.setIsReconnect(false);
+            loginBuilder.setPlayerId(playerId);
+            loginBuilder.setIsReconnect(playerId > 0);
             
             // 设置游戏服务器ID，如果提供了的话
             if (gameServerId != null && !gameServerId.isEmpty()) {

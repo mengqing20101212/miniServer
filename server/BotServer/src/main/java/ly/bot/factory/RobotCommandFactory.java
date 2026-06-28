@@ -17,7 +17,17 @@ public class RobotCommandFactory {
     public static RobotCommand createCommand(CommandType type, Object... params) {
         switch (type) {
             case LOGIN:
-                if (params.length >= 6) {
+                if (params.length >= 7) {
+                    return new LoginCommand(
+                        (String) params[0],
+                        (String) params[1],
+                        (Long) params[2],
+                        (String) params[3],
+                        (String) params[4],
+                        (String) params[5],
+                        (Long) params[6]
+                    );
+                } else if (params.length >= 6) {
                     // 6个参数：account, token, accountId, channel, deviceId, gameServerId
                     return new LoginCommand(
                         (String) params[0], // account

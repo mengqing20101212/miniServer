@@ -52,15 +52,7 @@ public class ResourceModule extends AbstractModule {
 
     @Override
     public boolean saveData() {
-        try {
-            Codec<ResourceModuleData> codec = ProtobufProxy.create(ResourceModuleData.class);
-            byte[] data = codec.encode(moduleData);
-            player.getPlayerData().getModuleData().addModuleData(ModuleEnum.RESOURCE_MODULE.getName(), data);
-            return true;
-        } catch (Exception e) {
-            System.err.println("Error saving ResourceModuleData for player " + player.getPlayerId() + ": " + e.getMessage());
-            return false;
-        }
+        return saveModuleData(ModuleEnum.RESOURCE_MODULE, moduleData);
     }
 
     @Override

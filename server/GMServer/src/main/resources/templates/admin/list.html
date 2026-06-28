@@ -152,10 +152,7 @@
         var t = getToken();
         if (!t) { redirectToLogin(); return; }
         fetch(url, { method: 'GET', headers: { 'Authorization': 'Bearer ' + t, 'Accept': 'application/json' } })
-        .then(function(r) {
-            if (r.status === 401) { redirectToLogin(); return; }
-            return r.json();
-        })
+        .then(handleApiResponse)
         .then(function(d) { cb(d.code === 200 ? null : new Error(d.message || 'Request failed'), d.code === 200 ? d.data : null); })
         .catch(function(e) { cb(e, null); });
     }
@@ -164,12 +161,33 @@
         if (!t) { redirectToLogin(); return; }
         var body = data ? JSON.stringify(data) : null;
         fetch(url, { method: 'POST', headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: body })
-        .then(function(r) {
-            if (r.status === 401) { redirectToLogin(); return; }
-            return r.json();
-        })
+        .then(handleApiResponse)
         .then(function(d) { cb(d.code === 200 ? null : new Error(d.message || 'Request failed'), d.code === 200 ? d.data : null); })
         .catch(function(e) { cb(e, null); });
+    }
+
+    function handleApiResponse(r) {
+        if (r.status === 401 || r.status === 403) {
+            redirectToLogin();
+            throw new Error('登录已过期');
+        }
+        return r.text().then(function(text) {
+            var data = null;
+            if (text && text.trim()) {
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('接口返回不是JSON: HTTP ' + r.status);
+                }
+            }
+            if (!r.ok) {
+                throw new Error((data && (data.message || data.msg)) || ('HTTP ' + r.status));
+            }
+            if (!data) {
+                throw new Error('接口返回为空');
+            }
+            return data;
+        });
     }
 
     (function() {

@@ -41,19 +41,22 @@ public class LoginService {
     }
 
     public List<MiniPlayer> getPlayers(String account) {
-        LoginEntry entry = getLoginEntry(account);
+        LoginEntry entry = loadFromDB(account);
         if (entry == null) {
             logger.warn("未查到该账号信息:" + account);
             return new ArrayList<MiniPlayer>();
         }
+        CacheService.getCacheService(LoginEntry.class).put(entry, account);
         List<Long> guids = new ArrayList<>();
-        if (entry.getPlayers() != null) {
+        if (entry.getPlayers() != null && !entry.getPlayers().isBlank()) {
             String[] strs = entry.getPlayers().trim().split(";");
             for (String str : strs) {
-                guids.add(Long.parseLong(str));
+                if (str != null && !str.isBlank()) {
+                    guids.add(Long.parseLong(str.trim()));
+                }
             }
             List<MiniPlayer> miniPlayerList = MiniPlayerHelper.getMiniPlayerList(guids);
-            return miniPlayerList;
+            return miniPlayerList.stream().filter(player -> player != null).collect(Collectors.toList());
         }
         return new ArrayList<>();
     }

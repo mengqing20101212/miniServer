@@ -179,10 +179,15 @@ public class NetService {
                 return null;
             }
             
-            ConnectSession existingObject = gameObjectMaps.computeIfAbsent(guid, k -> object);
-            if (existingObject != object) {
-                log.warn("Duplicate session GUID detected: {}", guid);
-                return existingObject;
+            ConnectSession existingObject = gameObjectMaps.put(guid, object);
+            if (existingObject != null && existingObject != object) {
+                log.warn("Duplicate session GUID detected: {}, replace old session", guid);
+                gameObjectContextMaps.entrySet().removeIf(entry -> entry.getValue() == existingObject);
+                try {
+                    existingObject.closeChannel();
+                } catch (Exception e) {
+                    log.warn("Error closing duplicate old session {}", guid, e);
+                }
             }
             
             gameObjectContextMaps.put(ctx, object);

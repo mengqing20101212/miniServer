@@ -123,6 +123,7 @@ public class GateLoginController implements IGateController {
                         return;
                     }
 
+                    client.setPlayerId(scLogin.getPlayerId());
                     // 登录响应解析成功后仍走统一转发入口，由 Gate 分配客户端下行 seq。
                     client.sendGameResponseToClient(resp);
                 } finally {

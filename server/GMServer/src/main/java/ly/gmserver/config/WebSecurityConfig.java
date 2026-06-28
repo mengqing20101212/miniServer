@@ -1,6 +1,7 @@
 package ly.gmserver.config;
 
 import ly.gmserver.filter.JwtAuthFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,6 +34,10 @@ public class WebSecurityConfig {
             .csrf(csrf -> csrf.disable())
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint((request, response, authException) -> writeJsonError(response, 401, "未登录或登录已过期"))
+                .accessDeniedHandler((request, response, accessDeniedException) -> writeJsonError(response, 403, "没有权限"))
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/admin/login",
@@ -51,6 +56,13 @@ public class WebSecurityConfig {
             .logout(logout -> logout.disable())
             .httpBasic(basic -> basic.disable());
         return http.build();
+    }
+
+    private void writeJsonError(HttpServletResponse response, int status, String message) throws java.io.IOException {
+        response.setStatus(status);
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"code\":" + status + ",\"message\":\"" + message + "\"}");
     }
 
     @Bean

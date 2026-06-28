@@ -3,7 +3,9 @@ package ly.logic.gm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,9 +42,11 @@ final class GmPlayerReflectionUtils {
     }
 
     private static Object toPlainObject(Object value, IdentityHashMap<Object, Boolean> visited) {
-        if (value == null || value instanceof String || value instanceof Number || value instanceof Boolean
-                || value instanceof Enum<?>) {
-            return value;
+        if (value == null) {
+            return null;
+        }
+        if (isSimpleValue(value)) {
+            return value instanceof TemporalAccessor || value instanceof Date ? String.valueOf(value) : value;
         }
         if (visited.containsKey(value)) {
             return "[cycle]";
@@ -83,6 +87,17 @@ final class GmPlayerReflectionUtils {
             }
         }
         return result;
+    }
+
+    private static boolean isSimpleValue(Object value) {
+        return value instanceof String
+                || value instanceof Number
+                || value instanceof Boolean
+                || value instanceof Character
+                || value instanceof Enum<?>
+                || value instanceof TemporalAccessor
+                || value instanceof Date
+                || value.getClass().isPrimitive();
     }
 
     private static Object readPart(Object current, String part) {
@@ -230,6 +245,7 @@ final class GmPlayerReflectionUtils {
         return Modifier.isStatic(modifiers)
                 || Modifier.isTransient(modifiers)
                 || "player".equals(field.getName())
+                || "modules".equals(field.getName())
                 || "class".equals(field.getName());
     }
 

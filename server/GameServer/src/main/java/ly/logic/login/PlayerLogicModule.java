@@ -18,7 +18,7 @@ public class PlayerLogicModule extends AbstractModule {
 
     @Override
     public boolean saveData() {
-        return false;
+        return true;
     }
 
     @Override

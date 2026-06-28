@@ -35,6 +35,9 @@ public class RpcService {
 
   /** 获取某一类服务器的全部可用 RPC 连接器。 */
   public List<RpcNodeConnector> getRpcNodeConnectorsByServerType(ServerTypeEnum serverType) {
+    if (!isRpcConnectableType(serverType)) {
+      return new ArrayList<>();
+    }
     List<NacosServerNode> nodeList = NacosService.getInstance().getNodeList(serverType);
     List<RpcNodeConnector> rpcNodeConnectors = new ArrayList<>();
     nodeList.forEach(
@@ -49,6 +52,9 @@ public class RpcService {
 
   /** 根据 Nacos 节点信息创建连接器。 */
   private synchronized RpcNodeConnector createRpcNodeConnector(String serverId) {
+    if (serverId == null || serverId.isBlank() || serverId.equals(ly.ServerContext.getServerId())) {
+      return null;
+    }
     RpcNodeConnector existing = rpcNodeConnectorMap.get(serverId);
     if (existing != null && existing.isConnect()) {
       return existing;
@@ -57,6 +63,9 @@ public class RpcService {
     if (nacosServerNode == null) {
       LoggerDef.NetLogger.error(
           "RpcService createRpcNodeConnector NacosServerNode not found for serverId={}", serverId);
+      return null;
+    }
+    if (!isRpcConnectableType(nacosServerNode.getServerType())) {
       return null;
     }
     if (!nacosServerNode.canUse()) {
@@ -92,6 +101,13 @@ public class RpcService {
     if (serverId == null || serverId.isBlank()) {
       return;
     }
+    if (serverId.equals(ly.ServerContext.getServerId())) {
+      return;
+    }
+    NacosServerNode node = NacosService.getInstance().getNodeMap().get(serverId);
+    if (node != null && !isRpcConnectableType(node.getServerType())) {
+      return;
+    }
     Thread.ofVirtual()
         .name("reliable-rpc-replay-" + serverId)
         .start(() -> ReliableRpcStore.getInstance().replayForTarget(serverId));
@@ -123,7 +139,7 @@ public class RpcService {
             () -> {
               // 先尝试为当前 Nacos 缓存中的节点建立连接，再补发对应 outbox。
               for (ServerTypeEnum serverType : ServerTypeEnum.values()) {
-                if (serverType != ServerTypeEnum.UNKNOWN) {
+                if (isRpcConnectableType(serverType)) {
                   getRpcNodeConnectorsByServerType(serverType);
                 }
               }
@@ -155,11 +171,18 @@ public class RpcService {
   private void replayKnownTargets() {
     // Nacos 可能先通知节点上线，目标端口稍后才真正绑定；周期性重建连接可以覆盖这段窗口。
     for (ServerTypeEnum serverType : ServerTypeEnum.values()) {
-      if (serverType != ServerTypeEnum.UNKNOWN) {
+      if (isRpcConnectableType(serverType)) {
         getRpcNodeConnectorsByServerType(serverType);
       }
     }
     ReliableRpcStore.getInstance().replayAllAvailableTargets();
+  }
+
+  private boolean isRpcConnectableType(ServerTypeEnum serverType) {
+    return serverType != null
+        && serverType != ServerTypeEnum.UNKNOWN
+        && serverType != ServerTypeEnum.GM
+        && serverType != ServerTypeEnum.GMSERVER;
   }
 
   /** 周期心跳入口，由外部定时器每秒调用一次。 */

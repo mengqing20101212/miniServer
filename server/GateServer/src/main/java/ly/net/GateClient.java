@@ -39,7 +39,7 @@ public class GateClient {
     }
 
     public long getSessionGuid() {
-        return getAccountId();
+        return playerId > 0 ? playerId : getAccountId();
     }
 
     public int getClientSid() {

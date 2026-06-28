@@ -1,7 +1,7 @@
 package ly.net;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.Iterator;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 

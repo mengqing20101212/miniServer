@@ -62,10 +62,13 @@ public class Player {
             // 初始化玩家各个功能模块
             // 这里可以初始化装备、技能、任务等系统
 
-            TimeStatisticsUtils.TimeStatisticsLog log = TimeStatisticsUtils.makeLogBegin(String.format("Player-%s-%d-InitModules", getAccount(), getPlayerId()), 1000);
+            TimeStatisticsUtils.TimeStatisticsLog log = TimeStatisticsUtils
+                    .makeLogBegin(String.format("Player-%s-%d-InitModules", getAccount(), getPlayerId()), 1000);
 
             for (ModuleEnum moduleEnum : ModuleEnum.values()) {
-                TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()), 50);
+                TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(
+                        String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()),
+                        50);
                 byte[] moduleData = playerData.getModuleData(moduleEnum);
                 AbstractModule module = createModuleInstance(moduleEnum, moduleData);
                 module.init(this);
@@ -74,16 +77,25 @@ public class Player {
                 moduleInitLog.LogEnd();
             }
 
+            // 初始化完成后落一次模块快照，避免老号 modules 为空或新号只有空壳数据。
+            for (ModuleEnum moduleEnum : ModuleEnum.values()) {
+                AbstractModule module = playerData.getModule(moduleEnum);
+                if (module != null) {
+                    module.saveData();
+                }
+            }
+            playerData.getPlayerEntry().asyncUpdate();
+
             log.LogEnd();
 
             // 设置玩家状态为已初始化
-//            setStatus(PlayerStatusEnum.INITIALIZED);
+            // setStatus(PlayerStatusEnum.INITIALIZED);
 
             // 分发玩家初始化完成事件
-//            dispatchEvent(PlayerEventType.PLAYER_INIT_COMPLETE);
+            // dispatchEvent(PlayerEventType.PLAYER_INIT_COMPLETE);
         } catch (Exception e) {
             System.err.println("Error initializing modules for player " + getPlayerId() + ": " + e.getMessage());
-//            setStatus(PlayerStatusEnum.INIT_FAILED);
+            // setStatus(PlayerStatusEnum.INIT_FAILED);
         }
 
     }
@@ -134,9 +146,9 @@ public class Player {
         dispatchEvent(PlayerEventSource.SELF, getPlayerId(), playerEventType, args);
     }
 
-    public void dispatchEvent(PlayerEventSource source, long sourcePlayerId, PlayerEventType playerEventType, Object... args) {
-        PlayerEventParam param =
-                PlayerEventParam.of(this, playerEventType, source, sourcePlayerId, args);
+    public void dispatchEvent(PlayerEventSource source, long sourcePlayerId, PlayerEventType playerEventType,
+            Object... args) {
+        PlayerEventParam param = PlayerEventParam.of(this, playerEventType, source, sourcePlayerId, args);
         if (gamePlayer == null) {
             eventManager.dispatchEvent(param);
             return;
@@ -176,14 +188,16 @@ public class Player {
     }
 
     public void statPlay() {
-        LoggerDef.SystemLogger.info("[statPlay] starting tick thread, playerId={}, account={}", getPlayerId(), getAccount());
+        LoggerDef.SystemLogger.info("[statPlay] starting tick thread, playerId={}, account={}", getPlayerId(),
+                getAccount());
         Thread.ofVirtual().name(String.format("Player-%s-%d", getAccount(), getPlayerId())).start(() -> {
             tick();
         });
     }
 
     private void tick() {
-        LoggerDef.SystemLogger.info("[Player-tick] thread started, playerId={}, gamePlayer={}", getPlayerId(), gamePlayer != null);
+        LoggerDef.SystemLogger.info("[Player-tick] thread started, playerId={}, gamePlayer={}", getPlayerId(),
+                gamePlayer != null);
         try {
             while (true) {
                 try {

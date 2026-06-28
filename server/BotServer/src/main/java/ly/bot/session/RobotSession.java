@@ -1,6 +1,7 @@
 package ly.bot.session;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -155,6 +156,7 @@ public class RobotSession {
                 // 注意：这里不能直接修改final字段accountId和token，所以我们需要在连接时使用服务器返回的值
                 long returnedAccountId = serverListResult.getAccountId();
                 String returnedToken = serverListResult.getToken();
+                long returnedPlayerId = firstPlayerId(serverListResult);
                 if (gameServerId == null) {
                     gameServerId = serverListResult.getFirstGameServerId();
                 }
@@ -167,7 +169,7 @@ public class RobotSession {
 
                     // 连接到GateServer
                     connectToGateServer(gateServer.getServerIp(), gateServer.getServerPort(), returnedAccountId,
-                            returnedToken, gameServerId);
+                            returnedToken, gameServerId, returnedPlayerId);
                 } else {
                     logger.error("机器人 #{} 未获取到GateServer信息", botId);
                 }
@@ -205,6 +207,11 @@ public class RobotSession {
      * 连接到GateServer
      */
     private void connectToGateServer(String gateHost, int gatePort, long accountId, String token, String gameServerId) {
+        connectToGateServer(gateHost, gatePort, accountId, token, gameServerId, 0);
+    }
+
+    private void connectToGateServer(
+            String gateHost, int gatePort, long accountId, String token, String gameServerId, long playerId) {
         logger.info("机器人 #{} 正在连接GateServer {}:{}", botId, gateHost, gatePort);
 
         try {
@@ -213,7 +220,7 @@ public class RobotSession {
             gateClient.start(workerGroup);
 
             // 等待连接就绪
-            int maxWait = 50; // 最多等待5秒
+            int maxWait = 50;
             while (!gateClient.isReady() && maxWait > 0) {
                 Thread.sleep(100);
                 maxWait--;
@@ -230,7 +237,7 @@ public class RobotSession {
                 initializeModuleManager();
 
                 // 发送登录请求到GateServer，使用从服务器获取的所有必要信息
-                sendLoginToGateServer(accountId, token, gameServerId);
+                sendLoginToGateServer(accountId, token, gameServerId, playerId);
             } else {
                 logger.error("机器人 #{} 连接GateServer超时", botId);
             }
@@ -259,13 +266,17 @@ public class RobotSession {
      * 向GateServer发送登录请求
      */
     private void sendLoginToGateServer(long accountId, String token, String gameServerId) {
+        sendLoginToGateServer(accountId, token, gameServerId, 0);
+    }
+
+    private void sendLoginToGateServer(long accountId, String token, String gameServerId, long playerId) {
         logger.info("机器人 #{} 正在向GateServer发送登录请求", botId);
 
         try {
             // 使用命令模式创建登录命令，使用从服务器获取的账号ID和令牌
             RobotCommand loginCommand = RobotCommandFactory.createCommand(
                     RobotCommandFactory.CommandType.LOGIN,
-                    account, token, accountId, "robot_channel", "robot_device_" + botId, gameServerId);
+                    account, token, accountId, "robot_channel", "robot_device_" + botId, gameServerId, playerId);
 
             loginCommand.execute(gateClient, this);
 
@@ -291,6 +302,24 @@ public class RobotSession {
      */
     private void sendLoginToGateServer() {
         sendLoginToGateServer(this.accountId, this.token, null);
+    }
+
+    private long firstPlayerId(ly.bot.http.HttpServerListClient.ServerListResult serverListResult) {
+        if (serverListResult == null || serverListResult.getPlayers() == null || serverListResult.getPlayers().isEmpty()) {
+            return 0;
+        }
+        Object first = serverListResult.getPlayers().get(0);
+        if (first instanceof Map<?, ?> map) {
+            Object guid = map.get("guid");
+            if (guid instanceof Number number) {
+                return number.longValue();
+            }
+            Object playerId = map.get("playerId");
+            if (playerId instanceof Number number) {
+                return number.longValue();
+            }
+        }
+        return 0;
     }
 
     /**
