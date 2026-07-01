@@ -365,13 +365,10 @@ public class RobotSession {
     public void handleLoginResponse(AbstractMessagePacket response) {
         logger.info("机器人 #{} 收到登录响应: {}", botId, response);
 
-        // 根据响应内容判断登录是否成功
-        // 这里需要根据实际的响应格式进行处理
         if (response.getCmd() == Cmd.CMD.SC_Login_VALUE) {
             isLoginSuccess = true;
 
-            // 创建玩家信息对象（这里需要从响应数据中提取实际的玩家信息）
-            // 暂时使用默认值，实际应用中应从响应包中解析
+            // 从 SC_Login 中解析玩家信息；解析失败时 buildPlayerInfoFromLoginResponse 会使用账号信息兜底。
             this.playerInfo = buildPlayerInfoFromLoginResponse(response);
 
             logger.info("机器人 #{} 玩家信息已保存: {}", botId, playerInfo);

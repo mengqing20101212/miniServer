@@ -41,6 +41,17 @@ rg -n --glob '!**/target/**' --glob '!logs/**' --glob '!runlogs/**' --glob '!**/
 - 目录扫描、Jar 扫描、最终实体集合都固定顺序，减少无意义 diff。
 - 已重新生成当前跟踪的 `create-tables.sql` 文件。
 
+### BotServer 登录响应注释整理
+
+位置：
+
+- `server/BotServer/src/main/java/ly/bot/session/RobotSession.java`
+
+处理结果：
+
+- 清理了 `handleLoginResponse` 附近“暂时使用默认值”的旧注释。
+- 当前注释明确说明：Bot 会从 `SC_Login` 解析玩家信息，解析失败时使用账号信息兜底。
+
 ## P2
 
 ### BotServer CombatModule 仍然用移动 Action 代替战斗
@@ -58,22 +69,6 @@ rg -n --glob '!**/target/**' --glob '!logs/**' --glob '!runlogs/**' --glob '!**/
 - 等战斗协议稳定后新增 `CombatAction`。
 - `CombatModule` 只组织战斗相关 Action，不再复用移动行为。
 - 测试报告中增加战斗请求、战斗回包、失败码校验。
-
-### BotServer RobotSession 登录响应注释和实际实现需要整理
-
-位置：
-
-- `server/BotServer/src/main/java/ly/bot/session/RobotSession.java`
-
-现状：
-
-- `handleLoginResponse` 附近还有旧注释，描述为“暂时使用默认值”。
-- 实际代码已经通过 `buildPlayerInfoFromLoginResponse` 解析 `SC_Login`。
-
-建议：
-
-- 清理旧注释，改成当前真实行为。
-- 如果 `SC_Login` 后续补充更多玩家基础字段，统一在 `buildPlayerInfoFromLoginResponse` 中解析。
 
 ## P3
 
@@ -101,4 +96,3 @@ rg -n --glob '!**/target/**' --glob '!logs/**' --glob '!runlogs/**' --glob '!**/
 - 历史变更文档里的“临时 force reset”记录。
 - `ConfigService` 关闭临时 `JarFile` 的注释。
 - `LoginController` 关于数据库记录暂时不可用时读取 Redis 缓存的说明。
-
