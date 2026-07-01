@@ -1,7 +1,5 @@
 package ly.bot.module.impl;
 
-import ly.bot.command.RobotCommand;
-import ly.bot.factory.RobotCommandFactory;
 import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
@@ -17,13 +15,8 @@ public class LoginModule implements RobotModule {
     public boolean executeStep(NetClient client, RobotSession session) {
         // 登录通常在初始化时完成，这里只是标记为已完成
         if (step == 0) {
-            // 如果尚未登录，则发送登录请求
+            // 登录请求由 RobotSession 主流程发送，这里只记录等待状态。
             if (!session.isLoginSuccess()) {
-                RobotCommand loginCommand = RobotCommandFactory.createCommand(
-                    RobotCommandFactory.CommandType.LOGIN
-                );
-                loginCommand.execute(client, session);
-                
                 // 存储登录相关的数据到会话级别存储
                 session.getDataStore().put("login", "loginStartTime", System.currentTimeMillis());
                 session.getDataStore().put("login", "loginAttemptCount", 1);

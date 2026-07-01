@@ -14,10 +14,13 @@ import com.google.protobuf.AbstractMessage;
 
 import io.netty.channel.EventLoopGroup;
 import ly.LoggerDef;
-import ly.bot.command.RobotCommand;
+import ly.bot.action.RobotActionContext;
+import ly.bot.action.RobotActionResult;
+import ly.bot.action.impl.HeartbeatAction;
+import ly.bot.action.impl.LoginAction;
+import ly.bot.action.impl.MoveAction;
 import ly.bot.data.RobotSessionDataStore;
 import ly.bot.entity.PlayerInfo;
-import ly.bot.factory.RobotCommandFactory;
 import ly.bot.module.ModuleManager;
 import ly.bot.module.RobotModule;
 import ly.bot.module.impl.HeartbeatModule;
@@ -273,12 +276,20 @@ public class RobotSession {
         logger.info("机器人 #{} 正在向GateServer发送登录请求", botId);
 
         try {
-            // 使用命令模式创建登录命令，使用从服务器获取的账号ID和令牌
-            RobotCommand loginCommand = RobotCommandFactory.createCommand(
-                    RobotCommandFactory.CommandType.LOGIN,
-                    account, token, accountId, "robot_channel", "robot_device_" + botId, gameServerId, playerId);
-
-            loginCommand.execute(gateClient, this);
+            LoginAction loginAction =
+                    new LoginAction(
+                            account,
+                            token,
+                            accountId,
+                            "robot_channel",
+                            "robot_device_" + botId,
+                            gameServerId,
+                            playerId);
+            RobotActionResult result = loginAction.execute(new RobotActionContext(gateClient, this));
+            if (!result.isSuccess()) {
+                logger.error("机器人 #{} 登录 Action 执行失败: {}", botId, result.getMessage());
+                return;
+            }
 
             logger.info("机器人 #{} 登录请求已发送", botId);
 
@@ -462,15 +473,11 @@ public class RobotSession {
             switch (actionType) {
                 case 0:
                     // 发送心跳
-                    RobotCommand heartbeatCmd = RobotCommandFactory.createCommand(
-                            RobotCommandFactory.CommandType.HEARTBEAT);
-                    heartbeatCmd.execute(gateClient, this);
+                    new HeartbeatAction().execute(new RobotActionContext(gateClient, this));
                     break;
                 case 1:
                     // 发送移动
-                    RobotCommand moveCmd = RobotCommandFactory.createCommand(
-                            RobotCommandFactory.CommandType.MOVE);
-                    moveCmd.execute(gateClient, this);
+                    new MoveAction().execute(new RobotActionContext(gateClient, this));
                     break;
                 case 2:
                     // 其他行为
@@ -604,24 +611,17 @@ public class RobotSession {
      */
     private void handleResponse(AbstractMessagePacket response) {
         try {
-            // 根据命令类型创建相应的命令对象并处理响应
-            ly.bot.command.RobotCommand command = null;
             switch (response.getCmd()) {
                 case ly.proto.Cmd.CMD.SC_Login_VALUE:
                     handleLoginResponse(response);
                     return;
                 case ly.proto.Cmd.CMD.SC_RpcPing_VALUE: // RPC心跳响应
-                    command = ly.bot.factory.RobotCommandFactory
-                            .createCommand(ly.bot.factory.RobotCommandFactory.CommandType.HEARTBEAT);
-                    break;
+                    new HeartbeatAction().onResponse(response, new RobotActionContext(gateClient, this));
+                    return;
                 default:
                     // 对于未知响应，可以根据需要创建通用处理命令
                     logger.debug("收到未知命令响应: {}", response.getCmd());
                     return;
-            }
-
-            if (command != null) {
-                command.onResponse(response, gateClient, this); // 传递this作为RobotSession实例
             }
         } catch (Exception e) {
             logger.error("处理响应异常", e);

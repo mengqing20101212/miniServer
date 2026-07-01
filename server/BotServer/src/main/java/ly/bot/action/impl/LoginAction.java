@@ -23,15 +23,22 @@ public class LoginAction implements RobotAction {
     private final String channel;
     private final String deviceId;
     private final String gameServerId;
+    private final long playerId;
     private String actionId;
 
     public LoginAction(String account, String token, long accountId, String channel, String deviceId, String gameServerId) {
+        this(account, token, accountId, channel, deviceId, gameServerId, 0);
+    }
+
+    public LoginAction(
+            String account, String token, long accountId, String channel, String deviceId, String gameServerId, long playerId) {
         this.account = account;
         this.token = token;
         this.accountId = accountId;
         this.channel = channel;
         this.deviceId = deviceId;
         this.gameServerId = gameServerId;
+        this.playerId = playerId;
     }
 
     @Override
@@ -47,7 +54,8 @@ public class LoginAction implements RobotAction {
                     .setChannel(channel)
                     .setToken(token)
                     .setDeviceId(deviceId)
-                    .setIsReconnect(false);
+                    .setPlayerId(playerId)
+                    .setIsReconnect(playerId > 0);
             loginBuilder.setGameServerId(gameServerId != null && !gameServerId.isEmpty() ? gameServerId : "game1001");
 
             AbstractMessagePacket packet = context.getSession().createPacket(requestCmd(), loginBuilder.build());

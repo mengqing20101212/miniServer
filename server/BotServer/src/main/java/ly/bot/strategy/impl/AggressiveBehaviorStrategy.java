@@ -2,8 +2,8 @@ package ly.bot.strategy.impl;
 
 import ly.bot.strategy.RobotBehaviorStrategy;
 import ly.net.NetClient;
-import ly.bot.command.RobotCommand;
-import ly.bot.factory.RobotCommandFactory;
+import ly.bot.action.RobotActionContext;
+import ly.bot.action.impl.HeartbeatAction;
 import ly.bot.session.RobotSession;
 import org.slf4j.Logger;
 import ly.LoggerDef;
@@ -16,17 +16,7 @@ public class AggressiveBehaviorStrategy implements RobotBehaviorStrategy {
     
     @Override
     public void execute(NetClient client, RobotSession session) {
-        // 执行一系列命令
-        RobotCommand loginCmd = RobotCommandFactory.createCommand(
-            RobotCommandFactory.CommandType.LOGIN,
-            "robot_user_aggressive",
-            "robot_token_aggressive", 
-            1000001L,
-            "robot_channel",
-            "robot_device_aggressive"
-        );
-        loginCmd.execute(client, session);
-        
+        new HeartbeatAction().execute(new RobotActionContext(client, session));
         logger.debug("执行激进型行为策略");
     }
     

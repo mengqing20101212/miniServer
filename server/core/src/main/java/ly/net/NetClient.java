@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 到远端服务器节点的 TCP 客户端。
  * <p>
- * 主要用于服务器间 RPC，也可用于测试客户端。发送时会自动维护 seq；接收包进入本地队列，
- * 同步 RPC 通过 seq 和响应 cmd 从队列中匹配结果。
+ * 主要用于服务器间 RPC，也可用于测试客户端。发送时会自动维护链路 seq；接收包进入本地队列。
+ * 同步 RPC 必须通过业务层 callId 匹配结果，seq 只用于链路日志和客户端包顺序排查。
  */
 public class NetClient {
     static Logger logger = LoggerDef.NetLogger;
@@ -285,23 +285,6 @@ public class NetClient {
 
     public int getSid() {
         return sid;
-    }
-
-    /**
-     * 从接收队列中查找指定请求的响应包。
-     * <p>
-     * 当前实现会扫描队列并移除匹配项；非匹配包会保留在队列中，供后续业务继续读取。
-     */
-    public AbstractMessagePacket getReceiveMsgBySeq(int sendSeq, int cmd) {
-        Iterator<AbstractMessagePacket> iterator = receivePacketQueue.iterator();
-        while (iterator.hasNext()) {
-            AbstractMessagePacket packet = iterator.next();
-            if (packet.getSeq() == sendSeq && packet.getCmd() == cmd) {
-                iterator.remove();
-                return packet;
-            }
-        }
-        return null;
     }
 
 }

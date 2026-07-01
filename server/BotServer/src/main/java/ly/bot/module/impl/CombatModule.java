@@ -1,7 +1,7 @@
 package ly.bot.module.impl;
 
-import ly.bot.command.RobotCommand;
-import ly.bot.factory.RobotCommandFactory;
+import ly.bot.action.RobotActionContext;
+import ly.bot.action.impl.MoveAction;
 import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
@@ -19,12 +19,8 @@ public class CombatModule implements RobotModule {
     
     @Override
     public boolean executeStep(NetClient client, RobotSession session) {
-        // 执行战斗相关命令
-        // 这里我们假设有一个战斗命令，暂时使用移动命令替代
-        RobotCommand combatCommand = RobotCommandFactory.createCommand(
-            RobotCommandFactory.CommandType.MOVE  // 暂时使用移动命令，实际应用中应有专门的战斗命令
-        );
-        combatCommand.execute(client, session);
+        // 暂时使用移动 Action 代替战斗行为，后续接入真实战斗协议时替换这里。
+        new MoveAction().execute(new RobotActionContext(client, session));
         
         // 存储战斗相关的数据到会话级别存储
         session.getDataStore().put("combat", "lastCombatActionTime", System.currentTimeMillis());

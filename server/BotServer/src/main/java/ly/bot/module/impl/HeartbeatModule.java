@@ -1,7 +1,8 @@
 package ly.bot.module.impl;
 
-import ly.bot.command.RobotCommand;
-import ly.bot.factory.RobotCommandFactory;
+import ly.bot.action.RobotActionContext;
+import ly.bot.action.RobotActionResult;
+import ly.bot.action.impl.HeartbeatAction;
 import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
@@ -16,11 +17,10 @@ public class HeartbeatModule implements RobotModule {
     
     @Override
     public boolean executeStep(NetClient client, RobotSession session) {
-        // 发送心跳包
-        RobotCommand heartbeatCommand = RobotCommandFactory.createCommand(
-            RobotCommandFactory.CommandType.HEARTBEAT
-        );
-        heartbeatCommand.execute(client, session);
+        RobotActionResult result = new HeartbeatAction().execute(new RobotActionContext(client, session));
+        if (!result.isSuccess()) {
+            return false;
+        }
         
         // 存储心跳相关的数据到会话级别存储
         session.getDataStore().put("heartbeat", "lastHeartbeatTime", System.currentTimeMillis());
