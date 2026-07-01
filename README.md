@@ -1,451 +1,267 @@
-# MiniServer - 分布式游戏服务器框架
+# MiniServer
 
-基于 Nacos 实现的高性能、可扩展的分布式游戏服务器框架，专为卡牌、肉鸽(Roguelike)和棋牌类游戏设计。
+MiniServer 是一个 Java 21 + Maven 多模块游戏服务器工程，核心目标是把网关、登录、游戏逻辑、GM 后台、机器人测试、协议生成、配置表生成等能力放在同一个可本地联调的仓库中。
 
-## 🚀 特性
+当前工程以 `server/pom.xml` 作为 Maven 聚合入口，运行时依赖 Nacos、MySQL、Redis/KeyDB，通信层基于 Netty，业务协议使用 protobuf 生成代码，GM 和 LoginServer 使用 Spring Boot。
 
-- **微服务架构**: 基于 Nacos 实现服务注册与发现，支持动态扩缩容
-- **高性能网络**: 使用 Netty 作为底层网络框架，支持高并发连接
-- **虚拟线程**: 利用 Java 19+ 虚拟线程提升并发性能，降低资源消耗
-- **灵活配置**: Excel 配置表自动转换为 Java 配置类，支持热更新
-- **协议支持**: 基于 Protobuf 的高效数据序列化，支持多种消息格式
-- **多服务器类型**: 支持登录、网关、游戏等多种服务器角色，职责分离
-- **分布式锁**: 基于 Redis 的分布式锁机制，保证数据一致性
-- **RPC通信**: 服务器间远程过程调用支持，实现服务间通信
-- **序列号校验**: 实现消息序列号校验机制，防止网络丢包
-- **异步处理**: 消息异步队列机制，提升处理效率
+## 目录结构
 
-## 🏗️ 系统架构
-
-![系统架构图](server/doc/serverStage.png)
-
-### 服务器类型详解
-
-- **LoginServer**: 基于 Spring Boot 的登录认证服务器，负责用户认证和会话管理
-  - 用户登录验证
-  - Token生成与验证
-  - 会话管理
-  - 服务器分配策略
-
-- **GateServer**: 网关服务器，处理客户端连接和消息转发
-  - 客户端连接管理
-  - 消息路由与转发
-  - 连接状态监控
-  - 流量控制与限流
-
-- **GameServer**: 游戏逻辑服务器，处理具体业务逻辑
-  - 游戏业务逻辑处理
-  - 玩家数据管理
-  - 游戏房间管理
-  - 实时对战逻辑
-
-- **CenterServer**: 中心服务器，处理全局逻辑
-  - 全局排行榜
-  - 活动管理
-  - 全服公告
-  - 跨服交互
-
-- **ChatServer**: 聊天服务器，专门处理聊天功能
-  - 公聊私聊
-  - 聊天过滤
-  - 消息持久化
-  - 聊天频道管理
-
-### 核心组件详解
-
-#### 网络层
-- `NetService`: 网络服务管理器，管理Netty服务器和连接会话
-- `ConnectSession`: 连接会话管理，封装客户端连接状态和消息队列
-- `HandlerRouterManager`: 消息处理器路由管理，根据CMD路由到对应处理器
-- `NetServer`: Netty服务器封装，处理网络IO事件
-- `ClientHandler`: 客户端消息处理器，处理连接建立、断开和消息收发
-
-#### 配置层
-- `ConfigService`: 配置服务管理器，负责加载所有配置
-- `ParserExcelConfig`: Excel配置表解析器，将Excel转换为文本配置
-- `ServerConfig`: 服务器配置类，包含服务器IP、端口、数据库等配置
-- `AbstractConfigManger`: 抽象配置管理器，提供通用配置加载逻辑
-- `InterfaceConfigManagerProxy`: 配置管理代理接口，支持热更新
-
-#### RPC层
-- `RpcService`: RPC服务管理，维护服务器间连接池
-- `RpcNodeConnector`: 服务器节点连接器，管理与其他服务器的连接
-- `RpcUtils`: RPC工具类，提供同步和异步调用方法
-- `NacosService`: Nacos服务发现与配置管理，实现服务注册与发现
-
-#### 数据存储
-- `MysqlService`: MySQL数据库服务，提供数据库连接和操作
-- `RedisUtils`: Redis缓存工具，提供常用缓存操作
-- `RedisKeys`: Redis键值管理，定义所有Redis键的命名规范
-- `MysqlConnector`: MySQL连接器，管理数据库连接池
-
-#### 核心框架
-- `ServerContext`: 服务器上下文，管理服务器全局状态
-- `ConnectSession`: 连接会话基类，管理客户端连接状态
-- `Connector`: 连接器，封装底层网络连接
-- `LoggerDef`: 日志定义，统一日志输出格式
-
-## 📁 项目结构详解
-
-```
+```text
 miniServer/
-├── excel/                 # Excel配置表
-│   ├── serverConfig/      # 生成的配置文本文件
-│   └── *.xlsx             # 原始Excel配置表（策划表）
-├── logs/                  # 日志文件
-│   ├── net.log            # 网络层日志
-│   └── system.log         # 系统运行日志
-├── proto/                 # Protocol Buffers定义
-│   ├── bin/               # protoc编译器
-│   ├── Cmd.proto          # 命令枚举定义
-│   ├── Login.proto        # 登录协议定义
-│   ├── ErrorMsg.proto     # 错误消息定义
-│   ├── Server.proto       # 服务器间通信协议
-│   └── *.proto            # 其他协议定义
-├── server/                # 服务器源码根目录
-│   ├── config/            # 配置管理模块
-│   │   ├── src/main/java/ly/config/
-│   │   │   ├── *.java     # 各种配置类（自动生成）
-│   │   │   ├── ServerConfig.java    # 服务器配置
-│   │   │   └── DbConfig.java        # 数据库配置
-│   │   └── pom.xml        # Maven配置
-│   ├── core/              # 核心框架模块
-│   │   ├── src/main/java/ly/          # 核心类
-│   │   │   ├── ServerContext.java     # 服务器上下文
-│   │   │   ├── IServer.java           # 服务器接口
-│   │   │   ├── Main.java              # 启动入口
-│   │   │   ├── LoggerDef.java         # 日志定义
-│   │   │   └── utils/                 # 工具类
-│   │   ├── src/main/java/ly/cache/    # 缓存服务
-│   │   ├── src/main/java/ly/config/   # 配置管理
-│   │   ├── src/main/java/ly/db/       # 数据库访问
-│   │   ├── src/main/java/ly/game/     # 游戏逻辑
-│   │   ├── src/main/java/ly/net/      # 网络层
-│   │   ├── src/main/java/ly/nacos/    # Nacos服务
-│   │   ├── src/main/java/ly/redis/    # Redis服务
-│   │   ├── src/main/java/ly/rpc/      # RPC服务
-│   │   ├── src/main/resources/        # 资源文件
-│   │   └── pom.xml        # Maven配置
-│   ├── GameServer/        # 游戏服务器
-│   │   ├── src/main/java/ly/          # 游戏服务器主类
-│   │   ├── src/main/java/ly/logic/    # 游戏业务逻辑
-│   │   ├── src/main/java/ly/net/      # 游戏服务器网络层
-│   │   └── pom.xml        # Maven配置
-│   ├── GateServer/        # 网关服务器
-│   │   ├── src/main/java/ly/          # 网关服务器主类
-│   │   ├── src/main/java/ly/logic/    # 网关业务逻辑
-│   │   ├── src/main/java/ly/net/      # 网关网络层
-│   │   └── pom.xml        # Maven配置
-│   ├── LoginServer/       # 登录服务器
-│   │   ├── src/main/java/ly/loginserver/ # 登录服务器主类
-│   │   ├── src/main/resources/        # Spring Boot配置
-│   │   └── pom.xml        # Maven配置
-│   ├── proto/             # 协议处理模块
-│   │   ├── src/main/java/ly/proto/    # 生成的协议类
-│   │   └── pom.xml        # Maven配置
-│   ├── tool/              # 工具模块
-│   │   ├── src/main/java/ly/          # 各种工具类
-│   │   │   ├── ParserExcelConfig.java # Excel解析器
-│   │   │   ├── ParserProto.java       # 协议解析器
-│   │   │   └── ToolMain.java          # 工具主入口
-│   │   └── pom.xml        # Maven配置
-│   └── doc/               # 文档目录
-│       ├── serverStage.png # 系统架构图
-│       └── serverStage.puml # PlantUML源码
-├── README.md              # 项目说明文档
-└── .gitignore             # Git忽略文件配置
+├── server/                 # Maven 聚合工程，主要 Java 代码都在这里
+│   ├── config/             # 策划配置表生成代码、ConfigManager、热更相关逻辑
+│   ├── proto/              # protobuf 生成后的 Java 协议类和协议工厂
+│   ├── tool/               # 协议、配置表、DB Entry 等代码生成工具
+│   ├── core/               # 网络、RPC、Nacos、Redis、MySQL、日志、排行等公共能力
+│   ├── LoginServer/        # 登录、注册、服务器列表、账号角色绑定
+│   ├── GameServer/         # 游戏主逻辑、玩家对象、模块数据、GM 玩家编辑 RPC
+│   ├── GateServer/         # 客户端网关、连接管理、转发 GameServer
+│   ├── BotServer/          # 机器人客户端、Module/Action 测试框架
+│   └── GMServer/           # GM 后台、权限、菜单、操作日志、配表热更、玩家详情
+├── proto/                  # protobuf 源定义和 proto_win.bat 生成脚本
+├── excel/                  # 策划配置表和运行时 txt 配表
+├── generated-sql/          # 生成的建表 SQL，属于跟踪文件，不要当临时文件删除
+├── docs/                   # 项目索引、开发流程、源码索引等文档
+├── logs/                   # 当前或历史运行日志
+├── runlogs/                # 本地联调运行日志
+└── STARTUP.SKILL.md        # 本地启动参数、启动顺序、校验规则
 ```
 
-## 🛠️ 快速开始
+## 模块说明
 
-### 环境要求
+| 模块 | 职责 |
+| --- | --- |
+| `core` | 公共运行时基础能力，包括 Netty 网络、RPC、Nacos、MySQL、Redis、日志、通用排行榜、死锁检测、服务器上下文等。 |
+| `config` | 配置表模型、Manager、Checker、A/B 版本热更加载与切换逻辑。 |
+| `proto` | 由根目录 `proto/*.proto` 生成的 Java 协议类，以及 `ProtoMessageFactory`。 |
+| `tool` | 离线代码生成工具，包括协议工厂生成、配置表代码生成、DB Entry/Helper/SQL 生成。 |
+| `LoginServer` | Spring Boot 登录服务，提供账号登录、角色列表、服务器列表，并维护账号与玩家 ID 绑定。 |
+| `GateServer` | 客户端接入网关，维护客户端 socket、SID、下行 seq，并把客户端包封装转发到 GameServer。 |
+| `GameServer` | 游戏主逻辑服务，维护在线玩家、玩家模块、统一任务队列、协程调用、GM 玩家数据编辑等。 |
+| `BotServer` | 机器人客户端，用 Module/Action 组织登录、移动、英雄等业务验证。 |
+| `GMServer` | Spring Boot GM 后台，包含管理员、角色、菜单、操作日志、安全管理、配表热更、在线玩家详情编辑等页面。 |
 
-- **Java**: 19+ (推荐使用最新LTS版本)
-- **Maven**: 3.6.0+
-- **Nacos**: 2.x (推荐2.2.0+)
-- **MySQL**: 5.7+ 或 8.0+
-- **Redis**: 6.0+
-- **操作系统**: Linux/macOS/Windows
+## 环境要求
 
-### 启动准备
+- JDK 21
+- Maven 3.9 或兼容版本
+- MySQL
+- Redis 或 KeyDB
+- Nacos 2.x
 
-1. **安装依赖服务**
-   ```bash
-   # 安装并启动 Nacos
-   docker run --name nacos-standalone -e MODE=standalone -p 8848:8848 -d nacos/nacos-server:latest
-   
-   # 安装并启动 MySQL
-   docker run --name mysql-game -e MYSQL_ROOT_PASSWORD=root123 -e MYSQL_DATABASE=gamedb -p 3306:3306 -d mysql:8.0
-   
-   # 安装并启动 Redis
-   docker run --name redis-game -p 6379:6379 -d redis:latest
-   ```
+本地调试时建议统一使用同一个 JDK 路径，避免 VSCode、命令行、脚本混用不同 Java 版本。
 
-2. **克隆项目**
-   ```bash
-   git clone <repository-url>
-   cd miniServer
-   ```
+## 构建
 
-3. **编译项目**
-   ```bash
-   cd server
-   mvn clean install -DskipTests
-   ```
+推荐从 `server/` 目录构建：
 
-### 启动各服务器模块
-
-#### 启动配置服务器 (Config Server)
-```bash
-cd config
-mvn compile exec:java -Dexec.mainClass="ly.Main"
+```powershell
+cd server
+mvn -DskipTests install
 ```
 
-#### 启动网关服务器 (Gate Server)
-```bash
-cd ../GateServer
-java -cp target/gateserver-1.0-SNAPSHOT.jar ly.GateServer localhost:8848 ly gate1001
+只编译部分模块时使用 `-pl` 和 `-am`：
+
+```powershell
+cd server
+mvn -DskipTests compile -pl GameServer -am
+mvn -DskipTests compile -pl GateServer -am
+mvn -DskipTests compile -pl BotServer -am
+mvn -DskipTests compile -pl GMServer -am
 ```
 
-#### 启动游戏服务器 (Game Server)
-```bash
-cd ../GameServer
-java -cp target/gameserver-1.0-SNAPSHOT.jar ly.GameServer localhost:8848 ly game1001
+如果 VSCode 出现 Java 编译缓存和 Maven 不一致，可以执行 `Java: Clean Java Language Server Workspace` 后重新导入。
+
+## 协议生成
+
+协议源文件位于根目录 `proto/`：
+
+```text
+proto/
+├── Cmd.proto
+├── Common.proto
+├── ErrorMsg.proto
+├── GmPlayer.proto
+├── Hero.proto
+├── Login.proto
+├── Move.proto
+├── Resource.proto
+└── Server.proto
 ```
 
-#### 启动登录服务器 (Login Server)
-```bash
-cd ../LoginServer
-./mvnw spring-boot:run
+Windows 下使用：
+
+```powershell
+cd proto
+.\proto_win.bat
 ```
 
-### 配置表管理
+脚本会执行两步：
 
-本框架支持将 Excel 配置表自动转换为 Java 配置类：
+1. 调用 `proto/bin/protoc.exe` 生成 `server/proto/src/main/java` 下的协议 Java 类。
+2. 调用 `tool-1.0-SNAPSHOT.jar ParserProto` 生成协议工厂。
 
-1. **Excel格式要求**
-   - 第1行：服务器字段名
-   - 第2行：客户端字段名
-   - 第3行：数据类型（INT, STRING, DOUBLE等）
-   - 第4行：字段注释
-   - 第5行：预留行
-   - 第6行开始：数据内容，首列标记为"#"表示有效数据
+协议命名需要和当前工具链保持一致。新增协议后要同步检查 `Cmd.proto`、协议消息名、生成后的 `ProtoMessageFactory`。
 
-2. **转换配置表**
-   ```bash
-   cd server/tool
-   mvn compile exec:java -Dexec.mainClass="ly.ToolMain" -Dexec.args="parserExcelConfig ../../excel"
-   ```
+## 配置表和生成代码
 
-3. **自定义配置类**
-   生成的配置类中包含自定义区域标记：
-   ```java
-   // @@@@@自定义属性开始区@@@@@
-   // 在此处添加自定义属性
-   // @@@@@自定义属性结束区@@@@@
-   
-   // @@@@@自定义方法开始区@@@@@
-   // 在此处添加自定义方法
-   // @@@@@自定义方法结束区@@@@@
-   ```
+策划配置源数据放在 `excel/`，运行时使用的 txt 配表也在该目录体系下。配置表相关代码由 `tool` 模块生成，主要产物在：
 
-### Nacos配置
+- `server/config/src/main/java/ly/config`
+- `server/config/src/main/java/ly/config/*ConfigManager*`
+- `server/config/src/main/java/ly/config/*Checker*`
 
-在Nacos中需要配置以下内容：
+当前配置表热更采用 A/B 版本切换思路：启动时加载一个版本，热更时加载备用版本，通过 GM 发布版本和切换时间，各服务器加载、检测成功后到点统一切换。
 
-1. **网关服务器配置** (Data ID: gate1001, Group: GATE)
-   ```yaml
-   configPath: "/path/to/config"
-   db:
-     jdbcUrl: "jdbc:mysql://localhost:3306/gamedb"
-     userName: "root"
-     passWord: "root123"
-   redis:
-     host: "localhost"
-     port: 6379
-   serverPort: 9001
-   serverIp: "127.0.0.1"
-   runModule: "production"
-   ```
+## 本地启动
 
-2. **游戏服务器配置** (Data ID: game1001, Group: GAME)
-   ```yaml
-   configPath: "/path/to/config"
-   db:
-     jdbcUrl: "jdbc:mysql://localhost:3306/gamedb"
-     userName: "root"
-     passWord: "root123"
-   redis:
-     host: "localhost"
-     port: 6379
-   serverPort: 9002
-   serverIp: "127.0.0.1"
-   runModule: "production"
-   ```
+本地启动参数以 `STARTUP.SKILL.md` 为准。当前规范参数：
 
-## 🔧 技术栈
+| 服务 | serverId | 端口 | 启动参数 |
+| --- | --- | --- | --- |
+| LoginServer | `login` | Net `8888`，HTTP `8889` | `--loginserver.nacosUrl=118.25.76.117:8848` |
+| GameServer | `game1001` | Net `9002` | `118.25.76.117:8848 ly game1001` |
+| GateServer | `gate1001` | Net `9001` | `118.25.76.117:8848 ly gate1001` |
+| GMServer | `gmServer` | Net `9088`，HTTP `9090` | 见 GMServer 配置和 Nacos |
+| BotServer | - | - | `--run-bots 127.0.0.1 8889 1` |
 
-### 后端技术
-- **语言**: Java 19+ (利用虚拟线程等新特性)
-- **框架**: 
-  - Spring Boot 3.x (登录服务器)
-  - Netty 4.x (网络通信)
-- **序列化**: Google Protocol Buffers 3.x
-- **注册中心**: Alibaba Nacos 2.x
-- **数据库**: MySQL 8.0+
-- **缓存**: Redis 6.0+
-- **构建工具**: Maven 3.6+
+启动顺序：
 
-### 核心依赖
-- **Netty**: 高性能网络通信框架
-- **Alibaba Nacos**: 服务发现与配置管理
-- **Google Protobuf**: 高效数据序列化
-- **Apache POI**: Excel文件处理
-- **SLF4J + Log4j2**: 日志框架
+1. LoginServer
+2. GameServer
+3. GateServer
+4. GMServer
+5. BotServer
 
-### 开发工具
-- **IDE**: IntelliJ IDEA / Eclipse
-- **版本控制**: Git
-- **容器化**: Docker (可选)
-- **性能监控**: JProfiler / VisualVM
+BotServer 必须等 Login、Game、Gate 都真正监听成功后再启动。
 
-## 📊 性能特性
+VSCode 已配置常用启动项：
 
-### 高并发支持
-- **虚拟线程**: 利用Java 19+的虚拟线程特性，大幅提升并发处理能力
-- **Netty优化**: 基于Netty的事件驱动模型，实现高效的异步IO
-- **连接池**: 数据库和Redis连接池优化，减少连接开销
+- `Debug LoginServer`
+- `Debug GameServer`
+- `Debug GateServer`
+- `Debug BotServer`
+- `Debug Backend Core`
+- `Debug Full Stack With Bot`
 
-### 低延迟设计
-- **异步队列**: 消息异步处理，避免阻塞主线程
-- **批量操作**: SQL批量执行优化，提升数据库性能
-- **缓存策略**: 多级缓存设计，减少数据库访问
+## 运行时约定
 
-### 可靠性保障
-- **序列号校验**: 实现消息序列号校验，防止网络丢包
-- **分布式锁**: 基于Redis的分布式锁，保证数据一致性
-- **心跳机制**: 服务器间心跳检测，及时发现故障节点
+### Nacos
 
-### 扩展性设计
-- **微服务架构**: 模块化设计，支持独立部署和扩展
-- **服务发现**: 基于Nacos的服务自动发现和注册
-- **负载均衡**: 支持多服务器实例的负载分发
+业务运行配置来自 Nacos。不要把旧文档里的 localhost 配置直接覆盖当前远程 Nacos 参数。当前本地联调默认 Nacos 地址是：
 
-## 🤝 支持的游戏类型
-
-### 卡牌游戏
-- 卡牌配置管理
-- 卡组构建系统
-- 战斗逻辑处理
-- 抽卡系统
-
-### 肉鸽(Roguelike)游戏
-- 随机地图生成
-- 角色成长系统
-- 道具系统
-- 关卡管理
-
-### 棋牌游戏
-- 房间匹配系统
-- 实时对战逻辑
-- 积分排名系统
-- 机器人AI
-
-### 扩展支持
-框架设计灵活，可通过以下方式扩展支持其他游戏类型：
-- 自定义协议定义
-- 新增业务逻辑模块
-- 扩展配置表结构
-- 添加新的服务器类型
-
-## 📄 协议说明
-
-### 消息格式规范
-- **双数CMD**: 客户端请求消息 (C2S)
-- **单数CMD**: 服务器响应消息 (S2C)  
-- **10000-20000**: 服务器间通信专用 (S2S)
-
-### 协议定义示例
-
-#### 登录协议 (Login.proto)
-```protobuf
-message csLogin {
-  string account = 1;      // 账号
-  string token = 2;        // 登录令牌
-  int64 accountId = 3;     // 账号ID
-  int64 playerId = 4;      // 玩家ID
-  string gameServerId = 5; // 目标游戏服务器ID
-}
-
-message scLogin {
-  int32 retCode = 1;       // 返回码
-  string message = 2;      // 返回消息
-  int64 playerId = 3;      // 玩家ID
-}
+```text
+118.25.76.117:8848
+namespace/env: ly
 ```
 
-#### 错误消息协议 (ErrorMsg.proto)
-```protobuf
-enum ErrorCode {
-  Ok = 0;                    // 成功
-  Failed = 1;                // 失败
-  system_error = 2;          // 系统错误
-  param_error = 3;           // 参数错误
-  account_error = 4;         // 账号错误
-  password_error = 5;        // 密码错误
-  account_forbidden = 6;     // 账号被禁用
-  account_online = 7;        // 账号已登录
-  account_not_register = 8;  // 账号未注册
-}
+### Redis/KeyDB
+
+Redis/KeyDB 需要可写。如果实例处于 replica/slave 且只读，排行榜、可靠 RPC、登录缓存等写操作会失败。
+
+### Gate、Game、SID、Seq
+
+- SID 用来标识客户端当前连接到 Gate 的 socket。
+- Gate 转发客户端上行包到 Game 时，会把客户端 SID 和客户端上行 seq 放进二次封装协议。
+- Game 处理业务时使用客户端 SID 做日志和玩家连接定位。
+- 下行 seq 由 Gate 面向客户端统一维护，用来帮助客户端发现下行包乱序或丢包。
+- RPC 回包匹配应使用 `callId`，不要再用 seq 作为 RPC 回调唯一标识。
+
+### GamePlayer 任务模型
+
+GamePlayer 内部使用统一 FIFO 队列处理：
+
+- 客户端上行 packet
+- 玩家自身事件
+- 其他玩家或模块投递的事件
+- 系统全局事件
+- 玩家协程任务
+
+这样可以保证同一个玩家对象上的业务按入队顺序串行执行，降低并发读写玩家数据的风险。
+
+### GM 玩家详情
+
+GM 玩家详情页用于查看和编辑在线玩家数据：
+
+- 玩家必须在线才允许编辑。
+- 玩家所在 GameServer 从 Redis 中查询。
+- 模块数据按玩家模块展开。
+- 编辑请求通过 GMServer RPC 到 GameServer，再投递到玩家队列内执行。
+- `PlayerEntry.modules` 是序列化大字段，页面不展示该字段。
+
+### 排行榜
+
+通用排行榜位于 `core` 模块，基于 Redis ZSet 实现：
+
+- 具体排行榜继承抽象基类。
+- `RankService` 管理排行榜实例和写入队列。
+- `RankUtils` 提供 Redis 排行操作。
+- 支持最大人数、过期删除、结算时间、结算后备份历史数据。
+- 同分时依赖 ZSet member 设计保证先达到分数的玩家靠前。
+
+## GM 后台
+
+默认 HTTP 入口：
+
+```text
+http://127.0.0.1:9090/gm/index
 ```
 
-### 消息处理流程
-1. 客户端发送请求消息
-2. 网关服务器接收并转发
-3. 游戏服务器处理业务逻辑
-4. 返回响应消息给客户端
+主要能力：
 
-## 📈 压力测试
+- 管理员管理
+- 角色管理
+- 菜单管理
+- 操作日志
+- 安全管理
+- 配表热更
+- 玩家详情
 
-### SQL性能测试
-- **批量执行**: 支持批量SQL执行，提升数据库性能
-- **连接池优化**: 针对不同场景优化连接池参数
-- **事务管理**: 合理使用事务，平衡性能与一致性
+GM 菜单由数据库配置驱动。如果页面提示菜单加载失败，优先检查 GMServer 日志、JWT 登录状态、菜单接口返回内容和数据库菜单记录。
 
-### 并发测试
-- **虚拟线程**: 利用虚拟线程提升并发处理能力
-- **连接数测试**: 支持数千并发连接
-- **内存优化**: 控制内存使用，避免OOM
+## BotServer 测试
 
-### 网络性能
-- **消息吞吐**: 支持每秒数万条消息处理
-- **延迟优化**: 端到端延迟控制在毫秒级别
-- **带宽利用**: 高效的数据压缩和序列化
+BotServer 使用 Module/Action 组织测试流程：
 
-## 🤖 开发理念
+- Module 表示一组业务验证，例如登录模块、移动模块、英雄模块。
+- Action 表示模块内的一次协议行为。
+- 初始化模块按顺序执行，随机业务模块可按策略循环执行。
 
-### 设计原则
-- **高性能**: 利用最新Java特性，追求极致性能
-- **可扩展**: 模块化设计，易于扩展新功能
-- **易维护**: 清晰的代码结构，完善的文档
-- **高可用**: 冗余设计，故障自动恢复
+常用启动：
 
-### 架构模式
-- **微服务**: 服务拆分，独立部署
-- **事件驱动**: 异步处理，提升响应速度
-- **配置外置**: 配置与代码分离，便于运维
-- **监控集成**: 内置监控点，便于问题定位
+```powershell
+cd server/BotServer
+java ly.BotServer --run-bots 127.0.0.1 8889 1
+```
 
-## 📄 许可证
+成功标准：
 
-此项目遵循 MIT 许可证。详情请参见 LICENSE 文件。
+- Bot 能通过 LoginServer 获取服务器列表。
+- Bot 能连接 GateServer。
+- 登录 GameServer 成功。
+- 业务 Action 能收到对应下行协议。
+- 日志无持续 RPC 超时、连接断开或协议解析错误。
 
-## 🤝 贡献
+## 日志和排查
 
-欢迎提交 Issue 和 Pull Request 来改进项目。
+常用日志目录：
 
-## 📞 支持
+- `logs/`
+- `runlogs/`
+- 各模块本地运行目录下的日志输出
 
-如有问题，请通过以下方式联系：
-- 提交 GitHub Issue
-- 发送邮件至 [邮箱地址]
+注意：
+
+- `logs/` 和 `runlogs/` 里可能混有历史日志，排查时先确认时间戳。
+- 乱码优先检查 JVM 参数是否包含 `-Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8`。
+- Netty、Nacos、MySQL 启动阶段可能有短暂重试日志，要结合后续成功日志判断。
+- 生成 SQL 文件是跟踪产物，不要因为本地脏改动直接删除。
+
+## 参考文档
+
+- `STARTUP.SKILL.md`：本地启动参数、启动顺序、成功标准。
+- `docs/AI_PROJECT_INDEX.md`：项目索引和文档地图。
+- `docs/DEV_WORKFLOW.md`：构建、生成、启动、调试流程。
+- `docs/JAVA_SOURCE_INDEX.md`：Java 源码索引。
+- `server/doc/module_index.md`：模块级阅读指南。
+- `server/doc/net_packet_unification_plan.md`：网络包统一设计记录。
