@@ -42,7 +42,7 @@ public class EntityToSqlGenerator {
      * 生成SQL文件
      */
     public void generateSqlFiles(Set<Class<?>> entityClasses) throws IOException {
-        Map<String, String> createTableSqls = new HashMap<>();
+        Map<String, String> createTableSqls = new TreeMap<>();
 
         for (Class<?> entityClass : entityClasses) {
             String tableName = getTableName(entityClass);
@@ -61,7 +61,7 @@ public class EntityToSqlGenerator {
      */
     public void generateDiffSqlFromDatabase(String packageName, Connection connection) throws IOException, ClassNotFoundException {
         Set<Class<?>> entityClasses = findEntityClasses(packageName);
-        Map<String, List<String>> alterTableSqls = new HashMap<>();
+        Map<String, List<String>> alterTableSqls = new TreeMap<>();
 
         for (Class<?> entityClass : entityClasses) {
             String tableName = getTableName(entityClass);
@@ -86,7 +86,7 @@ public class EntityToSqlGenerator {
      * 扫描包中所有带@DbTable注解的实体类
      */
     private Set<Class<?>> findEntityClasses(String packageName) throws IOException, ClassNotFoundException {
-        Set<Class<?>> classes = new HashSet<>();
+        List<Class<?>> scannedClasses = new ArrayList<>();
         String packagePath = packageName.replace('.', '/');
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         Enumeration<java.net.URL> resources = classLoader.getResources(packagePath);
@@ -96,23 +96,30 @@ public class EntityToSqlGenerator {
             if (resource.getProtocol().equals("file")) {
                 File directory = new File(resource.getFile());
                 if (directory.exists()) {
-                    scanDirectory(directory, packageName, classes);
+                    scanDirectory(directory, packageName, scannedClasses);
                 }
             } else if (resource.getProtocol().equals("jar")) {
-                scanJar(resource, packagePath, classes);
+                scanJar(resource, packagePath, scannedClasses);
             }
         }
-        
+
+        Set<Class<?>> classes = new LinkedHashSet<>();
+        scannedClasses.stream()
+                .sorted(
+                        Comparator.comparing((Class<?> clazz) -> Optional.ofNullable(getTableName(clazz)).orElse(""))
+                                .thenComparing(Class::getName))
+                .forEach(classes::add);
         return classes;
     }
 
     /**
      * 扫描目录中的类文件
      */
-    private void scanDirectory(File directory, String packageName, Set<Class<?>> classes) throws ClassNotFoundException {
+    private void scanDirectory(File directory, String packageName, Collection<Class<?>> classes) throws ClassNotFoundException {
         File[] files = directory.listFiles();
         if (files == null) return;
-        
+
+        Arrays.sort(files, Comparator.comparing(File::getName));
         for (File file : files) {
             if (file.isDirectory()) {
                 scanDirectory(file, packageName + "." + file.getName(), classes);
@@ -132,11 +139,12 @@ public class EntityToSqlGenerator {
      * <p>服务通过 Maven 或打包产物启动时，core 模块通常以 jar 形式出现在 classpath 中。
      * 如果只扫描 file 目录，启动自动建表会漏掉 core 里的公共 Entity。
      */
-    private void scanJar(java.net.URL resource, String packagePath, Set<Class<?>> classes)
+    private void scanJar(java.net.URL resource, String packagePath, Collection<Class<?>> classes)
             throws IOException, ClassNotFoundException {
         JarURLConnection connection = (JarURLConnection) resource.openConnection();
         try (JarFile jarFile = connection.getJarFile()) {
             Enumeration<JarEntry> entries = jarFile.entries();
+            List<String> classNames = new ArrayList<>();
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
                 String name = entry.getName();
@@ -146,6 +154,10 @@ public class EntityToSqlGenerator {
                 String classFileName = URLDecoder.decode(name, java.nio.charset.StandardCharsets.UTF_8)
                         .replace('/', '.');
                 String className = classFileName.substring(0, classFileName.length() - 6);
+                classNames.add(className);
+            }
+            Collections.sort(classNames);
+            for (String className : classNames) {
                 Class<?> clazz = Class.forName(className);
                 if (clazz.isAnnotationPresent(DbMeta.DbTable.class)) {
                     classes.add(clazz);
