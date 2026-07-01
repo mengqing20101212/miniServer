@@ -68,6 +68,7 @@ public class LoginManager {
 
     private void handleLogin(LoginTask task) {
         final long playerId = task.request.getPlayerId();
+        boolean firstLogin = false;
 
         if (!checkToken(task.request.getToken(), task.request.getAccount())) {
             LoggerDef.SystemLogger.error(
@@ -87,6 +88,7 @@ public class LoginManager {
                 if (lock) {
                     try {
                         onlinePlayer = PlayerManager.getInstance().createNewPlayer(task.request);
+                        firstLogin = true;
                     } finally {
                         RedisUtils.unlock(RedisKeys.LOCK_CREATE_PLAYER_NAME_KEY.getKey(task.request.getPlayerName()));
                     }
@@ -118,7 +120,9 @@ public class LoginManager {
         onlinePlayer.setToken(task.request.getToken());
 
         onlinePlayer.dispatchEvent(PlayerEventType.PLAYER_LOGIN_COMPLETE);
-        // TODO: 首次登录逻辑待实现。
+        if (firstLogin) {
+            onlinePlayer.dispatchEvent(PlayerEventType.PLAYER_FIRST_LOGIN);
+        }
         onlinePlayer.dispatchEvent(PlayerEventType.PLAYER_LOGIN_IS_RECONNECT, task.request.getIsReconnect());
 
         Login.scLogin response = Login.scLogin.newBuilder()

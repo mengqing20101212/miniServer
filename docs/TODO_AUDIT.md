@@ -8,48 +8,38 @@
 rg -n --glob '!**/target/**' --glob '!logs/**' --glob '!runlogs/**' --glob '!**/generated-sql/**' --glob '!server/config/src/main/java/ly/config/**' "TODO|FIXME|HACK|待处理|待优化|临时|暂时" server docs README.md STARTUP.SKILL.md
 ```
 
-## 结论
+## 当前结论
 
-当前显式 `TODO/FIXME/HACK` 不多，主要问题集中在登录首登逻辑、BotServer 测试行为仍有模拟实现、可靠 RPC 里保留了一个运维兜底方法，以及 generated-sql 需要单独确认是否提交。
+显式 `TODO/FIXME/HACK` 不多。已经处理首登事件和 generated-sql 输出稳定性，剩余主要是 BotServer 模拟行为、Bot 登录响应注释、可靠 RPC 手工重试接口是否正式化。
 
-## P1
+## 已完成
 
-### GameServer 首次登录逻辑待实现
+### GameServer 首次登录事件
 
 位置：
 
 - `server/GameServer/src/main/java/ly/logic/login/LoginManager.java`
+- `server/GameServer/src/main/java/ly/logic/player/event/PlayerEventType.java`
 
-现状：
+处理结果：
 
-- 登录完成后有 `TODO: 首次登录逻辑待实现`。
-- 当前代码会触发 `PLAYER_LOGIN_COMPLETE`，再触发重连事件，但首登流程没有明确入口。
+- 新增 `PLAYER_FIRST_LOGIN` 事件。
+- `LoginManager` 在本次创建新玩家后，于登录完成阶段投递首登事件。
+- 首登奖励、引导初始化等业务后续可以监听 `PLAYER_FIRST_LOGIN`。
 
-建议：
-
-- 明确首登判定条件，例如新建玩家、modules 为空、账号第一次绑定角色。
-- 首登初始化应放到玩家队列内执行，避免和登录线程、DB 加载线程并发修改玩家模块。
-- 覆盖新号创建、老号登录、重连登录三类测试。
-
-### generated-sql 改动单独确认
+### generated-sql 输出稳定性
 
 位置：
 
+- `server/core/src/main/java/ly/EntityToSqlGenerator.java`
 - `generated-sql/create-tables.sql`
 - `server/*/generated-sql/create-tables.sql`
 
-现状：
+处理结果：
 
-- 当前工作区里 generated-sql 有未提交改动。
-- diff 中包含真实新增表，例如 `rank_history`、GM 配表热更相关表。
-- 同时也有大量表顺序重排，不适合混进 Bot/RPC 重构提交。
-
-建议：
-
-- 单独跑一次 DB Entry/SQL 生成流程。
-- 确认生成顺序是否稳定。
-- 如果稳定，再单独提交 generated-sql。
-- 如果顺序不稳定，优先修生成器排序，减少无意义 diff。
+- SQL 生成器按表名稳定输出。
+- 目录扫描、Jar 扫描、最终实体集合都固定顺序，减少无意义 diff。
+- 已重新生成当前跟踪的 `create-tables.sql` 文件。
 
 ## P2
 
