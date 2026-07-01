@@ -52,6 +52,17 @@ rg -n --glob '!**/target/**' --glob '!logs/**' --glob '!runlogs/**' --glob '!**/
 - 清理了 `handleLoginResponse` 附近“暂时使用默认值”的旧注释。
 - 当前注释明确说明：Bot 会从 `SC_Login` 解析玩家信息，解析失败时使用账号信息兜底。
 
+### ReliableRpcMessage 临时强制重试方法
+
+位置：
+
+- `server/core/src/main/java/ly/rpc/ReliableRpcMessage.java`
+
+处理结果：
+
+- `resetRetryForForceReplay()` 没有任何调用方。
+- 已删除该临时方法，避免后续误以为存在正式运维入口。
+
 ## P2
 
 ### BotServer CombatModule 仍然用移动 Action 代替战斗
@@ -69,24 +80,6 @@ rg -n --glob '!**/target/**' --glob '!logs/**' --glob '!runlogs/**' --glob '!**/
 - 等战斗协议稳定后新增 `CombatAction`。
 - `CombatModule` 只组织战斗相关 Action，不再复用移动行为。
 - 测试报告中增加战斗请求、战斗回包、失败码校验。
-
-## P3
-
-### ReliableRpcMessage 强制重置退避方法需要明确用途
-
-位置：
-
-- `server/core/src/main/java/ly/rpc/ReliableRpcMessage.java`
-
-现状：
-
-- `resetRetryForForceReplay()` 标注为临时方法，用于 Redis 中积压消息强制重试。
-
-建议：
-
-- 如果仍然需要运维功能，改名为正式接口，例如 `resetRetryForManualReplay()`。
-- 调用入口需要有日志，记录操作人、消息 ID、原 retryCount、原 nextRetryAt。
-- 如果已不需要，删除方法和调用方。
 
 ## 已排除项
 
