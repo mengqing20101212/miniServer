@@ -13,7 +13,50 @@
         <module>proto</module>
         <module>tool</module>
         <module>core</module>
+        <module>LoginServer</module>
         <module>GameServer</module>
+        <module>GateServer</module>
         <module>BotServer</module>
+        <module>GMServer</module>
     </modules>
+
+    <!-- Added repositories to mitigate central timeout -->
+    <repositories>
+        <repository>
+            <id>aliyun-public</id>
+            <name>Aliyun Maven Public</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>repo1-maven</id>
+            <name>Maven Central (repo1)</name>
+            <url>https://repo1.maven.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>aliyun-public-plugins</id>
+            <name>Aliyun Maven Public Plugins</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

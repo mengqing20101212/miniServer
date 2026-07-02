@@ -1,9 +1,7 @@
 package ly.loginserver.result;
 
-/*
- * Author: liuYang
- * Date: 2025/4/14
- * File: ErrorCode
+/**
+ * 登录服 HTTP 返回结构，统一封装错误码、错误信息和接口数据。
  */
 public enum ErrorCode {
   OK(0, "成功"),
@@ -11,6 +9,8 @@ public enum ErrorCode {
   SYSTEM_ERROR(2, "系统错误"),
   PARAM_ERROR(3, "参数错误"),
   ACCOUNT_HAS_EXISTS(4, "该账号已经存在，不可在次注册"),
+  ACCOUNT_BANNED(5, "账号已被封禁"),
+  IP_BANNED(6, "IP已被封禁"),
   ;
   private int code;
   private String message;

@@ -18,6 +18,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 到远端服务器节点的 TCP 客户端。
+ * <p>
+ * 主要用于服务器间 RPC，也可用于测试客户端。发送时会自动维护链路 seq；接收包进入本地队列。
+ * 同步 RPC 必须通过业务层 callId 匹配结果，seq 只用于链路日志和客户端包顺序排查。
+ */
 public class NetClient {
     static Logger logger = LoggerDef.NetLogger;
 
@@ -57,6 +63,11 @@ public class NetClient {
         return host + ":" + port;
     }
 
+    /**
+     * 在指定 EventLoopGroup 上启动连接。
+     * <p>
+     * 连接本身是异步建立的，调用方应通过 {@link #isReady()} 判断是否已经拿到 sid。
+     */
     public void start(EventLoopGroup group) {
         this.group = group;
         connectOnce();
@@ -92,7 +103,8 @@ public class NetClient {
             if (future.isSuccess()) {
                 channel = future.channel();
                 NetClientManager.getInstance().addNewClient(this);
-                logger.info("Netty 客户端连接成功： channelId:{},  {}:{},  耗时:{}毫秒", channel.id().asLongText(), host, port, System.currentTimeMillis() - begin);
+                logger.info("Netty 客户端连接成功： channelId:{},  {}:{},  耗时:{}毫秒", channel.id().asLongText(), host, port,
+                        System.currentTimeMillis() - begin);
                 int maxTimeOut = 1000;
                 while (!isReady() && maxTimeOut > 0) {
                     Thread.sleep(3);
@@ -106,14 +118,17 @@ public class NetClient {
         }
     }
 
+    /**
+     * 发送服务器间 protobuf 消息。
+     *
+     * @return 本次发送使用的 seq；发送失败返回 -1
+     */
     public int sendS2SMessage(long guid, int cmd, AbstractMessage protoData) {
         final int seq = sendSeq.getAndIncrement();
-        AbstractMessagePacket messagePacket =
-                MessagePacketFactory.createAbstractMessagePacket(
-                        guid, cmd, protoData, seq, sid);
+        AbstractMessagePacket messagePacket = MessagePacketFactory.createAbstractMessagePacket(
+                guid, cmd, protoData, seq, sid);
         return send(messagePacket) ? seq : -1;
     }
-
 
     public void setSid(int sid) {
         if (this.sid == 0) {
@@ -136,6 +151,11 @@ public class NetClient {
         return channel != null && channel.isActive();
     }
 
+    /**
+     * 发送已有协议包。
+     * <p>
+     * 若包内 sid 为 0，会填入当前连接握手得到的 sid；若 seq 为 0，则分配新的自增序号。
+     */
     public boolean send(AbstractMessagePacket packet) {
         if (isConnected()) {
             sendPacket(packet);
@@ -171,9 +191,10 @@ public class NetClient {
         if (packet.getSid() == 0) {
             packet.setSid(sid);
         }
-        if (LoggerDef.NetLogger.isDebugEnabled()) {
-            LoggerDef.NetLogger.debug(String.format("sid:%d send packet:%s", sid, packet));
-        }
+        // if (LoggerDef.NetLogger.isDebugEnabled()) {
+        // LoggerDef.NetLogger.debug(String.format("sid:%d send packet:%s", sid,
+        // packet));
+        // }
         channel.writeAndFlush(packet);
         return true;
     }
@@ -188,6 +209,57 @@ public class NetClient {
 
     public Channel getChannel() {
         return channel;
+    }
+
+    public int getReceivePacketQueueSize() {
+        return receivePacketQueue.size();
+    }
+
+    /**
+     * 从接收队列中查找指定 callId 和外层 cmd 的 RPC 响应包。
+     *
+     * <p>Gate2Game 专用 RPC 和通用 Server2Server RPC 都必须使用 callId 匹配，
+     * 不能再依赖 TCP 连接上的 seq。seq 只保留给链路日志和客户端包顺序排查。
+     */
+    public AbstractMessagePacket getReceiveMsgByCallId(long callId, int cmd) {
+        Iterator<AbstractMessagePacket> iterator = receivePacketQueue.iterator();
+        while (iterator.hasNext()) {
+            AbstractMessagePacket packet = iterator.next();
+            if (packet.getCmd() == cmd) {
+                try {
+                    com.google.protobuf.AbstractMessage msg = ly.ProtoMessageFactory.createProtoMessage(cmd,
+                            packet.getData());
+                    if (matchRpcCallId(msg, callId)) {
+                        iterator.remove();
+                        return packet;
+                    }
+                } catch (Exception ignored) {
+                    // 解析失败时跳过该包，让其他读取逻辑继续处理。
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean matchRpcCallId(com.google.protobuf.AbstractMessage msg, long callId) {
+        if (msg instanceof ly.proto.Server.scGate2GameRpcGameCall resp) {
+            return resp.getCallId() == callId;
+        }
+        if (msg instanceof ly.proto.Server.scServer2Server resp) {
+            return resp.getCallId() == callId;
+        }
+        return false;
+    }
+
+    /**
+     * 将误取出的包放回接收队列头部。
+     * <p>
+     * 当 getReceiveMsgByCallId 取出包后发现 callId 不匹配时，调用此方法放回。
+     */
+    public void putBackPacket(AbstractMessagePacket packet) {
+        if (packet != null) {
+            receivePacketQueue.add(packet);
+        }
     }
 
     @Override
@@ -214,18 +286,5 @@ public class NetClient {
     public int getSid() {
         return sid;
     }
-
-    public AbstractMessagePacket getReceiveMsgBySeq(int sendSeq, int cmd) {
-        Iterator<AbstractMessagePacket> iterator = receivePacketQueue.iterator();
-        while (iterator.hasNext()) {
-            AbstractMessagePacket packet = iterator.next();
-            if (packet.getSeq() == sendSeq && packet.getCmd() == cmd) {
-                iterator.remove();
-                return packet;
-            }
-        }
-        return null;
-    }
-
 
 }

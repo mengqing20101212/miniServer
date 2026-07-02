@@ -2,6 +2,12 @@ package ly.net.packet;
 
 import com.google.protobuf.AbstractMessage;
 
+/**
+ * 协议包工厂。
+ * <p>
+ * 目前统一返回 {@link AbstractMessagePacket}，保留工厂入口是为了兼容旧调用点，并方便未来按
+ * 服务类型扩展不同包实现。
+ */
 public class MessagePacketFactory {
   private MessagePacketFactory() {}
 

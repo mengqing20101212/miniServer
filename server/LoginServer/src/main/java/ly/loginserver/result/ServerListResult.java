@@ -5,10 +5,8 @@ import ly.game.MiniPlayer;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Author: liuYang
- * Date: 2025/4/14
- * File: ServerListResult
+/**
+ * 登录服 HTTP 返回结构，统一封装错误码、错误信息和接口数据。
  */
 public class ServerListResult {
 

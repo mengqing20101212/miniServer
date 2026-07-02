@@ -5,38 +5,33 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/*
- * db entry实体类注解 用于 entry SQL Java bean映射
- * Author: liuYang
- * Date: 2025/4/3
- * File: RandomUtils
- */
+/** 数据库实体元数据注解定义。 */
 public class DbMeta {
 
-  /***
-   * 数据库表名 注解
-   */
+  /** 数据库表名注解。 */
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.TYPE)
   public @interface DbTable {
     String name() default "";
   }
 
-  /** 数据库 主键标记 */
+  /** 数据库主键字段注解。 */
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.FIELD)
   public @interface DbMasterKey {
     String name() default "";
 
-    /** 是否是自增的主键 true 是自增的主键， false 不是自增的主键 */
+    /** 是否为自增主键。 */
     boolean autoIncrement() default false;
   }
 
-  /** 数据库 字段属性 */
+  /** 数据库普通字段注解。 */
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.FIELD)
   public @interface DbField {
-    /** 属性名称 */
     String name() default "";
+
+    /** 指定建表时使用的数据库列类型；为空时按 Java 字段类型自动推导。 */
+    String columnType() default "";
   }
 }

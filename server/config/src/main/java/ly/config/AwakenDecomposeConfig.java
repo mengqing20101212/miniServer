@@ -1,0 +1,36 @@
+package ly.config;
+
+import java.util.List;
+import ly.utils.KV;
+
+/***
+ * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
+ */
+public class AwakenDecomposeConfig {
+  /**编号*/
+  public final int id;
+
+  /**道具id*/
+  public final int itemId;
+
+  /**物品名称*/
+  public final String name;
+
+  /**分解返还（道具id，数量）*/
+  public final String decomposeItemId;
+
+  // @@@@@自定义属性开始区@@@@@
+
+  // @@@@@自定义属性结束区@@@@@
+
+  public AwakenDecomposeConfig(int id, int itemId, String name, String decomposeItemId) {
+    this.id = id;
+    this.itemId = itemId;
+    this.name = name;
+    this.decomposeItemId = decomposeItemId;
+  }
+
+  // @@@@@自定义方法开始区@@@@@
+public void afterLoad() {}
+  // @@@@@自定义方法结束区@@@@@
+}

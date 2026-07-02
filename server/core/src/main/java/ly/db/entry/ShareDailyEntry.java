@@ -8,6 +8,9 @@ import ly.db.DbMeta;
  */
 @DbMeta.DbTable(name = "share_daily")
 public class ShareDailyEntry extends AbstractEntry {
+  private static final String[] DIRTY_FIELDS = {
+      "id", "code", "daily_time", "open", "high", "low", "close", "preclose", "volume", "amount", "adjustflag", "turn", "tradestatus", "pctChg", "peTTM", "pbMRQ", "psTTM", "pcfNcfTTM", "isST"
+  };
 
   @DbMeta.DbMasterKey(name="id", autoIncrement=true)
   @DbMeta.DbField(name="id")
@@ -82,6 +85,14 @@ public class ShareDailyEntry extends AbstractEntry {
   /**是否ST股，1是，0否*/
   @DbMeta.DbField(name="isST")
   private Integer isST;
+  public ShareDailyEntry() {
+    initDirtyState(DIRTY_FIELDS.length);
+  }
+
+  @Override
+  protected String[] allDirtyFieldNames() {
+    return DIRTY_FIELDS;
+  }
   public void save() {
     ShareDailyEntryHelper.save(this);
   }
@@ -105,6 +116,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setId(Integer Id) {
     this.id = Id;
     autoAddCurVersion();
+    markFieldDirty(0);
   }
   public Integer getId() {
     return id;
@@ -112,6 +124,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setCode(String Code) {
     this.code = Code;
     autoAddCurVersion();
+    markFieldDirty(1);
   }
   public String getCode() {
     return code;
@@ -119,6 +132,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setDailyTime(java.time.LocalDate DailyTime) {
     this.daily_time = DailyTime;
     autoAddCurVersion();
+    markFieldDirty(2);
   }
   public java.time.LocalDate getDailyTime() {
     return daily_time;
@@ -126,6 +140,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setOpen(String Open) {
     this.open = Open;
     autoAddCurVersion();
+    markFieldDirty(3);
   }
   public String getOpen() {
     return open;
@@ -133,6 +148,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setHigh(String High) {
     this.high = High;
     autoAddCurVersion();
+    markFieldDirty(4);
   }
   public String getHigh() {
     return high;
@@ -140,6 +156,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setLow(String Low) {
     this.low = Low;
     autoAddCurVersion();
+    markFieldDirty(5);
   }
   public String getLow() {
     return low;
@@ -147,6 +164,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setClose(String Close) {
     this.close = Close;
     autoAddCurVersion();
+    markFieldDirty(6);
   }
   public String getClose() {
     return close;
@@ -154,6 +172,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setPreclose(String Preclose) {
     this.preclose = Preclose;
     autoAddCurVersion();
+    markFieldDirty(7);
   }
   public String getPreclose() {
     return preclose;
@@ -161,6 +180,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setVolume(Long Volume) {
     this.volume = Volume;
     autoAddCurVersion();
+    markFieldDirty(8);
   }
   public Long getVolume() {
     return volume;
@@ -168,6 +188,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setAmount(Long Amount) {
     this.amount = Amount;
     autoAddCurVersion();
+    markFieldDirty(9);
   }
   public Long getAmount() {
     return amount;
@@ -175,6 +196,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setAdjustflag(Integer Adjustflag) {
     this.adjustflag = Adjustflag;
     autoAddCurVersion();
+    markFieldDirty(10);
   }
   public Integer getAdjustflag() {
     return adjustflag;
@@ -182,6 +204,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setTurn(String Turn) {
     this.turn = Turn;
     autoAddCurVersion();
+    markFieldDirty(11);
   }
   public String getTurn() {
     return turn;
@@ -189,6 +212,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setTradestatus(Integer Tradestatus) {
     this.tradestatus = Tradestatus;
     autoAddCurVersion();
+    markFieldDirty(12);
   }
   public Integer getTradestatus() {
     return tradestatus;
@@ -196,6 +220,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setPctchg(String Pctchg) {
     this.pctChg = Pctchg;
     autoAddCurVersion();
+    markFieldDirty(13);
   }
   public String getPctchg() {
     return pctChg;
@@ -203,6 +228,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setPettm(String Pettm) {
     this.peTTM = Pettm;
     autoAddCurVersion();
+    markFieldDirty(14);
   }
   public String getPettm() {
     return peTTM;
@@ -210,6 +236,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setPbmrq(String Pbmrq) {
     this.pbMRQ = Pbmrq;
     autoAddCurVersion();
+    markFieldDirty(15);
   }
   public String getPbmrq() {
     return pbMRQ;
@@ -217,6 +244,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setPsttm(String Psttm) {
     this.psTTM = Psttm;
     autoAddCurVersion();
+    markFieldDirty(16);
   }
   public String getPsttm() {
     return psTTM;
@@ -224,6 +252,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setPcfncfttm(String Pcfncfttm) {
     this.pcfNcfTTM = Pcfncfttm;
     autoAddCurVersion();
+    markFieldDirty(17);
   }
   public String getPcfncfttm() {
     return pcfNcfTTM;
@@ -231,6 +260,7 @@ public class ShareDailyEntry extends AbstractEntry {
  public void setIsst(Integer Isst) {
     this.isST = Isst;
     autoAddCurVersion();
+    markFieldDirty(18);
   }
   public Integer getIsst() {
     return isST;

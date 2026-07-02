@@ -116,6 +116,86 @@ public final class ErrorMsg {
      * <code>PLAYER_NOT_EXIST = 11;</code>
      */
     PLAYER_NOT_EXIST(11),
+    /**
+     * <pre>
+     *英雄不存在
+     * </pre>
+     *
+     * <code>HERO_NOT_FOUND = 5001;</code>
+     */
+    HERO_NOT_FOUND(5001),
+    /**
+     * <pre>
+     *英雄不属于当前玩家
+     * </pre>
+     *
+     * <code>HERO_NOT_BELONG = 5002;</code>
+     */
+    HERO_NOT_BELONG(5002),
+    /**
+     * <pre>
+     *资源不足
+     * </pre>
+     *
+     * <code>RESOURCE_NOT_ENOUGH = 5003;</code>
+     */
+    RESOURCE_NOT_ENOUGH(5003),
+    /**
+     * <pre>
+     *等级已达上限
+     * </pre>
+     *
+     * <code>LEVEL_MAX = 5004;</code>
+     */
+    LEVEL_MAX(5004),
+    /**
+     * <pre>
+     *星级已达上限
+     * </pre>
+     *
+     * <code>STAR_MAX = 5005;</code>
+     */
+    STAR_MAX(5005),
+    /**
+     * <pre>
+     *觉醒已达上限
+     * </pre>
+     *
+     * <code>AWAKEN_MAX = 5006;</code>
+     */
+    AWAKEN_MAX(5006),
+    /**
+     * <pre>
+     *升星条件不满足
+     * </pre>
+     *
+     * <code>STAR_CONDITION_NOT_MET = 5007;</code>
+     */
+    STAR_CONDITION_NOT_MET(5007),
+    /**
+     * <pre>
+     *觉醒条件不满足
+     * </pre>
+     *
+     * <code>AWAKEN_CONDITION_NOT_MET = 5008;</code>
+     */
+    AWAKEN_CONDITION_NOT_MET(5008),
+    /**
+     * <pre>
+     *英雄槽位已满
+     * </pre>
+     *
+     * <code>HERO_SLOT_FULL = 5009;</code>
+     */
+    HERO_SLOT_FULL(5009),
+    /**
+     * <pre>
+     *英雄已存在
+     * </pre>
+     *
+     * <code>HERO_ALREADY_EXISTS = 5010;</code>
+     */
+    HERO_ALREADY_EXISTS(5010),
     UNRECOGNIZED(-1),
     ;
 
@@ -215,7 +295,86 @@ public final class ErrorMsg {
      * <code>PLAYER_NOT_EXIST = 11;</code>
      */
     public static final int PLAYER_NOT_EXIST_VALUE = 11;
-
+    /**
+     * <pre>
+     *英雄不存在
+     * </pre>
+     *
+     * <code>HERO_NOT_FOUND = 5001;</code>
+     */
+    public static final int HERO_NOT_FOUND_VALUE = 5001;
+    /**
+     * <pre>
+     *英雄不属于当前玩家
+     * </pre>
+     *
+     * <code>HERO_NOT_BELONG = 5002;</code>
+     */
+    public static final int HERO_NOT_BELONG_VALUE = 5002;
+    /**
+     * <pre>
+     *资源不足
+     * </pre>
+     *
+     * <code>RESOURCE_NOT_ENOUGH = 5003;</code>
+     */
+    public static final int RESOURCE_NOT_ENOUGH_VALUE = 5003;
+    /**
+     * <pre>
+     *等级已达上限
+     * </pre>
+     *
+     * <code>LEVEL_MAX = 5004;</code>
+     */
+    public static final int LEVEL_MAX_VALUE = 5004;
+    /**
+     * <pre>
+     *星级已达上限
+     * </pre>
+     *
+     * <code>STAR_MAX = 5005;</code>
+     */
+    public static final int STAR_MAX_VALUE = 5005;
+    /**
+     * <pre>
+     *觉醒已达上限
+     * </pre>
+     *
+     * <code>AWAKEN_MAX = 5006;</code>
+     */
+    public static final int AWAKEN_MAX_VALUE = 5006;
+    /**
+     * <pre>
+     *升星条件不满足
+     * </pre>
+     *
+     * <code>STAR_CONDITION_NOT_MET = 5007;</code>
+     */
+    public static final int STAR_CONDITION_NOT_MET_VALUE = 5007;
+    /**
+     * <pre>
+     *觉醒条件不满足
+     * </pre>
+     *
+     * <code>AWAKEN_CONDITION_NOT_MET = 5008;</code>
+     */
+    public static final int AWAKEN_CONDITION_NOT_MET_VALUE = 5008;
+    /**
+     * <pre>
+     *英雄槽位已满
+     * </pre>
+     *
+     * <code>HERO_SLOT_FULL = 5009;</code>
+     */
+    public static final int HERO_SLOT_FULL_VALUE = 5009;
+    /**
+     * <pre>
+     *英雄已存在
+     * </pre>
+     *
+     * <code>HERO_ALREADY_EXISTS = 5010;</code>
+     */
+    public static final int HERO_ALREADY_EXISTS_VALUE = 5010;
 
     public final int getNumber() {
       if (this == UNRECOGNIZED) {
@@ -253,6 +412,16 @@ public final class ErrorMsg {
         case 9: return PLAYER_NAME_EXISTS;
         case 10: return TOKEN_ERROR;
         case 11: return PLAYER_NOT_EXIST;
+        case 5001: return HERO_NOT_FOUND;
+        case 5002: return HERO_NOT_BELONG;
+        case 5003: return RESOURCE_NOT_ENOUGH;
+        case 5004: return LEVEL_MAX;
+        case 5005: return STAR_MAX;
+        case 5006: return AWAKEN_MAX;
+        case 5007: return STAR_CONDITION_NOT_MET;
+        case 5008: return AWAKEN_CONDITION_NOT_MET;
+        case 5009: return HERO_SLOT_FULL;
+        case 5010: return HERO_ALREADY_EXISTS;
         default: return null;
       }
     }

@@ -1,4 +1,5 @@
-id	starNum	type	dropShow	drop	sceneId	npcId	modelId	resourceNpc	resourceIcon	iconNum	
+#fields	id	starNum	type	dropShow	drop	sceneId	npcId	modelId	resourceNpc	resourceIcon	iconNum
+#types	INT	INT	INT	STRING	INT	INT	STRING	INT	INT	INT	INT
 1	36	2	2201	2201	202060	20206011	349104201	349104301	314001002	10
 2	72	2	2203	2203	204070	20407011	349104202	349104302	314001002	5
 3	108	2	2203	2203	206070	20607011	349104203	349104303	314001002	5

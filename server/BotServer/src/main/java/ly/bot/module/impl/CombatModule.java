@@ -1,7 +1,7 @@
 package ly.bot.module.impl;
 
-import ly.bot.command.RobotCommand;
-import ly.bot.factory.RobotCommandFactory;
+import ly.bot.action.RobotActionContext;
+import ly.bot.action.impl.MoveAction;
 import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
@@ -9,11 +9,7 @@ import ly.net.NetClient;
 import java.util.Random;
 
 /**
- * 战斗模块 - 处理战斗相关行为
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: CombatModule
+ * 机器人行为模块，封装登录、心跳、移动、战斗等可组合行为能力。
  */
 public class CombatModule implements RobotModule {
     private boolean completed = false;
@@ -23,12 +19,8 @@ public class CombatModule implements RobotModule {
     
     @Override
     public boolean executeStep(NetClient client, RobotSession session) {
-        // 执行战斗相关命令
-        // 这里我们假设有一个战斗命令，暂时使用移动命令替代
-        RobotCommand combatCommand = RobotCommandFactory.createCommand(
-            RobotCommandFactory.CommandType.MOVE  // 暂时使用移动命令，实际应用中应有专门的战斗命令
-        );
-        combatCommand.execute(client, session);
+        // 暂时使用移动 Action 代替战斗行为，后续接入真实战斗协议时替换这里。
+        new MoveAction().execute(new RobotActionContext(client, session));
         
         // 存储战斗相关的数据到会话级别存储
         session.getDataStore().put("combat", "lastCombatActionTime", System.currentTimeMillis());

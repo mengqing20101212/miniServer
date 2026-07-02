@@ -2,7 +2,6 @@ package ly.logic.login;
 
 import ly.GateClientManager;
 import ly.LoggerDef;
-import ly.ServerContext;
 import ly.net.GateClient;
 import ly.net.GateConnectSession;
 import ly.net.HandlerContext;
@@ -13,11 +12,10 @@ import ly.proto.Login;
 import ly.redis.RedisKeys;
 import ly.redis.RedisUtils;
 
+/**
+ * 网关侧协议控制器，处理客户端登录/登出并转发到后端游戏服。
+ */
 public class GateLogoutController implements IGateController {
-
-    static {
-        ServerContext.addController(new GateLogoutController());
-    }
 
     @Override
     public void registerHandlerRouter() {

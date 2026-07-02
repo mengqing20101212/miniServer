@@ -4,8 +4,12 @@ import ly.config.DbConfig;
 import ly.config.RedisConfig;
 import ly.config.ServerConfig;
 import ly.db.MysqlService;
+import ly.monitor.DeadlockDetector;
 import ly.redis.RedisUtils;
 
+/**
+ * 公共服务器启动示例或独立运行入口，用于本地验证网络框架。
+ */
 public class StandaloneServer {
     public static void main(String[] args) {
         System.out.println("启动独立服务器模式...");
@@ -20,9 +24,9 @@ public class StandaloneServer {
 
         // 配置数据库
         DbConfig dbConfig = new DbConfig();
-        dbConfig.setJdbcUrl("jdbc:mysql://139.224.80.204:3306/pick_money");
+        dbConfig.setJdbcUrl("jdbc:mysql://118.25.76.117:3306/pick_money");
         dbConfig.setUserName("root");
-        dbConfig.setPassWord("ly.1006897725");
+        dbConfig.setPassWord("Ly@2026Root!8899");
         dbConfig.setMaxPoolSize(20);
         dbConfig.setMinIdle(5);
         dbConfig.setIdleTimeout(30000);
@@ -40,6 +44,7 @@ public class StandaloneServer {
         ServerContext.serverConfig = serverConfig;
         ServerContext.ENV = "prod";
         ServerContext.serverType = ly.config.ServerTypeEnum.GATE;
+        DeadlockDetector.start();
 
         try {
             // 初始化数据库服务

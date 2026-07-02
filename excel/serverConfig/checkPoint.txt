@@ -1,4 +1,5 @@
-id	des	pointType	para	functionName	
+#fields	id	des	pointType	para	functionName
+#types	INT	STRING	INT	STRING	STRING
 1	启动游戏（点击游戏图标后）	0	 	 
 2	LOGO闪屏结束后	0	 	 
 9999	热更失败	0	 	 

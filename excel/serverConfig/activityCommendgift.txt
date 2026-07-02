@@ -1,4 +1,5 @@
-id	CommendLevel	Commendtype	RewardShow	drop	rechargShow	rechargdrop	
+#fields	id	CommendLevel	Commendtype	RewardShow	drop	rechargShow	rechargdrop
+#types	INT	INT	INT	INT	INT	INT	INT
 1	40	1	20000162	20000162	20000164	20000164
 2	80	1	20000162	20000162	20000028	20000028
 3	120	1	20000163	20000163	20000162	20000162

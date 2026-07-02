@@ -1,4 +1,5 @@
-id	description	type	school	grade	sequence	pos	suitIds	mainAttrPoolId	subAttrPoolId	subAttrUpgradePoolId	upgradeType	decomposeGold	decomposeDG	quality	lightAttrPoolId	
+#fields	id	description	type	school	grade	sequence	pos	suitIds	mainAttrPoolId	subAttrPoolId	subAttrUpgradePoolId	upgradeType	decomposeGold	decomposeDG	quality	lightAttrPoolId
+#types	INT	STRING	INT	INT	INT	INT	INT	STRING	INT	INT	INT	INT	INT	INT	INT	INT
 4101100	主核：幸运	4	1	1	100	0	1	1000	0	21000	1	3000	0	1	0
 4101200	主核：幸运	4	1	1	200	0	1	2000	0	22000	2	3500	0	2	0
 4101300	主核：幸运	4	1	1	300	0	1	3000	0	23000	3	4000	0	3	0

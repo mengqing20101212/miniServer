@@ -1,4 +1,5 @@
-id	name	sceneInfo	image	Dec	missionId	unlockDec	
+#fields	id	name	sceneInfo	image	Dec	missionId	unlockDec
+#types	INT	STRING	INT	INT	STRING	INT	STRING
 1	市郊森林	500301	340740001	初始能量增加3	108001	等级达到1级
 2	夕阳河堤	500302	340740002	角色行动后获得能量+1	108002	等级达到1级
 3	避难广场	500303	340740003	单体技能伤害增加10%	108003	等级达到1级

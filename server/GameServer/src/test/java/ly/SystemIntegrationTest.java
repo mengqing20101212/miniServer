@@ -26,9 +26,9 @@ public class SystemIntegrationTest
         boolean redisSuccess = false;
         
         // Test MySQL connection
-        String mysqlUrl = "jdbc:mysql://139.224.80.204:3306/pick_money";
+        String mysqlUrl = "jdbc:mysql://118.25.76.117:3306/pick_money";
         String mysqlUsername = "root";
-        String mysqlPassword = "ly.1006897725";
+        String mysqlPassword = "Ly@2026Root!8899";
 
         try {
             Connection conn = DriverManager.getConnection(mysqlUrl, mysqlUsername, mysqlPassword);

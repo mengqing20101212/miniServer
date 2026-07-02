@@ -1,27 +1,29 @@
 syntax = "proto3";
 option java_package = "ly.proto";
 
-// 服务器间通信协议负载消息的类型
+// 服务器间通信协议负载消息类型
 enum ServerMsgType
 {
-  protobufMsg = 0; // protobuf  消息
-  structMsg = 1; //bean 结构体消息
+  protobufMsg = 0; // protobuf 消息
+  structMsg = 1; // bean 结构体消息
 }
 
-// 服务器间通信协议
+// 服务器间通信请求
 message csServer2Server
 {
   ServerMsgType  type = 1;
-  int32 cmd = 2;    //protobufMsg 则为 消息号 ；  structMsg 则为 结构体定义的枚举号
+  int32 cmd = 2;    // protobufMsg 为消息号，structMsg 为结构体定义的枚举号
   bytes data = 3;
+  int64 callId = 4; // RPC 请求匹配 id，响应必须原样带回
 }
 
-// 服务器间通信协议
+// 服务器间通信响应
 message scServer2Server
 {
   ServerMsgType  type = 1;
-  int32 cmd = 2;    //protobufMsg 则为 消息号 ；  structMsg 则为 结构体定义的枚举号
+  int32 cmd = 2;    // protobufMsg 为消息号，structMsg 为结构体定义的枚举号
   bytes data = 3;
+  int64 callId = 4; // 从请求中原样带回，用于发送方匹配 RPC 响应
 }
 
 // 心跳包
@@ -36,15 +38,21 @@ message scRpcPing
   int64 time = 1;
 }
 
-// 网关调用游戏服务器Rpc方法
+// Gate 转发客户端请求到 Game 的 RPC 包
 message csGate2GameRpcGameCall{
-  int32 cmd = 1;// client 发送给gate 请求 cmd
-  int32 sid = 2;// client 发送给gate 请求 会话id
-  int64 guid = 3;// client 发送给gate 请求 玩家id
-  int32 seq = 4;// client 发送给gate 请求 序列id
-  bytes data = 5;// client 发送给gate 请求 数据
+  int32 clientCmd = 1;// 客户端发给 Gate 的原始请求 cmd
+  int32 clientSid = 2;// 客户端在 Gate 上的连接 sid
+  int64 guid = 3;// 客户端请求对应的玩家 id
+  int32 clientReqSeq = 4;// 客户端上行 seq，只用于日志排查，业务不依赖
+  bytes data = 5;// 客户端原始请求数据
+  int64 callId = 6;// RPC 请求匹配 id，Game 必须原样带回
 }
-// 网关调用游戏服务器Rpc方法响应
+
+// Game 返回给 Gate 的客户端下行包，客户端下行 seq 由 Gate 统一生成
 message scGate2GameRpcGameCall{
-  bytes data = 1;// game 发送给gate 响应 数据
+  int32 clientCmd = 1;// Game 要发给客户端的下行 cmd
+  int32 clientSid = 2;// 客户端在 Gate 上的连接 sid
+  reserved 3;// 旧版 seq 字段，不再使用
+  bytes data = 4;// Game 返回给客户端的数据
+  int64 callId = 5;// 从请求中原样带回，用于 Gate 匹配 RPC 响应
 }

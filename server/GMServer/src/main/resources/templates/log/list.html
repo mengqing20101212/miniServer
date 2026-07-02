@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operation Log</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .log-container { padding: 20px; }
+        .log-header { margin-bottom: 20px; }
+        .log-header h2 { margin: 0; font-size: 1.5rem; }
+        .search-section { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 16px; margin-bottom: 16px; }
+        .search-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+        .search-row .form-group { flex: 1; min-width: 150px; }
+        .search-row .form-group label { font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; color: #495057; }
+        .search-row .form-group .form-control,
+        .search-row .form-group .form-select { font-size: 0.9rem; }
+        .search-actions { display: flex; gap: 8px; align-items: flex-end; padding-bottom: 1px; }
+        .table th { white-space: nowrap; background-color: #f8f9fa; font-size: 0.85rem; }
+        .table td { vertical-align: middle; font-size: 0.9rem; }
+        .detail-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+        .detail-cell:hover { color: #0d6efd; }
+        .result-badge { font-size: 0.8em; }
+        .pagination-section { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px; }
+        .pagination-info { font-size: 0.9rem; color: #6c757d; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #6c757d; }
+        .empty-state i { font-size: 3rem; margin-bottom: 15px; display: block; }
+        .floating-alert { position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .detail-modal-body { word-break: break-all; max-height: 400px; overflow-y: auto; }
+        .detail-modal-body pre { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 12px; font-size: 0.85rem; white-space: pre-wrap; }
+        .log-time { font-size: 0.85rem; color: #6c757d; white-space: nowrap; }
+        .action-badge { font-size: 0.8em; }
+    </style>
+</head>
+<body>
+<div class="log-container">
+    <!-- Header -->
+    <div class="log-header">
+        <h2><i class="fas fa-history me-2"></i>Operation Log</h2>
+    </div>
+
+    <!-- Search Filters -->
+    <div class="search-section">
+        <div class="search-row">
+            <div class="form-group">
+                <label for="filterUsername">Username</label>
+                <input type="text" id="filterUsername" class="form-control" placeholder="Filter by username..." autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="filterAction">Action</label>
+                <input type="text" id="filterAction" class="form-control" placeholder="e.g. login, create, delete..." autocomplete="off">
+            </div>
+            <div class="form-group" style="min-width:140px;">
+                <label for="filterDateFrom">From</label>
+                <input type="date" id="filterDateFrom" class="form-control">
+            </div>
+            <div class="form-group" style="min-width:140px;">
+                <label for="filterDateTo">To</label>
+                <input type="date" id="filterDateTo" class="form-control">
+            </div>
+            <div class="search-actions">
+                <button class="btn btn-primary" onclick="searchLogs()" title="Search">
+                    <i class="fas fa-search me-1"></i>Search
+                </button>
+                <button class="btn btn-outline-secondary" onclick="clearFilters()" title="Clear">
+                    <i class="fas fa-times me-1"></i>Clear
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-sm">
+            <thead>
+                <tr>
+                    <th style="width:55px;">ID</th>
+                    <th style="width:60px;">Admin ID</th>
+                    <th style="width:100px;">Username</th>
+                    <th style="width:90px;">Action</th>
+                    <th style="width:130px;">Target</th>
+                    <th>Detail</th>
+                    <th style="width:110px;">IP</th>
+                    <th style="width:65px;">Result</th>
+                    <th style="width:155px;">Created At</th>
+                </tr>
+            </thead>
+            <tbody id="logTableBody">
+                <tr id="loadingRow">
+                    <td colspan="9" class="text-center py-4">
+                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                        Loading...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display:none;">
+        <i class="fas fa-inbox"></i>
+        <p>No operation logs found.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-section" id="paginationSection" style="display:none;">
+        <div class="pagination-info" id="paginationInfo"></div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0" id="paginationUl"></ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i>Operation Detail</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-sm table-bordered mb-3">
+                    <tr><th style="width:100px;">ID</th><td id="detailId"></td></tr>
+                    <tr><th>Admin ID</th><td id="detailAdminId"></td></tr>
+                    <tr><th>Username</th><td id="detailUsername"></td></tr>
+                    <tr><th>Action</th><td id="detailAction"></td></tr>
+                    <tr><th>Target</th><td id="detailTarget"></td></tr>
+                    <tr><th>IP</th><td id="detailIp"></td></tr>
+                    <tr><th>Result</th><td id="detailResult"></td></tr>
+                    <tr><th>Created At</th><td id="detailCreatedAt"></td></tr>
+                </table>
+                <label class="form-label fw-bold">Detail Content:</label>
+                <div class="detail-modal-body">
+                    <pre id="detailContent">-</pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Standalone API helpers for iframe pages
+    function getToken() { try { return parent.getToken ? parent.getToken() : localStorage.getItem('gm_token'); } catch(e) { return localStorage.getItem('gm_token'); } }
+    function redirectToLogin() { window.location.href = '/gm/login'; }
+    function apiGet(url, cb) {
+        var t = getToken();
+        if (!t) { redirectToLogin(); return; }
+        fetch(url, { method: 'GET', headers: { 'Authorization': 'Bearer ' + t, 'Accept': 'application/json' } })
+        .then(function(r) {
+            if (r.status === 401) { redirectToLogin(); return; }
+            return r.json();
+        })
+        .then(function(d) { cb(d.code === 200 ? null : new Error(d.message || 'Request failed'), d.code === 200 ? d.data : null); })
+        .catch(function(e) { cb(e, null); });
+    }
+    function apiPost(url, data, cb) {
+        var t = getToken();
+        if (!t) { redirectToLogin(); return; }
+        var body = data ? JSON.stringify(data) : null;
+        fetch(url, { method: 'POST', headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: body })
+        .then(function(r) {
+            if (r.status === 401) { redirectToLogin(); return; }
+            return r.json();
+        })
+        .then(function(d) { cb(d.code === 200 ? null : new Error(d.message || 'Request failed'), d.code === 200 ? d.data : null); })
+        .catch(function(e) { cb(e, null); });
+    }
+
+    (function() {
+    'use strict';
+
+    var currentPage = 1;
+    var pageSize = 20;
+    var totalPages = 0;
+    var totalItems = 0;
+    var detailModal = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+
+        // Enter key triggers search
+        document.getElementById('filterUsername').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchLogs(); });
+        document.getElementById('filterAction').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchLogs(); });
+        document.getElementById('filterDateFrom').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchLogs(); });
+        document.getElementById('filterDateTo').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchLogs(); });
+
+        loadLogs();
+    });
+
+    function getFilterParams() {
+        var params = '?page=' + currentPage + '&pageSize=' + pageSize;
+
+        var username = document.getElementById('filterUsername').value.trim();
+        if (username) {
+            params += '&username=' + encodeURIComponent(username);
+        }
+
+        var action = document.getElementById('filterAction').value.trim();
+        if (action) {
+            params += '&action=' + encodeURIComponent(action);
+        }
+
+        var dateFrom = document.getElementById('filterDateFrom').value;
+        if (dateFrom) {
+            params += '&dateFrom=' + encodeURIComponent(dateFrom);
+        }
+
+        var dateTo = document.getElementById('filterDateTo').value;
+        if (dateTo) {
+            params += '&dateTo=' + encodeURIComponent(dateTo);
+        }
+
+        // Also support keyword param which the backend might use
+        if (username) {
+            params += '&keyword=' + encodeURIComponent(username);
+        }
+
+        return params;
+    }
+
+    function loadLogs() {
+        document.getElementById('emptyState').style.display = 'none';
+        var params = getFilterParams();
+
+        apiGet('/api/log/list' + params, function(err, data) {
+            if (err) {
+                showError('Failed to load logs: ' + (err.message || 'Unknown error'));
+                return;
+            }
+            renderTable(data);
+        });
+    }
+
+    function renderTable(data) {
+        var items = data.content || data.rows || data.list || data.data || data || [];
+        if (!Array.isArray(items)) items = [];
+
+        currentPage = data.number !== undefined ? data.number + 1 : (data.pageNum || currentPage);
+        totalPages = data.totalPages || 1;
+        totalItems = data.totalElements || data.total || items.length;
+
+        if (data.totalPages === undefined && data.total === undefined) {
+            totalPages = 1;
+            totalItems = items.length;
+        }
+
+        var tbody = document.getElementById('logTableBody');
+        var emptyState = document.getElementById('emptyState');
+
+        if (!items.length) {
+            tbody.innerHTML = '';
+            emptyState.style.display = 'block';
+            document.getElementById('paginationSection').style.display = 'none';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+
+        var html = '';
+        for (var i = 0; i < items.length; i++) {
+            var log = items[i];
+            var id = log.id || '';
+            var adminId = log.adminId || log.userId || '';
+            var username = log.username || log.userName || log.adminName || '-';
+            var action = log.action || log.operation || '';
+            var target = log.target || log.targetType || log.module || '';
+            var detail = log.detail || log.content || log.message || log.remark || log.description || '';
+            var ip = log.ip || log.ipAddress || log.clientIp || '';
+            var result = log.result || log.status || log.success;
+            var createdAt = log.createdAt || log.createTime || log.operateTime || log.timestamp || '-';
+
+            // Determine result display
+            var resultLabel, resultClass;
+            if (result === true || result === 1 || result === '1' || result === 'success' || result === 'SUCCESS' || result === true || result === 'true') {
+                resultLabel = 'Success';
+                resultClass = 'bg-success';
+            } else if (result === false || result === 0 || result === '0' || result === 'fail' || result === 'FAIL' || result === 'failure' || result === false || result === 'false') {
+                resultLabel = 'Failed';
+                resultClass = 'bg-danger';
+            } else if (result === 'partial' || result === 'PARTIAL') {
+                resultLabel = 'Partial';
+                resultClass = 'bg-warning text-dark';
+            } else {
+                resultLabel = result || '-';
+                resultClass = 'bg-secondary';
+            }
+
+            // Truncate detail
+            var detailTruncated = detail ? String(detail).substring(0, 60) : '-';
+            if (detail && String(detail).length > 60) {
+                detailTruncated += '...';
+            }
+
+            var targetDisplay = target || '-';
+            var ipDisplay = ip || '-';
+
+            html += '<tr>' +
+                '<td>' + esc(id) + '</td>' +
+                '<td>' + esc(adminId) + '</td>' +
+                '<td><i class="fas fa-user me-1 text-muted"></i>' + esc(username) + '</td>' +
+                '<td><span class="badge bg-info action-badge">' + esc(action) + '</span></td>' +
+                '<td class="small">' + esc(targetDisplay) + '</td>' +
+                '<td class="detail-cell" title="' + esc(detail) + '" onclick="openDetail(' + i + ')">' +
+                    esc(detailTruncated) +
+                '</td>' +
+                '<td class="small"><code>' + esc(ipDisplay) + '</code></td>' +
+                '<td><span class="badge ' + resultClass + ' result-badge">' + resultLabel + '</span></td>' +
+                '<td class="log-time">' + esc(createdAt) + '</td>' +
+                '</tr>';
+
+            // Store full detail on the data item for modal
+            items[i]._fullDetail = detail;
+        }
+
+        tbody.innerHTML = html;
+
+        // Store items for modal reference
+        window._logItems = items;
+
+        renderPagination();
+    }
+
+    function renderPagination() {
+        var section = document.getElementById('paginationSection');
+        var info = document.getElementById('paginationInfo');
+        var ul = document.getElementById('paginationUl');
+
+        if (totalPages <= 1) {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = 'flex';
+        info.textContent = 'Page ' + currentPage + ' of ' + totalPages + ' (Total: ' + totalItems + ')';
+
+        var html = '';
+        var startP = Math.max(1, currentPage - 2);
+        var endP = Math.min(totalPages, currentPage + 2);
+
+        html += '<li class="page-item' + (currentPage <= 1 ? ' disabled' : '') + '">' +
+            '<a class="page-link" href="javascript:void(0)" onclick="goToPage(' + (currentPage - 1) + ')">&laquo;</a></li>';
+
+        if (startP > 1) {
+            html += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">1</a></li>';
+            if (startP > 2) html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        }
+
+        for (var p = startP; p <= endP; p++) {
+            html += '<li class="page-item' + (p === currentPage ? ' active' : '') + '">' +
+                '<a class="page-link" href="javascript:void(0)" onclick="goToPage(' + p + ')">' + p + '</a></li>';
+        }
+
+        if (endP < totalPages) {
+            if (endP < totalPages - 1) html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            html += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="goToPage(' + totalPages + ')">' + totalPages + '</a></li>';
+        }
+
+        html += '<li class="page-item' + (currentPage >= totalPages ? ' disabled' : '') + '">' +
+            '<a class="page-link" href="javascript:void(0)" onclick="goToPage(' + (currentPage + 1) + ')">&raquo;</a></li>';
+
+        ul.innerHTML = html;
+    }
+
+    window.goToPage = function(page) {
+        if (page < 1 || page > totalPages || page === currentPage) return;
+        currentPage = page;
+        loadLogs();
+    };
+
+    window.searchLogs = function() {
+        currentPage = 1;
+        loadLogs();
+    };
+
+    window.clearFilters = function() {
+        document.getElementById('filterUsername').value = '';
+        document.getElementById('filterAction').value = '';
+        document.getElementById('filterDateFrom').value = '';
+        document.getElementById('filterDateTo').value = '';
+        currentPage = 1;
+        loadLogs();
+    };
+
+    window.openDetail = function(index) {
+        var items = window._logItems;
+        if (!items || !items[index]) return;
+
+        var log = items[index];
+
+        document.getElementById('detailId').textContent = log.id || '-';
+        document.getElementById('detailAdminId').textContent = log.adminId || log.userId || '-';
+        document.getElementById('detailUsername').textContent = log.username || log.userName || log.adminName || '-';
+        document.getElementById('detailAction').textContent = log.action || log.operation || '-';
+        document.getElementById('detailTarget').textContent = log.target || log.targetType || log.module || '-';
+        document.getElementById('detailIp').textContent = log.ip || log.ipAddress || log.clientIp || '-';
+
+        var result = log.result || log.status || log.success;
+        var resultDisplay;
+        if (result === true || result === 1 || result === '1' || result === 'success' || result === 'SUCCESS' || result === true || result === 'true') {
+            resultDisplay = 'Success';
+        } else if (result === false || result === 0 || result === '0' || result === 'fail' || result === 'FAIL' || result === 'failure' || result === false || result === 'false') {
+            resultDisplay = 'Failed';
+        } else {
+            resultDisplay = result || '-';
+        }
+        document.getElementById('detailResult').textContent = resultDisplay;
+
+        document.getElementById('detailCreatedAt').textContent = log.createdAt || log.createTime || log.operateTime || log.timestamp || '-';
+        document.getElementById('detailContent').textContent = log._fullDetail || log.detail || log.content || log.message || log.remark || log.description || '-';
+
+        detailModal.show();
+    };
+
+    function showError(msg) {
+        var tbody = document.getElementById('logTableBody');
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-danger">' +
+            '<i class="fas fa-exclamation-circle me-2"></i>' + esc(msg) + '</td></tr>';
+        document.getElementById('paginationSection').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'none';
+    }
+
+    function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+})();
+</script>
+</body>
+</html>

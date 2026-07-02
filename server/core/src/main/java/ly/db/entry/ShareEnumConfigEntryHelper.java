@@ -30,7 +30,7 @@ public class ShareEnumConfigEntryHelper {
   }
 
   public static void asyncUpdate(ShareEnumConfigEntry ShareEnumConfigEntry, String... fileds) {
-    MysqlService.getInstance().addUpdateEntry(ShareEnumConfigEntry);
+    MysqlService.getInstance().addUpdateEntry(ShareEnumConfigEntry, fileds);
   }
 
   public static List<ShareEnumConfigEntry> select(String[] fields, Object... params) {

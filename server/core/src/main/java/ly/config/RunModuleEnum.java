@@ -1,9 +1,7 @@
 package ly.config;
 
-/*
- * Author: liuYang
- * Date: 2025/4/7
- * File: RunModuleEnum
+/**
+ * 公共配置模型或枚举，描述服务器启动、数据库、Redis 和模块开关等基础参数。
  */
 public enum RunModuleEnum {
   /** 测试 debug 模式，日志级别比较低 */

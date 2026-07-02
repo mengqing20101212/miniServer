@@ -1,4 +1,5 @@
-id	minArea	maxArea	dropId	
+#fields	id	minArea	maxArea	dropId
+#types	INT	INT	INT	INT
 1	1	3000	3801
 2	3001	5000	3802
 3	5001	7000	3803

@@ -1,4 +1,5 @@
-id	groupId	squence	condition	attrId	isSwitch	des	
+#fields	id	groupId	squence	condition	attrId	isSwitch	des
+#types	INT	INT	INT	STRING	INT	INT	STRING
 21	2	1	2,1	3021	0	经验加成1_绿
 22	2	2	2,2	3022	0	经验加成2_绿
 23	2	3	2,3	3023	0	经验加成3_绿

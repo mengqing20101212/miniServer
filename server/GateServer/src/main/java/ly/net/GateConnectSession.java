@@ -1,116 +1,207 @@
 package ly.net;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.Message;
+
 import ly.GateClientManager;
 import ly.LoggerDef;
-import ly.net.packet.*;
+import ly.ProtoMessageFactory;
+import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
+import ly.proto.Server;
+import ly.security.SecurityBanService;
 
 /**
- * 网关连接会话类
- * <p>
- * 负责处理网关服务器与客户端之间的连接，管理消息的接收和转发，
- * 是网关服务器中的核心网络会话组件。
+ * Gate 连接会话，封装客户端连接、收发队列和 Gate 转发所需状态。
  */
 public class GateConnectSession extends ConnectSession {
-    /**
-     * 构造函数
-     *
-     * @param guid 会话全局唯一标识符
-     */
+    private final AtomicBoolean receiveWorkerStarted = new AtomicBoolean();
+    private volatile Thread receiveWorker;
+    private long rateSecond;
+    private int rateCount;
+    private int rateViolationCount;
+
     public GateConnectSession(long guid) {
         super(guid);
+        startReceiveWorker();
     }
 
-    /**
-     * 会话心跳更新方法
-     * <p>
-     * 网关会话暂不需要特定的心跳处理逻辑
-     */
     @Override
     public void tick() {
-        // 网关会话心跳更新，目前无需特殊处理
     }
 
-    /**
-     * 处理接收到的数据包
-     * <p>
-     * 根据数据包类型进行不同的处理：
-     * 1. 客户端到服务器的数据包(AbstractMessagePacket)
-     * 2. 服务器到服务器的数据包(AbstractMessagePacket)
-     *
-     * @param packet 接收到的数据包
-     */
     @Override
     public void addReceivePacket(AbstractMessagePacket packet) {
-        // 调用父类方法进行基础处理
         super.addReceivePacket(packet);
+    }
 
-        // 记录接收到的数据包信息
-        LoggerDef.LogProto("receive {}|{}|{}|{}", getGuid(), packet.getSid(), packet.getCmd(), packet.getLength());
+    private void startReceiveWorker() {
+        if (!receiveWorkerStarted.compareAndSet(false, true)) {
+            return;
+        }
+        receiveWorker = Thread.ofVirtual()
+                .name("gate-session-receive-" + getGuid())
+                .start(
+                        () -> {
+                            while (!Thread.currentThread().isInterrupted()) {
+                                try {
+                                    AbstractMessagePacket packet = receivePacketQueue.take();
+                                    handleReceivePacket(packet);
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                } catch (Exception e) {
+                                    LoggerDef.SystemLogger.error(
+                                            "GateConnectSession handle receive packet error, guid={}",
+                                            getGuid(),
+                                            e);
+                                }
+                            }
+                        });
+    }
 
-        // 统一包结构后，通过命令区间判定来源类型：
-        // 10000~20000 为服务器间消息；其余视为客户端请求。
+    @Override
+    public void closeChannel() {
+        Thread worker = receiveWorker;
+        if (worker != null) {
+            worker.interrupt();
+        }
+        super.closeChannel();
+    }
+
+    private void handleReceivePacket(AbstractMessagePacket packet) {
+        LoggerDef.LogNet(String.format("<<%s: sessionGuid:%d, packetGuid:%d, sid:%d, cmd:%s, seq:%d,len:%d",
+                getReceiveServerLogName(packet.getCmd()), getGuid(), packet.getGuid(),
+                packet.getSid(), Cmd.CMD.forNumber(packet.getCmd()).name(), packet.getSeq(), packet.getLength()));
+        if (shouldRejectPacket(packet)) {
+            return;
+        }
         boolean serverInnerCmd = packet.getCmd() > Cmd.CMD.CS_Server2Server_VALUE
                 && packet.getCmd() <= Cmd.CMD.MaxServeMsgId_VALUE;
 
-        // 处理客户端到服务器的数据包
         if (!serverInnerCmd && packet.getCmd() != Cmd.CMD.SC_Logout_VALUE) {
-            AbstractMessagePacket csPacket = packet;
-            // 尝试获取对应的客户端对象
-            GateClient client = GateClientManager.getInstance().getClient(getGuid());
-
-            // 如果客户端对象不存在（未登录状态），则交给处理器路由处理（如登录请求）
-            if (client == null) {
-                try {
-                    // 执行处理器路由
-                    HandlerRouterManager.execute(this, csPacket);
-                    // 处理完毕后关闭通道
-                    closeChannel();
-                } catch (Exception e) {
-                    // 记录异常信息
-                    LoggerDef.SystemLogger.error("GateConnectSession addReceivePacket error, cmd={}", csPacket.getCmd(), e);
-                    e.printStackTrace();
-                }
-            } else {
-                // 已登录状态，转发数据包到游戏服务器
-                client.sendPacketToGameServer(csPacket);
-            }
+            handleClientPacket(packet);// 不是登录包，直接转发到后端游戏服，登录包由 HandlerRouterManager 执行，保持连接打开等待后续响应。
+            return;
         }
-        // 处理服务器到服务器的数据包
-        else {
-            AbstractMessagePacket s2sPacket = packet;
-            // 处理登出命令特殊情况
-            if (s2sPacket.getCmd() == Cmd.CMD.SC_Logout_VALUE) {
-                HandlerRouterManager.execute(this, s2sPacket);
-            } else {
-                // 查找对应的客户端并转发消息
-                GateClient client = GateClientManager.getInstance().getClient(getGuid());
-                if (client == null) {
-                    // 兼容部分链路通过 sid 关联客户端的情况
-                    client = GateClientManager.getInstance().getClient((long) s2sPacket.getSid());
-                }
-                if (client != null) {
-                    client.sendPacketToClient(s2sPacket);
-                }
+        handleServerPacket(packet);// 登录包和服务器内部包由 HandlerRouterManager 执行，保持连接打开等待后续响应。
+    }
+
+    private Object getReceiveServerLogName(int cmd) {
+        if (cmd <= Cmd.CMD.CS_Server2Server_VALUE) {
+            return "client";
+        } else if (cmd > Cmd.CMD.CS_Server2Server_VALUE && cmd <= Cmd.CMD.MaxServeMsgId_VALUE) {
+            return "server";
+        }
+        return "UNKNOWN";
+    }
+
+    private void handleClientPacket(AbstractMessagePacket csPacket) {
+        GateClient client = GateClientManager.getInstance().getClient(getGuid());
+        if (client == null) {
+            // 登录后的客户端业务包可能携带 playerId 作为 guid，Gate 连接定位必须按 sid 兜底。
+            client = GateClientManager.getInstance().getClientBySid(csPacket.getSid());
+        }
+
+        if (client == null) {
+            try {
+                // 登录异步处理，保持连接打开等待后续响应。
+                HandlerRouterManager.execute(this, csPacket);
+            } catch (Exception e) {
+                LoggerDef.SystemLogger.error(
+                        "GateConnectSession addReceivePacket error, cmd={}", csPacket.getCmd(), e);
             }
+        } else {
+            client.sendPacketToGameServer(csPacket);
         }
     }
 
+    private void handleServerPacket(AbstractMessagePacket s2sPacket) {
+        if (s2sPacket.getCmd() == Cmd.CMD.SC_Logout_VALUE) {
+            HandlerRouterManager.execute(this, s2sPacket);
+            return;
+        }
 
-    /**
-     * 向客户端发送消息
-     *
-     * @param cmd 命令ID
-     * @param msg Protobuf消息对象
-     */
+        if (s2sPacket.getCmd() == Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE) {
+            // RPC 外层 sid 是 Gate/Game 连接 sid，客户端 sid 必须以内层协议为准。
+            Server.scGate2GameRpcGameCall resp = (Server.scGate2GameRpcGameCall) ProtoMessageFactory.createProtoMessage(
+                    Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, s2sPacket.getData());
+            if (resp == null) {
+                return;
+            }
+            GateClient client = GateClientManager.getInstance().getClientBySid(resp.getClientSid());
+            if (client != null) {
+                client.sendGameResponseToClient(resp);
+            }
+            return;
+        }
+
+        GateClient client = GateClientManager.getInstance().getClient(getGuid());
+        if (client == null) {
+            client = GateClientManager.getInstance().getClientBySid(s2sPacket.getSid());
+        }
+        if (client != null) {
+            client.sendPacketToClient(s2sPacket);
+        }
+    }
+
+    private boolean shouldRejectPacket(AbstractMessagePacket packet) {
+        SecurityBanService securityBanService = SecurityBanService.getInstance();
+        String ip = getConnector() != null ? getConnector().getRemoteIp() : "";
+        GateClient client = GateClientManager.getInstance().getClient(getGuid());
+        if (client == null && packet != null) {
+            client = GateClientManager.getInstance().getClientBySid(packet.getSid());
+        }
+        String account = client != null ? client.getAccount() : null;
+        Long accountId = client != null && client.getAccountId() > 0 ? client.getAccountId() : null;
+        Long playerId = client != null && client.getPlayerId() > 0 ? client.getPlayerId() : null;
+        Integer cmd = packet != null ? packet.getCmd() : null;
+        Integer sid = packet != null ? packet.getSid() : null;
+        Integer seq = packet != null ? packet.getSeq() : null;
+
+        if (securityBanService.isIpBanned(ip)) {
+            securityBanService.writeRejectEvent(ip, account, accountId, playerId, cmd, sid, seq, "Gate IP封禁");
+            closeChannel();
+            return true;
+        }
+        if (account != null && securityBanService.isAccountBanned(account)) {
+            securityBanService.writeRejectEvent(ip, account, accountId, playerId, cmd, sid, seq, "Gate 账号封禁");
+            closeChannel();
+            return true;
+        }
+        if (playerId != null && securityBanService.isPlayerBanned(playerId)) {
+            securityBanService.writeRejectEvent(ip, account, accountId, playerId, cmd, sid, seq, "Gate 角色封禁");
+            closeChannel();
+            return true;
+        }
+        if (isRateLimited()) {
+            securityBanService.writeRateLimitEvent(ip, account, accountId, playerId, cmd, sid, seq, "Gate 发包频率过高");
+            closeChannel();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isRateLimited() {
+        long second = System.currentTimeMillis() / 1000;
+        if (second != rateSecond) {
+            rateSecond = second;
+            rateCount = 0;
+        }
+        rateCount++;
+        if (rateCount <= 80) {
+            return false;
+        }
+        rateViolationCount++;
+        return rateViolationCount >= 3;
+    }
+
     public void sendClientMsg(int cmd, Message msg) {
-        // 创建服务器到客户端的数据包
-        AbstractMessagePacket s2cPacket = new AbstractMessagePacket();
-        s2cPacket.setGuid(getGuid());
-        s2cPacket.setCmd(cmd);
-        s2cPacket.setData(msg.toByteArray());
-        // 添加到发送队列
+        if (!(msg instanceof AbstractMessage abstractMessage)) {
+            throw new IllegalArgumentException("msg must extend AbstractMessage");
+        }
+        AbstractMessagePacket s2cPacket = PacketCompat.createPacket(getGuid(), cmd, 0, 0,
+                abstractMessage.toByteArray());
         addSendPacket(s2cPacket);
     }
 }

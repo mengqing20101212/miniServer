@@ -2,6 +2,7 @@ package ly.db.entry;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import ly.db.MysqlService;
 
 /*
@@ -30,7 +31,7 @@ public class LoginEntryHelper {
   }
 
   public static void asyncUpdate(LoginEntry LoginEntry, String... fileds) {
-    MysqlService.getInstance().addUpdateEntry(LoginEntry);
+    MysqlService.getInstance().addUpdateEntry(LoginEntry, fileds);
   }
 
   public static List<LoginEntry> select(String[] fields, Object... params) {

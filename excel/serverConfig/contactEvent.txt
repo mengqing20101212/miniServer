@@ -1,4 +1,5 @@
-id	type	beizhu	para	startDialog	rightDialog	wrongDialog	dropSuccess	dropFail	basicMail	
+#fields	id	type	beizhu	para	startDialog	rightDialog	wrongDialog	dropSuccess	dropFail	basicMail
+#types	INT	INT	STRING	INT	STRING	STRING	STRING	INT	INT	INT
 101	1	火男面1	101	story_dialog_lianluo_9_X	 	 	52101	52102	101
 102	1	火男面2	102	story_dialog_lianluo_9_X	 	 	52101	52102	101
 103	1	火男面3	103	story_dialog_lianluo_9_X	 	 	52101	52102	101

@@ -1,6 +1,7 @@
 package ly.rpc;
 
 import com.google.protobuf.AbstractMessage;
+import com.google.protobuf.ByteString;
 import ly.LoggerDef;
 import ly.ProtoMessageFactory;
 import ly.ServerContext;
@@ -10,6 +11,7 @@ import ly.nacos.NacosService;
 import ly.net.NetClient;
 import ly.net.NetClientManager;
 import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Server;
 
@@ -42,7 +44,6 @@ public class RpcNodeConnector {
      * 默认超时时间（毫秒）
      */
     private final int DEFAULT_TIMEOUT = 1000;
-
 
     /**
      * 构造函数
@@ -158,9 +159,9 @@ public class RpcNodeConnector {
                 return false;
             }
             // 避免重复创建字符串对象，仅在调试级别记录
-            if (LoggerDef.ProtoLogger.isDebugEnabled()) {
-                LoggerDef.ProtoLogger.debug("send packet {}", packet.toSimpleString());
-            }
+            // if (LoggerDef.ProtoLogger.isDebugEnabled()) {
+            // LoggerDef.ProtoLogger.debug("send packet {}", packet.toSimpleString());
+            // }
             return true;
         }
         return false;
@@ -169,12 +170,13 @@ public class RpcNodeConnector {
     /**
      * 同步发送消息包并等待响应
      *
-     * @param packet 要发送的消息包
+     * @param packet  要发送的消息包
      * @param timeout 超时时间（毫秒）
      * @return 响应消息包，如果超时或失败则返回null
      */
     public AbstractMessagePacket syncSendPacket(AbstractMessagePacket packet, int timeout) {
         final int sendSeq = packet.getSeq();
+        final int responseCmd = packet.getCmd() + 1;
 
         try {
             if (sendPacket(packet)) {
@@ -183,8 +185,7 @@ public class RpcNodeConnector {
 
                 // 使用简单的轮询方式等待响应，适合虚拟线程环境
                 while (System.currentTimeMillis() < endTime) {
-                    // 查找对应序列号和命令的响应消息
-                    AbstractMessagePacket response = client.getReceiveMsgBySeq(sendSeq, packet.getCmd() + 1);
+                    AbstractMessagePacket response = getReceiveMsgByRpcIdentity(packet, responseCmd);
                     if (response != null) {
                         return response;
                     }
@@ -197,7 +198,8 @@ public class RpcNodeConnector {
                 return null;
             }
         } catch (Exception e) {
-            LoggerDef.NetLogger.warn("RPC call failed, serverId={}, seq={}, error={}", serverId, sendSeq, e.getMessage());
+            LoggerDef.NetLogger.warn("RPC call failed, serverId={}, seq={}, error={}", serverId, sendSeq,
+                    e.getMessage());
         }
         return null;
     }
@@ -234,9 +236,23 @@ public class RpcNodeConnector {
      * @return 响应消息对象，如果超时或失败则返回null
      */
     public AbstractMessage syncSendProtoMessage(long guid, int cmd, AbstractMessage protoData, int timeout) {
-        int sendReq = sendProtoMessage(guid, cmd, protoData);
-        if (sendReq == -1) {
+        return syncSendProtoMessage(guid, cmd, protoData, timeout, RpcFailSavePolicy.NONE);
+    }
+
+    /**
+     * 同步发送 RPC，并在发送失败或响应超时时按策略保存为可靠消息。
+     */
+    public AbstractMessage syncSendProtoMessage(
+            long guid, int cmd, AbstractMessage protoData, int timeout, RpcFailSavePolicy failSavePolicy) {
+        long callId = newCallId();
+        Server.csServer2Server request = buildServer2ServerRequest(cmd, protoData, callId);
+        AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
+                guid, Cmd.CMD.CS_Server2Server_VALUE, request, client.getSendSeq(), 0);
+        // 可靠补发包必须脱离当前 TCP 连接上下文，避免旧 sid/seq 在新连接上触发目标服丢包校验。
+        AbstractMessagePacket reliablePacket = createServer2ServerRpcPacket(guid, cmd, protoData, 0, 0, callId);
+        if (!sendPacket(packet)) {
             LoggerDef.NetLogger.warn("send proto message failed, serverId={}, guid={}, cmd={}", serverId, guid, cmd);
+            saveReliableIfNeeded(reliablePacket, failSavePolicy, "send failed");
             return null;
         }
 
@@ -246,23 +262,130 @@ public class RpcNodeConnector {
 
             // 使用简单的轮询方式等待响应
             while (System.currentTimeMillis() < endTime) {
-                // 查找对应序列号和命令的响应消息
-                AbstractMessagePacket response = client.getReceiveMsgBySeq(sendReq, cmd + 1);
+                AbstractMessagePacket response = client.getReceiveMsgByCallId(callId, Cmd.CMD.SC_Server2Server_VALUE);
                 if (response != null) {
-                    // 解析响应数据包
-                    return unpackPacket(response);
+                    return unpackServer2ServerResponse(response, cmd + 1, callId);
                 }
 
                 // 短暂睡眠，让出CPU时间片
                 Thread.sleep(10);
             }
 
-            // 超时返回null
+            // SEND_FAILED_OR_TIMEOUT 会把响应超时也保存下来；调用方仍然立即拿到 null。
+            saveReliableIfNeeded(reliablePacket, failSavePolicy, "response timeout");
             return null;
         } catch (Exception e) {
-            LoggerDef.NetLogger.warn("RPC proto call failed, serverId={}, cmd={}, error={}", serverId, cmd, e.getMessage());
+            LoggerDef.NetLogger.warn("RPC proto call failed, serverId={}, cmd={}, error={}", serverId, cmd,
+                    e.getMessage());
+            saveReliableIfNeeded(reliablePacket, failSavePolicy, "rpc exception");
         }
         return null;
+    }
+
+    private AbstractMessagePacket getReceiveMsgByRpcIdentity(AbstractMessagePacket requestPacket, int responseCmd) {
+        long callId = extractCallId(requestPacket);
+        if (callId > 0) {
+            return client.getReceiveMsgByCallId(callId, responseCmd);
+        }
+        LoggerDef.NetLogger.warn(
+                "RPC packet has no callId, serverId={}, cmd={}, responseCmd={}",
+                serverId,
+                requestPacket == null ? null : requestPacket.getCmd(),
+                responseCmd);
+        return null;
+    }
+
+    private long extractCallId(AbstractMessagePacket requestPacket) {
+        if (requestPacket == null) {
+            return 0;
+        }
+        try {
+            if (requestPacket.getCmd() == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) {
+                Server.csGate2GameRpcGameCall request = (Server.csGate2GameRpcGameCall) ProtoMessageFactory
+                        .createProtoMessage(
+                                Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE, requestPacket.getData());
+                return request == null ? 0 : request.getCallId();
+            }
+            if (requestPacket.getCmd() == Cmd.CMD.CS_Server2Server_VALUE) {
+                Server.csServer2Server request = (Server.csServer2Server) ProtoMessageFactory.createProtoMessage(
+                        Cmd.CMD.CS_Server2Server_VALUE, requestPacket.getData());
+                return request == null ? 0 : request.getCallId();
+            }
+            return 0;
+        } catch (Exception e) {
+            LoggerDef.NetLogger.warn("extract rpc callId failed, serverId={}, cmd={}", serverId,
+                    requestPacket.getCmd());
+            return 0;
+        }
+    }
+
+    public static AbstractMessagePacket createServer2ServerRpcPacket(
+            long guid, int cmd, AbstractMessage protoData, int seq, int sid, long callId) {
+        Server.csServer2Server request = buildServer2ServerRequest(cmd, protoData, callId);
+        return MessagePacketFactory.createAbstractMessagePacket(
+                guid, Cmd.CMD.CS_Server2Server_VALUE, request, seq, sid);
+    }
+
+    private static Server.csServer2Server buildServer2ServerRequest(
+            int cmd, AbstractMessage protoData, long callId) {
+        return Server.csServer2Server.newBuilder()
+                .setType(Server.ServerMsgType.protobufMsg)
+                .setCmd(cmd)
+                .setData(protoData == null ? ByteString.EMPTY : protoData.toByteString())
+                .setCallId(callId)
+                .build();
+    }
+
+    private AbstractMessage unpackServer2ServerResponse(
+            AbstractMessagePacket receivedPacket, int expectedInnerCmd, long callId) {
+        try {
+            Server.scServer2Server response = (Server.scServer2Server) ProtoMessageFactory.createProtoMessage(
+                    Cmd.CMD.SC_Server2Server_VALUE, receivedPacket.getData());
+            if (response == null) {
+                return null;
+            }
+            if (response.getCallId() != callId) {
+                LoggerDef.NetLogger.warn(
+                        "S2S rpc callId mismatch, serverId={}, expected={}, got={}",
+                        serverId,
+                        callId,
+                        response.getCallId());
+                return null;
+            }
+            if (response.getCmd() != expectedInnerCmd) {
+                LoggerDef.NetLogger.warn(
+                        "S2S rpc response cmd mismatch, serverId={}, expected={}, got={}",
+                        serverId,
+                        expectedInnerCmd,
+                        response.getCmd());
+                return null;
+            }
+            return ProtoMessageFactory.createProtoMessage(response.getCmd(), response.getData().toByteArray());
+        } catch (Exception e) {
+            LoggerDef.NetLogger.error(
+                    "Failed to unpack S2S rpc response, serverId={}, expectedCmd={}, error={}",
+                    serverId,
+                    expectedInnerCmd,
+                    e.getMessage());
+            return null;
+        }
+    }
+
+    private long newCallId() {
+        return System.nanoTime() ^ Thread.currentThread().threadId();
+    }
+
+    private void saveReliableIfNeeded(
+            AbstractMessagePacket packet, RpcFailSavePolicy failSavePolicy, String reason) {
+        // 默认策略不改变旧同步 RPC 行为，只有显式传入策略时才进入 Redis outbox。
+        if (failSavePolicy == null || failSavePolicy == RpcFailSavePolicy.NONE) {
+            return;
+        }
+        // SEND_FAILED_ONLY 不处理响应超时，避免同步请求已经在目标服执行但响应丢失时被重复补发。
+        if (failSavePolicy == RpcFailSavePolicy.SEND_FAILED_ONLY && !"send failed".equals(reason)) {
+            return;
+        }
+        ReliableRpcStore.getInstance().save(serverId, packet, reason);
     }
 
     /**

@@ -19,9 +19,9 @@ public class DatabaseConnectionTest
     @Test
     public void testDatabaseConnection()
     {
-        String url = "jdbc:mysql://139.224.80.204:3306/pick_money";
+        String url = "jdbc:mysql://118.25.76.117:3306/pick_money";
         String username = "root";
-        String password = "ly.1006897725";
+        String password = "Ly@2026Root!8899";
 
         try {
             Connection conn = DriverManager.getConnection(url, username, password);

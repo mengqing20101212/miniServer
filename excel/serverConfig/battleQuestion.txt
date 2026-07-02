@@ -1,4 +1,5 @@
-id	questionContent	questionPic	answer	answer1	answerResult1	answerEffect1	answer2	answerResult2	answerEffect2	answer3	answerResult3	answerEffect3	answer4	answerResult4	answerEffect4	
+#fields	id	questionContent	questionPic	answer	answer1	answerResult1	answerEffect1	answer2	answerResult2	answerEffect2	answer3	answerResult3	answerEffect3	answer4	answerResult4	answerEffect4
+#types	INT	STRING	INT	INT	STRING	STRING	INT	STRING	STRING	INT	STRING	STRING	INT	STRING	STRING	INT
 1	我们背心军团涵盖了各级的精英！大哥可是S级英雄！你们不可能赢下去的！	313002300	0	你大哥已经被淘汰了。	什么？那我还是去投靠其他队伍吧……	0	我们会战胜他的！	别吹牛了！拿出真本事啊！看我捏碎你们！	0	我们会击败你的。	少……少废话！	0	 	 	0
 2	呱？情况好像不太妙啊呱？	313102000	0	为什么要和地底人一起战斗？	给……给你们传授点经验教训！	0	今天晚上就吃干锅牛蛙了！	呱呱呱~！（该内容不宜翻译）	0	没空和你们谈笑……	（跑的比地底人还快）	0	 	 	0
 3	我们背心军团涵盖了各级的精英！大哥可是S级英雄！你们不可能赢下去的！	313002300	0	你大哥已经被淘汰了。	什么？那我还是去投靠其他队伍吧……	0	你们蘑菇是个酱油	蘑菇逃跑了	0	我们会击败你的。	少……少废话！	0	 	 	0

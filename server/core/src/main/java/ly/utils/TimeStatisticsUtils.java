@@ -2,6 +2,9 @@ package ly.utils;
 
 import ly.LoggerDef;
 
+/**
+ * 公共工具类，
+ */
 public class TimeStatisticsUtils {
 
     public static TimeStatisticsLog makeLogBegin(String callName, long maxCost) {

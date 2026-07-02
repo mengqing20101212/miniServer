@@ -1,4 +1,5 @@
-id	heroid	config_name	headResource_S	bgResource	bgResource_0	skillResource	effectResource_1	effectResource_2	color	
+#fields	id	heroid	config_name	headResource_S	bgResource	bgResource_0	skillResource	effectResource_1	effectResource_2	color
+#types	INT	INT	STRING	INT	INT	INT	INT	INT	INT	STRING
 1000211	002	杰诺斯·武装	349900002	349910020	349910021	400990002	260000247	260000248	f58b00
 1000311	003	战栗的龙卷	349900003	349910030	349910031	400990003	260000249	260000250	00cd7d
 1000321	003	战栗的龙卷（魔女）	349900003	349910030	349910031	400990003	260000249	260000250	00cd7d

@@ -5,7 +5,6 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level - %msg%n"/>
         </Console>
-
         <!-- 网络日志 -->
         <RollingFile name="netRollingFile" fileName="logs/net.log"
                      filePattern="logs/net-%d{yyyy-MM-dd}.log">
@@ -41,6 +40,16 @@
                 <TimeBasedTriggeringPolicy/>
             </Policies>
         </RollingFile>
+
+        <!-- 死信日志 -->
+        <RollingFile name="deadLetterRollingFile" fileName="logs/dead-letter.log"
+                     filePattern="logs/dead-letter-%d{yyyy-MM-dd}.log">
+            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+
     </Appenders>
 
     <Loggers>
@@ -57,8 +66,12 @@
             <AppenderRef ref="systemRollingFile"/>
             <AppenderRef ref="Console"/>
         </Logger>
-        <Logger name="DbLogger" level="DEBUG" additivity="false">
+        <!-- <Logger name="DbLogger" level="DEBUG" additivity="false">
             <AppenderRef ref="DbRollingFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger> -->
+        <Logger name="deadLetterLogger" level="WARN" additivity="false">
+            <AppenderRef ref="deadLetterRollingFile"/>
             <AppenderRef ref="Console"/>
         </Logger>
         <Root level="INFO">

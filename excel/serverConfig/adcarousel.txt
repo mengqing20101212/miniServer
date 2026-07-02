@@ -1,4 +1,5 @@
-id	beizhu	adcarousel	adcarousel2	timeType	startTime	endTime	specialEndTime	jump1	order	level_limit	OpenServiceActivity	
+#fields	id	beizhu	adcarousel	adcarousel2	timeType	startTime	endTime	specialEndTime	jump1	order	level_limit	OpenServiceActivity
+#types	INT	STRING	INT	INT	INT	STRING	STRING	LIST<INT>	INT	INT	LIST<INT>	INT
 1	首充轮播图	340680002	8	1	44701	49451	0,5,0,172800	92	1	2,99	0
 2	累充轮播图	340680001	8	1	2022-5-20 05:00:00	2022-5-22 04:59:59	0,5,0,604800	93	4	2,99	0
 3	表彰计划	340680101	1	1	2022-5-20 05:00:00	2022-5-22 04:59:59	7,5,0,60480000	107	2	2,99	0

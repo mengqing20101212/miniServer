@@ -14,6 +14,18 @@ enum ErrorCode{
   PLAYER_NAME_EXISTS = 9; //玩家名已存在
   TOKEN_ERROR = 10; //token错误
   PLAYER_NOT_EXIST = 11; //玩家不存在
+
+  // 英雄相关错误码 5000-5099
+  HERO_NOT_FOUND = 5001; //英雄不存在
+  HERO_NOT_BELONG = 5002; //英雄不属于当前玩家
+  RESOURCE_NOT_ENOUGH = 5003; //资源不足
+  LEVEL_MAX = 5004; //等级已达上限
+  STAR_MAX = 5005; //星级已达上限
+  AWAKEN_MAX = 5006; //觉醒已达上限
+  STAR_CONDITION_NOT_MET = 5007; //升星条件不满足
+  AWAKEN_CONDITION_NOT_MET = 5008; //觉醒条件不满足
+  HERO_SLOT_FULL = 5009; //英雄槽位已满
+  HERO_ALREADY_EXISTS = 5010; //英雄已存在
 }
 
 

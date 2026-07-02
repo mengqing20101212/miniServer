@@ -1,4 +1,5 @@
-id	curve_resname	
+#fields	id	curve_resname
+#types	INT	STRING
 0	curve_normal
 1	curve_line
 1001	curve_move_away_normal

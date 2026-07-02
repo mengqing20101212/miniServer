@@ -4,6 +4,9 @@ import ly.proto.Login;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 游戏服玩家相关模型，承载玩家连接状态、持久化数据或模块数据。
+ */
 public class PlayerUtils {
     private static final Logger logger = LoggerFactory.getLogger(PlayerUtils.class);
     

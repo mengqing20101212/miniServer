@@ -6,26 +6,31 @@ import ly.LoggerDef;
 import ly.net.packet.AbstractMessagePacket;
 import org.slf4j.Logger;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-/*
- * Author: liuYang
- * Date: 2025/4/8
- * File: ServerHandler
+/**
+ * 服务端 Netty 入站处理器。
+ * <p>
+ * 它只处理连接生命周期和包入队，不直接执行业务逻辑。业务处理由各服务自己的 tick 或路由
+ * 逻辑从 {@link ConnectSession} 接收队列中取包后完成。
  */
 public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePacket> {
     static final Logger log = LoggerDef.NetLogger;
-    static AtomicInteger sessionCreator = new AtomicInteger(1);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, AbstractMessagePacket packet) throws Exception {
-        // 连接确认包特殊处理
+        // 客户端建立 TCP 后会发 CMD_ACK=0 请求 sid，服务端返回分配的会话 id。
         if (packet.getCmd() == AbstractMessagePacket.CMD_ACK) {
-            ctx.channel().writeAndFlush(new AbstractMessagePacket(sessionCreator.getAndIncrement()));
+            ConnectSession session = NetService.getInstance().getGameObject(ctx);
+            if (session == null || session.getConnector() == null) {
+                log.error("ACK failed, session not found for channel[{}], remote:{}", ctx.channel().id(), ctx.channel().remoteAddress());
+                ctx.close();
+                return;
+            }
+            // ACK sid 必须和 Connector sid 保持一致，Gate 后续要靠客户端原样带回的 sid 定位连接。
+            ctx.channel().writeAndFlush(new AbstractMessagePacket(session.getConnector().getSessionId()));
             return;
         }
 
-        // 获取会话
+        // 普通业务包必须先找到 channelActive 阶段创建的会话。
         ConnectSession session = NetService.getInstance().getGameObject(ctx);
         if (session == null) {
             log.error("Got null gameObject from channel[{}], :{}, packet:{}", ctx.channel().id(), ctx.channel().remoteAddress(), packet);
@@ -33,7 +38,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePa
             return;
         }
 
-        // 处理消息分发 - 使用新的HandlerContext机制
+        // 这里只入队，避免 Netty IO 线程直接执行耗时业务。
         session.addReceivePacket(packet);
     }
 
@@ -61,6 +66,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePa
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
+        // 新连接会通过 GameObjectProvider 创建对应服务自己的 ConnectSession 子类。
         ConnectSession object = NetService.getInstance().addChannel(ctx);
         log.info(String.format("收到新连接sid:%s, GameObjectSid:%d :[%s]", ctx.channel().id(), object.connector.sessionId, ctx.channel().remoteAddress()));
         object.getConnector().setStatus(Connector.CONNECT_STATUS_OPEN);

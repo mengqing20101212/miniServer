@@ -1,22 +1,48 @@
 package ly;
 
 import ly.config.ServerTypeEnum;
+import ly.logic.login.GateLoginController;
+import ly.logic.login.GateLogoutController;
+import ly.net.GateClient;
 import ly.net.GateConnectSessionProvider;
+import ly.proto.Cmd;
+import ly.proto.Server;
+import ly.rpc.RpcService;
+import ly.startup.StartupSkillLoader;
 
 /**
- * Hello world!
+ * GateServer 启动入口。
  */
 public class GateServer {
     public static void main(String[] args) {
         System.out.println("Hello World!");
-        if (args.length != 3) {
-            System.out.println("args error");
-            return;
-        }
-        String nacosUrl = args[0];
-        String env = args[1];
-        String serverId = args[2];
-        ServerContext.startUp(nacosUrl, ServerTypeEnum.GATE.getType(), serverId, env, new GateConnectSessionProvider());
-
+        StartupSkillLoader.ResolvedServerArgs resolved = StartupSkillLoader.resolveServerArgs(ServerTypeEnum.GATE, args);
+        ServerContext.addController(new GateLoginController(), new GateLogoutController());
+        RpcService.getInstance()
+                .setReliableReplayResponseHandler(
+                        (message, response) -> {
+                            if (response.getCmd() != Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE) {
+                                return false;
+                            }
+                            Server.scGate2GameRpcGameCall resp =
+                                    (Server.scGate2GameRpcGameCall)
+                                            ProtoMessageFactory.createProtoMessage(response.getCmd(), response.getData());
+                            if (resp == null) {
+                                return false;
+                            }
+                            // 重放的是客户端业务包，回包里的 clientSid 仍然是客户端在 Gate 上的 sid。
+                            GateClient client = GateClientManager.getInstance().getClientBySid(resp.getClientSid());
+                            if (client == null) {
+                                return false;
+                            }
+                            client.sendGameResponseToClient(resp);
+                            return true;
+                        });
+        ServerContext.startUp(
+                resolved.nacosUrl,
+                ServerTypeEnum.GATE.getType(),
+                resolved.serverId,
+                resolved.env,
+                new GateConnectSessionProvider());
     }
 }

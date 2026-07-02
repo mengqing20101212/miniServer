@@ -10,12 +10,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * 自动建表服务类
- * 在服务器启动时自动创建或更新表结构
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: AutoTableService
+ * 自动建表服务。
+ * <p>
+ * 启动时扫描生成的 Entry 类，生成建表 SQL 并尝试通过当前 MySQL 连接执行。该服务用于本地
+ * 开发和小规模部署的表结构初始化，生产环境仍应配合正式迁移流程审查 SQL。
  */
 public class AutoTableService {
     

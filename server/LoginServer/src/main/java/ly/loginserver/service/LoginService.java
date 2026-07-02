@@ -22,11 +22,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-/*
- * Author: liuYang
- * Date: 2025/4/14
- * File: LoginService
+/**
+ * 登录服业务服务，封装账号创建、token 维护以及可用网关/游戏服选择逻辑。
  */
 @Service
 public class LoginService {
@@ -42,19 +41,22 @@ public class LoginService {
     }
 
     public List<MiniPlayer> getPlayers(String account) {
-        LoginEntry entry = getLoginEntry(account);
+        LoginEntry entry = loadFromDB(account);
         if (entry == null) {
             logger.warn("未查到该账号信息:" + account);
             return new ArrayList<MiniPlayer>();
         }
+        CacheService.getCacheService(LoginEntry.class).put(entry, account);
         List<Long> guids = new ArrayList<>();
-        if (entry.getPlayers() != null) {
+        if (entry.getPlayers() != null && !entry.getPlayers().isBlank()) {
             String[] strs = entry.getPlayers().trim().split(";");
             for (String str : strs) {
-                guids.add(Long.parseLong(str));
+                if (str != null && !str.isBlank()) {
+                    guids.add(Long.parseLong(str.trim()));
+                }
             }
             List<MiniPlayer> miniPlayerList = MiniPlayerHelper.getMiniPlayerList(guids);
-            return miniPlayerList;
+            return miniPlayerList.stream().filter(player -> player != null).collect(Collectors.toList());
         }
         return new ArrayList<>();
     }
@@ -76,7 +78,7 @@ public class LoginService {
         List<NacosServerNode> list =
                 NacosService.getInstance().getNodeList(ServerTypeEnum.GATE).stream()
                         .sorted(Comparator.comparingInt(NacosServerNode::getLoadNum))
-                        .toList();
+                        .collect(Collectors.toList());
         if (list.isEmpty()) {
             return null;
         }
@@ -97,7 +99,7 @@ public class LoginService {
                                 node -> {
                                     return node.canUse();
                                 })
-                        .toList();
+                        .collect(Collectors.toList());
         List<ServerListResult.ServerNode> serverNodeList = new ArrayList<>();
         for (NacosServerNode node : list) {
             ServerListResult.ServerNode serverNode = new ServerListResult.ServerNode();
@@ -164,7 +166,11 @@ public class LoginService {
             entry.setToken(createToken(account));
             entry.setCreateTime(now);
             entry.setLastLoginTime(now);
-            entry.save();
+            boolean saveSuccess = LoginEntryHelper.save(entry);
+            if (!saveSuccess) {
+                logger.error("Failed to persist account to DB, account: {}", account);
+                return null;
+            }
             // 保存成功后写入Redis
             String key = RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account);
             RedisUtils.set(key, entry.getId());
@@ -190,6 +196,9 @@ public class LoginService {
         }
     }
 
+
+    public LoginService() {
+    }
     public void saveToken(String account, String token) {
         RedisUtils.setWithExpire(
                 RedisKeys.LOGIN_ACCOUNT_TOKEN_KEY.getKey(account), token, 1, TimeUnit.HOURS);

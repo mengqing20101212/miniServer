@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/*
- * Author: liuYang
- * Date: 2025/4/18
- * File: ThreeGateTest
+/**
+ * 测试类，用于验证该模块的连接、生成器或工具方法行为。
  */
 public class ThreeGateTest {
 

@@ -1,4 +1,5 @@
-skill	group	nextExp	bonus	
+#fields	skill	group	nextExp	bonus
+#types	INT	INT	INT	INT
 1	1	10	2
 2	1	15	3
 3	1	22	4

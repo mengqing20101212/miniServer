@@ -1,4 +1,5 @@
-id	drop	rewardShow	score	array	row	front	payGift	payGiftShow	rechargeId	isCrossNode	drop2	rewardShow2	line	circle	
+#fields	id	drop	rewardShow	score	array	row	front	payGift	payGiftShow	rechargeId	isCrossNode	drop2	rewardShow2	line	circle
+#types	INT	INT	STRING	INT	INT	INT	STRING	INT	STRING	INT	INT	INT	STRING	STRING	STRING
 1	30000101	30000101	2	1	4	 	0	 	0	0	30000101	30000101	 	 
 2	30000102	30000102	2	2	4	1	0	 	0	0	30000102	30000102	1,4|2,4	 
 3	30000103	30000103	2	3	4	2	0	 	0	0	30000103	30000103	2,4|3,4	 

@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 > nul
-set JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
+set JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8
 
 echo 终端编码已设置为UTF-8
 cd server

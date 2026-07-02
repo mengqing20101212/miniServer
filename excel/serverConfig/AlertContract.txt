@@ -1,4 +1,5 @@
-id	level	enemyInfo	enemyCircuitInfo	enemyPara	sceneId	dropId	firstDrop	dropShow	hint	tipPic	background	backgroundIn	heroPicId	recommendHeroIds	recommendTypes	avgLineupLevel	dropDay	dropDayShow	targetLevel	
+#fields	id	level	enemyInfo	enemyCircuitInfo	enemyPara	sceneId	dropId	firstDrop	dropShow	hint	tipPic	background	backgroundIn	heroPicId	recommendHeroIds	recommendTypes	avgLineupLevel	dropDay	dropDayShow	targetLevel
+#types	INT	INT	STRING	STRING	STRING	STRING	INT	INT	STRING	STRING	INT	INT	INT	INT	STRING	STRING	INT	INT	INT	INT
 1	1	38,2,4,1	1,0	6,-200|11,0	800101,800102	800011	800012	800011	我方<color=#ff0000>群体</color>伤害翻倍,我方<color=#ff0000>单体</color>伤害翻倍	340780101	340780001	340080044	321000801	2,3,5,10,13,14,17,21,35|4,6,39,50,11,12,15,20,22	2,3	0	501013	501013	10
 2	2	39,2,4,1	1,0	6,-180|11,0	800201,800202	800021	800022	800021	我方<color=#ff0000>群体</color>伤害翻倍,我方<color=#ff0000>单体</color>伤害翻倍	340780103	340780003	340080074	321002101	2,3,5,10,13,14,17,21,35|4,6,39,50,11,12,15,20,22	2,3	26	501023	501023	10
 3	3	40,2,5,1	1,0	6,-160|11,0	800301,800302	800031	800032	800031	我方<color=#ff0000>群体</color>伤害翻倍,我方<color=#ff0000>单体</color>伤害翻倍	340780102	340780002	340080072	321000801	2,3,5,10,13,14,17,21,35|4,6,39,50,11,12,15,20,22	2,3	27	501033	501033	10

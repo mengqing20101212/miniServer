@@ -9,6 +9,9 @@ import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
 
+/**
+ * 公共工具类，提供时间、随机、位图、KV 解析或通用数据结构等辅助能力。
+ */
 public class TimeUtils {
     public static LocalDateTime now() {
         return LocalDateTime.now();

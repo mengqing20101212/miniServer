@@ -1,4 +1,5 @@
-id	config_name	characterModelId	defaultAni	bornShowAni	clickType	clickAniList	clickCameraList	moveDistance	cameraDistance	clickText	groupText	ActivityType	param_1	param_2	npcGrounpId	showPriority	decorationId	decorationPoint	
+#fields	id	config_name	characterModelId	defaultAni	bornShowAni	clickType	clickAniList	clickCameraList	moveDistance	cameraDistance	clickText	groupText	ActivityType	param_1	param_2	npcGrounpId	showPriority	decorationId	decorationPoint
+#types	INT	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING	STRING
 4000211	杰诺斯(武装)（主城展示）	4000211	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	2	为了变强，我什么困难都会努力克服！	 	0	 	 	 	1,0	 	 
 4000311	战栗的龙卷（主城展示）	4000311	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	1	嗯？你有什么疑问吗？	乖乖回家去，事情交给我处理就够了。	0	 	 	5,1	 	 	 
 4000321	战栗的龙卷（星月魔女主城展示）	4000321	idle_show_loop|1	born_show	1	maincity_talk_start|0|zhucheng,maincity_talk_loop|1,maincity_talk_end	0	9,0	1	嗯？你有什么疑问吗？	乖乖回家去，事情交给我处理就够了。	0	 	 	5,1	 	 	 

@@ -1,4 +1,5 @@
-id	stage	Days	rewardShow	drop	rechargShow	rewardsfree	rewardsfinally	finallydrop	RechargeShop	
+#fields	id	stage	Days	rewardShow	drop	rechargShow	rewardsfree	rewardsfinally	finallydrop	RechargeShop
+#types	INT	INT	INT	STRING	INT	INT	INT	INT	INT	INT
 1	1	1	20000055	20000055	20000055	20000054	0	0	20049
 2	1	2	20000056	20000056	20000056	20000054	0	0	20050
 3	1	3	20000057	20000057	20000057	20000054	0	0	20051

@@ -30,7 +30,7 @@ public class ShareDailyEntryHelper {
   }
 
   public static void asyncUpdate(ShareDailyEntry ShareDailyEntry, String... fileds) {
-    MysqlService.getInstance().addUpdateEntry(ShareDailyEntry);
+    MysqlService.getInstance().addUpdateEntry(ShareDailyEntry, fileds);
   }
 
   public static List<ShareDailyEntry> select(String[] fields, Object... params) {

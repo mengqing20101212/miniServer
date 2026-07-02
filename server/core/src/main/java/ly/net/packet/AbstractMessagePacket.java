@@ -4,9 +4,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import java.util.Arrays;
 
-/*
- * Unified packet implementation:
- * [length:2][cmd:4][sid:4][seq:4][guid:8][time:4][data:N]
+/**
+ * 网络层统一协议包。
+ * <p>
+ * 二进制格式固定为：
+ * {@code [length:2][cmd:4][sid:4][seq:4][guid:8][time:4][data:N]}。
+ * {@code length} 包含自身 2 字节和后续全部字段长度，因此最小包长为 22。
+ * {@code data} 保存 protobuf 序列化后的业务消息，由上层根据 {@code cmd} 反序列化。
  */
 public class AbstractMessagePacket {
   public static final int CMD_ACK = 0;
@@ -22,7 +26,11 @@ public class AbstractMessagePacket {
     this.time = (int) (System.currentTimeMillis() / 1000L);
   }
 
-  // ack packet
+  /**
+   * 创建连接确认包。
+   * <p>
+   * cmd 为 {@link #CMD_ACK}，sid 是服务端分配给该连接的会话 id。
+   */
   public AbstractMessagePacket(int sessionId) {
     this();
     this.cmd = CMD_ACK;
@@ -83,10 +91,12 @@ public class AbstractMessagePacket {
     this.guid = guid;
   }
 
+  /** 返回除 data 外的包头长度。 */
   protected short getHeadLength() {
     return 22;
   }
 
+  /** 计算当前包完整长度，写包前会重新计算以同步 data 长度。 */
   protected short getPacketLen() {
     return (short) (getHeadLength() + data.length);
   }
@@ -107,6 +117,11 @@ public class AbstractMessagePacket {
     this.time = time;
   }
 
+  /**
+   * 将当前对象编码到 Netty 的输出缓冲区。
+   *
+   * @return 编码成功返回 {@code true}；异常时返回 {@code false} 并交由调用方记录日志
+   */
   public boolean encode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) {
     try {
       if (data == null) {
@@ -126,6 +141,12 @@ public class AbstractMessagePacket {
     }
   }
 
+  /**
+   * 从输入缓冲区读取除 length 外的包体字段。
+   * <p>
+   * 调用方已经读出了 {@code packetLen}，这里按固定头结构继续读取 cmd、sid、seq、guid、
+   * time 和 data。若包长小于头长，说明上游解码状态异常。
+   */
   public boolean decode(int packetLen, ByteBuf in) {
     try {
       this.length = (short) packetLen;
@@ -148,6 +169,7 @@ public class AbstractMessagePacket {
     }
   }
 
+  /** 返回适合协议日志使用的简短摘要，避免打印完整 data。 */
   public String toSimpleString() {
     return String.format("%d|%d|%d|%d|%d|%d", cmd, sid, seq, guid, data.length, getPacketLen());
   }

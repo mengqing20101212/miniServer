@@ -1,4 +1,5 @@
-id	name	icon	dec	
+#fields	id	name	icon	dec
+#types	INT	STRING	INT	STRING
 1	生命	340020401	代表角色可承受的伤害，角色生命值为0时阵亡
 2	攻击	340020402	增加角色攻击时造成的伤害
 3	防御	340020403	降低角色受到攻击时承受的伤害

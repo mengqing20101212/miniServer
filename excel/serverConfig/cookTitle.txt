@@ -1,4 +1,5 @@
-id	title	star	
+#fields	id	title	star
+#types	INT	STRING	INT
 101	极上的	15
 102	还算可以的	5
 103	 	1

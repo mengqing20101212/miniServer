@@ -6,6 +6,9 @@ import ly.logic.player.event.PlayerEventType;
 
 import java.util.List;
 
+/**
+ * 游戏服玩家相关模型，承载玩家连接状态、持久化数据或模块数据。
+ */
 public class PlayerLogicModule extends AbstractModule {
     long lastLoginTimer;
 
@@ -15,7 +18,7 @@ public class PlayerLogicModule extends AbstractModule {
 
     @Override
     public boolean saveData() {
-        return false;
+        return true;
     }
 
     @Override

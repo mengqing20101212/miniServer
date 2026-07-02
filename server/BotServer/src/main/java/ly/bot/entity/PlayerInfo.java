@@ -1,11 +1,7 @@
 package ly.bot.entity;
 
 /**
- * 玩家信息实体类
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: PlayerInfo
+ * 机器人侧玩家信息模型，保存登录后得到的账号和角色基础数据。
  */
 public class PlayerInfo {
     private long playerId;      // 玩家ID

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMServer - Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f4f6f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0 1rem;
+            height: 56px;
+            z-index: 1040;
+            flex-shrink: 0;
+        }
+        .navbar .navbar-brand { color: #fff; font-weight: 600; font-size: 1.2rem; letter-spacing: 0.5px; }
+        .navbar .navbar-brand i { margin-right: 0.5rem; }
+        .navbar .nav-link { color: rgba(255,255,255,0.85) !important; padding: 0.5rem 0.8rem; border-radius: 0.25rem; transition: background 0.2s; }
+        .navbar .nav-link:hover { background: rgba(255,255,255,0.15); color: #fff !important; }
+        .navbar .dropdown-menu { border: none; box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.1); border-radius: 0.5rem; }
+        .navbar .dropdown-item i { width: 1.2rem; text-align: center; margin-right: 0.5rem; color: #667eea; }
+        .navbar .dropdown-item:hover { background: #f0f2ff; }
+        .admin-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: inline-flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 600; font-size: 0.85rem; margin-right: 0.5rem;
+        }
+        .sidebar-toggle-btn {
+            background: none; border: none; color: rgba(255,255,255,0.85);
+            font-size: 1.3rem; cursor: pointer; padding: 0 0.5rem; transition: color 0.2s;
+        }
+        .sidebar-toggle-btn:hover { color: #fff; }
+        .layout-wrapper { display: flex; flex: 1; min-height: 0; }
+        .sidebar {
+            width: 250px; min-width: 250px; background: #fff;
+            border-right: 1px solid #e3e6f0;
+            display: flex; flex-direction: column;
+            transition: width 0.3s ease, min-width 0.3s ease; overflow: hidden;
+        }
+        .sidebar.collapsed { width: 0; min-width: 0; border-right: none; }
+        .sidebar-header {
+            padding: 1rem 1.2rem; font-weight: 600; color: #5a5c69;
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;
+            border-bottom: 1px solid #e3e6f0; flex-shrink: 0;
+        }
+        .sidebar-menu { flex: 1; overflow-y: auto; padding: 0.5rem 0; }
+        .sidebar-menu::-webkit-scrollbar { width: 4px; }
+        .sidebar-menu::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+        .nav-item-side { list-style: none; }
+        .nav-link-side {
+            display: flex; align-items: center; padding: 0.65rem 1.2rem;
+            color: #5a5c69; text-decoration: none; font-size: 0.9rem;
+            transition: all 0.2s; cursor: pointer; border-left: 3px solid transparent;
+        }
+        .nav-link-side:hover { background: #f0f2ff; color: #667eea; border-left-color: #667eea; }
+        .nav-link-side.active { background: #f0f2ff; color: #667eea; border-left-color: #667eea; font-weight: 500; }
+        .nav-link-side i { width: 1.5rem; text-align: center; font-size: 1rem; margin-right: 0.5rem; }
+        .nav-link-side .menu-arrow { margin-left: auto; transition: transform 0.3s; font-size: 0.8rem; }
+        .nav-link-side .menu-arrow.open { transform: rotate(90deg); }
+        .sub-menu { list-style: none; padding: 0; overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+        .sub-menu.open { max-height: 500px; }
+        .sub-menu .nav-link-side { padding-left: 3.2rem; font-size: 0.85rem; }
+        .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; padding: 0; overflow: hidden; }
+        .tab-strip { display: flex; align-items: center; gap: 0.25rem; padding: 0.5rem 0.75rem 0; background: #f4f6f9; border-bottom: 1px solid #e3e6f0; overflow-x: auto; flex-shrink: 0; }
+        .page-tab { display: inline-flex; align-items: center; gap: 0.45rem; max-width: 180px; height: 34px; padding: 0 0.55rem 0 0.75rem; color: #5a5c69; background: #e9edf6; border: 1px solid #dce1ee; border-bottom: none; border-radius: 0.45rem 0.45rem 0 0; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
+        .page-tab.active { color: #4e5bd5; background: #fff; font-weight: 600; }
+        .page-tab-title { overflow: hidden; text-overflow: ellipsis; }
+        .page-tab-close { border: none; background: transparent; color: #8a90a3; width: 18px; height: 18px; border-radius: 50%; line-height: 18px; padding: 0; }
+        .page-tab-close:hover { background: #eef1f7; color: #dc3545; }
+        .content-frame { width: 100%; height: 100%; border: none; background: #fff; display: none; }
+        .content-frame.active { display: block; }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; top: 56px; left: 0; bottom: 0; z-index: 1030; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
+            .sidebar.collapsed { left: -250px; }
+            .sidebar-overlay { display: none; position: fixed; top: 56px; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 1029; }
+            .sidebar-overlay.show { display: block; }
+            .main-content { padding: 1rem; }
+        }
+        .frame-loading { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #667eea; }
+        .frame-loading.show { display: block; }
+        .content-container { position: relative; flex: 1; display: flex; flex-direction: column; padding: 0.75rem; min-height: 0; }
+        .frame-stack { flex: 1; min-height: 0; background: #fff; border-radius: 0.5rem; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075); overflow: hidden; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand navbar-dark">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center">
+                <button class="sidebar-toggle-btn" id="sidebarToggle" title="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a class="navbar-brand ms-2" href="/gm/index">
+                    <i class="fas fa-shield-alt"></i> GMServer
+                </a>
+            </div>
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="admin-avatar" id="adminAvatar">A</span>
+                        <span id="adminName">Admin</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="openPage('/gm/admin/profile', 'Profile')"><i class="fas fa-user-circle"></i> Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="layout-wrapper">
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header"><i class="fas fa-th-list me-1"></i> Navigation</div>
+            <ul class="sidebar-menu" id="menuTree">
+                <li class="nav-item-side"><div class="nav-link-side text-center" style="cursor:default;border-left:none;"><i class="fas fa-spinner fa-spin"></i> Loading menu...</div></li>
+            </ul>
+        </div>
+        <div class="main-content" id="mainContent">
+            <div class="tab-strip" id="tabStrip"></div>
+            <div class="content-container">
+                <div class="frame-loading" id="frameLoading"><i class="fas fa-spinner fa-spin fa-2x"></i><p class="mt-2">Loading...</p></div>
+                <div class="frame-stack" id="frameStack"></div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function getToken() { return localStorage.getItem('gm_token'); }
+    function getAdmin() { try { var r = localStorage.getItem('gm_admin'); return r ? JSON.parse(r) : null; } catch(e) { return null; } }
+    function redirectToLogin() { localStorage.removeItem('gm_token'); localStorage.removeItem('gm_admin'); window.location.href = '/gm/login'; }
+    
+    function apiGet(url, cb) {
+        var t = getToken();
+        if (!t) { redirectToLogin(); return; }
+        fetch(url, { method: 'GET', headers: { 'Authorization': 'Bearer ' + t, 'Accept': 'application/json' } })
+        .then(handleApiResponse)
+        .then(function(d) { cb(null, d); })
+        .catch(function(e) { cb(e, null); });
+    }
+    
+    function apiPost(url, data, cb) {
+        var t = getToken();
+        if (!t) { redirectToLogin(); return; }
+        fetch(url, { method: 'POST', headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(data) })
+        .then(handleApiResponse)
+        .then(function(d) { cb(null, d); })
+        .catch(function(e) { cb(e, null); });
+    }
+
+    function handleApiResponse(r) {
+        if (r.status === 401 || r.status === 403) {
+            redirectToLogin();
+            throw new Error('登录已过期');
+        }
+        return r.text().then(function(text) {
+            var data = null;
+            if (text && text.trim()) {
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('接口返回不是JSON: HTTP ' + r.status);
+                }
+            }
+            if (!r.ok) {
+                throw new Error((data && (data.message || data.msg)) || ('HTTP ' + r.status));
+            }
+            if (!data) {
+                throw new Error('接口返回为空');
+            }
+            return data;
+        });
+    }
+
+    (function() {
+        var t = getToken();
+        if (!t) { redirectToLogin(); return; }
+        var admin = getAdmin();
+        if (admin) {
+            document.getElementById('adminName').textContent = admin.username || admin.name || 'Admin';
+            var av = document.getElementById('adminAvatar');
+            av.textContent = (admin.username || admin.name || 'A').charAt(0).toUpperCase();
+        }
+    })();
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleBtn = document.getElementById('sidebarToggle');
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        toggleBtn.addEventListener('click', function() { sidebar.classList.toggle('collapsed'); overlay.classList.toggle('show'); });
+        overlay.addEventListener('click', function() { sidebar.classList.add('collapsed'); overlay.classList.remove('show'); });
+    });
+
+    function loadMenuTree() {
+        apiGet('/api/menu/tree', function(err, data) {
+            var container = document.getElementById('menuTree');
+            if (err || !data) {
+                container.innerHTML = '<li class="nav-item-side"><div class="nav-link-side text-danger"><i class="fas fa-exclamation-triangle"></i> Failed to load menu</div></li>';
+                return;
+            }
+            var menus = data;
+            if (data.data && Array.isArray(data.data)) menus = data.data;
+            else if (data.menu && Array.isArray(data.menu)) menus = data.menu;
+            else if (data.menus && Array.isArray(data.menus)) menus = data.menus;
+            if (!Array.isArray(menus)) {
+                container.innerHTML = '<li class="nav-item-side"><div class="nav-link-side"><i class="fas fa-info-circle"></i> No menu items</div></li>';
+                return;
+            }
+            container.innerHTML = '';
+            menus.forEach(function(item) { var li = buildMenuItem(item); if (li) container.appendChild(li); });
+        });
+    }
+
+    function buildMenuItem(item) {
+        if (!item) return null;
+        var name = item.name || item.title || item.label || 'Menu';
+        var icon = item.icon || getDefaultIcon(name);
+        var path = item.path || item.url || item.route || '';
+        var children = item.children || item.subMenu || item.submenu || [];
+        var li = document.createElement('li');
+        li.className = 'nav-item-side';
+        var a = document.createElement('a');
+        a.className = 'nav-link-side';
+        a.innerHTML = '<i class="' + icon + '"></i> <span>' + name + '</span>';
+        if (children && children.length > 0) {
+            var arrow = document.createElement('span');
+            arrow.className = 'menu-arrow fas fa-chevron-right';
+            a.appendChild(arrow);
+            var ul = document.createElement('ul');
+            ul.className = 'sub-menu';
+            children.forEach(function(child) { var childLi = buildMenuItem(child); if (childLi) ul.appendChild(childLi); });
+            a.addEventListener('click', function(e) { e.preventDefault(); arrow.classList.toggle('open'); ul.classList.toggle('open'); });
+            li.appendChild(a);
+            li.appendChild(ul);
+        } else if (path) {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                openPage(path, name);
+                document.querySelectorAll('.nav-link-side').forEach(function(n) { n.classList.remove('active'); });
+                a.classList.add('active');
+            });
+            li.appendChild(a);
+        } else {
+            a.style.cursor = 'default'; a.style.fontWeight = '600'; a.style.fontSize = '0.8rem';
+            a.style.textTransform = 'uppercase'; a.style.color = '#b0b3c0'; a.style.borderLeft = 'none';
+            li.appendChild(a);
+        }
+        return li;
+    }
+
+    function getDefaultIcon(name) {
+        var map = { 'dashboard':'fas fa-tachometer-alt', 'admin':'fas fa-user-shield', 'user':'fas fa-users', 'player':'fas fa-gamepad', 'role':'fas fa-user-tag', 'menu':'fas fa-sitemap', 'server':'fas fa-server', 'log':'fas fa-clipboard-list', 'config':'fas fa-cog', 'system':'fas fa-cogs', 'setting':'fas fa-sliders-h', 'report':'fas fa-chart-bar', 'notice':'fas fa-bullhorn', 'mail':'fas fa-envelope', 'permission':'fas fa-key', 'manage':'fas fa-tasks', 'data':'fas fa-database', 'tool':'fas fa-wrench', 'help':'fas fa-question-circle' };
+        var lower = name.toLowerCase();
+        for (var key in map) { if (lower.indexOf(key) !== -1) return map[key]; }
+        return 'fas fa-circle';
+    }
+
+    var tabs = {};
+    var activeTabKey = '';
+    var currentPageTitle = 'Dashboard';
+    function openPage(url, title) {
+        if (!url) return;
+        var key = url;
+        if (tabs[key]) {
+            activateTab(key);
+            return;
+        }
+        var frame = document.createElement('iframe');
+        frame.className = 'content-frame';
+        frame.dataset.tabKey = key;
+        frame.onload = onFrameLoad;
+        document.getElementById('frameStack').appendChild(frame);
+        tabs[key] = { url: url, title: title || 'Page', frame: frame };
+        createTab(key, tabs[key].title);
+        activateTab(key);
+        var loading = document.getElementById('frameLoading');
+        loading.classList.add('show');
+        frame.src = url;
+        currentPageTitle = title || 'Page';
+    }
+
+    function onFrameLoad() { document.getElementById('frameLoading').classList.remove('show'); }
+
+    function createTab(key, title) {
+        var tab = document.createElement('div');
+        tab.className = 'page-tab';
+        tab.dataset.tabKey = key;
+        tab.innerHTML = '<span class="page-tab-title">' + escapeHtml(title) + '</span><button class="page-tab-close" title="关闭">×</button>';
+        tab.addEventListener('click', function() { activateTab(key); });
+        tab.querySelector('.page-tab-close').addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeTab(key);
+        });
+        document.getElementById('tabStrip').appendChild(tab);
+    }
+
+    function activateTab(key) {
+        if (!tabs[key]) return;
+        activeTabKey = key;
+        document.querySelectorAll('.page-tab').forEach(function(tab) {
+            tab.classList.toggle('active', tab.dataset.tabKey === key);
+        });
+        document.querySelectorAll('.content-frame').forEach(function(frame) {
+            frame.classList.toggle('active', frame.dataset.tabKey === key);
+        });
+    }
+
+    function closeTab(key) {
+        var tab = tabs[key];
+        if (!tab) return;
+        tab.frame.remove();
+        var tabEl = Array.from(document.querySelectorAll('.page-tab')).find(function(item) {
+            return item.dataset.tabKey === key;
+        });
+        if (tabEl) tabEl.remove();
+        delete tabs[key];
+        if (activeTabKey === key) {
+            var keys = Object.keys(tabs);
+            if (keys.length > 0) activateTab(keys[keys.length - 1]);
+        }
+    }
+
+    function escapeHtml(s) {
+        return (s == null ? '' : String(s)).replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
+    }
+
+    function handleLogout() {
+        var t = getToken();
+        if (t) { apiPost('/api/admin/logout', {}, function(err, data) { localStorage.removeItem('gm_token'); localStorage.removeItem('gm_admin'); window.location.href = '/gm/login'; }); }
+        else { localStorage.removeItem('gm_token'); localStorage.removeItem('gm_admin'); window.location.href = '/gm/login'; }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        apiGet('/api/admin/info', function(err, data) {
+            if (!err && data) {
+                var admin = data.admin || data.data || data;
+                if (admin) {
+                    localStorage.setItem('gm_admin', JSON.stringify(admin));
+                    document.getElementById('adminName').textContent = admin.username || admin.name || 'Admin';
+                    var av = document.getElementById('adminAvatar');
+                    av.textContent = (admin.username || admin.name || 'A').charAt(0).toUpperCase();
+                }
+            }
+        });
+        loadMenuTree();
+        openPage('/gm/admin/dashboard', 'Dashboard');
+    });
+    </script>
+</body>
+</html>

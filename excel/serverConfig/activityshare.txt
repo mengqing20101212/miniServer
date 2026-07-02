@@ -1,4 +1,5 @@
-id	beizhu	share_type	drop	dropShow	name	
+#fields	id	beizhu	share_type	drop	dropShow	name
+#types	INT	STRING	INT	INT	INT	STRING
 1	10连抽分享	2	20000191	20000191	本周首次分享获得50钻石
 2	获得SSR分享	1	20000191	20000191	本次分享可获得50钻石
 3	赛季段位分享	2	20000191	20000191	本周首次分享获得50钻石

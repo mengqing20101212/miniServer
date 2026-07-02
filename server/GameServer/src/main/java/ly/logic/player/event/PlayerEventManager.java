@@ -9,10 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.function.Consumer;
 
+/**
+ * 游戏服管理器，维护对应业务对象的生命周期和查询入口。
+ */
 public class PlayerEventManager {
     Map<PlayerEventType, List<IPlayerEvent>> eventHandlerMap = new HashMap<>();
-    ArrayBlockingQueue<PlayerEventParam> eventQueue = new ArrayBlockingQueue<>(1024);
+    private final ArrayBlockingQueue<PlayerEventParam> pendingEventQueue = new ArrayBlockingQueue<>(1024);
 
     public void register(PlayerEventType eventType, IPlayerEvent eventHandler) {
         List<IPlayerEvent> eventHandlers = eventHandlerMap.get(eventType);
@@ -24,19 +28,32 @@ public class PlayerEventManager {
     }
 
     public void dispatchEvent(Player player, PlayerEventType eventType, Object... args) {
-        PlayerEventParam param = new PlayerEventParam(player, eventType, args);
-        eventQueue.add(param);
+        dispatchEvent(new PlayerEventParam(player, eventType, args));
     }
 
-    public void tickEvent() {
-        while (!eventQueue.isEmpty()) {
-            PlayerEventParam param = eventQueue.poll();
-            handleEvent(param.getPlayer(), param.getEventType(), param.getArgs());
+    public void dispatchEvent(PlayerEventParam param) {
+        if (!pendingEventQueue.offer(param)) {
+            LoggerDef.SystemLogger.error(
+                    "PlayerEventManager pending queue full, playerId={}, eventType={}",
+                    param.getPlayer() == null ? 0L : param.getPlayer().getPlayerId(),
+                    param.getEventType());
+        }
+    }
+
+    public void drainPendingEvents(Consumer<PlayerEventParam> consumer) {
+        PlayerEventParam param;
+        while ((param = pendingEventQueue.poll()) != null) {
+            consumer.accept(param);
         }
     }
 
     public void handleEvent(Player player, PlayerEventType eventType, Object... args) {
-        PlayerEventParam param = new PlayerEventParam(player, eventType, args);
+        handleEvent(new PlayerEventParam(player, eventType, args));
+    }
+
+    public void handleEvent(PlayerEventParam param) {
+        Player player = param.getPlayer();
+        PlayerEventType eventType = param.getEventType();
         List<IPlayerEvent> eventHandlers = eventHandlerMap.get(eventType);
         long beginT1 = TimeUtils.nowMillis();
 

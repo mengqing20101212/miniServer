@@ -6,11 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 基于ConcurrentHashMap的模块数据存储实现
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: ConcurrentModuleDataStore
+ * 机器人运行时数据存储，提供模块隔离的键值状态保存能力。
  */
 public class ConcurrentModuleDataStore<T> implements ModuleDataStore<T> {
     

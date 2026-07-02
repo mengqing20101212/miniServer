@@ -1,4 +1,5 @@
-id	openType	scheDuling	shopId	drop	rechargShow	sloganName	sloganBg	limitPara	rechargeShopId	refreshTime	moneyType	quantity	
+#fields	id	openType	scheDuling	shopId	drop	rechargShow	sloganName	sloganBg	limitPara	rechargeShopId	refreshTime	moneyType	quantity
+#types	INT	INT	INT	INT	INT	INT	STRING	INT	INT	INT	INT	INT	INT
 1	119	1	1	20000261	20000261	免费	3	1	0	172800	1120020	0
 2	119	1	1	20000262	20000262	2折	1	1	20103	172800	1120020	0
 3	119	1	1	20000263	20000263	2折	1	1	20104	172800	1120020	0

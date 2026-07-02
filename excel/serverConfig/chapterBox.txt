@@ -1,4 +1,5 @@
-id	chapterMainId	drop	dropShow	patterntype	
+#fields	id	chapterMainId	drop	dropShow	patterntype
+#types	INT	INT	INT	INT	INT
 201021	1	2010217	2010217	1
 201041	1	2010417	2010417	1
 202021	2	2020217	2020217	1

@@ -1,6 +1,10 @@
 package ly.net;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.protobuf.AbstractMessage;
+
 import ly.LoggerDef;
 import ly.ProtoMessageFactory;
 import ly.logic.player.Player;
@@ -8,14 +12,17 @@ import ly.logic.player.PlayerManager;
 import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
+import ly.proto.Server;
+import ly.utils.CommonUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * 游戏服管理器，维护对应业务对象的生命周期和查询入口。
+ */
 public class GameHandlerRouteManager extends HandlerRouterManager {
     private static final GameHandlerRouteManager instance = new GameHandlerRouteManager();
     Map<Integer, GameHandlerRouter<? extends AbstractMessage>> gameHandlerRouterMap = new HashMap<>();
-//    Map<Integer, Class<? extends AbstractMessage>> protoClassMap = new HashMap<>();
+    // Map<Integer, Class<? extends AbstractMessage>> protoClassMap = new
+    // HashMap<>();
 
     public static GameHandlerRouteManager getInstance() {
         return instance;
@@ -27,22 +34,25 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
     /**
      * 执行（自动类型检查 + 安全强转）
      */
-    @SuppressWarnings("unchecked")
     public static void execute(GameConnectSession session, AbstractMessagePacket packet) {
         try {
             final int cmd = packet.getCmd();
             GameHandlerRouteManager instance = getInstance();
-            if (instance.gameHandlerRouterMap.containsKey(cmd)) {//game handler 单独处理
+            if (cmd == Cmd.CMD.CS_Server2Server_VALUE) {
+                executeServer2ServerRpc(session, packet);
+                return;
+            }
+            if (instance.gameHandlerRouterMap.containsKey(cmd)) {// game handler 单独处理
                 Player player = PlayerManager.getInstance().getOnlinePlayer(packet.getGuid());
                 if (!checkPacket(packet)) {
                     return;
                 }
                 if (player != null) {
                     player.getGamePlayer().addPacket(packet);
-                } else {//login packet 处理
+                } else {// login packet 处理
                     HandlerRouterManager.execute(session, packet);
                 }
-            } else {//其他途径的消息由逻辑处理
+            } else {// 其他途径的消息由逻辑处理
                 HandlerRouterManager.execute(session, packet);
             }
         } catch (Exception e) {
@@ -51,35 +61,62 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
         }
     }
 
+    private static void executeServer2ServerRpc(GameConnectSession session, AbstractMessagePacket packet) {
+        Server.csServer2Server request = (Server.csServer2Server) ProtoMessageFactory.createProtoMessage(
+                Cmd.CMD.CS_Server2Server_VALUE, packet.getData());
+        if (request == null) {
+            LoggerDef.SystemLogger.error("execute S2S rpc fail, request is null");
+            return;
+        }
+        if (request.getType() != Server.ServerMsgType.protobufMsg) {
+            LoggerDef.SystemLogger.error("execute S2S rpc fail, unsupported type={}", request.getType());
+            return;
+        }
+
+        AbstractMessagePacket innerPacket = new AbstractMessagePacket(
+                packet.getGuid(),
+                request.getCmd(),
+                packet.getSid(),
+                0,
+                request.getData().toByteArray());
+        Server2ServerRpcContext.run(request.getCallId(), () -> execute(session, innerPacket));
+    }
+
     private static boolean checkPacket(AbstractMessagePacket packet) {
         final int cmd = packet.getCmd();
-//        Class<? extends AbstractMessage> protoClass = instance.protoClassMap.get(cmd);
-//        if (protoClass == null) {
-//            LoggerDef.SystemLogger.error(" GameHandlerRouteManager checkPacket error, protoClass is null, cmd:{}", cmd);
-//            return false;
-//        }
+        // Class<? extends AbstractMessage> protoClass =
+        // instance.protoClassMap.get(cmd);
+        // if (protoClass == null) {
+        // LoggerDef.SystemLogger.error(" GameHandlerRouteManager checkPacket error,
+        // protoClass is null, cmd:{}", cmd);
+        // return false;
+        // }
 
         return true;
     }
 
     public <R extends AbstractMessage> void register(Cmd.CMD cmd, GameHandlerRouter<R> handler) {
         gameHandlerRouterMap.put(cmd.getNumber(), handler);
-//        protoClassMap.put(cmd.getNumber(), protoClass);
+        // protoClassMap.put(cmd.getNumber(), protoClass);
 
-        LoggerDef.SystemLogger.info(String.format("GameHandlerRouteManager register handler cmd:%s( %d ),handler:%s", cmd.toString(), cmd.getNumber(), handler.getClass().getSimpleName()));
+        LoggerDef.SystemLogger.info(String.format("GameHandlerRouteManager register handler cmd:%s( %d ),handler:%s",
+                cmd.toString(), cmd.getNumber(), handler.getClass().getSimpleName()));
     }
-
 
     public static boolean execute(Player player, int cmd, int seq, int sid, AbstractMessage req) {
         // 检查请求类型是否匹配
-//        Class<? extends AbstractMessage> expectedType = instance.protoClassMap.get(cmd);
-//        if (expectedType == null || !expectedType.isInstance(request)) {
-//            LoggerDef.SystemLogger.error("execute cmd={} fail, request type mismatch: expected={}, actual={}",
-//                    cmd, expectedType == null ? "unknown" : expectedType.getName(), request.getClass().getName());
-//            return false;
-//        }
+        // Class<? extends AbstractMessage> expectedType =
+        // instance.protoClassMap.get(cmd);
+        // if (expectedType == null || !expectedType.isInstance(request)) {
+        // LoggerDef.SystemLogger.error("execute cmd={} fail, request type mismatch:
+        // expected={}, actual={}",
+        // cmd, expectedType == null ? "unknown" : expectedType.getName(),
+        // request.getClass().getName());
+        // return false;
+        // }
         GameHandlerRouter<?> router = instance.gameHandlerRouterMap.get(cmd);
-        AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(player.getPlayerId(), cmd, req, seq, sid);
+        AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(player.getPlayerId(), cmd, req,
+                seq, sid);
         try {
             // 创建游戏处理器上下文并执行路由处理
             GameHandlerContext context = new GameHandlerContext(player, packet);
@@ -99,7 +136,8 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
      */
     public static boolean execute(Player player, AbstractMessagePacket packet) {
         if (player == null || packet == null) {
-            LoggerDef.SystemLogger.error("execute route, param invalid: player={}, packet={}", player == null, packet == null);
+            LoggerDef.SystemLogger.error("execute route, param invalid: player={}, packet={}", player == null,
+                    packet == null);
             return false;
         }
 
@@ -117,6 +155,11 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
             LoggerDef.SystemLogger.error("execute cmd={} fail, request deserialize error", cmd);
             return false;
         }
+        LoggerDef.LogProto(String.format(
+                "receive clientCmd=%s|clientReqSeq=%d|guid=%d|clientSid=%d|callId=%d|%s",
+                Cmd.CMD.forNumber(packet.getCmd()).name(), packet.getSeq(),
+                packet.getGuid(),
+                packet.getSid(), player.getGamePlayer().getLastCallId(), CommonUtils.logProto(request)));
 
         return execute(player, cmd, packet.getSeq(), packet.getSid(), request);
     }

@@ -1,17 +1,11 @@
 package ly.bot.module.impl;
 
-import ly.bot.command.RobotCommand;
-import ly.bot.factory.RobotCommandFactory;
 import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
 
 /**
- * 货币模块 - 管理虚拟货币
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: CurrencyModule
+ * 机器人行为模块，封装登录、心跳、移动、战斗等可组合行为能力。
  */
 public class CurrencyModule implements RobotModule {
     private boolean completed = false;

@@ -1,0 +1,48 @@
+syntax = "proto3";
+option java_package = "ly.proto";
+
+// GM 玩家模块快照
+message gmPlayerModule {
+  string moduleName = 1;
+  string className = 2;
+  string json = 3;
+  bool editable = 4;
+}
+
+// GM 字段修改项，path 使用点分路径，例如 heroList[0].level 或 moduleData.resources.1
+message gmPlayerFieldChange {
+  string path = 1;
+  string oldValue = 2;
+  string newValue = 3;
+}
+
+// GM 查询在线玩家详情
+message csGmPlayerDetail {
+  int64 playerId = 1;
+}
+
+message scGmPlayerDetail {
+  int32 code = 1;
+  string error = 2;
+  int64 playerId = 3;
+  bool online = 4;
+  string gameServerId = 5;
+  string baseJson = 6;
+  repeated gmPlayerModule modules = 7;
+}
+
+// GM 修改在线玩家模块字段
+message csGmUpdatePlayerModule {
+  int64 playerId = 1;
+  string moduleName = 2;
+  repeated gmPlayerFieldChange changes = 3;
+  string operator = 4;
+}
+
+message scGmUpdatePlayerModule {
+  int32 code = 1;
+  string error = 2;
+  int64 playerId = 3;
+  string moduleName = 4;
+  string json = 5;
+}

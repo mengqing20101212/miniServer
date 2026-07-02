@@ -1,0 +1,70 @@
+syntax = "proto3";
+option java_package = "ly.proto";
+
+import "ErrorMsg.proto";
+
+// 获取英雄列表请求
+message CS_HeroList {
+}
+
+// 英雄信息
+message HeroInfo {
+  int64 hero_uid = 1;
+  int32 hero_id = 2;
+  int32 level = 3;
+  int32 star = 4;
+  int32 awaken = 5;
+  int64 exp = 6;
+  int64 max_exp = 7;
+}
+
+// 获取英雄列表响应
+message SC_HeroList {
+  repeated HeroInfo hero_list = 1;
+}
+
+// 英雄升级请求
+message CS_HeroLevelUp {
+  int64 hero_uid = 1;
+  repeated int32 exp_item_ids = 2;
+}
+
+// 英雄升级响应
+message SC_HeroLevelUp {
+  ErrorCode result = 1;
+  HeroInfo hero_info = 2;
+}
+
+// 英雄升星请求
+message CS_HeroStarUp {
+  int64 hero_uid = 1;
+}
+
+// 英雄升星响应
+message SC_HeroStarUp {
+  ErrorCode result = 1;
+  HeroInfo hero_info = 2;
+}
+
+// 英雄觉醒请求
+message CS_HeroAwaken {
+  int64 hero_uid = 1;
+}
+
+// 英雄觉醒响应
+message SC_HeroAwaken {
+  ErrorCode result = 1;
+  HeroInfo hero_info = 2;
+}
+
+// 添加英雄请求（内部使用，GM命令等）
+message CS_HeroAdd {
+  int32 hero_id = 1;
+  int32 count = 2;
+}
+
+// 添加英雄响应
+message SC_HeroAdd {
+  ErrorCode result = 1;
+  repeated HeroInfo hero_list = 2;
+}

@@ -30,7 +30,7 @@ public class GameItemEntryHelper {
   }
 
   public static void asyncUpdate(GameItemEntry gameItemEntry, String... fileds) {
-    MysqlService.getInstance().addUpdateEntry(gameItemEntry);
+    MysqlService.getInstance().addUpdateEntry(gameItemEntry, fileds);
   }
 
   public static List<GameItemEntry> select(String[] fields, Object... params) {

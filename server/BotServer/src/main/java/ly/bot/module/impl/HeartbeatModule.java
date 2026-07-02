@@ -1,17 +1,14 @@
 package ly.bot.module.impl;
 
-import ly.bot.command.RobotCommand;
-import ly.bot.factory.RobotCommandFactory;
+import ly.bot.action.RobotActionContext;
+import ly.bot.action.RobotActionResult;
+import ly.bot.action.impl.HeartbeatAction;
 import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
 
 /**
- * 心跳模块 - 处理心跳相关行为
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: HeartbeatModule
+ * 机器人行为模块，封装登录、心跳、移动、战斗等可组合行为能力。
  */
 public class HeartbeatModule implements RobotModule {
     private boolean completed = false;
@@ -20,11 +17,10 @@ public class HeartbeatModule implements RobotModule {
     
     @Override
     public boolean executeStep(NetClient client, RobotSession session) {
-        // 发送心跳包
-        RobotCommand heartbeatCommand = RobotCommandFactory.createCommand(
-            RobotCommandFactory.CommandType.HEARTBEAT
-        );
-        heartbeatCommand.execute(client, session);
+        RobotActionResult result = new HeartbeatAction().execute(new RobotActionContext(client, session));
+        if (!result.isSuccess()) {
+            return false;
+        }
         
         // 存储心跳相关的数据到会话级别存储
         session.getDataStore().put("heartbeat", "lastHeartbeatTime", System.currentTimeMillis());

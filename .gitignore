@@ -1,4 +1,5 @@
 logs/
+runlogs/
 *.log
 /.idea/google-java-format.xml
 .idea
@@ -7,3 +8,8 @@ logs/
 *.class
 *.vscode
 /target/
+**/target/
+*.LCKpom.xml~
+dependency-reduced-pom.xml
+logs/system.log
+logs/net.log

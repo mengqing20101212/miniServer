@@ -3,21 +3,26 @@ package ly.logic.player;
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.google.protobuf.AbstractMessage;
+
+import ly.LoggerDef;
 import ly.logic.player.event.PlayerEventManager;
+import ly.logic.player.event.PlayerEventParam;
+import ly.logic.player.event.PlayerEventSource;
 import ly.logic.player.event.PlayerEventType;
 import ly.net.GamePlayer;
-import ly.net.packet.MessagePacketFactory;
-import ly.net.packet.AbstractMessagePacket;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
-import ly.proto.Server;
 import ly.utils.TimeStatisticsUtils;
 import ly.utils.TimeUtils;
 
+/**
+ * 游戏服玩家相关模型，承载玩家连接状态、持久化数据或模块数据。
+ */
 public class Player {
     private GamePlayer gamePlayer;
     private PlayerData playerData;
     private PlayerStatusEnum status;
+    private String loginToken;
 
     private final PlayerEventManager eventManager = new PlayerEventManager();
 
@@ -57,30 +62,60 @@ public class Player {
             // 初始化玩家各个功能模块
             // 这里可以初始化装备、技能、任务等系统
 
-            TimeStatisticsUtils.TimeStatisticsLog log = TimeStatisticsUtils.makeLogBegin(String.format("Player-%s-%d-InitModules", getAccount(), getPlayerId()), 1000);
+            TimeStatisticsUtils.TimeStatisticsLog log = TimeStatisticsUtils
+                    .makeLogBegin(String.format("Player-%s-%d-InitModules", getAccount(), getPlayerId()), 1000);
 
             for (ModuleEnum moduleEnum : ModuleEnum.values()) {
-                TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()), 50);
+                TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(
+                        String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()),
+                        50);
                 byte[] moduleData = playerData.getModuleData(moduleEnum);
-                Codec<?> codec = ProtobufProxy.create(moduleEnum.getModule().getClass());
-                AbstractModule module = (AbstractModule) codec.decode(moduleData);
+                AbstractModule module = createModuleInstance(moduleEnum, moduleData);
                 module.init(this);
                 module.onLoadData();
+                playerData.putModule(moduleEnum, module);
                 moduleInitLog.LogEnd();
             }
+
+            // 初始化完成后落一次模块快照，避免老号 modules 为空或新号只有空壳数据。
+            for (ModuleEnum moduleEnum : ModuleEnum.values()) {
+                AbstractModule module = playerData.getModule(moduleEnum);
+                if (module != null) {
+                    module.saveData();
+                }
+            }
+            playerData.getPlayerEntry().asyncUpdate();
 
             log.LogEnd();
 
             // 设置玩家状态为已初始化
-//            setStatus(PlayerStatusEnum.INITIALIZED);
+            // setStatus(PlayerStatusEnum.INITIALIZED);
 
             // 分发玩家初始化完成事件
-//            dispatchEvent(PlayerEventType.PLAYER_INIT_COMPLETE);
+            // dispatchEvent(PlayerEventType.PLAYER_INIT_COMPLETE);
         } catch (Exception e) {
             System.err.println("Error initializing modules for player " + getPlayerId() + ": " + e.getMessage());
-//            setStatus(PlayerStatusEnum.INIT_FAILED);
+            // setStatus(PlayerStatusEnum.INIT_FAILED);
         }
 
+    }
+
+    private AbstractModule createModuleInstance(ModuleEnum moduleEnum, byte[] moduleData) throws Exception {
+        Class<? extends AbstractModule> moduleClass = moduleEnum.getModule().getClass();
+        if (moduleData == null || moduleData.length == 0) {
+            return moduleClass.getDeclaredConstructor().newInstance();
+        }
+        try {
+            Codec<?> codec = ProtobufProxy.create(moduleClass);
+            return (AbstractModule) codec.decode(moduleData);
+        } catch (Exception e) {
+            LoggerDef.SystemLogger.warn(
+                    "init module fallback, playerId={}, module={}, reason={}",
+                    getPlayerId(),
+                    moduleClass.getSimpleName(),
+                    e.getMessage());
+            return moduleClass.getDeclaredConstructor().newInstance();
+        }
     }
 
     public void setStatus(PlayerStatusEnum playerStatusEnum) {
@@ -100,12 +135,25 @@ public class Player {
     }
 
     public String getToken() {
-        return gamePlayer.getToken();
+        return loginToken;
     }
 
-    // TODO  玩家事件分发 需要一个异步版本
+    public void setToken(String loginToken) {
+        this.loginToken = loginToken;
+    }
+
     public void dispatchEvent(PlayerEventType playerEventType, Object... args) {
-        eventManager.dispatchEvent(this, playerEventType, args);
+        dispatchEvent(PlayerEventSource.SELF, getPlayerId(), playerEventType, args);
+    }
+
+    public void dispatchEvent(PlayerEventSource source, long sourcePlayerId, PlayerEventType playerEventType,
+            Object... args) {
+        PlayerEventParam param = PlayerEventParam.of(this, playerEventType, source, sourcePlayerId, args);
+        if (gamePlayer == null) {
+            eventManager.dispatchEvent(param);
+            return;
+        }
+        gamePlayer.addEvent(param);
     }
 
     public long getCreateTime() {
@@ -113,11 +161,13 @@ public class Player {
     }
 
     public int getLevel() {
-        return playerData.playerEntry.getLevel();
+        Integer level = playerData.playerEntry.getLevel();
+        return level == null ? 1 : level;
     }
 
     public int getVipLevel() {
-        return playerData.playerEntry.getViplevel();
+        Integer vipLevel = playerData.playerEntry.getViplevel();
+        return vipLevel == null ? 0 : vipLevel;
     }
 
     public long getLoginTime() {
@@ -130,23 +180,35 @@ public class Player {
 
     public void setGamePlayer(GamePlayer gamePlayer) {
         this.gamePlayer = gamePlayer;
+        // GamePlayer 处理队列中的业务包时需要反向拿到 Player 上下文。
+        if (gamePlayer != null) {
+            gamePlayer.bindPlayer(this);
+            eventManager.drainPendingEvents(gamePlayer::addEvent);
+        }
     }
 
     public void statPlay() {
+        LoggerDef.SystemLogger.info("[statPlay] starting tick thread, playerId={}, account={}", getPlayerId(),
+                getAccount());
         Thread.ofVirtual().name(String.format("Player-%s-%d", getAccount(), getPlayerId())).start(() -> {
             tick();
         });
     }
 
     private void tick() {
+        LoggerDef.SystemLogger.info("[Player-tick] thread started, playerId={}, gamePlayer={}", getPlayerId(),
+                gamePlayer != null);
         try {
             while (true) {
                 try {
-                    eventManager.tickEvent();
-                    gamePlayer.tickPacket();
-                    if (gamePlayer.isEmpty()) {
-                        Thread.sleep(100);
+                    if (gamePlayer == null) {
+                        Thread.sleep(100L);
+                        continue;
                     }
+                    gamePlayer.tickWorkItem();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -157,29 +219,10 @@ public class Player {
     }
 
     public void sendErrorCode(Cmd.CMD cmd, ErrorMsg.ErrorCode errorCode) {
-        ErrorMsg.scErrorCode.Builder res = ErrorMsg.scErrorCode.newBuilder();
-        res.setMsgId(cmd.getNumber());
-        res.setErrorCode(errorCode);
-        sendMsg(Cmd.CMD.SC_ErrorCode, res.build());
+        gamePlayer.sendErrorCode(cmd.getNumber(), errorCode);
     }
 
     public void sendMsg(Cmd.CMD cmd, AbstractMessage message) {
-        if (getGamePlayer().getLastClientCmd() == 0) {
-            AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), cmd.getNumber(), message, 0, 0);
-            getGamePlayer().getSession().addSendPacket(sendPacket);
-        } else {
-            if (cmd.getNumber() == getGamePlayer().getLastClientCmd() + 1) {
-                Server.scGate2GameRpcGameCall.Builder builder = Server.scGate2GameRpcGameCall.newBuilder();
-                builder.setData(message.toByteString());
-                AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, builder.build(), getGamePlayer().getLastSeq(), gamePlayer.getLastSid());
-                getGamePlayer().getSession().addSendPacket(sendPacket);
-                getGamePlayer().setLastClientCmd(0);
-                getGamePlayer().setLastSeq(0);
-                getGamePlayer().setLastSid(0);
-            } else {
-                AbstractMessagePacket sendPacket = MessagePacketFactory.createAbstractMessagePacket(getPlayerId(), cmd.getNumber(), message, gamePlayer.getLastSeq(), gamePlayer.getLastSid());
-                getGamePlayer().getSession().addSendPacket(sendPacket);
-            }
-        }
+        gamePlayer.sendMsg(cmd.getNumber(), message);
     }
 }

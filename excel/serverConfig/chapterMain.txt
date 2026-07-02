@@ -1,4 +1,5 @@
-id	patterntype	storyName	chapterShow	unlockLv	storyId	nextChapter	lastChapter	chapterStage	starReward	rewardShow	unlockWord	background	introduce	
+#fields	id	patterntype	storyName	chapterShow	unlockLv	storyId	nextChapter	lastChapter	chapterStage	starReward	rewardShow	unlockWord	background	introduce
+#types	INT	INT	STRING	STRING	INT	INT	INT	INT	STRING	STRING	STRING	STRING	INT	STRING
 1	1	<size=40>第</size>1<size=40>章</size>	第一章	1	0	2	0	201010,201020,201021,201030,201031,201040,201041,201050,201061	3,2010001|9,2010002|18,2010003	2010001,2010002,2010003	等级达到1级	330900202	 
 2	1	<size=40>第</size>2<size=40>章</size>	第二章	5	101	3	1	202010,202020,202021,202030,202031,202040,202041,202050,202061	3,2020001|9,2020002|18,2020003	2020001,2020002,2020003	等级达到5级	330900206	红色标示的目标蕴含着可利用的能量，应优先解决
 3	1	<size=40>第</size>3<size=40>章</size>	第三章	7	101	4	2	203010,203020,203021,203030,203031,203040,203041,203050,203061	3,2030001|9,2030002|18,2030003	2030001,2030002,2030003	等级达到7级	330900210	红色标示的目标蕴含着可利用的能量，应优先解决

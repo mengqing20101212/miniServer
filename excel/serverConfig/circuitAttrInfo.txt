@@ -1,4 +1,5 @@
-id	type	description	skillDescription	attrType	attrNum	upgradeAdd	name	pos	quality	sequence	skillId	extraSkillId	
+#fields	id	type	description	skillDescription	attrType	attrNum	upgradeAdd	name	pos	quality	sequence	skillId	extraSkillId
+#types	INT	INT	STRING	STRING	INT	INT	INT	STRING	INT	STRING	INT	INT	INT
 501	1	主属性--攻击加成+33_通用_位置0_橙	技能--暂无技能	9	33	11	通用	0	橙	1	0	0
 401	1	主属性--攻击加成+29_通用_位置0_紫	技能--暂无技能	9	29	10	通用	0	紫	1	0	0
 301	1	主属性--攻击加成+21_通用_位置0_蓝	技能--暂无技能	9	21	7	通用	0	蓝	1	0	0

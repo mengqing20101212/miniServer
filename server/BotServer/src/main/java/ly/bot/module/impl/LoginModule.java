@@ -1,17 +1,11 @@
 package ly.bot.module.impl;
 
-import ly.bot.command.RobotCommand;
-import ly.bot.factory.RobotCommandFactory;
 import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
 
 /**
- * 登录模块 - 处理登录相关行为
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: LoginModule
+ * 机器人行为模块，封装登录、心跳、移动、战斗等可组合行为能力。
  */
 public class LoginModule implements RobotModule {
     private boolean completed = false;
@@ -21,13 +15,8 @@ public class LoginModule implements RobotModule {
     public boolean executeStep(NetClient client, RobotSession session) {
         // 登录通常在初始化时完成，这里只是标记为已完成
         if (step == 0) {
-            // 如果尚未登录，则发送登录请求
+            // 登录请求由 RobotSession 主流程发送，这里只记录等待状态。
             if (!session.isLoginSuccess()) {
-                RobotCommand loginCommand = RobotCommandFactory.createCommand(
-                    RobotCommandFactory.CommandType.LOGIN
-                );
-                loginCommand.execute(client, session);
-                
                 // 存储登录相关的数据到会话级别存储
                 session.getDataStore().put("login", "loginStartTime", System.currentTimeMillis());
                 session.getDataStore().put("login", "loginAttemptCount", 1);

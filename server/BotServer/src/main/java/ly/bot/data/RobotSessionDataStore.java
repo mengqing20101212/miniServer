@@ -4,11 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 机器人会话数据存储 - 用于跨模块共享数据
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: RobotSessionDataStore
+ * 机器人运行时数据存储，提供模块隔离的键值状态保存能力。
  */
 public class RobotSessionDataStore {
     

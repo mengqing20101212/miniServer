@@ -1,4 +1,5 @@
-id	name	resource	tag	
+#fields	id	name	resource	tag
+#types	INT	STRING	INT	STRING
 1	杰诺斯(武装)	313000200	2
 2	战栗的龙卷	313000300	3
 3	金属球棒	313000800	2

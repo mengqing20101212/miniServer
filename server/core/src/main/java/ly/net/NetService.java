@@ -13,10 +13,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/*
- * Author: liuYang
- * Date: 2025/4/8
- * File: NetServcie
+/**
+ * Netty 服务端总控。
+ * <p>
+ * 负责创建监听端口、维护 Channel 到 {@link ConnectSession} 的映射，并用一个后台任务
+ * 批量刷新所有会话的待发送队列。业务代码通常不直接操作 Channel，而是通过会话对象
+ * 收包和发包。
  */
 public class NetService {
     protected static final AttributeKey<Boolean> SELF_CLOSED = AttributeKey.valueOf("selfClosed");
@@ -48,20 +50,26 @@ public class NetService {
         return sidCreator.incrementAndGet();
     }
 
+    /**
+     * 启动一个或多个 TCP 监听端口。
+     *
+     * @param gameObjectProvider 新连接会话工厂，不同业务服可创建自己的 ConnectSession 子类
+     * @param ports 需要监听的端口列表
+     */
     public void startUp(GameObjectProvider gameObjectProvider, int... ports) {
         if (ports.length == 0) {
             throw new IllegalArgumentException("No ports provided");
         }
         this.gameObjectProvider = gameObjectProvider;
 
-        // 优化NetService发送任务，使用自适应间隔和批量处理
+        // 发送任务和 Netty IO 解耦：业务只入队，后台线程按负载自适应 flush。
         Thread.ofVirtual()
                 .name("send-packet-task")
                 .start(
                         () -> {
                             while (!Thread.currentThread().isInterrupted()) {
                                 try {
-                                    // 自适应间隔：根据队列大小调整发送频率
+                                    // 队列越大刷新越频繁，低负载时降低空轮询成本。
                                     int queueSize = gameObjectMaps.values().stream()
                                             .mapToInt(session -> session.sendPacketQueue.size())
                                             .sum();
@@ -102,6 +110,11 @@ public class NetService {
         }
     }
 
+    /**
+     * 移除断开的 Channel，并清理会话映射。
+     * <p>
+     * Netty 的 inactive/exception 路径都会调用这里，方法内部对空 ctx 和重复关闭做容错。
+     */
     public void delChannel(ChannelHandlerContext ctx) {
         if (ctx == null || ctx.channel() == null) {
             return;
@@ -132,6 +145,12 @@ public class NetService {
         }
     }
 
+    /**
+     * 为新建 Channel 创建业务会话并建立双向索引。
+     * <p>
+     * {@code gameObjectMaps} 按业务 guid 查询，{@code gameObjectContextMaps} 按 Netty ctx
+     * 查询。若 Provider 返回重复 guid，会保留旧会话并返回旧对象。
+     */
     public ConnectSession addChannel(ChannelHandlerContext ctx) {
         if (ctx == null) {
             log.error("Failed to add channel: ChannelHandlerContext is null");
@@ -160,10 +179,15 @@ public class NetService {
                 return null;
             }
             
-            ConnectSession existingObject = gameObjectMaps.computeIfAbsent(guid, k -> object);
-            if (existingObject != object) {
-                log.warn("Duplicate session GUID detected: {}", guid);
-                return existingObject;
+            ConnectSession existingObject = gameObjectMaps.put(guid, object);
+            if (existingObject != null && existingObject != object) {
+                log.warn("Duplicate session GUID detected: {}, replace old session", guid);
+                gameObjectContextMaps.entrySet().removeIf(entry -> entry.getValue() == existingObject);
+                try {
+                    existingObject.closeChannel();
+                } catch (Exception e) {
+                    log.warn("Error closing duplicate old session {}", guid, e);
+                }
             }
             
             gameObjectContextMaps.put(ctx, object);

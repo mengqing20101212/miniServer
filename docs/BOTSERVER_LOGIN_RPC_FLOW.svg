@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1240" viewBox="0 0 1800 1240">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .title { font: 700 30px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 16px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #475569; }
+      .lane-title { font: 700 18px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #0f172a; }
+      .box-title { font: 700 16px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #111827; }
+      .box-text { font: 14px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #334155; }
+      .small { font: 13px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; fill: #475569; }
+      .lane { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1; }
+      .bot { fill: #e0f2fe; stroke: #0284c7; stroke-width: 1.5; rx: 8; }
+      .login { fill: #dcfce7; stroke: #16a34a; stroke-width: 1.5; rx: 8; }
+      .gate { fill: #fef3c7; stroke: #d97706; stroke-width: 1.5; rx: 8; }
+      .game { fill: #ede9fe; stroke: #7c3aed; stroke-width: 1.5; rx: 8; }
+      .rpc { fill: #fee2e2; stroke: #dc2626; stroke-width: 1.5; rx: 8; }
+      .ok { fill: #ecfdf5; stroke: #059669; stroke-width: 1.5; rx: 8; }
+      .warn { fill: #fff7ed; stroke: #fb923c; stroke-width: 1.5; rx: 8; }
+      .arrow { stroke: #334155; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #64748b; stroke-width: 2; fill: none; marker-end: url(#arrow); stroke-dasharray: 6 5; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1800" height="1240" fill="#ffffff"/>
+  <text x="40" y="48" class="title">BotServer 登录与 Gate/Game RPC 流程</text>
+  <text x="40" y="78" class="subtitle">seq 只属于当前 socket；clientReqSeq 只做日志；Gate 统一分配 clientDownSeq；Gate/Game 用 callId 匹配回包。</text>
+
+  <rect x="40" y="110" width="300" height="760" class="lane"/>
+  <rect x="360" y="110" width="300" height="760" class="lane"/>
+  <rect x="680" y="110" width="500" height="760" class="lane"/>
+  <rect x="1200" y="110" width="520" height="760" class="lane"/>
+  <text x="60" y="140" class="lane-title">BotServer</text>
+  <text x="380" y="140" class="lane-title">LoginServer HTTP</text>
+  <text x="700" y="140" class="lane-title">GateServer</text>
+  <text x="1220" y="140" class="lane-title">GameServer</text>
+
+  <rect x="70" y="170" width="240" height="80" class="bot"/>
+  <text x="90" y="198" class="box-title">1. 获取登录信息</text>
+  <text x="90" y="224" class="box-text">/login/register 或 serverList</text>
+  <path d="M310,210 L360,210" class="arrow"/>
+  <rect x="390" y="170" width="240" height="80" class="login"/>
+  <text x="410" y="198" class="box-title">返回 Gate 和 token</text>
+  <text x="410" y="224" class="box-text">accountId / token / gameServerId</text>
+  <path d="M390,245 L310,275" class="dash"/>
+
+  <rect x="70" y="300" width="240" height="90" class="bot"/>
+  <text x="90" y="328" class="box-title">2. 连接 Gate</text>
+  <text x="90" y="354" class="box-text">TCP connect + CMD_ACK</text>
+  <text x="90" y="378" class="box-text">收到 clientSid</text>
+  <path d="M310,345 L680,345" class="arrow"/>
+  <rect x="720" y="300" width="410" height="90" class="gate"/>
+  <text x="740" y="328" class="box-title">GateClient 建立</text>
+  <text x="740" y="354" class="box-text">保存账号、目标 Game、clientSid</text>
+  <text x="740" y="378" class="box-text">clientDownSeq 从 0 开始递增</text>
+
+  <rect x="70" y="430" width="240" height="90" class="bot"/>
+  <text x="90" y="458" class="box-title">3. 发送 CS_Login</text>
+  <text x="90" y="484" class="box-text">sid=clientSid</text>
+  <text x="90" y="508" class="box-text">seq=clientReqSeq</text>
+  <path d="M310,475 L680,475" class="arrow"/>
+  <rect x="720" y="430" width="410" height="100" class="gate"/>
+  <text x="740" y="458" class="box-title">Gate 二次封装</text>
+  <text x="740" y="484" class="box-text">clientCmd / clientSid / clientReqSeq</text>
+  <text x="740" y="508" class="box-text">生成 callId，等待 callId 回包</text>
+  <path d="M1130,480 L1200,480" class="arrow"/>
+  <rect x="1240" y="430" width="430" height="110" class="game"/>
+  <text x="1260" y="458" class="box-title">Game 解包登录</text>
+  <text x="1260" y="484" class="box-text">外层 sid/seq 属于 Gate-Game RPC</text>
+  <text x="1260" y="508" class="box-text">内层 clientSid/clientReqSeq 只用于客户端上下文</text>
+  <text x="1260" y="532" class="box-text">登录 DB 操作进入 LoginManager 协程</text>
+
+  <rect x="1240" y="590" width="430" height="90" class="rpc"/>
+  <text x="1260" y="618" class="box-title">4. Game 返回内层响应</text>
+  <text x="1260" y="644" class="box-text">clientCmd=SC_Login / clientSid / callId</text>
+  <text x="1260" y="668" class="box-text">不携带 clientDownSeq</text>
+  <path d="M1240,635 L1130,635" class="arrow"/>
+  <rect x="720" y="590" width="410" height="100" class="gate"/>
+  <text x="740" y="618" class="box-title">Gate 匹配并转发</text>
+  <text x="740" y="644" class="box-text">getReceiveMsgByCallId(callId)</text>
+  <text x="740" y="668" class="box-text">nextClientDownSeq() 后写客户端 socket</text>
+  <path d="M720,640 L310,640" class="arrow"/>
+  <rect x="70" y="590" width="240" height="90" class="ok"/>
+  <text x="90" y="618" class="box-title">Bot 收到 SC_Login</text>
+  <text x="90" y="644" class="box-text">sid=clientSid</text>
+  <text x="90" y="668" class="box-text">seq=clientDownSeq</text>
+
+  <rect x="70" y="735" width="240" height="80" class="bot"/>
+  <text x="90" y="763" class="box-title">5. 业务包</text>
+  <text x="90" y="789" class="box-text">CS_HeroList 等同样封装</text>
+  <path d="M310,775 L680,775" class="arrow"/>
+  <rect x="720" y="735" width="410" height="80" class="gate"/>
+  <text x="740" y="763" class="box-title">Gate -> Game</text>
+  <text x="740" y="789" class="box-text">失败或超时保存 Redis outbox</text>
+  <path d="M1130,775 L1200,775" class="arrow"/>
+  <rect x="1240" y="735" width="430" height="80" class="game"/>
+  <text x="1260" y="763" class="box-title">GamePlayer 队列</text>
+  <text x="1260" y="789" class="box-text">按玩家队列顺序处理 packet/event</text>
+
+  <rect x="40" y="930" width="1680" height="230" class="warn"/>
+  <text x="70" y="965" class="box-title">可靠 RPC 重放</text>
+  <text x="70" y="1000" class="box-text">1. Gate 发送 Game 失败时，把原始 CS_Gate2GameRpcGameCall 保存到 Redis outbox。</text>
+  <text x="70" y="1030" class="box-text">2. Game 恢复后 Gate 重放，重新写入新的 callId，并等待 SC_Gate2GameRpcGameCall。</text>
+  <text x="70" y="1060" class="box-text">3. 重放等待线程消费回包后，调用 Gate 注册的处理器，按 clientSid 找回客户端并转发。</text>
+  <text x="70" y="1090" class="box-text">4. 如果 clientSid 对应客户端不存在，处理器返回失败，outbox 消息保留到下一轮重试。</text>
+  <text x="70" y="1120" class="small">本轮严格测试验证：Bot 登录后停 Game，HeroList 保存 outbox；Game 重启后回包 cmd=1002 sid=3 seq=2 正常回到 Bot。</text>
+</svg>

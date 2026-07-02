@@ -1,4 +1,5 @@
-id	type	name	icon	star	recipe	cookSkill	skillExp	skillIncrease	baseReward	activityId	saitamaExp	dropId	word	
+#fields	id	type	name	icon	star	recipe	cookSkill	skillExp	skillIncrease	baseReward	activityId	saitamaExp	dropId	word
+#types	INT	INT	STRING	INT	INT	STRING	STRING	INT	INT	STRING	INT	INT	INT	STRING
 1	1	烤肉丼饭	314005003	1	1,6	1	2	10	1120005,5	0	4	3801	明火烤肉，加上秘制酱料覆盖到丼饭的上层
 2	1	鳗鱼玉子烧	314005006	1	2,5	2	2	10	1120002,2000	0	4	3802	美味营养，制作简单
 3	1	豚骨拉面	314005018	1	3,6	3	2	10	6110001,10	0	4	3803	经过长时间熬制的豚骨高汤，令人无法拒绝

@@ -8,6 +8,7 @@ import ly.db.DbMeta;
  */
 @DbMeta.DbTable(name = "share_enum_config")
 public class ShareEnumConfigEntry extends AbstractEntry {
+  private static final String[] DIRTY_FIELDS = {"id", "code", "name", "config_desc"};
 
   @DbMeta.DbMasterKey(name="id", autoIncrement=true)
   @DbMeta.DbField(name="id")
@@ -18,6 +19,14 @@ public class ShareEnumConfigEntry extends AbstractEntry {
   private String name;
   @DbMeta.DbField(name="config_desc")
   private String config_desc;
+  public ShareEnumConfigEntry() {
+    initDirtyState(DIRTY_FIELDS.length);
+  }
+
+  @Override
+  protected String[] allDirtyFieldNames() {
+    return DIRTY_FIELDS;
+  }
   public void save() {
     ShareEnumConfigEntryHelper.save(this);
   }
@@ -41,6 +50,7 @@ public class ShareEnumConfigEntry extends AbstractEntry {
  public void setId(Integer Id) {
     this.id = Id;
     autoAddCurVersion();
+    markFieldDirty(0);
   }
   public Integer getId() {
     return id;
@@ -48,6 +58,7 @@ public class ShareEnumConfigEntry extends AbstractEntry {
  public void setCode(String Code) {
     this.code = Code;
     autoAddCurVersion();
+    markFieldDirty(1);
   }
   public String getCode() {
     return code;
@@ -55,6 +66,7 @@ public class ShareEnumConfigEntry extends AbstractEntry {
  public void setName(String Name) {
     this.name = Name;
     autoAddCurVersion();
+    markFieldDirty(2);
   }
   public String getName() {
     return name;
@@ -62,6 +74,7 @@ public class ShareEnumConfigEntry extends AbstractEntry {
  public void setConfigDesc(String ConfigDesc) {
     this.config_desc = ConfigDesc;
     autoAddCurVersion();
+    markFieldDirty(3);
   }
   public String getConfigDesc() {
     return config_desc;

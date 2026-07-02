@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-container { padding: 20px; max-width: 800px; margin: 0 auto; }
+        .form-header { margin-bottom: 20px; }
+        .form-header h2 { font-size: 1.5rem; margin: 0; }
+        .form-label { font-weight: 500; }
+        .required::after { content: " *"; color: #dc3545; }
+        .card-body { padding: 30px; }
+        .btn-group-wide { display: flex; gap: 10px; }
+        .btn-group-wide .btn { flex: 1; }
+        .alert-fixed { position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .perm-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .perm-item .form-control { flex: 1; }
+        .perm-item .btn { flex-shrink: 0; }
+        .add-perm-btn { margin-top: 4px; }
+        .menu-tree-container { max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 12px; }
+        .menu-tree-container::-webkit-scrollbar { width: 6px; }
+        .menu-tree-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        .tree-node { margin-left: 0; }
+        .tree-node .tree-children { margin-left: 24px; padding-left: 12px; border-left: 1px dashed #dee2e6; }
+        .tree-node .form-check { margin-bottom: 6px; }
+        .tree-node .form-check-label { cursor: pointer; }
+        .tree-node .form-check-input { cursor: pointer; }
+        .tree-leaf-count { font-size: 0.8rem; color: #6c757d; margin-left: 6px; }
+        .select-all-bar { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .select-all-bar .btn { font-size: 0.85rem; }
+        .section-title { font-weight: 600; color: #495057; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <!-- Header -->
+    <div class="form-header d-flex justify-content-between align-items-center">
+        <h2 id="formTitle"><i class="fas fa-user-tag me-2"></i>Add Role</h2>
+        <a href="/gm/role/list" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
+
+    <!-- Error Alert -->
+    <div id="errorAlert" class="alert alert-danger d-none" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span id="errorText"></span>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card">
+        <div class="card-body">
+            <input type="hidden" id="roleId" value="">
+
+            <!-- Name -->
+            <div class="mb-3">
+                <label for="name" class="form-label required">Name</label>
+                <input type="text" id="name" class="form-control" placeholder="Enter role name" maxlength="50" autocomplete="off">
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea id="description" class="form-control" rows="3" placeholder="Enter role description" maxlength="200"></textarea>
+            </div>
+
+            <!-- Permissions Section -->
+            <div class="mb-4">
+                <div class="section-title"><i class="fas fa-key me-2"></i>Permissions</div>
+                <div id="permissionsContainer">
+                    <!-- Dynamic permission items will be added here -->
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-success add-perm-btn" onclick="addPermissionItem()">
+                    <i class="fas fa-plus me-1"></i>Add Permission
+                </button>
+            </div>
+
+            <!-- Menu Assignment Section -->
+            <div class="mb-3">
+                <div class="section-title"><i class="fas fa-sitemap me-2"></i>Menu Assignment</div>
+                <div class="select-all-bar">
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllMenus(true)">
+                        <i class="fas fa-check-double me-1"></i>Select All
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectAllMenus(false)">
+                        <i class="fas fa-times me-1"></i>Deselect All
+                    </button>
+                    <span id="selectedMenuCount" class="badge bg-info ms-auto">0 selected</span>
+                </div>
+                <div class="menu-tree-container" id="menuTreeContainer">
+                    <div class="text-center py-4 text-muted" id="menuLoading">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Loading menu tree...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="btn-group-wide mt-4">
+                <button type="button" class="btn btn-primary" onclick="submitForm()" id="submitBtn">
+                    <i class="fas fa-save me-1"></i><span id="submitBtnText">Save</span>
+                </button>
+                <a href="/gm/role/list" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Standalone API helpers for iframe pages
+    function getToken() { try { return parent.getToken ? parent.getToken() : localStorage.getItem('gm_token'); } catch(e) { return localStorage.getItem('gm_token'); } }
+    function redirectToLogin() { window.location.href = '/gm/login'; }
+    function apiGet(url, cb) {
+        var t = getToken();
+        if (!t) { redirectToLogin(); return; }
+        fetch(url, { method: 'GET', headers: { 'Authorization': 'Bearer ' + t, 'Accept': 'application/json' } })
+        .then(function(r) {
+            if (r.status === 401) { redirectToLogin(); return; }
+            return r.json();
+        })
+        .then(function(d) { cb(d.code === 200 ? null : new Error(d.message || 'Request failed'), d.code === 200 ? d.data : null); })
+        .catch(function(e) { cb(e, null); });
+    }
+    function apiPost(url, data, cb) {
+        var t = getToken();
+        if (!t) { redirectToLogin(); return; }
+        var body = data ? JSON.stringify(data) : null;
+        fetch(url, { method: 'POST', headers: { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: body })
+        .then(function(r) {
+            if (r.status === 401) { redirectToLogin(); return; }
+            return r.json();
+        })
+        .then(function(d) { cb(d.code === 200 ? null : new Error(d.message || 'Request failed'), d.code === 200 ? d.data : null); })
+        .catch(function(e) { cb(e, null); });
+    }
+
+    (function() {
+    'use strict';
+
+    var isEditMode = false;
+    var editRoleId = null;
+    var permissionIndex = 0;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Detect mode from URL path
+        var path = window.location.pathname;
+        if (/\/edit\//.test(path)) {
+            isEditMode = true;
+            var parts = path.split('/');
+            for (var i = 0; i < parts.length; i++) {
+                if (parts[i] === 'edit' && i + 1 < parts.length) {
+                    editRoleId = parts[i + 1];
+                    break;
+                }
+            }
+        }
+
+        setupMode();
+
+        // Load menu tree
+        loadMenuTree();
+
+        // If edit mode, load role data
+        if (isEditMode && editRoleId) {
+            loadRoleData(editRoleId);
+        }
+    });
+
+    function setupMode() {
+        var title = document.getElementById('formTitle');
+        var submitBtnText = document.getElementById('submitBtnText');
+
+        if (isEditMode) {
+            title.innerHTML = '<i class="fas fa-user-edit me-2"></i>Edit Role';
+            submitBtnText.textContent = 'Update';
+        } else {
+            title.innerHTML = '<i class="fas fa-user-tag me-2"></i>Add Role';
+            submitBtnText.textContent = 'Save';
+        }
+    }
+
+    // Load role data for edit mode
+    function loadRoleData(id) {
+        apiGet('/api/role/' + id, function(err, data) {
+            if (err) {
+                showAlert('Failed to load role data: ' + (err.message || 'Unknown error'));
+                return;
+            }
+
+            var role = data;
+            if (data && data.data) role = data.data;
+            if (!role) {
+                showAlert('Role not found.');
+                return;
+            }
+
+            document.getElementById('roleId').value = role.id || id;
+            document.getElementById('name').value = role.name || '';
+            document.getElementById('description').value = role.description || '';
+
+            // Load permissions
+            var permissions = role.permissions || [];
+            for (var i = 0; i < permissions.length; i++) {
+                addPermissionItem(permissions[i]);
+            }
+
+            // Load menuIds - will be applied after menu tree loads
+            if (role.menuIds && Array.isArray(role.menuIds) && role.menuIds.length > 0) {
+                window._pendingMenuIds = role.menuIds.slice();
+            }
+        });
+    }
+
+    // --- Permissions Section ---
+
+    window.addPermissionItem = function(value) {
+        var container = document.getElementById('permissionsContainer');
+        var idx = permissionIndex++;
+        var div = document.createElement('div');
+        div.className = 'perm-item';
+        div.dataset.index = idx;
+
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control form-control-sm';
+        input.placeholder = 'e.g. user:create, user:edit';
+        input.value = value || '';
+
+        var removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn btn-sm btn-outline-danger';
+        removeBtn.title = 'Remove';
+        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        removeBtn.addEventListener('click', function() {
+            div.remove();
+        });
+
+        div.appendChild(input);
+        div.appendChild(removeBtn);
+        container.appendChild(div);
+
+        if (value) input.focus();
+        return div;
+    };
+
+    function getPermissions() {
+        var items = document.querySelectorAll('#permissionsContainer .perm-item');
+        var result = [];
+        for (var i = 0; i < items.length; i++) {
+            var input = items[i].querySelector('input');
+            var val = input.value.trim();
+            if (val) {
+                result.push(val);
+            }
+        }
+        return result;
+    }
+
+    // --- Menu Tree Section ---
+
+    function loadMenuTree() {
+        var container = document.getElementById('menuTreeContainer');
+
+        apiGet('/api/menu/tree', function(err, data) {
+            var loadingEl = document.getElementById('menuLoading');
+            if (loadingEl) loadingEl.style.display = 'none';
+
+            if (err || !data) {
+                container.innerHTML = '<div class="text-center py-4 text-danger"><i class="fas fa-exclamation-circle me-2"></i>Failed to load menu tree</div>';
+                return;
+            }
+
+            var menus = data;
+            if (data.data && Array.isArray(data.data)) menus = data.data;
+            else if (data.menus && Array.isArray(data.menus)) menus = data.menus;
+            else if (data.menu && Array.isArray(data.menu)) menus = data.menu;
+            else if (data.list && Array.isArray(data.list)) menus = data.list;
+            else if (data.content && Array.isArray(data.content)) menus = data.content;
+            else if (data.rows && Array.isArray(data.rows)) menus = data.rows;
+
+            if (!Array.isArray(menus) || menus.length === 0) {
+                container.innerHTML = '<div class="text-center py-4 text-muted"><i class="fas fa-info-circle me-2"></i>No menu items available</div>';
+                return;
+            }
+
+            var treeHtml = '<div class="tree-node">';
+            for (var i = 0; i < menus.length; i++) {
+                treeHtml += buildMenuNode(menus[i], 0);
+            }
+            treeHtml += '</div>';
+            container.innerHTML = treeHtml;
+
+            // Apply pending menu selections if any
+            if (window._pendingMenuIds && window._pendingMenuIds.length > 0) {
+                var ids = window._pendingMenuIds;
+                for (var j = 0; j < ids.length; j++) {
+                    var checkbox = document.querySelector('.menu-checkbox[data-menu-id="' + ids[j] + '"]');
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                }
+                window._pendingMenuIds = null;
+                updateSelectedCount();
+            }
+        });
+    }
+
+    function buildMenuNode(item, depth) {
+        if (!item) return '';
+
+        var id = item.id || item.menuId || item.key || '';
+        var name = item.name || item.title || item.label || 'Menu';
+        var children = item.children || item.subMenu || item.submenu || [];
+        var hasChildren = children && Array.isArray(children) && children.length > 0;
+
+        var html = '<div class="form-check">';
+        html += '<input class="form-check-input menu-checkbox" type="checkbox" data-menu-id="' + id + '" id="menu_' + id + '" onchange="onMenuCheckboxChange()">';
+        html += '<label class="form-check-label" for="menu_' + id + '">';
+        html += '<i class="fas ' + (hasChildren ? 'fa-folder-open' : 'fa-file') + ' me-1 text-muted"></i>';
+        html += esc(name);
+        if (hasChildren) {
+            html += ' <span class="tree-leaf-count">(' + countLeaves(children) + ' sub)</span>';
+        }
+        html += '</label></div>';
+
+        if (hasChildren) {
+            html += '<div class="tree-children">';
+            for (var i = 0; i < children.length; i++) {
+                html += buildMenuNode(children[i], depth + 1);
+            }
+            html += '</div>';
+        }
+
+        return html;
+    }
+
+    function countLeaves(children) {
+        var count = 0;
+        for (var i = 0; i < children.length; i++) {
+            var subs = children[i].children || children[i].subMenu || children[i].submenu || [];
+            if (subs.length > 0) {
+                count += countLeaves(subs);
+            } else {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    function getSelectedMenuIds() {
+        var checkboxes = document.querySelectorAll('.menu-checkbox:checked');
+        var ids = [];
+        for (var i = 0; i < checkboxes.length; i++) {
+            ids.push(parseInt(checkboxes[i].dataset.menuId));
+        }
+        return ids;
+    }
+
+    window.onMenuCheckboxChange = function() {
+        updateSelectedCount();
+    };
+
+    window.selectAllMenus = function(select) {
+        var checkboxes = document.querySelectorAll('.menu-checkbox');
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = select;
+        }
+        updateSelectedCount();
+    };
+
+    function updateSelectedCount() {
+        var count = document.querySelectorAll('.menu-checkbox:checked').length;
+        var el = document.getElementById('selectedMenuCount');
+        if (el) {
+            el.textContent = count + ' selected';
+        }
+    }
+
+    // --- Form Submission ---
+
+    window.submitForm = function() {
+        var btn = document.getElementById('submitBtn');
+        var errorEl = document.getElementById('errorAlert');
+        var errorText = document.getElementById('errorText');
+        errorEl.classList.add('d-none');
+
+        // Validation
+        var name = document.getElementById('name').value.trim();
+        if (!name) {
+            showAlert('Role name is required.');
+            document.getElementById('name').focus();
+            return;
+        }
+
+        var description = document.getElementById('description').value.trim();
+        var permissions = getPermissions();
+        var menuIds = getSelectedMenuIds();
+
+        // Build payload
+        var payload = {
+            name: name,
+            description: description,
+            permissions: permissions,
+            menuIds: menuIds
+        };
+
+        if (isEditMode) {
+            payload.id = document.getElementById('roleId').value;
+        }
+
+        // Disable button
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+
+        var url = isEditMode ? '/api/role/update' : '/api/role/create';
+
+        apiPost(url, payload, function(err, data) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save me-1"></i>' + (isEditMode ? 'Update' : 'Save');
+
+            if (err) {
+                showAlert('Failed to save: ' + (err.message || 'Unknown error'));
+                return;
+            }
+
+            // Success - redirect to list
+            window.location.href = '/gm/role/list';
+        });
+    };
+
+    function showAlert(msg) {
+        var errorEl = document.getElementById('errorAlert');
+        var errorText = document.getElementById('errorText');
+        errorText.textContent = msg;
+        errorEl.classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+})();
+</script>
+</body>
+</html>

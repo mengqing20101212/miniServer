@@ -1,7 +1,12 @@
 # Nacos 服务器配置信息
 
+## 历史说明
+此文件记录的是较早阶段的 localhost Nacos 说明，仅适用于本地旧环境。
+当前项目默认运行参数请优先以 `STARTUP.SKILL.md` 为准。
+如果与 `STARTUP.SKILL.md` 冲突，请不要使用本文件覆盖当前启动配置。
+
 ## Nacos 服务器地址
-Nacos 服务器已成功部署在本机：
+以下内容是旧的本地示例配置：
 - 地址: localhost
 - 端口: 8848
 - 访问地址: http://localhost:8848/nacos

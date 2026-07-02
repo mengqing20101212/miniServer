@@ -9,10 +9,11 @@ import ly.net.packet.AbstractMessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import org.slf4j.Logger;
 
-/*
- * Author: liuYang
- * Date: 2025/4/8
- * File: CommonDecoder
+/**
+ * Netty 入站解码器，把 TCP 字节流拆成完整的 {@link AbstractMessagePacket}。
+ * <p>
+ * TCP 可能半包或粘包，因此这里通过 length 字段循环读取。数据不足一个完整包时会
+ * reset readerIndex，等待下一次网络读事件继续拼包。
  */
 public class CommonDecoder extends ByteToMessageDecoder {
   static final Logger log = LoggerDef.SystemLogger;
@@ -24,10 +25,12 @@ public class CommonDecoder extends ByteToMessageDecoder {
       in.markReaderIndex();
       try {
         short len = in.readShort();
+        // 最小包只有固定包头，没有业务体；小于该长度说明包头已经损坏。
         if (len < 22) {
           in.resetReaderIndex();
           break;
         }
+        // 业务体还没到齐，恢复读指针后等待 Netty 下次继续解码。
         if (in.readableBytes() < len - 2) {
           in.resetReaderIndex();
           break;

@@ -6,6 +6,9 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 测试类，用于验证该模块的连接、生成器或工具方法行为。
+ */
 public class KVTest {
 
     @Test

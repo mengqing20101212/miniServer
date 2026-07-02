@@ -6,30 +6,25 @@ import ly.net.NetClient;
 import org.slf4j.Logger;
 
 import java.util.List;
-import java.util.Random;
 
 /**
- * 模块管理器 - 管理机器人行为模块
- * 
- * Author: OpenClaw AI Assistant
- * Date: 2026/2/5
- * File: ModuleManager
+ * ModuleManager 的核心定义，承载所在包对应的业务模型或辅助逻辑。
  */
 public class ModuleManager {
     private static final Logger logger = LoggerDef.SystemLogger;
     
     private final List<RobotModule> modules;
     private RobotModule currentModule;
-    private final Random random;
     private final RobotSession session;
     private final NetClient client;
+    private int nextModuleIndex;
     
     public ModuleManager(List<RobotModule> modules, RobotSession session, NetClient client) {
         this.modules = modules;
         this.session = session;
         this.client = client;
-        this.random = new Random();
         this.currentModule = null;
+        this.nextModuleIndex = 0;
     }
     
     /**
@@ -62,9 +57,9 @@ public class ModuleManager {
      */
     private void selectNextModule() {
         if (!modules.isEmpty()) {
-            // 随机选择一个模块
-            int index = random.nextInt(modules.size());
-            currentModule = modules.get(index);
+            // 按注册顺序轮询模块，测试时可以稳定复现完整协议链路。
+            currentModule = modules.get(nextModuleIndex);
+            nextModuleIndex = (nextModuleIndex + 1) % modules.size();
             logger.debug("选择了新模块: {}", currentModule.getName());
         }
     }

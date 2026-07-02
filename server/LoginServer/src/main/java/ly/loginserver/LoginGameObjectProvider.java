@@ -6,10 +6,8 @@ import ly.net.GameObjectProvider;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-/*
- * Author: liuYang
- * Date: 2025/4/14
- * File: LoginGameObjectProvider
+/**
+ * 登录服连接对象工厂，负责为公共网络层创建登录服会话对象。
  */
 public class LoginGameObjectProvider implements GameObjectProvider {
     AtomicInteger guidCreate = new AtomicInteger(0);

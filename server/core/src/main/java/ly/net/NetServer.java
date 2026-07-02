@@ -9,10 +9,11 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import ly.LoggerDef;
 import org.slf4j.Logger;
 
-/*
- * Author: liuYang
- * Date: 2025/4/8
- * File: NetServer
+/**
+ * 单端口 Netty TCP 服务器封装。
+ * <p>
+ * {@link NetService} 可以创建多个 NetServer 实例监听多个端口；每个实例共享同一组 boss/worker
+ * 线程池，并使用统一的编解码器和 {@link ServerHandler}。
  */
 public class NetServer {
   static Logger logger = LoggerDef.SystemLogger;
@@ -30,6 +31,11 @@ public class NetServer {
     return port;
   }
 
+  /**
+   * 绑定端口并安装 pipeline。
+   * <p>
+   * pipeline 顺序固定为 decoder -> encoder -> serverHandler，保证入站先解包、出站先组包。
+   */
   public boolean startUp(EventLoopGroup boss, EventLoopGroup worker) {
     try {
       bootstrap

@@ -1,4 +1,5 @@
-id	name	questType	scheDuling	exchangeNum	drop	dropShow	finishMax	reset	
+#fields	id	name	questType	scheDuling	exchangeNum	drop	dropShow	finishMax	reset
+#types	INT	STRING	INT	INT	STRING	INT	INT	INT	INT
 1001	兑换限定招募券	100	1	2300002,100	20000567	20000567	10	2
 1002	兑换觉醒精华	100	1	2300002,50	20000607	20000607	5	2
 1003	兑换埼玉卡	100	1	2300002,20	20000568	20000568	5	2

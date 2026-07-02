@@ -1,0 +1,26 @@
+package ly.config;
+
+/***
+ * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
+ */
+public class Random_headFrameConfig {
+  /** 编号 */
+  public final int id;
+
+  /** 资源名 */
+  public final String value;
+
+  // @@@@@自定义属性开始区@@@@@
+
+  // @@@@@自定义属性结束区@@@@@
+
+  public Random_headFrameConfig(int id, String value) {
+    this.id = id;
+    this.value = value;
+  }
+
+  // @@@@@自定义方法开始区@@@@@
+  public void afterLoad() {
+  }
+  // @@@@@自定义方法结束区@@@@@
+}

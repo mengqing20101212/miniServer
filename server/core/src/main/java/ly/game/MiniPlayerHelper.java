@@ -6,10 +6,8 @@ import ly.cache.CacheService;
 import ly.redis.RedisKeys;
 import ly.redis.RedisUtils;
 
-/*
- * Author: liuYang
- * Date: 2025/4/14
- * File: MiniPlayerHelper
+/**
+ * 轻量玩家对象，用于公共框架或测试场景中的最小玩家模型。
  */
 public class MiniPlayerHelper {
   /**

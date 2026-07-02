@@ -6,6 +6,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * 工具模块命令入口，用于串联配置、协议和数据库代码生成流程。
+ */
 public class ToolMain {
   public static void main(String[] args) {
     String type = args[0];
@@ -16,6 +19,11 @@ public class ToolMain {
       System.out.println("解析 策划表 完成");
     } else if (type.equals("ParserProto")) {
       new ParserProto("D:\\WORK\\me\\miniServer\\proto").parser();
+    } else if (type.equals("parserDbEntry")) {
+      String module = args[1];
+      System.out.println("开始生成DB Entry代码，targetModule=" + module);
+      new ParserDbEntry(module).parser();
+      System.out.println("生成 DB Entry 完成");
     } else if (type.equals("generateSqlFromEntity")) {
       System.out.println("开始从实体类生成SQL...");
       // 注意：这个功能需要在有数据库连接的情况下运行
