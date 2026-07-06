@@ -1,11 +1,7 @@
 package ly.logic.hero;
 
-import com.baidu.bjf.remoting.protobuf.Codec;
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-
 import ly.config.ResourceType;
 import ly.logic.hero.module.HeroBean;
-import ly.logic.hero.module.HeroModule;
 import ly.logic.hero.module.HeroModule;
 import ly.logic.player.ModuleEnum;
 import ly.logic.player.Player;
@@ -23,13 +19,13 @@ import ly.proto.Hero;
 
 import org.junit.Before;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -120,6 +116,19 @@ public class HeroControllerTest {
         throw new NoSuchFieldException(fieldName + " not found in " + target.getClass());
     }
 
+    private static int validHeroId(int index) {
+        List<Integer> heroIds = ly.config.HeroInfoConfigManager.getInstance()
+                .getConfigMap()
+                .keySet()
+                .stream()
+                .sorted()
+                .toList();
+        if (heroIds.isEmpty()) {
+            throw new IllegalStateException("heroInfo 配置为空，无法执行 HeroControllerTest");
+        }
+        return heroIds.get(index % heroIds.size());
+    }
+
     /**
      * Create a PlayerData instance WITHOUT calling its constructor (which triggers
      * protobuf).
@@ -154,9 +163,9 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroList() {
         // 先添加几个英雄
-        heroModule.addHero(1001);
-        heroModule.addHero(1002);
-        heroModule.addHero(1003);
+        heroModule.addHero(validHeroId(0));
+        heroModule.addHero(validHeroId(1));
+        heroModule.addHero(validHeroId(2));
 
         // 创建请求
         Hero.CS_HeroList request = Hero.CS_HeroList.newBuilder().build();
@@ -178,11 +187,10 @@ public class HeroControllerTest {
     /**
      * 测试英雄升级
      */
-    @Ignore("protobuf 3.21.7 不支持 repeated 字段 (makeMutableCopy)，需要 3.25+")
     @Test
     public void testHandleHeroLevelUp() {
         // 添加一个英雄
-        HeroBean hero = heroModule.addHero(1001);
+        HeroBean hero = heroModule.addHero(validHeroId(0));
         int initialLevel = hero.level;
 
         // 创建升级请求（使用经验道具 ID 列表）
@@ -211,7 +219,6 @@ public class HeroControllerTest {
     /**
      * 测试升级不存在的英雄
      */
-    @Ignore("protobuf 3.21.7 不支持 repeated 字段")
     @Test
     public void testHandleHeroLevelUpNonExistent() {
         // 创建升级请求（使用不存在的 heroUid）
@@ -232,11 +239,10 @@ public class HeroControllerTest {
     /**
      * 测试升级时经验道具不足
      */
-    @Ignore("protobuf 3.21.7 不支持 repeated 字段")
     @Test
     public void testHandleHeroLevelUpInsufficientExpItems() {
         // 添加一个英雄
-        HeroBean hero = heroModule.addHero(1001);
+        HeroBean hero = heroModule.addHero(validHeroId(0));
 
         // 清空经验道具
         resourceModule.deductResource(ResourceType.EXP_ITEM, 5000);
@@ -261,7 +267,7 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroStarUp() {
         // 添加一个英雄
-        HeroBean hero = heroModule.addHero(2);
+        HeroBean hero = heroModule.addHero(validHeroId(0));
 
         // 创建升星请求
         Hero.CS_HeroStarUp request = Hero.CS_HeroStarUp.newBuilder()
@@ -301,7 +307,7 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroAwaken() {
         // 添加一个英雄
-        HeroBean hero = heroModule.addHero(2);
+        HeroBean hero = heroModule.addHero(validHeroId(0));
 
         // 创建觉醒请求
         Hero.CS_HeroAwaken request = Hero.CS_HeroAwaken.newBuilder()
@@ -346,7 +352,7 @@ public class HeroControllerTest {
     public void testHandleHeroAdd() {
         // 创建添加英雄请求
         Hero.CS_HeroAdd request = Hero.CS_HeroAdd.newBuilder()
-                .setHeroId(2)
+                .setHeroId(validHeroId(0))
                 .setCount(1)
                 .build();
 
@@ -364,9 +370,9 @@ public class HeroControllerTest {
         assertEquals("应返回 1 个英雄", 1, response.getHeroListCount());
 
         // 验证英雄确实被添加
-        HeroBean addedHero = heroModule.getHero(mockPlayer.getPlayerId() * 1000000L + 2);
+        HeroBean addedHero = heroModule.getHero(mockPlayer.getPlayerId() * 1000000L + validHeroId(0));
         assertNotNull("英雄应被添加", addedHero);
-        assertEquals("英雄 ID 应正确", 2, addedHero.heroId);
+        assertEquals("英雄 ID 应正确", validHeroId(0), addedHero.heroId);
     }
 
     /**
@@ -376,7 +382,7 @@ public class HeroControllerTest {
     public void testHandleHeroAddMultiple() {
         // 添加多个不同 ID 的英雄（相同 heroId 只能添加一个，因为 heroUid 唯一）
         Hero.CS_HeroAdd request = Hero.CS_HeroAdd.newBuilder()
-                .setHeroId(3)
+                .setHeroId(validHeroId(1))
                 .setCount(1)
                 .build();
 
@@ -400,11 +406,12 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroAddAlreadyExists() {
         // 先添加一个英雄
-        heroModule.addHero(4);
+        int heroId = validHeroId(2);
+        heroModule.addHero(heroId);
 
         // 再次尝试添加相同 ID 的英雄
         Hero.CS_HeroAdd request = Hero.CS_HeroAdd.newBuilder()
-                .setHeroId(4)
+                .setHeroId(heroId)
                 .setCount(1)
                 .build();
 
@@ -423,12 +430,12 @@ public class HeroControllerTest {
     public void testHandleHeroAddMaxLimit() {
         // 添加大量英雄直到达到限制
         for (int i = 0; i < 100; i++) {
-            heroModule.addHero(2000 + i);
+            heroModule.addHero(validHeroId(i));
         }
 
         // 尝试再添加一个英雄
         Hero.CS_HeroAdd request = Hero.CS_HeroAdd.newBuilder()
-                .setHeroId(2100)
+                .setHeroId(validHeroId(0))
                 .setCount(1)
                 .build();
 
@@ -443,7 +450,6 @@ public class HeroControllerTest {
     /**
      * 测试资源消耗正确性
      */
-    @Ignore("protobuf 3.21.7 不支持 repeated 字段")
     @Test
     public void testResourceConsumption() {
         // 记录初始资源
@@ -451,7 +457,7 @@ public class HeroControllerTest {
         long initialExpItem = resourceModule.getResource(ResourceType.EXP_ITEM);
 
         // 添加英雄并尝试升级
-        HeroBean hero = heroModule.addHero(1001);
+        HeroBean hero = heroModule.addHero(validHeroId(0));
 
         // 创建升级请求
         Hero.CS_HeroLevelUp request = Hero.CS_HeroLevelUp.newBuilder()

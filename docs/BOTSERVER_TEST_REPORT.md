@@ -13,6 +13,7 @@ BotServer 需要覆盖以下链路：
 5. BotServer 登录成功后执行业务 Module/Action。
 6. Hero 模块发送英雄相关协议并收到对应回包。
 7. Movement 模块执行移动行为。
+8. Combat 模块执行战斗模拟行为，并且不复用 Movement 的移动 Action。
 
 ## 启动前检查
 
@@ -50,6 +51,7 @@ BotServer 日志需要满足：
 - 登录成功后开始执行 `RobotModule`。
 - Hero 模块至少能完成 `CS_HeroList -> SC_HeroList`。
 - Movement 模块执行成功，不再走旧 `RobotCommand`。
+- Combat 模块执行 `SimulatedCombatAction`，只写入 `combat` 数据域，不发送移动包。
 - 统计信息中登录成功数为 1。
 
 示例关键日志：
@@ -126,6 +128,7 @@ BotServer 日志需要满足：
   登录:
   HeroList:
   Movement:
+  Combat:
 问题:
 结论:
 ```
