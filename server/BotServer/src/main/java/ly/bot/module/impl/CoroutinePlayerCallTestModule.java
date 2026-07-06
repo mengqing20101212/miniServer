@@ -16,6 +16,8 @@ import ly.proto.Move;
  *
  * <p>测试链路：Bot A 登录 -> Bot B 登录 -> A 发送 Move 并携带 B 的 playerId ->
  * Game 在 A 的玩家队列里通过 CoroutineUtils.on(B) 读取 B 的等级 -> A 收到 Move 响应并校验。
+ *
+ * <p>客户端上行 seq 只用于日志排查，Gate 返回客户端的下行 seq 由 Gate 连接维度统一递增。
  */
 public class CoroutinePlayerCallTestModule {
     private static final long RESPONSE_TIMEOUT_MS = 15_000L;
@@ -56,7 +58,8 @@ public class CoroutinePlayerCallTestModule {
             }
 
             AbstractMessagePacket response =
-                    waitForResponse(clientA, Cmd.CMD.SC_Move_VALUE, moveSeq + 1, clientA.getSid());
+                    waitForResponse(clientA, Cmd.CMD.SC_Move_VALUE, clientA.getSid());
+            assertNextClientDownSeq(contextA.lastClientDownSeq(), response, "A Move响应");
             Move.scMove scMove =
                     (Move.scMove)
                             ProtoMessageFactory.createProtoMessage(
@@ -140,7 +143,8 @@ public class CoroutinePlayerCallTestModule {
             throw new IllegalStateException("发送 CS_Login 失败, account=" + account);
         }
         AbstractMessagePacket loginResp =
-                waitForResponse(client, Cmd.CMD.SC_Login_VALUE, loginSeq + 1, client.getSid());
+                waitForResponse(client, Cmd.CMD.SC_Login_VALUE, client.getSid());
+        int lastClientDownSeq = assertNextClientDownSeq(0, loginResp, account + " 登录响应");
         Login.scLogin scLogin =
                 (Login.scLogin)
                         ProtoMessageFactory.createProtoMessage(Cmd.CMD.SC_Login_VALUE, loginResp.getData());
@@ -152,7 +156,7 @@ public class CoroutinePlayerCallTestModule {
                 account,
                 scLogin.getPlayerId(),
                 client.getSid());
-        return new LoginContext(client, scLogin.getPlayerId());
+        return new LoginContext(client, scLogin.getPlayerId(), lastClientDownSeq);
     }
 
     private static HttpServerListClient.ServerListResult ensureAccountAndServerList(
@@ -180,13 +184,13 @@ public class CoroutinePlayerCallTestModule {
         return false;
     }
 
-    private static AbstractMessagePacket waitForResponse(NetClient client, int cmd, int seq, int sid)
+    private static AbstractMessagePacket waitForResponse(NetClient client, int cmd, int sid)
             throws InterruptedException {
         long deadline = System.currentTimeMillis() + RESPONSE_TIMEOUT_MS;
         while (System.currentTimeMillis() < deadline) {
             AbstractMessagePacket packet = client.readPacket();
             if (packet != null) {
-                if (packet.getCmd() == cmd && packet.getSeq() == seq && packet.getSid() == sid) {
+                if (packet.getCmd() == cmd && packet.getSid() == sid) {
                     return packet;
                 }
                 System.out.printf(
@@ -198,7 +202,20 @@ public class CoroutinePlayerCallTestModule {
             Thread.sleep(POLL_INTERVAL_MS);
         }
         throw new IllegalStateException(
-                String.format("等待响应超时 cmd=%d seq=%d sid=%d", cmd, seq, sid));
+                String.format("等待响应超时 cmd=%d sid=%d", cmd, sid));
+    }
+
+    private static int assertNextClientDownSeq(int previousSeq, AbstractMessagePacket packet, String name) {
+        int expectedSeq = previousSeq + 1;
+        if (packet.getSeq() != expectedSeq) {
+            throw new IllegalStateException(
+                    String.format(
+                            "%s 下行 seq 校验失败，expect seq=%d, actual seq=%d",
+                            name,
+                            expectedSeq,
+                            packet.getSeq()));
+        }
+        return packet.getSeq();
     }
 
     private static boolean fail(String message) {
@@ -206,6 +223,6 @@ public class CoroutinePlayerCallTestModule {
         return false;
     }
 
-    private record LoginContext(NetClient client, long playerId) {
+    private record LoginContext(NetClient client, long playerId, int lastClientDownSeq) {
     }
 }

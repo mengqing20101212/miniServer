@@ -200,7 +200,7 @@ public class GateConnectSession extends ConnectSession {
         if (!(msg instanceof AbstractMessage abstractMessage)) {
             throw new IllegalArgumentException("msg must extend AbstractMessage");
         }
-        AbstractMessagePacket s2cPacket = PacketCompat.createPacket(getGuid(), cmd, 0, 0,
+        AbstractMessagePacket s2cPacket = new AbstractMessagePacket(getGuid(), cmd, 0, 0,
                 abstractMessage.toByteArray());
         addSendPacket(s2cPacket);
     }

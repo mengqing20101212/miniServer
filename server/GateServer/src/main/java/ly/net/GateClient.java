@@ -222,7 +222,7 @@ public class GateClient {
             return;
         }
         // 客户端下行 seq 只在 Gate 连接维度递增，Game 不参与生成。
-        AbstractMessagePacket s2cPacket = PacketCompat.createPacket(
+        AbstractMessagePacket s2cPacket = new AbstractMessagePacket(
                 getSessionGuid(),
                 resp.getClientCmd(),
                 resp.getClientSid(),
