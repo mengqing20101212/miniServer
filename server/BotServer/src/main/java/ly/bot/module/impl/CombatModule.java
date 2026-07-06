@@ -1,46 +1,35 @@
 package ly.bot.module.impl;
 
 import ly.bot.action.RobotActionContext;
-import ly.bot.action.impl.MoveAction;
+import ly.bot.action.RobotActionResult;
+import ly.bot.action.impl.SimulatedCombatAction;
 import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
 
-import java.util.Random;
-
 /**
- * 机器人行为模块，封装登录、心跳、移动、战斗等可组合行为能力。
+ * 机器人战斗模块。
+ *
+ * <p>当前项目还没有真实战斗协议，因此这里只组织战斗模拟 Action，不再复用移动 Action。
+ * 后续接入战斗协议时，只需要替换 Action 实现，模块调度逻辑不用变。</p>
  */
 public class CombatModule implements RobotModule {
     private boolean completed = false;
     private int step = 0;
-    private static final int MAX_COMBAT_ACTIONS = 10; // 战斗模块执行10次战斗动作
-    private final Random random = new Random();
+    private static final int MAX_COMBAT_ACTIONS = 10;
+    private final SimulatedCombatAction combatAction = new SimulatedCombatAction();
     
     @Override
     public boolean executeStep(NetClient client, RobotSession session) {
-        // 暂时使用移动 Action 代替战斗行为，后续接入真实战斗协议时替换这里。
-        new MoveAction().execute(new RobotActionContext(client, session));
-        
-        // 存储战斗相关的数据到会话级别存储
-        session.getDataStore().put("combat", "lastCombatActionTime", System.currentTimeMillis());
-        session.getDataStore().put("combat", "combatActionCount", step + 1);
-        session.getDataStore().put("combat", "currentHp", 100 - (step * 5)); // 模拟血量变化
-        session.getDataStore().put("combat", "currentMp", 80 - (step * 3)); // 模拟魔法值变化
-        session.getDataStore().put("combat", "opponentHp", 100 - (random.nextInt(20))); // 模拟对手血量
-        
-        // 模拟战斗结果
-        if (random.nextBoolean()) {
-            session.getDataStore().put("combat", "lastCombatResult", "hit");
-        } else {
-            session.getDataStore().put("combat", "lastCombatResult", "miss");
+        RobotActionResult result = combatAction.execute(new RobotActionContext(client, session));
+        if (!result.isSuccess()) {
+            return false;
         }
         
         step++;
         if (step >= MAX_COMBAT_ACTIONS) {
             completed = true;
             session.getDataStore().put("combat", "combatFinished", true);
-            session.getDataStore().put("combat", "totalDamageDealt", step * 10); // 模拟造成的总伤害
         }
         
         return completed;
@@ -50,7 +39,7 @@ public class CombatModule implements RobotModule {
     public void reset() {
         completed = false;
         step = 0;
-        // 注意：不再清除会话级别的数据，因为其他模块可能需要这些数据
+        // 保留 combat 数据域，便于后续模块和报告读取本轮模拟结果。
     }
     
     @Override

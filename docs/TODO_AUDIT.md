@@ -10,7 +10,7 @@ rg -n --glob '!**/target/**' --glob '!logs/**' --glob '!runlogs/**' --glob '!**/
 
 ## 当前结论
 
-显式 `TODO/FIXME/HACK` 不多。已经处理首登事件和 generated-sql 输出稳定性，剩余主要是 BotServer 模拟行为、Bot 登录响应注释、可靠 RPC 手工重试接口是否正式化。
+显式 `TODO/FIXME/HACK` 不多。已经处理首登事件、generated-sql 输出稳定性、BotServer 模拟行为、Bot 登录响应注释和可靠 RPC 手工重试接口清理。
 
 ## 已完成
 
@@ -63,23 +63,22 @@ rg -n --glob '!**/target/**' --glob '!logs/**' --glob '!runlogs/**' --glob '!**/
 - `resetRetryForForceReplay()` 没有任何调用方。
 - 已删除该临时方法，避免后续误以为存在正式运维入口。
 
-## P2
-
-### BotServer CombatModule 仍然用移动 Action 代替战斗
+### BotServer CombatModule 不再复用移动 Action
 
 位置：
 
 - `server/BotServer/src/main/java/ly/bot/module/impl/CombatModule.java`
+- `server/BotServer/src/main/java/ly/bot/action/impl/SimulatedCombatAction.java`
 
-现状：
+处理结果：
 
-- `CombatModule` 当前使用 `MoveAction` 代替战斗行为。
+- 新增 `SimulatedCombatAction`，在没有真实战斗协议前只维护 `combat` 数据域。
+- `CombatModule` 改为组织战斗 Action，不再发送或复用移动行为。
+- 后续接入真实战斗协议时，只需要替换 `SimulatedCombatAction` 的发包和回包校验逻辑。
 
-建议：
+## P2
 
-- 等战斗协议稳定后新增 `CombatAction`。
-- `CombatModule` 只组织战斗相关 Action，不再复用移动行为。
-- 测试报告中增加战斗请求、战斗回包、失败码校验。
+当前没有明确需要立即处理的 P2 项。
 
 ## 已排除项
 
