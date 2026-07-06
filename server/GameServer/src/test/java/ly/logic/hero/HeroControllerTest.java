@@ -88,7 +88,7 @@ public class HeroControllerTest {
         mockPlayerData.putModule(ModuleEnum.RESOURCE_MODULE, resourceModule);
 
         // 初始化上下文
-        mockContext = new GameHandlerContext(mockPlayer, new MockAbstractMessagePacket());
+        mockContext = new GameHandlerContext(mockPlayer, new MockRequestPacket());
     }
 
     @After
@@ -536,8 +536,8 @@ public class HeroControllerTest {
     /**
      * 模拟 MessagePacket
      */
-    private static class MockAbstractMessagePacket extends MessagePacket {
-        public MockAbstractMessagePacket() {
+    private static class MockRequestPacket extends MessagePacket {
+        public MockRequestPacket() {
             super();
         }
 

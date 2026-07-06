@@ -20,7 +20,19 @@ public class RobotActionRegistry {
 
     public void register(RobotAction action) {
         if (action.responseCmd() > 0) {
-            responseActions.put(action.responseCmd(), action);
+            /*
+             * 当前注册表只按 response cmd 分发，适合 Bot 的模块级协议验证。
+             * 如果同一个响应 cmd 对应多个有状态 Action，后注册者会覆盖先注册者，
+             * 因此模块内部应复用同一个 Action 实例，或后续升级为 callId/seq 级 PendingRequest。
+             */
+            RobotAction oldAction = responseActions.put(action.responseCmd(), action);
+            if (oldAction != null && oldAction != action) {
+                logger.warn(
+                        "机器人响应 cmd 重复注册，旧 Action 会被覆盖, cmd: {}, old: {}, new: {}",
+                        action.responseCmd(),
+                        oldAction.getName(),
+                        action.getName());
+            }
         }
     }
 

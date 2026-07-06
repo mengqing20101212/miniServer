@@ -14,7 +14,7 @@ public class MessagePacketFactory {
     return new MessagePacket();
   }
 
-  // compatibility with old callsite
+  // 兼容旧调用点：历史上部分代码会传一个无意义的 int 参数创建空包。
   public static MessagePacket createMessagePacket(int ignored) {
     return createMessagePacket();
   }

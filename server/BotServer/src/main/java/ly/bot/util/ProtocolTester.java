@@ -34,7 +34,7 @@ public class ProtocolTester {
             
             Login.csLogin loginRequest = loginBuilder.build();
             
-            // 测试创建AbstractMessagePacket
+            // 测试创建 MessagePacket
             int seq = 1; // 序列号
             int sid = 100; // 会话ID
             long guid = 123456L; // 全局唯一ID
@@ -52,7 +52,7 @@ public class ProtocolTester {
             System.out.println("- SID: " + packet.getSid());
             System.out.println("- 序列号: " + packet.getSeq());
             System.out.println("- 数据长度: " + (packet.getData() != null ? packet.getData().length : 0));
-            // 注意：AbstractMessagePacket有getGuid方法但现在可用
+            // MessagePacket 保留 guid 字段，Bot 可以用它校验玩家或账号标识。
             System.out.println("- GUID: " + packet.getGuid());
             
             logger.info("登录协议封包测试完成");
