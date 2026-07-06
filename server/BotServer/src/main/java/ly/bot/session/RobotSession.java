@@ -15,6 +15,7 @@ import com.google.protobuf.AbstractMessage;
 import io.netty.channel.EventLoopGroup;
 import ly.LoggerDef;
 import ly.bot.action.RobotActionContext;
+import ly.bot.action.RobotActionRegistry;
 import ly.bot.action.RobotActionResult;
 import ly.bot.action.impl.HeartbeatAction;
 import ly.bot.action.impl.LoginAction;
@@ -73,6 +74,9 @@ public class RobotSession {
 
     // 模块管理器
     private ModuleManager moduleManager;
+
+    // Action 响应分发表，收到下行包后按 response cmd 回调对应 Action。
+    private final RobotActionRegistry actionRegistry = new RobotActionRegistry();
 
     // 玩家信息
     private PlayerInfo playerInfo;
@@ -400,6 +404,7 @@ public class RobotSession {
                 new ly.bot.module.impl.CombatModule(),
                 new ly.bot.module.impl.CurrencyModule(),
                 new ly.bot.module.impl.GachaModule());
+        modules.forEach(module -> module.setupActions().forEach(actionRegistry::register));
 
         // 初始化模块管理器
         this.moduleManager = new ModuleManager(modules, this, gateClient);
@@ -616,6 +621,9 @@ public class RobotSession {
                     new HeartbeatAction().onResponse(response, new RobotActionContext(gateClient, this));
                     return;
                 default:
+                    if (actionRegistry.dispatch(response, new RobotActionContext(gateClient, this))) {
+                        return;
+                    }
                     // 对于未知响应，可以根据需要创建通用处理命令
                     logger.debug("收到未知命令响应: {}", response.getCmd());
                     return;
