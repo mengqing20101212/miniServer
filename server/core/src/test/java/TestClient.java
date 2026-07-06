@@ -1,6 +1,6 @@
 import ly.net.NetClient;
 import ly.net.NetClientManager;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 /**
  * 测试类，用于验证该模块的连接、生成器或工具方法行为。
@@ -30,8 +30,8 @@ public class TestClient {
         .start(
             () -> {
               for (int i = 0; i < 1000; i++) {
-                AbstractMessagePacket packet =
-                    new AbstractMessagePacket(guid, 1, 0, client.getSendSeq(), new byte[] {1, 2, 3, 4});
+                MessagePacket packet =
+                    new MessagePacket(guid, 1, 0, client.getSendSeq(), new byte[] {1, 2, 3, 4});
                 client.send(packet);
               }
             });

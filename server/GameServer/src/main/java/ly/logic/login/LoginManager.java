@@ -10,7 +10,7 @@ import ly.logic.player.PlayerStatusEnum;
 import ly.logic.player.PlayerUtils;
 import ly.logic.player.event.PlayerEventType;
 import ly.net.GamePlayer;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
@@ -176,7 +176,7 @@ public class LoginManager {
                 .setData(response.toByteString())
                 .setCallId(task.callId)
                 .build();
-        AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
+        MessagePacket packet = MessagePacketFactory.createMessagePacket(
                 guid,
                 Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE,
                 builder,

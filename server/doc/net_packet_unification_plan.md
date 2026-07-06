@@ -3,8 +3,7 @@
 > 目标：`ly.net.packet` 收敛为一个包类；协议头只保留最核心字段，降低认知负担。
 
 > 当前状态：统一包头和 `CMD_ACK` 已在代码中落地。运行时统一使用
-> `AbstractMessagePacket` + `MessagePacketFactory`，旧 `C2SMessagePacket` 备份文件已删除。
-> 后续如果要进一步收敛命名，可以单独把 `AbstractMessagePacket` 重命名为 `MessagePacket`。
+> `MessagePacket` + `MessagePacketFactory`，旧 `C2SMessagePacket` 备份文件已删除。
 
 ## 1. 约束（按你的要求）
 
@@ -63,7 +62,7 @@
 
 ## 4. 已落地的迁移结果
 
-- `AbstractMessagePacket` 已使用固定 22 字节包头：
+- `MessagePacket` 已使用固定 22 字节包头：
   `[length:2][cmd:4][sid:4][seq:4][guid:8][time:4][data:N]`
 - `CommonEncoder` / `CommonDecoder` 已按固定头编解码。
 - ACK 已改为普通包：`cmd = CMD_ACK`。
@@ -71,18 +70,17 @@
 
 ### 保留项
 
-- 类名仍叫 `AbstractMessagePacket`。这是为了减少一次性大范围 import 变更。
-- 工厂方法仍保留 `createAbstractMessagePacket(...)`，用于兼容旧调用点。
+- 工厂方法仍保留 deprecated 的 `createAbstractMessagePacket(...)` 兼容入口，旧外部调用可以短期继续编译。
 
 ---
 
 ## 5. 代码改造清单
 
-1. 已完成：`AbstractMessagePacket` 成为唯一运行时包实现。
+1. 已完成：`MessagePacket` 成为唯一运行时包实现。
 2. 已完成：`MessagePacketFactory` 收敛为统一构造。
 3. 已完成：`CommonEncoder/CommonDecoder` 改为固定头编解码。
 4. 已完成：ACK 下线独立类型，改用 `CMD_ACK`。
-5. 可选：后续把 `AbstractMessagePacket` 重命名为 `MessagePacket`，同步更新引用。
+5. 已完成：`AbstractMessagePacket` 重命名为 `MessagePacket`，同步更新引用。
 
 ---
 
@@ -100,13 +98,11 @@
 1. 已完成：落地统一包头 + 编解码器。
 2. 已完成：Gate / Game / Bot / RPC 都使用统一包。
 3. 已完成：删除旧备份类与旧 ACK 类型。
-4. 可选：类名和工厂方法命名再收口。
+4. 已完成：类名和主要工厂方法命名收口；旧工厂方法只作为兼容入口保留。
 
 ---
 
 ## 8. 下一步可执行项
 
-当前没有必须立即执行的 Packet 结构改造。可选收口项：
-
-- 将 `AbstractMessagePacket` 重命名为 `MessagePacket`。
-- 将 `createAbstractMessagePacket(...)` 重命名为 `createMessagePacket(...)` 并保留兼容入口一段时间。
+当前没有必须立即执行的 Packet 结构改造。后续只需要在确认没有外部旧调用后，删除
+`MessagePacketFactory.createAbstractMessagePacket(...)` 兼容入口。

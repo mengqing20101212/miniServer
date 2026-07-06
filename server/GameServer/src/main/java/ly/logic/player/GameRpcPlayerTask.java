@@ -1,7 +1,7 @@
 package ly.logic.player;
 
 import ly.net.GameConnectSession;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 /**
  * Gate 转发到 Game 的非登录业务任务。
@@ -11,10 +11,10 @@ import ly.net.packet.AbstractMessagePacket;
  */
 public class GameRpcPlayerTask {
     final GameConnectSession session;
-    final AbstractMessagePacket packet;
+    final MessagePacket packet;
     final long callId;
 
-    public GameRpcPlayerTask(GameConnectSession session, AbstractMessagePacket packet, long callId) {
+    public GameRpcPlayerTask(GameConnectSession session, MessagePacket packet, long callId) {
         this.session = session;
         this.packet = packet;
         this.callId = callId;

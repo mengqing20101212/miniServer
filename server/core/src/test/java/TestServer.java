@@ -5,7 +5,7 @@ import ly.net.ConnectSession;
 import ly.net.GameObjectProvider;
 import ly.net.NetService;
 import ly.net.packet.MessagePacketFactory;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 /**
  * 公共服务器启动示例或独立运行入口，用于本地验证网络框架。
@@ -54,8 +54,8 @@ public class TestServer {
             getReceivePacketList()
                     .forEach(
                             packet -> {
-                                AbstractMessagePacket msg =
-                                        MessagePacketFactory.copyMessagePacket((AbstractMessagePacket) packet);
+                                MessagePacket msg =
+                                        MessagePacketFactory.copyMessagePacket((MessagePacket) packet);
                                 AbstractMessage protoMsg =
                                         ProtoMessageFactory.createProtoMessage(packet.getCmd(), packet.getData());
                                 sendPacket(msg);

@@ -1,6 +1,6 @@
 package ly.rpc;
 
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 /**
  * 可靠 RPC 重放回包处理器。
@@ -18,5 +18,5 @@ public interface ReliableRpcReplayResponseHandler {
    * @param response 目标服务器返回的 RPC 回包
    * @return true 表示业务方已经消费该回包，可以删除 outbox 消息
    */
-  boolean handle(ReliableRpcMessage message, AbstractMessagePacket response);
+  boolean handle(ReliableRpcMessage message, MessagePacket response);
 }

@@ -3,7 +3,7 @@ package ly.net;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import ly.LoggerDef;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import org.slf4j.Logger;
 
 /**
@@ -12,11 +12,11 @@ import org.slf4j.Logger;
  * 每个 Channel 在连接建立时会绑定一个 {@link NetClient}，收到的包会转入该客户端的
  * receive 队列，供 RPC 同步等待或调用方批量读取。
  */
-public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePacket> {
+public class ClientHandler extends SimpleChannelInboundHandler<MessagePacket> {
     static Logger logger = LoggerDef.SystemLogger;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, AbstractMessagePacket msg)
+    protected void channelRead0(ChannelHandlerContext ctx, MessagePacket msg)
             throws Exception {
         // if (LoggerDef.NetLogger.isDebugEnabled()) {
         // LoggerDef.NetLogger.debug("客户端(sid:{}, remote:{}), 收到消息：{}",
@@ -63,6 +63,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<AbstractMessagePa
         logger.info("ClientHandler channelActive 客户端连接成功 {}, remote: {}", ctx.channel().id().asLongText(),
                 ctx.channel().remoteAddress());
         // 连接成功后先发送 ACK 握手包，请求服务端分配 sid。
-        ctx.channel().writeAndFlush(new AbstractMessagePacket(0));
+        ctx.channel().writeAndFlush(new MessagePacket(0));
     }
 }

@@ -5,12 +5,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 import ly.LoggerDef;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import org.slf4j.Logger;
 
 /**
- * Netty 入站解码器，把 TCP 字节流拆成完整的 {@link AbstractMessagePacket}。
+ * Netty 入站解码器，把 TCP 字节流拆成完整的 {@link MessagePacket}。
  * <p>
  * TCP 可能半包或粘包，因此这里通过 length 字段循环读取。数据不足一个完整包时会
  * reset readerIndex，等待下一次网络读事件继续拼包。
@@ -35,7 +35,7 @@ public class CommonDecoder extends ByteToMessageDecoder {
           in.resetReaderIndex();
           break;
         }
-        AbstractMessagePacket packet = MessagePacketFactory.createMessagePacket();
+        MessagePacket packet = MessagePacketFactory.createMessagePacket();
         if (packet != null && packet.decode(len, in)) {
           list.add(packet);
         } else {

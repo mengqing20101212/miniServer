@@ -6,7 +6,7 @@ import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
 import ly.net.NetService;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Hero;
@@ -86,13 +86,13 @@ public class RpcSeqSidTestModule implements RobotModule {
             int heroSeq = client.getSendSeq();
             Hero.CS_HeroList heroReq = Hero.CS_HeroList.newBuilder().build();
             long playerId = session.getPlayerInfo() != null ? session.getPlayerInfo().getPlayerId() : 0;
-            AbstractMessagePacket heroPacket =
-                    MessagePacketFactory.createAbstractMessagePacket(
+            MessagePacket heroPacket =
+                    MessagePacketFactory.createMessagePacket(
                             playerId, Cmd.CMD.CS_HeroList_VALUE, heroReq, heroSeq, sid);
             if (!client.send(heroPacket)) {
                 return failStep("发送 CS_HeroList 失败");
             }
-            AbstractMessagePacket heroResp =
+            MessagePacket heroResp =
                     waitForResponse(client, Cmd.CMD.SC_HeroList_VALUE, sid);
             assertPacket(heroResp, Cmd.CMD.SC_HeroList_VALUE, sid, "英雄列表响应");
             assertPositiveClientDownSeq(heroResp, "英雄列表响应");
@@ -235,13 +235,13 @@ public class RpcSeqSidTestModule implements RobotModule {
                             .setDeviceId("rpc-seq-sid-test")
                             .setIsReconnect(playerIdOverride != null && playerIdOverride > 0)
                             .build();
-            AbstractMessagePacket loginPacket =
-                    MessagePacketFactory.createAbstractMessagePacket(
+            MessagePacket loginPacket =
+                    MessagePacketFactory.createMessagePacket(
                             accountId, Cmd.CMD.CS_Login_VALUE, loginReq, loginSeq, sid);
             if (!gateClient.send(loginPacket)) {
                 return fail("发送 CS_Login 失败");
             }
-            AbstractMessagePacket loginResp =
+            MessagePacket loginResp =
                     waitForResponse(gateClient, Cmd.CMD.SC_Login_VALUE, sid);
             assertPacket(loginResp, Cmd.CMD.SC_Login_VALUE, sid, "登录响应");
             int expectedNextClientDownSeq = assertNextClientDownSeq(0, loginResp, "登录响应");
@@ -264,13 +264,13 @@ public class RpcSeqSidTestModule implements RobotModule {
 
             int heroSeq = gateClient.getSendSeq();
             Hero.CS_HeroList heroReq = Hero.CS_HeroList.newBuilder().build();
-            AbstractMessagePacket heroPacket =
-                    MessagePacketFactory.createAbstractMessagePacket(
+            MessagePacket heroPacket =
+                    MessagePacketFactory.createMessagePacket(
                             scLogin.getPlayerId(), Cmd.CMD.CS_HeroList_VALUE, heroReq, heroSeq, sid);
             if (!gateClient.send(heroPacket)) {
                 return fail("发送 CS_HeroList 失败");
             }
-            AbstractMessagePacket heroResp =
+            MessagePacket heroResp =
                     waitForResponse(
                             gateClient, Cmd.CMD.SC_HeroList_VALUE, sid, responseTimeoutMs);
             assertPacket(heroResp, Cmd.CMD.SC_HeroList_VALUE, sid, "英雄列表响应");
@@ -324,17 +324,17 @@ public class RpcSeqSidTestModule implements RobotModule {
         return false;
     }
 
-    private static AbstractMessagePacket waitForResponse(NetClient client, int cmd, int sid)
+    private static MessagePacket waitForResponse(NetClient client, int cmd, int sid)
             throws InterruptedException {
         return waitForResponse(client, cmd, sid, RESPONSE_TIMEOUT_MS);
     }
 
-    private static AbstractMessagePacket waitForResponse(
+    private static MessagePacket waitForResponse(
             NetClient client, int cmd, int sid, long timeoutMs)
             throws InterruptedException {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
-            AbstractMessagePacket packet = client.readPacket();
+            MessagePacket packet = client.readPacket();
             if (packet != null) {
                 if (packet.getCmd() == cmd && packet.getSid() == sid) {
                     return packet;
@@ -348,7 +348,7 @@ public class RpcSeqSidTestModule implements RobotModule {
                 String.format("等待响应超时 cmd=%d sid=%d", cmd, sid));
     }
 
-    private static void assertPacket(AbstractMessagePacket packet, int cmd, int sid, String name) {
+    private static void assertPacket(MessagePacket packet, int cmd, int sid, String name) {
         if (packet == null) {
             throw new IllegalStateException(name + "为空");
         }
@@ -360,14 +360,14 @@ public class RpcSeqSidTestModule implements RobotModule {
         }
     }
 
-    private static void assertPositiveClientDownSeq(AbstractMessagePacket packet, String name) {
+    private static void assertPositiveClientDownSeq(MessagePacket packet, String name) {
         if (packet.getSeq() <= 0) {
             throw new IllegalStateException(
                     String.format("%s 下行 seq 校验失败，expect seq > 0, actual seq=%d", name, packet.getSeq()));
         }
     }
 
-    private static int assertNextClientDownSeq(int previousSeq, AbstractMessagePacket packet, String name) {
+    private static int assertNextClientDownSeq(int previousSeq, MessagePacket packet, String name) {
         int expectedSeq = previousSeq + 1;
         if (packet.getSeq() != expectedSeq) {
             throw new IllegalStateException(

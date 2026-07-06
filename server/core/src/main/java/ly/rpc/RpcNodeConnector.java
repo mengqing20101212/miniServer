@@ -10,7 +10,7 @@ import ly.nacos.NacosServerNode;
 import ly.nacos.NacosService;
 import ly.net.NetClient;
 import ly.net.NetClientManager;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Server;
@@ -150,7 +150,7 @@ public class RpcNodeConnector {
      * @param packet 消息包对象
      * @return 发送成功返回true，失败返回false
      */
-    public boolean sendPacket(AbstractMessagePacket packet) {
+    public boolean sendPacket(MessagePacket packet) {
         if (isConnect()) {
             boolean success = client.send(packet);
             if (!success) {
@@ -174,7 +174,7 @@ public class RpcNodeConnector {
      * @param timeout 超时时间（毫秒）
      * @return 响应消息包，如果超时或失败则返回null
      */
-    public AbstractMessagePacket syncSendPacket(AbstractMessagePacket packet, int timeout) {
+    public MessagePacket syncSendPacket(MessagePacket packet, int timeout) {
         final int sendSeq = packet.getSeq();
         final int responseCmd = packet.getCmd() + 1;
 
@@ -185,7 +185,7 @@ public class RpcNodeConnector {
 
                 // 使用简单的轮询方式等待响应，适合虚拟线程环境
                 while (System.currentTimeMillis() < endTime) {
-                    AbstractMessagePacket response = getReceiveMsgByRpcIdentity(packet, responseCmd);
+                    MessagePacket response = getReceiveMsgByRpcIdentity(packet, responseCmd);
                     if (response != null) {
                         return response;
                     }
@@ -210,7 +210,7 @@ public class RpcNodeConnector {
      * @param packet 要发送的消息包
      * @return 响应消息包，如果超时或失败则返回null
      */
-    public AbstractMessagePacket syncSendPacket(AbstractMessagePacket packet) {
+    public MessagePacket syncSendPacket(MessagePacket packet) {
         return syncSendPacket(packet, DEFAULT_TIMEOUT);
     }
 
@@ -246,10 +246,10 @@ public class RpcNodeConnector {
             long guid, int cmd, AbstractMessage protoData, int timeout, RpcFailSavePolicy failSavePolicy) {
         long callId = newCallId();
         Server.csServer2Server request = buildServer2ServerRequest(cmd, protoData, callId);
-        AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
+        MessagePacket packet = MessagePacketFactory.createMessagePacket(
                 guid, Cmd.CMD.CS_Server2Server_VALUE, request, client.getSendSeq(), 0);
         // 可靠补发包必须脱离当前 TCP 连接上下文，避免旧 sid/seq 在新连接上触发目标服丢包校验。
-        AbstractMessagePacket reliablePacket = createServer2ServerRpcPacket(guid, cmd, protoData, 0, 0, callId);
+        MessagePacket reliablePacket = createServer2ServerRpcPacket(guid, cmd, protoData, 0, 0, callId);
         if (!sendPacket(packet)) {
             LoggerDef.NetLogger.warn("send proto message failed, serverId={}, guid={}, cmd={}", serverId, guid, cmd);
             saveReliableIfNeeded(reliablePacket, failSavePolicy, "send failed");
@@ -262,7 +262,7 @@ public class RpcNodeConnector {
 
             // 使用简单的轮询方式等待响应
             while (System.currentTimeMillis() < endTime) {
-                AbstractMessagePacket response = client.getReceiveMsgByCallId(callId, Cmd.CMD.SC_Server2Server_VALUE);
+                MessagePacket response = client.getReceiveMsgByCallId(callId, Cmd.CMD.SC_Server2Server_VALUE);
                 if (response != null) {
                     return unpackServer2ServerResponse(response, cmd + 1, callId);
                 }
@@ -282,7 +282,7 @@ public class RpcNodeConnector {
         return null;
     }
 
-    private AbstractMessagePacket getReceiveMsgByRpcIdentity(AbstractMessagePacket requestPacket, int responseCmd) {
+    private MessagePacket getReceiveMsgByRpcIdentity(MessagePacket requestPacket, int responseCmd) {
         long callId = extractCallId(requestPacket);
         if (callId > 0) {
             return client.getReceiveMsgByCallId(callId, responseCmd);
@@ -295,7 +295,7 @@ public class RpcNodeConnector {
         return null;
     }
 
-    private long extractCallId(AbstractMessagePacket requestPacket) {
+    private long extractCallId(MessagePacket requestPacket) {
         if (requestPacket == null) {
             return 0;
         }
@@ -319,10 +319,10 @@ public class RpcNodeConnector {
         }
     }
 
-    public static AbstractMessagePacket createServer2ServerRpcPacket(
+    public static MessagePacket createServer2ServerRpcPacket(
             long guid, int cmd, AbstractMessage protoData, int seq, int sid, long callId) {
         Server.csServer2Server request = buildServer2ServerRequest(cmd, protoData, callId);
-        return MessagePacketFactory.createAbstractMessagePacket(
+        return MessagePacketFactory.createMessagePacket(
                 guid, Cmd.CMD.CS_Server2Server_VALUE, request, seq, sid);
     }
 
@@ -337,7 +337,7 @@ public class RpcNodeConnector {
     }
 
     private AbstractMessage unpackServer2ServerResponse(
-            AbstractMessagePacket receivedPacket, int expectedInnerCmd, long callId) {
+            MessagePacket receivedPacket, int expectedInnerCmd, long callId) {
         try {
             Server.scServer2Server response = (Server.scServer2Server) ProtoMessageFactory.createProtoMessage(
                     Cmd.CMD.SC_Server2Server_VALUE, receivedPacket.getData());
@@ -376,7 +376,7 @@ public class RpcNodeConnector {
     }
 
     private void saveReliableIfNeeded(
-            AbstractMessagePacket packet, RpcFailSavePolicy failSavePolicy, String reason) {
+            MessagePacket packet, RpcFailSavePolicy failSavePolicy, String reason) {
         // 默认策略不改变旧同步 RPC 行为，只有显式传入策略时才进入 Redis outbox。
         if (failSavePolicy == null || failSavePolicy == RpcFailSavePolicy.NONE) {
             return;
@@ -394,7 +394,7 @@ public class RpcNodeConnector {
      * @param receivedPacket 接收到的数据包
      * @return 解析后的Protobuf消息对象，如果解析失败则返回null
      */
-    private AbstractMessage unpackPacket(AbstractMessagePacket receivedPacket) {
+    private AbstractMessage unpackPacket(MessagePacket receivedPacket) {
         try {
             // 使用ProtoMessageFactory创建对应的Protobuf消息对象
             return ProtoMessageFactory.createProtoMessage(receivedPacket.getCmd(), receivedPacket.getData());

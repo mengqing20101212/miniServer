@@ -125,7 +125,7 @@ public class RpcService {
     this.reliableReplayResponseHandler = handler;
   }
 
-  boolean handleReliableReplayResponse(ReliableRpcMessage message, ly.net.packet.AbstractMessagePacket response) {
+  boolean handleReliableReplayResponse(ReliableRpcMessage message, ly.net.packet.MessagePacket response) {
     ReliableRpcReplayResponseHandler handler = reliableReplayResponseHandler;
     return handler != null && handler.handle(message, response);
   }

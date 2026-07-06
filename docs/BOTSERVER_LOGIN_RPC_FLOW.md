@@ -4,9 +4,9 @@
 
 ## 核心原则
 
-`AbstractMessagePacket.seq` 只属于当前 socket，不跨 socket 复用。
+`MessagePacket.seq` 只属于当前 socket，不跨 socket 复用。
 
-| 当前 socket | `AbstractMessagePacket.sid` | `AbstractMessagePacket.seq` |
+| 当前 socket | `MessagePacket.sid` | `MessagePacket.seq` |
 | --- | --- | --- |
 | Bot -> Gate | `clientSid` | `clientReqSeq`，客户端上行日志序号 |
 | Gate -> Game | `rpcSid` | `rpcSeq`，服务器间 RPC 外层序号 |

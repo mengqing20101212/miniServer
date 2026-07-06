@@ -7,7 +7,7 @@ import ly.logic.login.LoginTask;
 import ly.net.GameConnectSession;
 import ly.net.GamePlayer;
 import ly.net.IGameController;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
@@ -23,7 +23,7 @@ public class Gate2GameRpcGameCallController implements IGameController {
                 register(
                                 Cmd.CMD.CS_Gate2GameRpcGameCall,
                                 GameConnectSession.class,
-                                AbstractMessagePacket.class,
+                                MessagePacket.class,
                                 Server.csGate2GameRpcGameCall.class,
                                 (context, req) -> {
                                         final int clientCmd = req.getClientCmd();
@@ -35,7 +35,7 @@ public class Gate2GameRpcGameCallController implements IGameController {
                                         ly.LoggerDef.NetLogger.info(
                                                         "[Gate2GameRpc] received, clientCmd={}, clientReqSeq={}, guid={}, clientSid={}, callId={}",
                                                         clientCmd, clientReqSeq, guid, clientSid, callId);
-                                        AbstractMessagePacket clientPacket = new AbstractMessagePacket(guid, clientCmd,
+                                        MessagePacket clientPacket = new MessagePacket(guid, clientCmd,
                                                         clientSid, clientReqSeq, data);
                                         if (clientCmd == Cmd.CMD.CS_Login_VALUE) {
                                                 handleLoginPacket(context.session(), clientPacket, callId);
@@ -88,7 +88,7 @@ public class Gate2GameRpcGameCallController implements IGameController {
                                 });
         }
 
-        private void handleLoginPacket(GameConnectSession session, AbstractMessagePacket clientPacket, long callId) {
+        private void handleLoginPacket(GameConnectSession session, MessagePacket clientPacket, long callId) {
                 Login.csLogin request = (Login.csLogin) ProtoMessageFactory.createProtoMessage(Cmd.CMD.CS_Login_VALUE,
                                 clientPacket.getData());
                 if (request == null) {
@@ -131,7 +131,7 @@ public class Gate2GameRpcGameCallController implements IGameController {
                                         .setData(errorMsg.toByteString())
                                         .setCallId(callId)
                                         .build();
-                        AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
+                        MessagePacket packet = MessagePacketFactory.createMessagePacket(
                                         guid,
                                         Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE,
                                         builder,

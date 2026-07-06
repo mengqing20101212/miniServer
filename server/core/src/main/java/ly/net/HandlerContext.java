@@ -1,11 +1,11 @@
 package ly.net;
 
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 /**
  * 处理器上下文，封装会话和数据包
  */
-public record HandlerContext<S extends ConnectSession, P extends AbstractMessagePacket>(
+public record HandlerContext<S extends ConnectSession, P extends MessagePacket>(
         S session,
         P packet
 ) {

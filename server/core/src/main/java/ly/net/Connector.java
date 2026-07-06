@@ -1,7 +1,7 @@
 package ly.net;
 
 import io.netty.channel.ChannelHandlerContext;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 import java.net.InetSocketAddress;
 
@@ -86,7 +86,7 @@ public class Connector {
      * 如果调用方没有设置 sid，则自动写入服务端为当前连接分配的 sessionId。
      * 方法加 synchronized 是为了避免多线程同时复用同一个 packet/channel 时打乱状态设置。
      */
-    public synchronized boolean write(AbstractMessagePacket packet) {
+    public synchronized boolean write(MessagePacket packet) {
         if (packet.getSid() == 0) {
             packet.setSid(sessionId);
         }

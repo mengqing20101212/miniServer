@@ -33,7 +33,7 @@ import ly.bot.state.impl.LoggedInState;
 import ly.bot.stats.PacketLatencyStats;
 import ly.net.NetClient;
 import ly.net.NetService;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Login;
@@ -61,7 +61,7 @@ public class RobotSession {
     private static ly.bot.http.HttpServerListClient globalHttpClient;
 
     // 消息队列，用于处理服务器响应
-    private final BlockingQueue<AbstractMessagePacket> messageQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<MessagePacket> messageQueue = new LinkedBlockingQueue<>();
 
     private volatile boolean isLoginSuccess = false;
     private volatile boolean isGateConnected = false;
@@ -188,7 +188,7 @@ public class RobotSession {
         }
     }
 
-    private PlayerInfo buildPlayerInfoFromLoginResponse(AbstractMessagePacket response) {
+    private PlayerInfo buildPlayerInfoFromLoginResponse(MessagePacket response) {
         try {
             Login.scLogin login = Login.scLogin.parseFrom(response.getData());
             return new PlayerInfo(
@@ -366,7 +366,7 @@ public class RobotSession {
     /**
      * 处理登录响应
      */
-    public void handleLoginResponse(AbstractMessagePacket response) {
+    public void handleLoginResponse(MessagePacket response) {
         logger.info("机器人 #{} 收到登录响应: {}", botId, response);
 
         if (response.getCmd() == Cmd.CMD.SC_Login_VALUE) {
@@ -546,12 +546,12 @@ public class RobotSession {
      * seq 和 sid 都由当前 Gate 连接统一维护，Action 不再重复拼这些公共字段。
      * </p>
      */
-    public AbstractMessagePacket createPacket(int cmd, AbstractMessage message) {
+    public MessagePacket createPacket(int cmd, AbstractMessage message) {
         if (gateClient == null) {
             throw new IllegalStateException("Gate 连接尚未初始化，不能创建协议包");
         }
         long guid = playerInfo != null ? playerInfo.getPlayerId() : accountId;
-        return MessagePacketFactory.createAbstractMessagePacket(
+        return MessagePacketFactory.createMessagePacket(
                 guid,
                 cmd,
                 message,
@@ -571,7 +571,7 @@ public class RobotSession {
             while (running.get()) {
                 try {
                     // 从NetClient获取响应包并放入队列
-                    AbstractMessagePacket response = gateClient != null ? gateClient.readPacket() : null;
+                    MessagePacket response = gateClient != null ? gateClient.readPacket() : null;
                     if (response != null) {
                         // 将响应包放入消息队列
                         messageQueue.offer(response);
@@ -598,7 +598,7 @@ public class RobotSession {
         try {
             // 处理队列中的所有消息
             while (!messageQueue.isEmpty()) {
-                AbstractMessagePacket response = messageQueue.poll();
+                MessagePacket response = messageQueue.poll();
                 if (response != null) {
                     handleResponse(response);
                 }
@@ -611,7 +611,7 @@ public class RobotSession {
     /**
      * 处理服务器响应
      */
-    private void handleResponse(AbstractMessagePacket response) {
+    private void handleResponse(MessagePacket response) {
         try {
             switch (response.getCmd()) {
                 case ly.proto.Cmd.CMD.SC_Login_VALUE:

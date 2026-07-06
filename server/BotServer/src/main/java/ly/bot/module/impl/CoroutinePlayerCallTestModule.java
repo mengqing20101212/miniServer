@@ -4,7 +4,7 @@ import ly.ProtoMessageFactory;
 import ly.bot.http.HttpServerListClient;
 import ly.net.NetClient;
 import ly.net.NetService;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
@@ -46,8 +46,8 @@ public class CoroutinePlayerCallTestModule {
                             .setTargetY(200)
                             .setObservePlayerId(contextB.playerId())
                             .build();
-            AbstractMessagePacket packet =
-                    MessagePacketFactory.createAbstractMessagePacket(
+            MessagePacket packet =
+                    MessagePacketFactory.createMessagePacket(
                             contextA.playerId(),
                             Cmd.CMD.CS_Move_VALUE,
                             request,
@@ -57,7 +57,7 @@ public class CoroutinePlayerCallTestModule {
                 return fail("A 发送 CS_Move 失败");
             }
 
-            AbstractMessagePacket response =
+            MessagePacket response =
                     waitForResponse(clientA, Cmd.CMD.SC_Move_VALUE, clientA.getSid());
             assertNextClientDownSeq(contextA.lastClientDownSeq(), response, "A Move响应");
             Move.scMove scMove =
@@ -132,8 +132,8 @@ public class CoroutinePlayerCallTestModule {
                         .setDeviceId("coroutine-player-call-test")
                         .setIsReconnect(false)
                         .build();
-        AbstractMessagePacket loginPacket =
-                MessagePacketFactory.createAbstractMessagePacket(
+        MessagePacket loginPacket =
+                MessagePacketFactory.createMessagePacket(
                         serverList.getAccountId(),
                         Cmd.CMD.CS_Login_VALUE,
                         loginReq,
@@ -142,7 +142,7 @@ public class CoroutinePlayerCallTestModule {
         if (!client.send(loginPacket)) {
             throw new IllegalStateException("发送 CS_Login 失败, account=" + account);
         }
-        AbstractMessagePacket loginResp =
+        MessagePacket loginResp =
                 waitForResponse(client, Cmd.CMD.SC_Login_VALUE, client.getSid());
         int lastClientDownSeq = assertNextClientDownSeq(0, loginResp, account + " 登录响应");
         Login.scLogin scLogin =
@@ -184,11 +184,11 @@ public class CoroutinePlayerCallTestModule {
         return false;
     }
 
-    private static AbstractMessagePacket waitForResponse(NetClient client, int cmd, int sid)
+    private static MessagePacket waitForResponse(NetClient client, int cmd, int sid)
             throws InterruptedException {
         long deadline = System.currentTimeMillis() + RESPONSE_TIMEOUT_MS;
         while (System.currentTimeMillis() < deadline) {
-            AbstractMessagePacket packet = client.readPacket();
+            MessagePacket packet = client.readPacket();
             if (packet != null) {
                 if (packet.getCmd() == cmd && packet.getSid() == sid) {
                     return packet;
@@ -205,7 +205,7 @@ public class CoroutinePlayerCallTestModule {
                 String.format("等待响应超时 cmd=%d sid=%d", cmd, sid));
     }
 
-    private static int assertNextClientDownSeq(int previousSeq, AbstractMessagePacket packet, String name) {
+    private static int assertNextClientDownSeq(int previousSeq, MessagePacket packet, String name) {
         int expectedSeq = previousSeq + 1;
         if (packet.getSeq() != expectedSeq) {
             throw new IllegalStateException(

@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 
 import ly.LoggerDef;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 /**
  * 机器人响应分发表。
@@ -24,7 +24,7 @@ public class RobotActionRegistry {
         }
     }
 
-    public boolean dispatch(AbstractMessagePacket response, RobotActionContext context) {
+    public boolean dispatch(MessagePacket response, RobotActionContext context) {
         RobotAction action = responseActions.get(response.getCmd());
         if (action == null) {
             return false;

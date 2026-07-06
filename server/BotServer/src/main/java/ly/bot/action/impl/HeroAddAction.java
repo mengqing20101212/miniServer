@@ -9,7 +9,7 @@ import ly.bot.action.RobotAction;
 import ly.bot.action.RobotActionContext;
 import ly.bot.action.RobotActionResult;
 import ly.net.NetClient;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Hero;
 
@@ -37,7 +37,7 @@ public class HeroAddAction implements RobotAction {
             context.getSession().getLatencyStats().recordRequestSent(actionId, requestCmd());
             int selectedHeroId = selectHeroId(context);
 
-            AbstractMessagePacket packet = context.getSession().createPacket(
+            MessagePacket packet = context.getSession().createPacket(
                     requestCmd(),
                     Hero.CS_HeroAdd.newBuilder().setHeroId(selectedHeroId).setCount(count).build());
 
@@ -71,7 +71,7 @@ public class HeroAddAction implements RobotAction {
     }
 
     @Override
-    public void onResponse(AbstractMessagePacket response, RobotActionContext context) {
+    public void onResponse(MessagePacket response, RobotActionContext context) {
         try {
             Hero.SC_HeroAdd result = Hero.SC_HeroAdd.parseFrom(response.getData());
             context.getDataStore().put("hero", "lastAddResult", result.getResult().name());

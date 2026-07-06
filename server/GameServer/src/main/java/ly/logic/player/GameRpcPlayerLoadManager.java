@@ -4,7 +4,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import ly.LoggerDef;
 import ly.net.GamePlayer;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
@@ -39,7 +39,7 @@ public class GameRpcPlayerLoadManager {
             return;
         }
         if (!tasks.offer(task)) {
-            AbstractMessagePacket packet = task.packet;
+            MessagePacket packet = task.packet;
             LoggerDef.SystemLogger.error(
                     "GameRpcPlayerLoadManager queue full, drop packet playerId={}, cmd={}, seq={}, sid={}, queueSize={}, queueCapacity={}",
                     packet.getGuid(),
@@ -66,7 +66,7 @@ public class GameRpcPlayerLoadManager {
     }
 
     private void handleTask(GameRpcPlayerTask task) {
-        AbstractMessagePacket packet = task.packet;
+        MessagePacket packet = task.packet;
         long playerId = packet.getGuid();
         Player player = PlayerManager.getInstance().getOnlinePlayer(playerId);
         if (player == null) {
@@ -100,7 +100,7 @@ public class GameRpcPlayerLoadManager {
     }
 
     private void sendErrorCode(GameRpcPlayerTask task, ErrorMsg.ErrorCode errorCode) {
-        AbstractMessagePacket packet = task.packet;
+        MessagePacket packet = task.packet;
         ErrorMsg.scErrorCode errorMsg = ErrorMsg.scErrorCode.newBuilder()
                 .setErrorCode(errorCode)
                 .setMsgId(packet.getCmd())
@@ -111,7 +111,7 @@ public class GameRpcPlayerLoadManager {
                 .setData(errorMsg.toByteString())
                 .setCallId(task.callId)
                 .build();
-        AbstractMessagePacket responsePacket = MessagePacketFactory.createAbstractMessagePacket(
+        MessagePacket responsePacket = MessagePacketFactory.createMessagePacket(
                 packet.getGuid(),
                 Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE,
                 response,

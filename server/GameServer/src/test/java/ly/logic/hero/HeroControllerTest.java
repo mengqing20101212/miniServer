@@ -12,7 +12,7 @@ import ly.logic.resource.module.ResourceModuleData;
 import ly.net.GameConnectSession;
 import ly.net.GameHandlerContext;
 import ly.net.GamePlayer;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 import ly.proto.Hero;
@@ -515,7 +515,7 @@ public class HeroControllerTest {
         }
 
         @Override
-        public boolean addSendPacket(ly.net.packet.AbstractMessagePacket packet) {
+        public boolean addSendPacket(ly.net.packet.MessagePacket packet) {
             // 捕获发送的消息供测试验证（提取 protobuf 对象）
             if (testPlayer != null) {
                 testPlayer.addSentMessage(packet.getCmd(), extractMessage(packet));
@@ -534,9 +534,9 @@ public class HeroControllerTest {
     }
 
     /**
-     * 模拟 AbstractMessagePacket
+     * 模拟 MessagePacket
      */
-    private static class MockAbstractMessagePacket extends AbstractMessagePacket {
+    private static class MockAbstractMessagePacket extends MessagePacket {
         public MockAbstractMessagePacket() {
             super();
         }
@@ -561,9 +561,9 @@ public class HeroControllerTest {
     }
 
     /**
-     * 从 AbstractMessagePacket 中提取 protobuf 消息对象
+     * 从 MessagePacket 中提取 protobuf 消息对象
      */
-    private static Object extractMessage(AbstractMessagePacket packet) {
+    private static Object extractMessage(MessagePacket packet) {
         try {
             byte[] data = packet.getData();
             int cmd = packet.getCmd();

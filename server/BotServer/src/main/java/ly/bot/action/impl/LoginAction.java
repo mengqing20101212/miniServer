@@ -7,7 +7,7 @@ import ly.bot.action.RobotAction;
 import ly.bot.action.RobotActionContext;
 import ly.bot.action.RobotActionResult;
 import ly.net.NetClient;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Login;
 
@@ -58,7 +58,7 @@ public class LoginAction implements RobotAction {
                     .setIsReconnect(playerId > 0);
             loginBuilder.setGameServerId(gameServerId != null && !gameServerId.isEmpty() ? gameServerId : "game1001");
 
-            AbstractMessagePacket packet = context.getSession().createPacket(requestCmd(), loginBuilder.build());
+            MessagePacket packet = context.getSession().createPacket(requestCmd(), loginBuilder.build());
 
             if (!client.send(packet)) {
                 logger.error("机器人登录请求发送失败, account: {}", account);
@@ -74,7 +74,7 @@ public class LoginAction implements RobotAction {
     }
 
     @Override
-    public void onResponse(AbstractMessagePacket response, RobotActionContext context) {
+    public void onResponse(MessagePacket response, RobotActionContext context) {
         context.getSession().handleLoginResponse(response);
         if (actionId != null) {
             context.getSession().getLatencyStats().recordResponseReceived(actionId, response.getCmd());

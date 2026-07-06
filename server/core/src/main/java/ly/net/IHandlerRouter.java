@@ -1,13 +1,13 @@
 package ly.net;
 
 import com.google.protobuf.AbstractMessage;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 /**
  * 处理器路由接口
  */
 @FunctionalInterface
-public interface IHandlerRouter<S extends ConnectSession, P extends AbstractMessagePacket, R extends AbstractMessage> {
+public interface IHandlerRouter<S extends ConnectSession, P extends MessagePacket, R extends AbstractMessage> {
     /**
      * 处理路由
      *

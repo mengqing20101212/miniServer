@@ -2,7 +2,7 @@ package ly.rpc;
 
 import com.google.protobuf.AbstractMessage;
 import ly.config.ServerTypeEnum;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -18,12 +18,12 @@ public class RpcUtils {
      * @param serverId 目标服务器id
      * @param packet   要发送的数据包
      */
-    public static void request(String serverId, AbstractMessagePacket packet) {
+    public static void request(String serverId, MessagePacket packet) {
         request(serverId, packet, false);
     }
 
     /** 发送不等待响应的 RPC；saveOnFail 为 true 时发送失败会保存到 Redis 等目标服恢复后补发。 */
-    public static void request(String serverId, AbstractMessagePacket packet, boolean saveOnFail) {
+    public static void request(String serverId, MessagePacket packet, boolean saveOnFail) {
         RpcNodeConnector rpcNodeConnector = RpcService.getInstance().getRpcNodeConnector(serverId);
         if (rpcNodeConnector != null) {
             boolean success = rpcNodeConnector.sendPacket(packet);
@@ -81,7 +81,7 @@ public class RpcUtils {
         }
         if (failSavePolicy != null && failSavePolicy != RpcFailSavePolicy.NONE) {
             // 连连接器都创建失败时，说明目标节点当前不可达；保存时也必须使用 S2S RPC 外壳。
-            ly.net.packet.AbstractMessagePacket packet =
+            ly.net.packet.MessagePacket packet =
                     RpcNodeConnector.createServer2ServerRpcPacket(
                             guid, cmd, protoData, 0, 0, System.nanoTime() ^ Thread.currentThread().threadId());
             ReliableRpcStore.getInstance().save(serverId, packet, "connector unavailable");
@@ -101,7 +101,7 @@ public class RpcUtils {
      * @param serverType  目标服务器类型
      * @param packet   要发送的数据包
      */
-    public static void broadcastRequest(ServerTypeEnum serverType, AbstractMessagePacket packet) {
+    public static void broadcastRequest(ServerTypeEnum serverType, MessagePacket packet) {
         List<RpcNodeConnector> rpcNodeConnectors = RpcService.getInstance().getRpcNodeConnectorsByServerType(serverType);
         for (RpcNodeConnector rpcNodeConnector : rpcNodeConnectors) {
             rpcNodeConnector.sendPacket(packet);

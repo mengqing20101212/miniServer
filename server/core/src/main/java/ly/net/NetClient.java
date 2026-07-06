@@ -6,7 +6,7 @@ import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import ly.LoggerDef;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import org.slf4j.Logger;
 
@@ -33,7 +33,7 @@ public class NetClient {
     private EventLoopGroup group;
     private final boolean isMultiplex;
     private int sid;
-    BlockingQueue<AbstractMessagePacket> receivePacketQueue = new ArrayBlockingQueue<>(1024);
+    BlockingQueue<MessagePacket> receivePacketQueue = new ArrayBlockingQueue<>(1024);
     AtomicInteger sendSeq = new AtomicInteger(0);
     static AttributeKey<NetClient> SELF_ATTR_KEY = AttributeKey.valueOf("NET_CLIENT");
 
@@ -125,7 +125,7 @@ public class NetClient {
      */
     public int sendS2SMessage(long guid, int cmd, AbstractMessage protoData) {
         final int seq = sendSeq.getAndIncrement();
-        AbstractMessagePacket messagePacket = MessagePacketFactory.createAbstractMessagePacket(
+        MessagePacket messagePacket = MessagePacketFactory.createMessagePacket(
                 guid, cmd, protoData, seq, sid);
         return send(messagePacket) ? seq : -1;
     }
@@ -156,7 +156,7 @@ public class NetClient {
      * <p>
      * 若包内 sid 为 0，会填入当前连接握手得到的 sid；若 seq 为 0，则分配新的自增序号。
      */
-    public boolean send(AbstractMessagePacket packet) {
+    public boolean send(MessagePacket packet) {
         if (isConnected()) {
             sendPacket(packet);
             return true;
@@ -174,20 +174,20 @@ public class NetClient {
         return false;
     }
 
-    public AbstractMessagePacket readPacket() {
+    public MessagePacket readPacket() {
         return receivePacketQueue.poll();
     }
 
-    public List<AbstractMessagePacket> readAllPackets() {
+    public List<MessagePacket> readAllPackets() {
         if (!receivePacketQueue.isEmpty()) {
-            List<AbstractMessagePacket> packets = new ArrayList<>();
+            List<MessagePacket> packets = new ArrayList<>();
             receivePacketQueue.drainTo(packets); // 一次性取出所有内容
             return packets;
         }
         return new ArrayList<>();
     }
 
-    private synchronized boolean sendPacket(AbstractMessagePacket packet) {
+    private synchronized boolean sendPacket(MessagePacket packet) {
         if (packet.getSid() == 0) {
             packet.setSid(sid);
         }
@@ -199,8 +199,8 @@ public class NetClient {
         return true;
     }
 
-    public void addReceivePacket(AbstractMessagePacket packet) {
-        if (packet.getCmd() == AbstractMessagePacket.CMD_ACK) {
+    public void addReceivePacket(MessagePacket packet) {
+        if (packet.getCmd() == MessagePacket.CMD_ACK) {
             setSid(packet.getSid());
         } else {
             receivePacketQueue.add(packet);
@@ -221,10 +221,10 @@ public class NetClient {
      * <p>Gate2Game 专用 RPC 和通用 Server2Server RPC 都必须使用 callId 匹配，
      * 不能再依赖 TCP 连接上的 seq。seq 只保留给链路日志和客户端包顺序排查。
      */
-    public AbstractMessagePacket getReceiveMsgByCallId(long callId, int cmd) {
-        Iterator<AbstractMessagePacket> iterator = receivePacketQueue.iterator();
+    public MessagePacket getReceiveMsgByCallId(long callId, int cmd) {
+        Iterator<MessagePacket> iterator = receivePacketQueue.iterator();
         while (iterator.hasNext()) {
-            AbstractMessagePacket packet = iterator.next();
+            MessagePacket packet = iterator.next();
             if (packet.getCmd() == cmd) {
                 try {
                     com.google.protobuf.AbstractMessage msg = ly.ProtoMessageFactory.createProtoMessage(cmd,
@@ -256,7 +256,7 @@ public class NetClient {
      * <p>
      * 当 getReceiveMsgByCallId 取出包后发现 callId 不匹配时，调用此方法放回。
      */
-    public void putBackPacket(AbstractMessagePacket packet) {
+    public void putBackPacket(MessagePacket packet) {
         if (packet != null) {
             receivePacketQueue.add(packet);
         }

@@ -8,7 +8,7 @@ import com.google.protobuf.Message;
 import ly.GateClientManager;
 import ly.LoggerDef;
 import ly.ProtoMessageFactory;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Server;
 import ly.security.SecurityBanService;
@@ -33,7 +33,7 @@ public class GateConnectSession extends ConnectSession {
     }
 
     @Override
-    public void addReceivePacket(AbstractMessagePacket packet) {
+    public void addReceivePacket(MessagePacket packet) {
         super.addReceivePacket(packet);
     }
 
@@ -47,7 +47,7 @@ public class GateConnectSession extends ConnectSession {
                         () -> {
                             while (!Thread.currentThread().isInterrupted()) {
                                 try {
-                                    AbstractMessagePacket packet = receivePacketQueue.take();
+                                    MessagePacket packet = receivePacketQueue.take();
                                     handleReceivePacket(packet);
                                 } catch (InterruptedException e) {
                                     Thread.currentThread().interrupt();
@@ -70,7 +70,7 @@ public class GateConnectSession extends ConnectSession {
         super.closeChannel();
     }
 
-    private void handleReceivePacket(AbstractMessagePacket packet) {
+    private void handleReceivePacket(MessagePacket packet) {
         LoggerDef.LogNet(String.format("<<%s: sessionGuid:%d, packetGuid:%d, sid:%d, cmd:%s, seq:%d,len:%d",
                 getReceiveServerLogName(packet.getCmd()), getGuid(), packet.getGuid(),
                 packet.getSid(), Cmd.CMD.forNumber(packet.getCmd()).name(), packet.getSeq(), packet.getLength()));
@@ -96,7 +96,7 @@ public class GateConnectSession extends ConnectSession {
         return "UNKNOWN";
     }
 
-    private void handleClientPacket(AbstractMessagePacket csPacket) {
+    private void handleClientPacket(MessagePacket csPacket) {
         GateClient client = GateClientManager.getInstance().getClient(getGuid());
         if (client == null) {
             // 登录后的客户端业务包可能携带 playerId 作为 guid，Gate 连接定位必须按 sid 兜底。
@@ -116,7 +116,7 @@ public class GateConnectSession extends ConnectSession {
         }
     }
 
-    private void handleServerPacket(AbstractMessagePacket s2sPacket) {
+    private void handleServerPacket(MessagePacket s2sPacket) {
         if (s2sPacket.getCmd() == Cmd.CMD.SC_Logout_VALUE) {
             HandlerRouterManager.execute(this, s2sPacket);
             return;
@@ -145,7 +145,7 @@ public class GateConnectSession extends ConnectSession {
         }
     }
 
-    private boolean shouldRejectPacket(AbstractMessagePacket packet) {
+    private boolean shouldRejectPacket(MessagePacket packet) {
         SecurityBanService securityBanService = SecurityBanService.getInstance();
         String ip = getConnector() != null ? getConnector().getRemoteIp() : "";
         GateClient client = GateClientManager.getInstance().getClient(getGuid());
@@ -200,7 +200,7 @@ public class GateConnectSession extends ConnectSession {
         if (!(msg instanceof AbstractMessage abstractMessage)) {
             throw new IllegalArgumentException("msg must extend AbstractMessage");
         }
-        AbstractMessagePacket s2cPacket = new AbstractMessagePacket(getGuid(), cmd, 0, 0,
+        MessagePacket s2cPacket = new MessagePacket(getGuid(), cmd, 0, 0,
                 abstractMessage.toByteArray());
         addSendPacket(s2cPacket);
     }

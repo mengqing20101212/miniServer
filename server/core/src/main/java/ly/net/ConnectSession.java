@@ -1,7 +1,7 @@
 package ly.net;
 
 import ly.LoggerDef;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +32,10 @@ public class ConnectSession {
     int lastReceivedSeq;
 
     /** 待异步发送的消息队列，由 NetService 后台任务统一 flush。 */
-    Queue<AbstractMessagePacket> sendPacketQueue = new ConcurrentLinkedQueue<AbstractMessagePacket>();
+    Queue<MessagePacket> sendPacketQueue = new ConcurrentLinkedQueue<MessagePacket>();
 
     /** 收到的业务包队列；Netty IO 线程只入队，业务逻辑自行 drain。 */
-    BlockingQueue<AbstractMessagePacket> receivePacketQueue = new ArrayBlockingQueue<>(1024);
+    BlockingQueue<MessagePacket> receivePacketQueue = new ArrayBlockingQueue<>(1024);
 
     public ConnectSession(long guid) {
         this.guid = guid;
@@ -57,9 +57,9 @@ public class ConnectSession {
      * 添加收到的包。
      * <p>
      * 默认会做空包和 seq 连续性校验，子类可通过
-     * {@link #checkAddReceivePacket(AbstractMessagePacket)} 补充业务校验。
+     * {@link #checkAddReceivePacket(MessagePacket)} 补充业务校验。
      */
-    public void addReceivePacket(AbstractMessagePacket packet) {
+    public void addReceivePacket(MessagePacket packet) {
         if (!canAddReceivePacket(packet))
             return;
         if (!receivePacketQueue.offer(packet)) {
@@ -74,7 +74,7 @@ public class ConnectSession {
      * seq 为 0 的包被视为无序列要求，非 0 包必须严格递增，用于尽早发现客户端漏包、
      * 重放或乱序。
      */
-    public boolean canAddReceivePacket(AbstractMessagePacket packet) {
+    public boolean canAddReceivePacket(MessagePacket packet) {
         if (packet == null) {
             logger.error("Can't add receive packet, packet is null");
             return false;
@@ -95,7 +95,7 @@ public class ConnectSession {
     /**
      * 子类扩展点，例如网关/游戏服可在这里做登录态、cmd 白名单等检查。
      */
-    protected boolean checkAddReceivePacket(AbstractMessagePacket packet) {
+    protected boolean checkAddReceivePacket(MessagePacket packet) {
         return true;
     }
 
@@ -105,7 +105,7 @@ public class ConnectSession {
      * @param packet 待发送的消息
      * @return 是否添加成功
      */
-    public boolean addSendPacket(AbstractMessagePacket packet) {
+    public boolean addSendPacket(MessagePacket packet) {
         packet = Server2ServerRpcContext.wrapResponseIfNeeded(packet);
         return sendPacketQueue.add(packet);
     }
@@ -116,7 +116,7 @@ public class ConnectSession {
      * @param packet 待发送消息
      * @return true 发送成功， false发送失败
      */
-    public boolean sendPacket(AbstractMessagePacket packet) {
+    public boolean sendPacket(MessagePacket packet) {
         if (connector != null) {
             return connector.write(packet);
         }
@@ -130,7 +130,7 @@ public class ConnectSession {
      */
     public void sendAllPackets() {
         if (connector != null) {
-            AbstractMessagePacket sendPacket;
+            MessagePacket sendPacket;
             // 修复逻辑错误，避免跳过第一个包
             while ((sendPacket = sendPacketQueue.poll()) != null) {
                 if (!sendPacket(sendPacket)) {
@@ -149,8 +149,8 @@ public class ConnectSession {
     /***
      * 批量获取当前所有接收的消息并清空队列
      */
-    public List<AbstractMessagePacket> getReceivePacketList() {
-        List<AbstractMessagePacket> packets = new ArrayList<>();
+    public List<MessagePacket> getReceivePacketList() {
+        List<MessagePacket> packets = new ArrayList<>();
         receivePacketQueue.drainTo(packets); // 一次性取出所有内容
         return packets;
     }
