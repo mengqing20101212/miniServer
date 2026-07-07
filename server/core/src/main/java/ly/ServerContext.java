@@ -16,6 +16,12 @@ import ly.rpc.RpcService;
 import ly.security.SecurityBanService;
 import ly.startup.StartupSkillLoader;
 import ly.db.AutoTableService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.slf4j.Logger;
 
 /**
@@ -91,9 +97,7 @@ public class ServerContext {
         StartupSkillLoader.validateServerConfig(serverType, serverConfig);
         // 标准化路径分隔符，兼容 Nacos 中使用 Windows 路径格式（D:\WORK\...）在 Linux 下运行
         String configPath = serverConfig.configPath.replace('\\', '/');
-        ConfigService.getInstance().loadAllConfig(logger, configPath);
-        RedisUtils.init();
-        MysqlService.getInstance().init(serverConfig.db.jdbcUrl, serverConfig.db.userName, serverConfig.db.passWord, 0, 0, 0, 0);
+        initCoreDependencies(configPath);
         
         // 启动自动建表服务
         AutoTableService.getInstance().startAutoTableService();
@@ -111,6 +115,86 @@ public class ServerContext {
             throw new RuntimeException("配置热更监听启动失败", e);
         }
         logger.info("服务器 启动成功 耗时: " + (System.currentTimeMillis() - startTime) + "ms");
+    }
+
+    /**
+     * 并发初始化 Nacos 之后才能启动的核心依赖。
+     *
+     * <p>
+     * 配置表、Redis、MySQL 互相没有启动顺序依赖，串行启动会把 IO 等待时间叠加。
+     * 这里使用虚拟线程并发执行，任何一个任务失败都会取消剩余任务并中断启动，
+     * 防止服务带着半初始化状态继续绑定端口。
+     * </p>
+     */
+    private static void initCoreDependencies(String configPath) {
+        List<StartupTask> tasks = List.of(
+                new StartupTask("配置表加载", () -> ConfigService.getInstance().loadAllConfig(logger, configPath)),
+                new StartupTask("Redis 初始化", RedisUtils::init),
+                new StartupTask(
+                        "MySQL 初始化",
+                        () -> MysqlService.getInstance()
+                                .init(
+                                        serverConfig.db.jdbcUrl,
+                                        serverConfig.db.userName,
+                                        serverConfig.db.passWord,
+                                        0,
+                                        0,
+                                        0,
+                                        0)));
+        List<Future<?>> futures = new ArrayList<>(tasks.size());
+        long startTime = System.currentTimeMillis();
+        try (ExecutorService executor =
+                Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("startup-init-", 0).factory())) {
+            for (StartupTask task : tasks) {
+                futures.add(
+                        executor.submit(
+                                () -> {
+                                    runStartupTask(task);
+                                    return null;
+                                }));
+            }
+            for (int i = 0; i < futures.size(); i++) {
+                waitStartupTask(tasks.get(i), futures.get(i), futures);
+            }
+        }
+        logger.info("核心依赖并发初始化完成, cost={}ms", System.currentTimeMillis() - startTime);
+    }
+
+    private static void runStartupTask(StartupTask task) throws Exception {
+        long begin = System.currentTimeMillis();
+        logger.info("开始{}", task.name());
+        task.action().run();
+        logger.info("{}完成, cost={}ms", task.name(), System.currentTimeMillis() - begin);
+    }
+
+    private static void waitStartupTask(StartupTask task, Future<?> future, List<Future<?>> allFutures) {
+        try {
+            future.get();
+        } catch (InterruptedException e) {
+            cancelStartupTasks(allFutures);
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("服务器启动被中断:" + task.name(), e);
+        } catch (ExecutionException e) {
+            cancelStartupTasks(allFutures);
+            Throwable cause = e.getCause() == null ? e : e.getCause();
+            logger.error("服务器启动依赖初始化失败, task={}", task.name(), cause);
+            throw new RuntimeException("服务器启动依赖初始化失败:" + task.name(), cause);
+        }
+    }
+
+    private static void cancelStartupTasks(List<Future<?>> futures) {
+        for (Future<?> future : futures) {
+            if (!future.isDone()) {
+                future.cancel(true);
+            }
+        }
+    }
+
+    private record StartupTask(String name, StartupAction action) {}
+
+    @FunctionalInterface
+    private interface StartupAction {
+        void run() throws Exception;
     }
 
     /**
