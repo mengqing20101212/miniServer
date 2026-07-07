@@ -32,15 +32,21 @@ public class NetClient {
     private Channel channel;
     private EventLoopGroup group;
     private final boolean isMultiplex;
+    private final boolean connectFailureWarnOnly;
     private int sid;
     BlockingQueue<MessagePacket> receivePacketQueue = new ArrayBlockingQueue<>(1024);
     AtomicInteger sendSeq = new AtomicInteger(0);
     static AttributeKey<NetClient> SELF_ATTR_KEY = AttributeKey.valueOf("NET_CLIENT");
 
     public NetClient(String host, int port, boolean isMultiplex) {
+        this(host, port, isMultiplex, false);
+    }
+
+    public NetClient(String host, int port, boolean isMultiplex, boolean connectFailureWarnOnly) {
         this.isMultiplex = isMultiplex;
         this.host = host;
         this.port = port;
+        this.connectFailureWarnOnly = connectFailureWarnOnly;
     }
 
     public boolean isMultiplex() {
@@ -111,11 +117,23 @@ public class NetClient {
                     maxTimeOut -= 3;
                 }
             } else {
-                logger.error("客户端连接失败", future.cause());
+                logConnectFailure(future.cause());
             }
         } catch (Exception e) {
-            logger.error("客户端连接失败", e);
+            logConnectFailure(e);
         }
+    }
+
+    private void logConnectFailure(Throwable cause) {
+        if (connectFailureWarnOnly) {
+            logger.warn(
+                    "客户端连接暂不可用 host={}, port={}, reason={}",
+                    host,
+                    port,
+                    cause == null ? "unknown" : cause.getMessage());
+            return;
+        }
+        logger.error("客户端连接失败", cause);
     }
 
     /**

@@ -33,15 +33,11 @@ public class HeroStarUpAction implements RobotAction {
                 return RobotActionResult.fail("没有可升星的英雄 uid");
             }
 
-            NetClient client = context.getClient();
             actionId = "hero_star_up_" + System.currentTimeMillis();
             context.getSession().getLatencyStats().recordRequestSent(actionId, requestCmd());
 
-            MessagePacket packet = context.getSession().createPacket(
-                    requestCmd(),
-                    Hero.CS_HeroStarUp.newBuilder().setHeroUid(heroUid).build());
-
-            if (!client.send(packet)) {
+            if (!context.getSession()
+                    .sendActionPacket(this, Hero.CS_HeroStarUp.newBuilder().setHeroUid(heroUid).build())) {
                 logger.error("英雄升星请求发送失败, heroUid: {}", heroUid);
                 return RobotActionResult.fail("英雄升星请求发送失败");
             }

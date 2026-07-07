@@ -1,7 +1,9 @@
 package ly.bot.action;
 
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
 
@@ -11,20 +13,19 @@ import ly.net.packet.MessagePacket;
 /**
  * 机器人响应分发表。
  *
- * <p>当前先按响应 cmd 分发，后续如果要严格校验 seq/sid，可以在这里扩展 PendingRequest。</p>
+ * <p>Action 发包成功后会登记 PendingRequest，回包优先按 pending 队列分发。
+ * 普通客户端协议目前没有 callId，也不会回显上行 seq，所以这里用 responseCmd
+ * 维护先入先出的请求队列，避免同一个响应 cmd 被后注册 Action 覆盖。</p>
  */
 public class RobotActionRegistry {
     private static final Logger logger = LoggerDef.SystemLogger;
+    private static final long PENDING_TIMEOUT_MILLIS = 60_000L;
 
     private final Map<Integer, RobotAction> responseActions = new ConcurrentHashMap<>();
+    private final Map<Integer, Queue<PendingRequest>> pendingRequests = new ConcurrentHashMap<>();
 
     public void register(RobotAction action) {
         if (action.responseCmd() > 0) {
-            /*
-             * 当前注册表只按 response cmd 分发，适合 Bot 的模块级协议验证。
-             * 如果同一个响应 cmd 对应多个有状态 Action，后注册者会覆盖先注册者，
-             * 因此模块内部应复用同一个 Action 实例，或后续升级为 callId/seq 级 PendingRequest。
-             */
             RobotAction oldAction = responseActions.put(action.responseCmd(), action);
             if (oldAction != null && oldAction != action) {
                 logger.warn(
@@ -36,8 +37,22 @@ public class RobotActionRegistry {
         }
     }
 
+    public void registerPending(RobotAction action, MessagePacket request) {
+        int responseCmd = action.responseCmd();
+        if (responseCmd <= 0) {
+            return;
+        }
+        cleanupExpired(responseCmd);
+        pendingRequests
+                .computeIfAbsent(responseCmd, ignored -> new ConcurrentLinkedQueue<>())
+                .offer(new PendingRequest(action, request.getSeq(), System.currentTimeMillis()));
+    }
+
     public boolean dispatch(MessagePacket response, RobotActionContext context) {
-        RobotAction action = responseActions.get(response.getCmd());
+        RobotAction action = pollPendingAction(response);
+        if (action == null) {
+            action = responseActions.get(response.getCmd());
+        }
         if (action == null) {
             return false;
         }
@@ -50,4 +65,42 @@ public class RobotActionRegistry {
             return true;
         }
     }
+
+    private RobotAction pollPendingAction(MessagePacket response) {
+        cleanupExpired(response.getCmd());
+        Queue<PendingRequest> queue = pendingRequests.get(response.getCmd());
+        if (queue == null) {
+            return null;
+        }
+        PendingRequest pending = queue.poll();
+        if (queue.isEmpty()) {
+            pendingRequests.remove(response.getCmd(), queue);
+        }
+        return pending == null ? null : pending.action();
+    }
+
+    private void cleanupExpired(int responseCmd) {
+        Queue<PendingRequest> queue = pendingRequests.get(responseCmd);
+        if (queue == null) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        while (true) {
+            PendingRequest pending = queue.peek();
+            if (pending == null || now - pending.createTimeMillis() <= PENDING_TIMEOUT_MILLIS) {
+                break;
+            }
+            queue.poll();
+            logger.warn(
+                    "机器人 PendingRequest 超时清理, responseCmd={}, requestSeq={}, action={}",
+                    responseCmd,
+                    pending.requestSeq(),
+                    pending.action().getName());
+        }
+        if (queue.isEmpty()) {
+            pendingRequests.remove(responseCmd, queue);
+        }
+    }
+
+    private record PendingRequest(RobotAction action, int requestSeq, long createTimeMillis) {}
 }

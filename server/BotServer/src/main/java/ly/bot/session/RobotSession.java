@@ -14,6 +14,7 @@ import com.google.protobuf.AbstractMessage;
 
 import io.netty.channel.EventLoopGroup;
 import ly.LoggerDef;
+import ly.bot.action.RobotAction;
 import ly.bot.action.RobotActionContext;
 import ly.bot.action.RobotActionRegistry;
 import ly.bot.action.RobotActionResult;
@@ -559,6 +560,23 @@ public class RobotSession {
                 gateClient.isReady() ? gateClient.getSid() : 0);
     }
 
+    /**
+     * 发送 Action 请求并登记本次待回包。
+     *
+     * <p>
+     * Bot 的普通客户端协议没有 RPC callId，服务端回包也不会回显上行 seq。
+     * 因此发包成功后按 responseCmd 记录 FIFO pending，回包时优先交给本次请求对应的 Action。
+     * </p>
+     */
+    public boolean sendActionPacket(RobotAction action, AbstractMessage message) {
+        MessagePacket packet = createPacket(action.requestCmd(), message);
+        if (!gateClient.send(packet)) {
+            return false;
+        }
+        actionRegistry.registerPending(action, packet);
+        return true;
+    }
+
     public int getBotId() {
         return botId;
     }
@@ -618,7 +636,9 @@ public class RobotSession {
                     handleLoginResponse(response);
                     return;
                 case ly.proto.Cmd.CMD.SC_RpcPing_VALUE: // RPC心跳响应
-                    new HeartbeatAction().onResponse(response, new RobotActionContext(gateClient, this));
+                    if (!actionRegistry.dispatch(response, new RobotActionContext(gateClient, this))) {
+                        new HeartbeatAction().onResponse(response, new RobotActionContext(gateClient, this));
+                    }
                     return;
                 default:
                     if (actionRegistry.dispatch(response, new RobotActionContext(gateClient, this))) {

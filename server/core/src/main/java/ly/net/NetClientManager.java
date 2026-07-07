@@ -60,7 +60,11 @@ public class NetClientManager {
      * @return 新创建的 NetClient , 注意 外部使用的时候需要判断该连接是否准备好，可能未创建成功处于3次握手中
      */
     public NetClient newNetClient(String ip, int port) {
-        NetClient netClient = new NetClient(ip, port, false);
+        return newNetClient(ip, port, false);
+    }
+
+    public NetClient newNetClient(String ip, int port, boolean connectFailureWarnOnly) {
+        NetClient netClient = new NetClient(ip, port, false, connectFailureWarnOnly);
         netClient.start(group);
         return netClient;
     }

@@ -25,15 +25,10 @@ public class HeroListAction implements RobotAction {
     @Override
     public RobotActionResult execute(RobotActionContext context) {
         try {
-            NetClient client = context.getClient();
             actionId = "hero_list_" + System.currentTimeMillis();
             context.getSession().getLatencyStats().recordRequestSent(actionId, requestCmd());
 
-            MessagePacket packet = context.getSession().createPacket(
-                    requestCmd(),
-                    Hero.CS_HeroList.newBuilder().build());
-
-            if (!client.send(packet)) {
+            if (!context.getSession().sendActionPacket(this, Hero.CS_HeroList.newBuilder().build())) {
                 logger.error("获取英雄列表请求发送失败");
                 return RobotActionResult.fail("获取英雄列表请求发送失败");
             }

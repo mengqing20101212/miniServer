@@ -32,16 +32,17 @@ public class HeroAddAction implements RobotAction {
     @Override
     public RobotActionResult execute(RobotActionContext context) {
         try {
-            NetClient client = context.getClient();
             actionId = "hero_add_" + System.currentTimeMillis();
             context.getSession().getLatencyStats().recordRequestSent(actionId, requestCmd());
             int selectedHeroId = selectHeroId(context);
 
-            MessagePacket packet = context.getSession().createPacket(
-                    requestCmd(),
-                    Hero.CS_HeroAdd.newBuilder().setHeroId(selectedHeroId).setCount(count).build());
-
-            if (!client.send(packet)) {
+            if (!context.getSession()
+                    .sendActionPacket(
+                            this,
+                            Hero.CS_HeroAdd.newBuilder()
+                                    .setHeroId(selectedHeroId)
+                                    .setCount(count)
+                                    .build())) {
                 logger.error("添加英雄请求发送失败, heroId: {}, count: {}", selectedHeroId, count);
                 return RobotActionResult.fail("添加英雄请求发送失败");
             }

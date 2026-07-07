@@ -70,7 +70,7 @@
 
 ### 保留项
 
-- 工厂方法仍保留 deprecated 的 `createAbstractMessagePacket(...)` 兼容入口，旧外部调用可以短期继续编译。
+- 无。旧的 `createAbstractMessagePacket(...)` 兼容入口已经删除，后续统一使用 `createMessagePacket(...)`。
 
 ---
 
@@ -98,11 +98,10 @@
 1. 已完成：落地统一包头 + 编解码器。
 2. 已完成：Gate / Game / Bot / RPC 都使用统一包。
 3. 已完成：删除旧备份类与旧 ACK 类型。
-4. 已完成：类名和主要工厂方法命名收口；旧工厂方法只作为兼容入口保留。
+4. 已完成：类名和主要工厂方法命名收口；旧工厂方法兼容入口已删除。
 
 ---
 
 ## 8. 下一步可执行项
 
-当前没有必须立即执行的 Packet 结构改造。后续只需要在确认没有外部旧调用后，删除
-`MessagePacketFactory.createAbstractMessagePacket(...)` 兼容入口。
+当前没有必须立即执行的 Packet 结构改造。

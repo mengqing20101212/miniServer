@@ -38,23 +38,4 @@ public class MessagePacketFactory {
   public static MessagePacket createMessagePacket(int cmd, byte[] data) {
     return createMessagePacket(cmd, 0, data);
   }
-
-  /** @deprecated 使用 {@link #createMessagePacket(long, int, AbstractMessage, int, int)}。 */
-  @Deprecated
-  public static MessagePacket createAbstractMessagePacket(
-      long guid, int cmd, AbstractMessage protoData, int seq, int sid) {
-    return createMessagePacket(guid, cmd, protoData, seq, sid);
-  }
-
-  /** @deprecated 使用 {@link #createMessagePacket(int, int, byte[])}。 */
-  @Deprecated
-  public static MessagePacket createAbstractMessagePacket(int cmd, int seq, byte[] data) {
-    return createMessagePacket(cmd, seq, data);
-  }
-
-  /** @deprecated 使用 {@link #createMessagePacket(int, byte[])}。 */
-  @Deprecated
-  public static MessagePacket createAbstractMessagePacket(int cmd, byte[] data) {
-    return createMessagePacket(cmd, data);
-  }
 }

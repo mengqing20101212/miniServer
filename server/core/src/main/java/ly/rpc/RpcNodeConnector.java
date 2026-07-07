@@ -53,11 +53,15 @@ public class RpcNodeConnector {
      * @param port     目标服务器端口
      */
     public RpcNodeConnector(String serverId, String ip, int port) {
+        this(serverId, ip, port, false);
+    }
+
+    public RpcNodeConnector(String serverId, String ip, int port, boolean connectFailureWarnOnly) {
         this.serverId = serverId;
         this.ip = ip;
         this.port = port;
         // 通过NetClientManager创建新的网络客户端
-        this.client = NetClientManager.getInstance().newNetClient(ip, port);
+        this.client = NetClientManager.getInstance().newNetClient(ip, port, connectFailureWarnOnly);
     }
 
     /**

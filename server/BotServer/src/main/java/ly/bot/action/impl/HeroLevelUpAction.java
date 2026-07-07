@@ -37,16 +37,13 @@ public class HeroLevelUpAction implements RobotAction {
                 return RobotActionResult.fail("没有可升级的英雄 uid");
             }
 
-            NetClient client = context.getClient();
             actionId = "hero_level_up_" + System.currentTimeMillis();
             context.getSession().getLatencyStats().recordRequestSent(actionId, requestCmd());
 
             Hero.CS_HeroLevelUp.Builder builder = Hero.CS_HeroLevelUp.newBuilder().setHeroUid(heroUid);
             expItemIds.forEach(builder::addExpItemIds);
 
-            MessagePacket packet = context.getSession().createPacket(requestCmd(), builder.build());
-
-            if (!client.send(packet)) {
+            if (!context.getSession().sendActionPacket(this, builder.build())) {
                 logger.error("英雄升级请求发送失败, heroUid: {}", heroUid);
                 return RobotActionResult.fail("英雄升级请求发送失败");
             }
