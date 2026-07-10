@@ -3,7 +3,7 @@
 Prefer `AGENTS.md` at the repo root as the canonical AI guidance file.
 
 Project facts:
-- Java 21 multi-module Maven project
+- Java 25 multi-module Maven project
 - Aggregator POM: `server/pom.xml`
 - Main modules: `config`, `proto`, `tool`, `core`, `LoginServer`, `GameServer`, `GateServer`, `BotServer`
 - Core business logic focus is in `server/core`, `server/GameServer`, `server/GateServer`, `server/LoginServer`

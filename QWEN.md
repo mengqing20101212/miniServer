@@ -2,10 +2,10 @@
 
 ## Project Overview
 
-**MiniServer** is a high-performance distributed game server framework built with Java 21, designed for card games, Roguelike games, and board/card games. It uses a microservices architecture with Nacos for service discovery, Netty for networking, and supports virtual threads for enhanced concurrency.
+**MiniServer** is a high-performance distributed game server framework built with Java 25, designed for card games, Roguelike games, and board/card games. It uses a microservices architecture with Nacos for service discovery, Netty for networking, and supports virtual threads for enhanced concurrency.
 
 ### Core Technologies
-- **Language**: Java 21 (virtual threads)
+- **Language**: Java 25 (virtual threads)
 - **Frameworks**: Spring Boot 3.x (LoginServer), Netty 4.x
 - **Service Discovery**: Alibaba Nacos 2.x
 - **Database**: MySQL 8.0+, Redis 6.0+
@@ -29,7 +29,7 @@
 ## Building and Running
 
 ### Environment Requirements
-- Java 21 (JDK 21)
+- Java 25 (JDK 25)
 - Maven 3.6+
 - Access to Nacos, MySQL, Redis
 

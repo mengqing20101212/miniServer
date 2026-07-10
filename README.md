@@ -1,6 +1,6 @@
 # MiniServer
 
-MiniServer 是一个 Java 21 + Maven 多模块游戏服务器工程，核心目标是把网关、登录、游戏逻辑、GM 后台、机器人测试、协议生成、配置表生成等能力放在同一个可本地联调的仓库中。
+MiniServer 是一个 Java 25 + Maven 多模块游戏服务器工程，核心目标是把网关、登录、游戏逻辑、GM 后台、机器人测试、协议生成、配置表生成等能力放在同一个可本地联调的仓库中。
 
 当前工程以 `server/pom.xml` 作为 Maven 聚合入口，运行时依赖 Nacos、MySQL、Redis/KeyDB，通信层基于 Netty，业务协议使用 protobuf 生成代码，GM 和 LoginServer 使用 Spring Boot。
 

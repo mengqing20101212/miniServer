@@ -1,6 +1,6 @@
 # MiniServer AI Agent Guide
 
-This repository is a Java 21 + Maven multi-module game server project.
+This repository is a Java 25 + Maven multi-module game server project.
 
 ## 1. Repository shape
 - Root repo: `miniServer`
@@ -31,7 +31,7 @@ Notes:
 - Preferred build root: `server/`
 - Full build: `mvn -DskipTests install`
 - Existing helper scripts and IDE tasks may use `mvn clean compile` or `mvn clean package -DskipTests`
-- Project expects Java 21 in local editor settings
+- Project expects Java 25 in local editor settings
 - LoginServer is Spring Boot; other servers are plain Java entrypoints
 
 ## 4. Suggested code reading order

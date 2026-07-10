@@ -77,7 +77,7 @@ Do not start BotServer until Login/Game/Gate are actually listening on `8888`, `
 - Confirm ports `8888`, `8889`, `9001`, and `9002` are free before startup.
 - Build from `server` with `mvn -DskipTests install`.
 - Generate `cp.txt` for `LoginServer`, `GameServer`, `GateServer`, and `BotServer`.
-- Prefer a fixed JDK path such as `D:\Soft\env\Java\jdk-21\bin\java.exe`, not mixed `javapath` and direct JDK launches.
+- Prefer a fixed JDK path such as `D:\Soft\env\Java\jdk-25\bin\java.exe`, not mixed `javapath` and direct JDK launches.
 - Use fresh log names such as `login-clean.out.log`, `game-clean.out.log`, `gate-clean.out.log`, and `bot-clean.out.log`.
 - Check only the current clean logs; historical logs in `runlogs` may contain old failed attempts.
 
