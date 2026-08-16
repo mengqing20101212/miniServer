@@ -1,6 +1,6 @@
 package ly.net;
 
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Server;
@@ -32,7 +32,7 @@ public final class Server2ServerRpcContext {
         }
     }
 
-    public static AbstractMessagePacket wrapResponseIfNeeded(AbstractMessagePacket packet) {
+    public static MessagePacket wrapResponseIfNeeded(MessagePacket packet) {
         Long callId = CURRENT_CALL_ID.get();
         if (callId == null || callId <= 0 || packet == null) {
             return packet;
@@ -47,7 +47,7 @@ public final class Server2ServerRpcContext {
                         .setData(com.google.protobuf.ByteString.copyFrom(packet.getData()))
                         .setCallId(callId)
                         .build();
-        return MessagePacketFactory.createAbstractMessagePacket(
+        return MessagePacketFactory.createMessagePacket(
                 packet.getGuid(),
                 Cmd.CMD.SC_Server2Server_VALUE,
                 response,

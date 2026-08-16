@@ -9,7 +9,7 @@ import ly.LoggerDef;
 import ly.ProtoMessageFactory;
 import ly.logic.player.Player;
 import ly.logic.player.PlayerManager;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Server;
@@ -34,7 +34,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
     /**
      * 执行（自动类型检查 + 安全强转）
      */
-    public static void execute(GameConnectSession session, AbstractMessagePacket packet) {
+    public static void execute(GameConnectSession session, MessagePacket packet) {
         try {
             final int cmd = packet.getCmd();
             GameHandlerRouteManager instance = getInstance();
@@ -61,7 +61,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
         }
     }
 
-    private static void executeServer2ServerRpc(GameConnectSession session, AbstractMessagePacket packet) {
+    private static void executeServer2ServerRpc(GameConnectSession session, MessagePacket packet) {
         Server.csServer2Server request = (Server.csServer2Server) ProtoMessageFactory.createProtoMessage(
                 Cmd.CMD.CS_Server2Server_VALUE, packet.getData());
         if (request == null) {
@@ -73,7 +73,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
             return;
         }
 
-        AbstractMessagePacket innerPacket = new AbstractMessagePacket(
+        MessagePacket innerPacket = new MessagePacket(
                 packet.getGuid(),
                 request.getCmd(),
                 packet.getSid(),
@@ -82,7 +82,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
         Server2ServerRpcContext.run(request.getCallId(), () -> execute(session, innerPacket));
     }
 
-    private static boolean checkPacket(AbstractMessagePacket packet) {
+    private static boolean checkPacket(MessagePacket packet) {
         final int cmd = packet.getCmd();
         // Class<? extends AbstractMessage> protoClass =
         // instance.protoClassMap.get(cmd);
@@ -115,7 +115,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
         // return false;
         // }
         GameHandlerRouter<?> router = instance.gameHandlerRouterMap.get(cmd);
-        AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(player.getPlayerId(), cmd, req,
+        MessagePacket packet = MessagePacketFactory.createMessagePacket(player.getPlayerId(), cmd, req,
                 seq, sid);
         try {
             // 创建游戏处理器上下文并执行路由处理
@@ -134,7 +134,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
     /**
      * 执行路由
      */
-    public static boolean execute(Player player, AbstractMessagePacket packet) {
+    public static boolean execute(Player player, MessagePacket packet) {
         if (player == null || packet == null) {
             LoggerDef.SystemLogger.error("execute route, param invalid: player={}, packet={}", player == null,
                     packet == null);
@@ -164,7 +164,7 @@ public class GameHandlerRouteManager extends HandlerRouterManager {
         return execute(player, cmd, packet.getSeq(), packet.getSid(), request);
     }
 
-    public void processPacket(Player player, AbstractMessagePacket packet) {
+    public void processPacket(Player player, MessagePacket packet) {
         execute(player, packet);
     }
 }

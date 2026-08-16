@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import ly.LoggerDef;
 import ly.ProtoMessageFactory;
 import ly.ServerContext;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Server;
 import ly.redis.RedisUtils;
@@ -32,7 +32,7 @@ public class ReliableRpcStore {
     return INSTANCE;
   }
 
-  public boolean save(String targetServerId, AbstractMessagePacket packet, String reason) {
+  public boolean save(String targetServerId, MessagePacket packet, String reason) {
     if (RedisUtils.redissonClient == null) {
       LoggerDef.NetLogger.error("save reliable rpc failed, redis not initialized, target={}", targetServerId);
       return false;
@@ -107,7 +107,7 @@ public class ReliableRpcStore {
       lastReplayAt = System.currentTimeMillis();
       // 为补发包生成唯一 callId，用于匹配回包
       long callId = System.nanoTime() ^ Thread.currentThread().threadId();
-      AbstractMessagePacket replayPacket = buildReplayPacket(message, callId);
+      MessagePacket replayPacket = buildReplayPacket(message, callId);
       if (replayPacket == null) {
         LoggerDef.NetLogger.error("build replay packet failed, msgId={}", message.getMsgId());
         continue;
@@ -161,7 +161,7 @@ public class ReliableRpcStore {
 
     long deadline = System.currentTimeMillis() + 10_000L;
     while (System.currentTimeMillis() < deadline) {
-      AbstractMessagePacket response =
+      MessagePacket response =
           connector.getClient().getReceiveMsgByCallId(callId, expectedCmd);
       if (response != null) {
         if (message.getCmd() == Cmd.CMD.CS_Server2Server_VALUE) {
@@ -216,7 +216,7 @@ public class ReliableRpcStore {
     return 0;
   }
 
-  private boolean handleServer2ServerReplayResponse(AbstractMessagePacket response, long callId) {
+  private boolean handleServer2ServerReplayResponse(MessagePacket response, long callId) {
     Server.scServer2Server resp =
         (Server.scServer2Server)
             ProtoMessageFactory.createProtoMessage(Cmd.CMD.SC_Server2Server_VALUE, response.getData());
@@ -237,7 +237,7 @@ public class ReliableRpcStore {
   /**
    * 构建补发包：从原始消息重建 RPC 外壳，写入本轮补发使用的 callId。
    */
-  private AbstractMessagePacket buildReplayPacket(ReliableRpcMessage message, long callId) {
+  private MessagePacket buildReplayPacket(ReliableRpcMessage message, long callId) {
     if (message.getCmd() == Cmd.CMD.CS_Server2Server_VALUE) {
       return buildServer2ServerReplayPacket(message, callId);
     }
@@ -255,8 +255,8 @@ public class ReliableRpcStore {
           Server.csGate2GameRpcGameCall.newBuilder(original)
               .setCallId(callId)
               .build();
-      AbstractMessagePacket packet =
-          new AbstractMessagePacket(
+      MessagePacket packet =
+          new MessagePacket(
               message.toPacket().getGuid(),
               Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE,
               0, 0,
@@ -268,7 +268,7 @@ public class ReliableRpcStore {
     }
   }
 
-  private AbstractMessagePacket buildServer2ServerReplayPacket(ReliableRpcMessage message, long callId) {
+  private MessagePacket buildServer2ServerReplayPacket(ReliableRpcMessage message, long callId) {
     try {
       Server.csServer2Server original =
           (Server.csServer2Server)
@@ -280,7 +280,7 @@ public class ReliableRpcStore {
           Server.csServer2Server.newBuilder(original)
               .setCallId(callId)
               .build();
-      return new AbstractMessagePacket(
+      return new MessagePacket(
           message.toPacket().getGuid(),
           Cmd.CMD.CS_Server2Server_VALUE,
           0,

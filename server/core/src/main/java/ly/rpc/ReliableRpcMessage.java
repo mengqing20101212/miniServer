@@ -2,7 +2,7 @@ package ly.rpc;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 /**
  * 保存到 Redis 的可靠 RPC 消息快照，用于目标服恢复后补发。
@@ -30,7 +30,7 @@ public class ReliableRpcMessage implements Serializable {
       String msgId,
       String sourceServerId,
       String targetServerId,
-      AbstractMessagePacket packet,
+      MessagePacket packet,
       String reason) {
     ReliableRpcMessage message = new ReliableRpcMessage();
     message.msgId = msgId;
@@ -50,10 +50,10 @@ public class ReliableRpcMessage implements Serializable {
     return message;
   }
 
-  public AbstractMessagePacket toPacket() {
+  public MessagePacket toPacket() {
     // 重建协议包时保持 guid/cmd/data 不变，sid/seq 使用保存时归零后的值。
-    AbstractMessagePacket packet =
-        new AbstractMessagePacket(guid, cmd, sid, seq, data == null ? new byte[0] : data);
+    MessagePacket packet =
+        new MessagePacket(guid, cmd, sid, seq, data == null ? new byte[0] : data);
     packet.setTime(time);
     return packet;
   }

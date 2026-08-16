@@ -12,7 +12,7 @@ import java.util.Arrays;
  * {@code length} 包含自身 2 字节和后续全部字段长度，因此最小包长为 22。
  * {@code data} 保存 protobuf 序列化后的业务消息，由上层根据 {@code cmd} 反序列化。
  */
-public class AbstractMessagePacket {
+public class MessagePacket {
   public static final int CMD_ACK = 0;
   private short length;
   private int cmd;
@@ -22,7 +22,7 @@ public class AbstractMessagePacket {
   private int time;
   private byte[] data = new byte[0];
 
-  public AbstractMessagePacket() {
+  public MessagePacket() {
     this.time = (int) (System.currentTimeMillis() / 1000L);
   }
 
@@ -31,17 +31,17 @@ public class AbstractMessagePacket {
    * <p>
    * cmd 为 {@link #CMD_ACK}，sid 是服务端分配给该连接的会话 id。
    */
-  public AbstractMessagePacket(int sessionId) {
+  public MessagePacket(int sessionId) {
     this();
     this.cmd = CMD_ACK;
     this.sid = sessionId;
   }
 
-  public AbstractMessagePacket(long guid, int cmd, int seq, byte[] data) {
+  public MessagePacket(long guid, int cmd, int seq, byte[] data) {
     this(guid, cmd, 0, seq, data);
   }
 
-  public AbstractMessagePacket(long guid, int cmd, int sid, int seq, byte[] data) {
+  public MessagePacket(long guid, int cmd, int sid, int seq, byte[] data) {
     this();
     this.guid = guid;
     this.cmd = cmd;

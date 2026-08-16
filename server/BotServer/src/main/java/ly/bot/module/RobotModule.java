@@ -1,5 +1,8 @@
 package ly.bot.module;
 
+import java.util.List;
+
+import ly.bot.action.RobotAction;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
 
@@ -35,4 +38,15 @@ public interface RobotModule {
      * @return 模块名称
      */
     String getName();
+
+    /**
+     * 模块启动时需要注册的响应处理 Action。
+     *
+     * <p>模块可以只负责组织执行顺序，具体响应解析仍交给 Action 自己处理。</p>
+     *
+     * @return 需要注册到会话响应分发表的 Action 列表
+     */
+    default List<RobotAction> setupActions() {
+        return List.of();
+    }
 }

@@ -1523,7 +1523,7 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/net/NetServer.java` — `ly.net` — NetServer
 - [main] `src/main/java/ly/net/NetService.java` — `ly.net` — NetService
 - [main] `src/main/java/ly/net/ServerHandler.java` — `ly.net` — ServerHandler
-- [main] `src/main/java/ly/net/packet/AbstractMessagePacket.java` — `ly.net.packet` — AbstractMessagePacket
+- [main] `src/main/java/ly/net/packet/MessagePacket.java` — `ly.net.packet` — MessagePacket
 - [main] `src/main/java/ly/net/packet/MessagePacketFactory.java` — `ly.net.packet` — MessagePacketFactory
 - [main] `src/main/java/ly/redis/RedisKeys.java` — `ly.redis` — RedisKeys
 - [main] `src/main/java/ly/redis/RedisUtils.java` — `ly.redis` — RedisUtils

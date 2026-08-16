@@ -26,17 +26,27 @@ import ly.net.NetClient;
  */
 public class HeroModule implements RobotModule {
     private static final Logger logger = LoggerDef.SystemLogger;
+    private static final int MAX_WAIT_HERO_UID_ROUNDS = 3;
+
+    /*
+     * HeroList 会在模块流程里执行两次，但响应 cmd 都是 SC_HeroList。
+     * Bot 当前按响应 cmd 找 Action 处理回包，所以这里必须复用同一个实例，
+     * 避免注册表里后一个 HeroListAction 覆盖前一个，导致首个请求的响应统计丢失。
+     */
+    private final HeroListAction heroListAction = new HeroListAction();
 
     private final List<RobotAction> steps = List.of(
-            new HeroListAction(),
+            heroListAction,
             new HeroAddAction(0, 1),
-            new HeroListAction(),
+            heroListAction,
             new HeroLevelUpAction(0, List.of(1)),
             new HeroStarUpAction(0));
 
     private int stepIndex = 0;
     private boolean completed = false;
+    private int waitHeroUidRounds = 0;
 
+    @Override
     public List<RobotAction> setupActions() {
         return steps;
     }
@@ -47,9 +57,29 @@ public class HeroModule implements RobotModule {
             return true;
         }
         RobotAction action = steps.get(stepIndex);
+        if (requiresHeroUid(action) && !hasLatestHeroUid(session)) {
+            waitHeroUidRounds++;
+            if (waitHeroUidRounds <= MAX_WAIT_HERO_UID_ROUNDS) {
+                logger.info(
+                        "英雄模块等待英雄 uid 写入后再执行: {}, waitRound={}",
+                        action.getName(),
+                        waitHeroUidRounds);
+                return false;
+            }
+
+            logger.warn("英雄模块缺少英雄 uid，跳过可选动作: {}", action.getName());
+            waitHeroUidRounds = 0;
+            stepIndex++;
+            if (stepIndex >= steps.size()) {
+                completed = true;
+            }
+            return completed;
+        }
+
         RobotActionResult result = action.execute(new RobotActionContext(client, session));
         if (result.isSuccess()) {
             logger.info("英雄模块执行动作成功: {}", action.getName());
+            waitHeroUidRounds = 0;
         } else {
             logger.error("英雄模块执行动作失败: {}, reason: {}", action.getName(), result.getMessage());
         }
@@ -65,6 +95,7 @@ public class HeroModule implements RobotModule {
     public void reset() {
         stepIndex = 0;
         completed = false;
+        waitHeroUidRounds = 0;
     }
 
     @Override
@@ -75,5 +106,14 @@ public class HeroModule implements RobotModule {
     @Override
     public String getName() {
         return "HeroModule";
+    }
+
+    private boolean requiresHeroUid(RobotAction action) {
+        return action instanceof HeroLevelUpAction || action instanceof HeroStarUpAction;
+    }
+
+    private boolean hasLatestHeroUid(RobotSession session) {
+        Long latestHeroUid = session.getDataStore().getAs("hero", "latestHeroUid", Long.class);
+        return latestHeroUid != null && latestHeroUid > 0;
     }
 }

@@ -3,7 +3,7 @@ package ly.net;
 import com.google.protobuf.AbstractMessage;
 import ly.LoggerDef;
 import ly.ProtoMessageFactory;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class HandlerRouterManager {
      * Java 泛型在运行期会擦除，因此这里显式保存 Class，用于派发前检查真实类型。
      */
     protected static class RouterHolder<S extends ConnectSession,
-            P extends AbstractMessagePacket,
+            P extends MessagePacket,
             R extends AbstractMessage> {
         final Class<S> sessionType;
         final Class<P> packetType;
@@ -47,7 +47,7 @@ public class HandlerRouterManager {
         
         /** 在所有类型都匹配后执行真正的业务路由。 */
         @SuppressWarnings("unchecked")
-        public void execute(ConnectSession session, AbstractMessagePacket packet, AbstractMessage request) {
+        public void execute(ConnectSession session, MessagePacket packet, AbstractMessage request) {
             if (sessionType.isInstance(session) && packetType.isInstance(packet) && requestType.isInstance(request)) {
                 HandlerContext<S, P> context = new HandlerContext<>((S) session, (P) packet);
                 router.execute(context, (R) request);
@@ -68,7 +68,7 @@ public class HandlerRouterManager {
      * 同一个 CMD 只能注册一次。业务服通常在 Controller 的
      * {@code registerHandlerRouter()} 中调用该方法。
      */
-    public <S extends ConnectSession, P extends AbstractMessagePacket, R extends AbstractMessage>
+    public <S extends ConnectSession, P extends MessagePacket, R extends AbstractMessage>
     void addHandlerRouter(Cmd.CMD cmd,
                           Class<S> sessionType,
                           Class<P> packetType,
@@ -94,7 +94,7 @@ public class HandlerRouterManager {
      * 业务处理器只需要关心已经解析好的请求对象。
      */
     @SuppressWarnings("unchecked")
-    public static void execute(ConnectSession session, AbstractMessagePacket packet) {
+    public static void execute(ConnectSession session, MessagePacket packet) {
         final int cmd = packet.getCmd();
         HandlerRouterManager instance = HandlerRouterManager.getInstance();
         RouterHolder<?, ?, ?> holder = instance.getHandlerRouter(cmd);

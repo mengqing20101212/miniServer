@@ -52,6 +52,10 @@ public class RpcService {
 
   /** 根据 Nacos 节点信息创建连接器。 */
   private synchronized RpcNodeConnector createRpcNodeConnector(String serverId) {
+    return createRpcNodeConnector(serverId, false);
+  }
+
+  private synchronized RpcNodeConnector createRpcNodeConnector(String serverId, boolean connectFailureWarnOnly) {
     if (serverId == null || serverId.isBlank() || serverId.equals(ly.ServerContext.getServerId())) {
       return null;
     }
@@ -74,7 +78,8 @@ public class RpcService {
       return null;
     }
     RpcNodeConnector rpcNodeConnector =
-        new RpcNodeConnector(serverId, nacosServerNode.getIp(), nacosServerNode.getPort());
+        new RpcNodeConnector(
+            serverId, nacosServerNode.getIp(), nacosServerNode.getPort(), connectFailureWarnOnly);
     if (rpcNodeConnector.isConnect()) {
       LoggerDef.NetLogger.info(
           "RpcService createRpcNodeConnector success for serverId={}, ip={}, port={}",
@@ -125,7 +130,7 @@ public class RpcService {
     this.reliableReplayResponseHandler = handler;
   }
 
-  boolean handleReliableReplayResponse(ReliableRpcMessage message, ly.net.packet.AbstractMessagePacket response) {
+  boolean handleReliableReplayResponse(ReliableRpcMessage message, ly.net.packet.MessagePacket response) {
     ReliableRpcReplayResponseHandler handler = reliableReplayResponseHandler;
     return handler != null && handler.handle(message, response);
   }
@@ -140,7 +145,7 @@ public class RpcService {
               // 先尝试为当前 Nacos 缓存中的节点建立连接，再补发对应 outbox。
               for (ServerTypeEnum serverType : ServerTypeEnum.values()) {
                 if (isRpcConnectableType(serverType)) {
-                  getRpcNodeConnectorsByServerType(serverType);
+                  connectRpcNodesForReplay(serverType);
                 }
               }
               ReliableRpcStore.getInstance().replayAllAvailableTargets();
@@ -172,10 +177,17 @@ public class RpcService {
     // Nacos 可能先通知节点上线，目标端口稍后才真正绑定；周期性重建连接可以覆盖这段窗口。
     for (ServerTypeEnum serverType : ServerTypeEnum.values()) {
       if (isRpcConnectableType(serverType)) {
-        getRpcNodeConnectorsByServerType(serverType);
+        connectRpcNodesForReplay(serverType);
       }
     }
     ReliableRpcStore.getInstance().replayAllAvailableTargets();
+  }
+
+  private void connectRpcNodesForReplay(ServerTypeEnum serverType) {
+    List<NacosServerNode> nodeList = NacosService.getInstance().getNodeList(serverType);
+    for (NacosServerNode node : nodeList) {
+      createRpcNodeConnector(node.getServerId(), true);
+    }
   }
 
   private boolean isRpcConnectableType(ServerTypeEnum serverType) {

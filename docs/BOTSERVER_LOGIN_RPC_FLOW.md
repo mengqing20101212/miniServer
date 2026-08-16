@@ -4,9 +4,9 @@
 
 ## 核心原则
 
-`AbstractMessagePacket.seq` 只属于当前 socket，不跨 socket 复用。
+`MessagePacket.seq` 只属于当前 socket，不跨 socket 复用。
 
-| 当前 socket | `AbstractMessagePacket.sid` | `AbstractMessagePacket.seq` |
+| 当前 socket | `MessagePacket.sid` | `MessagePacket.seq` |
 | --- | --- | --- |
 | Bot -> Gate | `clientSid` | `clientReqSeq`，客户端上行日志序号 |
 | Gate -> Game | `rpcSid` | `rpcSeq`，服务器间 RPC 外层序号 |
@@ -95,4 +95,4 @@ sequenceDiagram
 
 ## 线程边界
 
-登录包不在 Game 的 RPC 入站线程里直接执行 DB 操作，而是进入 `LoginManager` 登录协程。在线玩家业务包进入对应 `GamePlayer` 队列。后续如果要继续降低 RPC 入站线程压力，可以把非登录的 lazy DB 加载也拆到专门业务执行器里。
+登录包不在 Game 的 RPC 入站线程里直接执行 DB 操作，而是进入 `LoginManager` 登录协程。在线玩家业务包直接进入对应 `GamePlayer` 队列。非登录包如果命中离线玩家，lazy DB 加载会进入 `GameRpcPlayerLoadManager` 独立队列，加载完成后再绑定 `GamePlayer` 并投递玩家队列，避免同步 DB IO 阻塞 RPC 入站线程。

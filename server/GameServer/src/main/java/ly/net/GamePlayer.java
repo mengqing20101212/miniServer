@@ -10,7 +10,7 @@ import ly.logic.player.Player;
 import ly.logic.player.coroutine.PlayerCoroutineTask;
 import ly.logic.player.coroutine.PlayerThreadContext;
 import ly.logic.player.event.PlayerEventParam;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
@@ -84,7 +84,7 @@ public class GamePlayer {
         this.lastClientCmd = lastClientCmd;
     }
 
-    public void addPacket(AbstractMessagePacket packet) {
+    public void addPacket(MessagePacket packet) {
         if (packet == null) {
             return;
         }
@@ -318,7 +318,7 @@ public class GamePlayer {
         return offlineDraining.get() && runningWorkCount == 0 && workQueue.isEmpty();
     }
 
-    private void processPacket(AbstractMessagePacket packet) {
+    private void processPacket(MessagePacket packet) {
         if (packet == null) {
             return;
         }
@@ -344,7 +344,7 @@ public class GamePlayer {
         task.execute(player);
     }
 
-    private void beginRequestContext(AbstractMessagePacket packet) {
+    private void beginRequestContext(MessagePacket packet) {
         setLastSeq(packet.getSeq());
         setLastClientCmd(packet.getCmd());
         setLastSid(packet.getSid());
@@ -368,7 +368,7 @@ public class GamePlayer {
         LoggerDef.LogProto("send {}|{}|{}|{}", playerId, getAccount(), Cmd.CMD.forNumber(cmd).name(),
                 CommonUtils.logProto(message));
         if (lastClientCmd == 0) {
-            AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(playerId, cmd, message, 0,
+            MessagePacket packet = MessagePacketFactory.createMessagePacket(playerId, cmd, message, 0,
                     0);
             session.addSendPacket(packet);
             return;
@@ -380,7 +380,7 @@ public class GamePlayer {
                 .setData(message.toByteString())
                 .setCallId(lastCallId)
                 .build();
-        AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
+        MessagePacket packet = MessagePacketFactory.createMessagePacket(
                 playerId,
                 Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE,
                 builder,

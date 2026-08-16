@@ -1,6 +1,6 @@
 package ly.bot.action;
 
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 /**
  * 机器人协议动作。
@@ -18,7 +18,7 @@ public interface RobotAction {
     /**
      * 处理服务端响应。没有响应语义的动作可以保持默认实现。
      */
-    default void onResponse(AbstractMessagePacket response, RobotActionContext context) {
+    default void onResponse(MessagePacket response, RobotActionContext context) {
     }
 
     /**

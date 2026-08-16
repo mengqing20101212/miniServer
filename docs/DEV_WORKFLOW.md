@@ -5,7 +5,7 @@
 
 ## 项目概要
 
-miniServer 是一个 Java 21 + Maven 多模块游戏服务器项目。
+miniServer 是一个 Java 25 + Maven 多模块游戏服务器项目。
 
 **repo 路径（WSL）：** `/mnt/d/WORK/me/miniServer`  
 **Maven 聚合根：** `server/pom.xml`
@@ -65,7 +65,7 @@ cd /mnt/d/WORK/me/miniServer/server
 cmd.exe /c "D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -DskipTests install -pl tool -am"
 
 # 2. 运行生成器
-cmd.exe /c "D:\Soft\env\Java\jdk-21\bin\java.exe -cp target\tool-1.0-SNAPSHOT.jar ly.ParserExcelConfig"
+cmd.exe /c "D:\Soft\env\Java\jdk-25\bin\java.exe -cp target\tool-1.0-SNAPSHOT.jar ly.ParserExcelConfig"
 ```
 
 **警告：** 重新生成会覆盖 `config` 模块的 Java 代码，并重写 `excel/serverConfig/*.txt` 文件。如果 HeroController 等业务代码引用了旧字段名，需要同步更新。
@@ -126,7 +126,7 @@ Excel 改版后旧字段名（过时）→ 新字段名：
 ## 构建与编译
 
 ### 不要使用 WSL 的 Java（WSL 只有 Java 17）
-项目需要 **Java 21**，使用 Windows 宿主机 JDK：
+项目需要 **Java 25**，使用 Windows 宿主机 JDK：
 
 ```bash
 # 完整构建（跳过测试）
@@ -167,7 +167,7 @@ cmd.exe /c "cd /d D:\WORK\me\miniServer\server && D:\Soft\env\apache-maven-3.9.1
 
 ```bash
 # LoginServer（Spring Boot）
-cmd.exe /c "cd /d D:\WORK\me\miniServer\server\LoginServer && D:\Soft\env\Java\jdk-21\bin\java.exe -jar target\LoginServer-0.0.1-SNAPSHOT.jar"
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server\LoginServer && D:\Soft\env\Java\jdk-25\bin\java.exe -jar target\LoginServer-0.0.1-SNAPSHOT.jar"
 
 # GateServer（mvn exec）
 cmd.exe /c "cd /d D:\WORK\me\miniServer\server\GateServer && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -q exec:java"
@@ -176,7 +176,7 @@ cmd.exe /c "cd /d D:\WORK\me\miniServer\server\GateServer && D:\Soft\env\apache-
 cmd.exe /c "cd /d D:\WORK\me\miniServer\server\GameServer && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -q exec:java"
 
 # BotServer（验证登录流程）
-cmd.exe /c "cd /d D:\WORK\me\miniServer\server\BotServer && D:\Soft\env\Java\jdk-21\bin\java.exe -jar target\BotServer-1.0-SNAPSHOT-shaded.jar --run-bots 127.0.0.1 8889 1"
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server\BotServer && D:\Soft\env\Java\jdk-25\bin\java.exe -jar target\BotServer-1.0-SNAPSHOT-shaded.jar --run-bots 127.0.0.1 8889 1"
 ```
 
 详细启动流程见 `STARTUP.SKILL.md`。
@@ -360,7 +360,7 @@ cmd.exe /c "netstat -ano | findstr :8889 && netstat -ano | findstr :9001 && nets
 
 ## 常见 Pitfalls
 
-1. ❌ **WSL Java 17 不够** — 项目需要 Java 21，永远用 Windows JDK
+1. ❌ **WSL Java 17 不够** — 项目需要 Java 25，永远用 Windows JDK
 2. ❌ **直接运行 `mvn` 而不通过 `cmd.exe /c`** — WSL bash 调用 Windows 程序必须用 `cmd.exe /c`
 3. ❌ **对自动生成的代码手动加字段** — 应在 `@@@@@自定义区@@@@@` 添加，否则重新生成时被覆盖
 4. ❌ **`-rf :GameServer` 不重建依赖** — config/core 改了必须 clean 全量

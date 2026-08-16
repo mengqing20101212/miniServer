@@ -2,7 +2,7 @@ package ly.logic.login;
 
 import ly.net.GameConnectSession;
 import ly.net.HandlerContext;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Login;
 
 /**
@@ -10,17 +10,17 @@ import ly.proto.Login;
  */
 public class LoginTask {
     final GameConnectSession session;
-    final AbstractMessagePacket packet;
+    final MessagePacket packet;
     final Login.csLogin request;
     final long callId;
 
-    public LoginTask(HandlerContext<GameConnectSession, AbstractMessagePacket> context, Login.csLogin request) {
+    public LoginTask(HandlerContext<GameConnectSession, MessagePacket> context, Login.csLogin request) {
         this(context.session(), context.packet(), request, 0);
     }
 
     public LoginTask(
             GameConnectSession session,
-            AbstractMessagePacket packet,
+            MessagePacket packet,
             Login.csLogin request,
             long callId) {
         this.session = session;

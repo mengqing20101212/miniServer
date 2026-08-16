@@ -3,7 +3,7 @@ package ly.net;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import ly.LoggerDef;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import org.slf4j.Logger;
 
 /**
@@ -12,13 +12,13 @@ import org.slf4j.Logger;
  * 它只处理连接生命周期和包入队，不直接执行业务逻辑。业务处理由各服务自己的 tick 或路由
  * 逻辑从 {@link ConnectSession} 接收队列中取包后完成。
  */
-public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePacket> {
+public class ServerHandler extends SimpleChannelInboundHandler<MessagePacket> {
     static final Logger log = LoggerDef.NetLogger;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, AbstractMessagePacket packet) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, MessagePacket packet) throws Exception {
         // 客户端建立 TCP 后会发 CMD_ACK=0 请求 sid，服务端返回分配的会话 id。
-        if (packet.getCmd() == AbstractMessagePacket.CMD_ACK) {
+        if (packet.getCmd() == MessagePacket.CMD_ACK) {
             ConnectSession session = NetService.getInstance().getGameObject(ctx);
             if (session == null || session.getConnector() == null) {
                 log.error("ACK failed, session not found for channel[{}], remote:{}", ctx.channel().id(), ctx.channel().remoteAddress());
@@ -26,7 +26,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<AbstractMessagePa
                 return;
             }
             // ACK sid 必须和 Connector sid 保持一致，Gate 后续要靠客户端原样带回的 sid 定位连接。
-            ctx.channel().writeAndFlush(new AbstractMessagePacket(session.getConnector().getSessionId()));
+            ctx.channel().writeAndFlush(new MessagePacket(session.getConnector().getSessionId()));
             return;
         }
 

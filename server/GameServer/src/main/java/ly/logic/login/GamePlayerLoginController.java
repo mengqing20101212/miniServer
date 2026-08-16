@@ -3,7 +3,7 @@ package ly.logic.login;
 import ly.net.GameConnectSession;
 import ly.net.HandlerContext;
 import ly.net.IGameController;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Login;
 
@@ -20,7 +20,7 @@ public class GamePlayerLoginController implements IGameController {
     }
 
 
-    public void handleLogin(HandlerContext<GameConnectSession, AbstractMessagePacket> context, Login.csLogin request) {
+    public void handleLogin(HandlerContext<GameConnectSession, MessagePacket> context, Login.csLogin request) {
         LoginTask task = new LoginTask(context, request);
         LoginManager.getInstance().addLoginTask(task);
     }

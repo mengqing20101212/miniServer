@@ -12,7 +12,7 @@ import ly.logic.player.coroutine.CoroutineUtils;
 import ly.net.GameConnectSession;
 import ly.net.HandlerContext;
 import ly.net.IGameController;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.GmPlayer;
@@ -37,7 +37,7 @@ public class GmPlayerController implements IGameController {
   }
 
   private void handleDetail(
-      HandlerContext<GameConnectSession, AbstractMessagePacket> context,
+      HandlerContext<GameConnectSession, MessagePacket> context,
       GmPlayer.csGmPlayerDetail request) {
     long playerId = request.getPlayerId();
     Player player = PlayerManager.getInstance().getOnlinePlayer(playerId);
@@ -98,7 +98,7 @@ public class GmPlayerController implements IGameController {
   }
 
   private void handleUpdateModule(
-      HandlerContext<GameConnectSession, AbstractMessagePacket> context,
+      HandlerContext<GameConnectSession, MessagePacket> context,
       GmPlayer.csGmUpdatePlayerModule request) {
     long playerId = request.getPlayerId();
     Player player = PlayerManager.getInstance().getOnlinePlayer(playerId);
@@ -198,6 +198,6 @@ public class GmPlayerController implements IGameController {
   }
 
   private void send(GameConnectSession session, long playerId, int cmd, AbstractMessage response) {
-    session.addSendPacket(MessagePacketFactory.createAbstractMessagePacket(playerId, cmd, response, 0, 0));
+    session.addSendPacket(MessagePacketFactory.createMessagePacket(playerId, cmd, response, 0, 0));
   }
 }

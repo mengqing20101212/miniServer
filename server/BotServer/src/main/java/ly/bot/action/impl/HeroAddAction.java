@@ -9,7 +9,7 @@ import ly.bot.action.RobotAction;
 import ly.bot.action.RobotActionContext;
 import ly.bot.action.RobotActionResult;
 import ly.net.NetClient;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Hero;
 
@@ -32,16 +32,17 @@ public class HeroAddAction implements RobotAction {
     @Override
     public RobotActionResult execute(RobotActionContext context) {
         try {
-            NetClient client = context.getClient();
             actionId = "hero_add_" + System.currentTimeMillis();
             context.getSession().getLatencyStats().recordRequestSent(actionId, requestCmd());
             int selectedHeroId = selectHeroId(context);
 
-            AbstractMessagePacket packet = context.getSession().createPacket(
-                    requestCmd(),
-                    Hero.CS_HeroAdd.newBuilder().setHeroId(selectedHeroId).setCount(count).build());
-
-            if (!client.send(packet)) {
+            if (!context.getSession()
+                    .sendActionPacket(
+                            this,
+                            Hero.CS_HeroAdd.newBuilder()
+                                    .setHeroId(selectedHeroId)
+                                    .setCount(count)
+                                    .build())) {
                 logger.error("添加英雄请求发送失败, heroId: {}, count: {}", selectedHeroId, count);
                 return RobotActionResult.fail("添加英雄请求发送失败");
             }
@@ -71,7 +72,7 @@ public class HeroAddAction implements RobotAction {
     }
 
     @Override
-    public void onResponse(AbstractMessagePacket response, RobotActionContext context) {
+    public void onResponse(MessagePacket response, RobotActionContext context) {
         try {
             Hero.SC_HeroAdd result = Hero.SC_HeroAdd.parseFrom(response.getData());
             context.getDataStore().put("hero", "lastAddResult", result.getResult().name());

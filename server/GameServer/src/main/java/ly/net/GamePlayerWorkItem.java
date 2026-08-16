@@ -2,7 +2,7 @@ package ly.net;
 
 import ly.logic.player.event.PlayerEventParam;
 import ly.logic.player.coroutine.PlayerCoroutineTask;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 
 /**
  * 玩家串行执行队列中的工作项。
@@ -17,13 +17,13 @@ class GamePlayerWorkItem {
     }
 
     private final Type type;
-    private final AbstractMessagePacket packet;
+    private final MessagePacket packet;
     private final PlayerEventParam event;
     private final PlayerCoroutineTask<?> coroutineTask;
 
     private GamePlayerWorkItem(
             Type type,
-            AbstractMessagePacket packet,
+            MessagePacket packet,
             PlayerEventParam event,
             PlayerCoroutineTask<?> coroutineTask) {
         this.type = type;
@@ -32,7 +32,7 @@ class GamePlayerWorkItem {
         this.coroutineTask = coroutineTask;
     }
 
-    static GamePlayerWorkItem packet(AbstractMessagePacket packet) {
+    static GamePlayerWorkItem packet(MessagePacket packet) {
         return new GamePlayerWorkItem(Type.PACKET, packet, null, null);
     }
 
@@ -48,7 +48,7 @@ class GamePlayerWorkItem {
         return type;
     }
 
-    AbstractMessagePacket getPacket() {
+    MessagePacket getPacket() {
         return packet;
     }
 

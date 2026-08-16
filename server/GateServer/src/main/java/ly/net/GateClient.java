@@ -8,7 +8,7 @@ import com.google.protobuf.Message;
 
 import ly.LoggerDef;
 import ly.ProtoMessageFactory;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Server;
@@ -90,7 +90,7 @@ public class GateClient {
         this.gameServerId = gameServerId;
     }
 
-    public void sendPacketToGameServer(AbstractMessagePacket csPacket) {
+    public void sendPacketToGameServer(MessagePacket csPacket) {
         // 普通业务包失败后保存到可靠 RPC outbox，等目标 GameServer 恢复后补发。
         Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket, true);
         if (resp != null) {
@@ -98,7 +98,7 @@ public class GateClient {
         }
     }
 
-    public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(AbstractMessagePacket csPacket) {
+    public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(MessagePacket csPacket) {
         return sendPacketToGameServerSync(csPacket, false);
     }
 
@@ -108,7 +108,7 @@ public class GateClient {
      * Returns null on timeout, parse error or if response is missing.
      */
     public <T extends com.google.protobuf.AbstractMessage> T sendPacketToGameServerSync(
-            AbstractMessagePacket csPacket, Class<T> protoClass) {
+            MessagePacket csPacket, Class<T> protoClass) {
         Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket, false);
         if (resp == null) {
             return null;
@@ -124,7 +124,7 @@ public class GateClient {
      * 等待响应时必须使用 callId，不能再用客户端 seq 推导响应包。
      */
     public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(
-            AbstractMessagePacket csPacket, boolean saveOnFailOrTimeout) {
+            MessagePacket csPacket, boolean saveOnFailOrTimeout) {
         RpcNodeConnector rpcNodeConnector = RpcService.getInstance().getRpcNodeConnector(gameServerId);
         long callId = newCallId();
         if (rpcNodeConnector == null || rpcNodeConnector.getClient() == null) {
@@ -142,7 +142,7 @@ public class GateClient {
                 .setCallId(callId)
                 .build();
 
-        AbstractMessagePacket rpcPacket = MessagePacketFactory.createAbstractMessagePacket(
+        MessagePacket rpcPacket = MessagePacketFactory.createMessagePacket(
                 req.getGuid(),
                 Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE,
                 req,
@@ -159,7 +159,7 @@ public class GateClient {
 
         long deadline = System.currentTimeMillis() + LOGIN_RPC_TIMEOUT_MS;
         while (System.currentTimeMillis() < deadline) {
-            AbstractMessagePacket response = rpcNodeConnector
+            MessagePacket response = rpcNodeConnector
                     .getClient()
                     .getReceiveMsgByCallId(callId, Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE);
             if (response != null) {
@@ -186,7 +186,7 @@ public class GateClient {
     }
 
     private void saveReliableRpcIfNeeded(
-            AbstractMessagePacket csPacket,
+            MessagePacket csPacket,
             Server.csGate2GameRpcGameCall wrappedRequest,
             boolean saveOnFailOrTimeout,
             String reason) {
@@ -204,7 +204,7 @@ public class GateClient {
                     .setData(ByteString.copyFrom(csPacket.getData()))
                     .build();
         }
-        AbstractMessagePacket reliablePacket = MessagePacketFactory.createAbstractMessagePacket(
+        MessagePacket reliablePacket = MessagePacketFactory.createMessagePacket(
                 request.getGuid(),
                 Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE,
                 request,
@@ -213,7 +213,7 @@ public class GateClient {
         ReliableRpcStore.getInstance().save(gameServerId, reliablePacket, reason);
     }
 
-    public void sendPacketToClient(AbstractMessagePacket s2cPacket) {
+    public void sendPacketToClient(MessagePacket s2cPacket) {
         session.sendPacket(s2cPacket);
     }
 
@@ -222,7 +222,7 @@ public class GateClient {
             return;
         }
         // 客户端下行 seq 只在 Gate 连接维度递增，Game 不参与生成。
-        AbstractMessagePacket s2cPacket = PacketCompat.createPacket(
+        MessagePacket s2cPacket = new MessagePacket(
                 getSessionGuid(),
                 resp.getClientCmd(),
                 resp.getClientSid(),

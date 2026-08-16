@@ -6,7 +6,7 @@ import ly.bot.module.RobotModule;
 import ly.bot.session.RobotSession;
 import ly.net.NetClient;
 import ly.net.NetService;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Hero;
@@ -16,7 +16,10 @@ import ly.proto.Login;
  * RPC seq/sid 专项测试模块。
  *
  * <p>该模块覆盖 Bot -> Gate -> Game -> Gate -> Bot 的真实链路，断言登录包和普通业务包的
- * cmd/seq/sid 是否符合协议约定。
+ * cmd/sid 是否符合协议约定，并校验 Gate 返回客户端的下行 seq 是连接维度递增。
+ *
+ * <p>注意：客户端上行 seq 只用于日志排查，不能再用 requestSeq + 1 推导服务端回包 seq。
+ * Gate 会在真正写客户端 socket 前统一分配 clientDownSeq。
  */
 public class RpcSeqSidTestModule implements RobotModule {
     private static final long RESPONSE_TIMEOUT_MS = 15_000;
@@ -83,15 +86,16 @@ public class RpcSeqSidTestModule implements RobotModule {
             int heroSeq = client.getSendSeq();
             Hero.CS_HeroList heroReq = Hero.CS_HeroList.newBuilder().build();
             long playerId = session.getPlayerInfo() != null ? session.getPlayerInfo().getPlayerId() : 0;
-            AbstractMessagePacket heroPacket =
-                    MessagePacketFactory.createAbstractMessagePacket(
+            MessagePacket heroPacket =
+                    MessagePacketFactory.createMessagePacket(
                             playerId, Cmd.CMD.CS_HeroList_VALUE, heroReq, heroSeq, sid);
             if (!client.send(heroPacket)) {
                 return failStep("发送 CS_HeroList 失败");
             }
-            AbstractMessagePacket heroResp =
-                    waitForResponse(client, Cmd.CMD.SC_HeroList_VALUE, heroSeq + 1, sid);
-            assertPacket(heroResp, Cmd.CMD.SC_HeroList_VALUE, heroSeq + 1, sid, "英雄列表响应");
+            MessagePacket heroResp =
+                    waitForResponse(client, Cmd.CMD.SC_HeroList_VALUE, sid);
+            assertPacket(heroResp, Cmd.CMD.SC_HeroList_VALUE, sid, "英雄列表响应");
+            assertPositiveClientDownSeq(heroResp, "英雄列表响应");
             Hero.SC_HeroList scHeroList =
                     (Hero.SC_HeroList)
                             ProtoMessageFactory.createProtoMessage(
@@ -231,15 +235,16 @@ public class RpcSeqSidTestModule implements RobotModule {
                             .setDeviceId("rpc-seq-sid-test")
                             .setIsReconnect(playerIdOverride != null && playerIdOverride > 0)
                             .build();
-            AbstractMessagePacket loginPacket =
-                    MessagePacketFactory.createAbstractMessagePacket(
+            MessagePacket loginPacket =
+                    MessagePacketFactory.createMessagePacket(
                             accountId, Cmd.CMD.CS_Login_VALUE, loginReq, loginSeq, sid);
             if (!gateClient.send(loginPacket)) {
                 return fail("发送 CS_Login 失败");
             }
-            AbstractMessagePacket loginResp =
-                    waitForResponse(gateClient, Cmd.CMD.SC_Login_VALUE, loginSeq + 1, sid);
-            assertPacket(loginResp, Cmd.CMD.SC_Login_VALUE, loginSeq + 1, sid, "登录响应");
+            MessagePacket loginResp =
+                    waitForResponse(gateClient, Cmd.CMD.SC_Login_VALUE, sid);
+            assertPacket(loginResp, Cmd.CMD.SC_Login_VALUE, sid, "登录响应");
+            int expectedNextClientDownSeq = assertNextClientDownSeq(0, loginResp, "登录响应");
             Login.scLogin scLogin =
                     (Login.scLogin)
                             ProtoMessageFactory.createProtoMessage(
@@ -259,16 +264,17 @@ public class RpcSeqSidTestModule implements RobotModule {
 
             int heroSeq = gateClient.getSendSeq();
             Hero.CS_HeroList heroReq = Hero.CS_HeroList.newBuilder().build();
-            AbstractMessagePacket heroPacket =
-                    MessagePacketFactory.createAbstractMessagePacket(
+            MessagePacket heroPacket =
+                    MessagePacketFactory.createMessagePacket(
                             scLogin.getPlayerId(), Cmd.CMD.CS_HeroList_VALUE, heroReq, heroSeq, sid);
             if (!gateClient.send(heroPacket)) {
                 return fail("发送 CS_HeroList 失败");
             }
-            AbstractMessagePacket heroResp =
+            MessagePacket heroResp =
                     waitForResponse(
-                            gateClient, Cmd.CMD.SC_HeroList_VALUE, heroSeq + 1, sid, responseTimeoutMs);
-            assertPacket(heroResp, Cmd.CMD.SC_HeroList_VALUE, heroSeq + 1, sid, "英雄列表响应");
+                            gateClient, Cmd.CMD.SC_HeroList_VALUE, sid, responseTimeoutMs);
+            assertPacket(heroResp, Cmd.CMD.SC_HeroList_VALUE, sid, "英雄列表响应");
+            assertNextClientDownSeq(expectedNextClientDownSeq, heroResp, "英雄列表响应");
             Hero.SC_HeroList scHeroList =
                     (Hero.SC_HeroList)
                             ProtoMessageFactory.createProtoMessage(
@@ -318,19 +324,19 @@ public class RpcSeqSidTestModule implements RobotModule {
         return false;
     }
 
-    private static AbstractMessagePacket waitForResponse(NetClient client, int cmd, int seq, int sid)
+    private static MessagePacket waitForResponse(NetClient client, int cmd, int sid)
             throws InterruptedException {
-        return waitForResponse(client, cmd, seq, sid, RESPONSE_TIMEOUT_MS);
+        return waitForResponse(client, cmd, sid, RESPONSE_TIMEOUT_MS);
     }
 
-    private static AbstractMessagePacket waitForResponse(
-            NetClient client, int cmd, int seq, int sid, long timeoutMs)
+    private static MessagePacket waitForResponse(
+            NetClient client, int cmd, int sid, long timeoutMs)
             throws InterruptedException {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
-            AbstractMessagePacket packet = client.readPacket();
+            MessagePacket packet = client.readPacket();
             if (packet != null) {
-                if (packet.getCmd() == cmd && packet.getSeq() == seq && packet.getSid() == sid) {
+                if (packet.getCmd() == cmd && packet.getSid() == sid) {
                     return packet;
                 }
                 System.out.printf("[RPC-SEQ-SID] ignore packet cmd=%d seq=%d sid=%d%n",
@@ -339,19 +345,37 @@ public class RpcSeqSidTestModule implements RobotModule {
             Thread.sleep(POLL_INTERVAL_MS);
         }
         throw new IllegalStateException(
-                String.format("等待响应超时 cmd=%d seq=%d sid=%d", cmd, seq, sid));
+                String.format("等待响应超时 cmd=%d sid=%d", cmd, sid));
     }
 
-    private static void assertPacket(AbstractMessagePacket packet, int cmd, int seq, int sid, String name) {
+    private static void assertPacket(MessagePacket packet, int cmd, int sid, String name) {
         if (packet == null) {
             throw new IllegalStateException(name + "为空");
         }
-        if (packet.getCmd() != cmd || packet.getSeq() != seq || packet.getSid() != sid) {
+        if (packet.getCmd() != cmd || packet.getSid() != sid) {
             throw new IllegalStateException(
                     String.format(
-                            "%s 校验失败，expect cmd=%d seq=%d sid=%d, actual cmd=%d seq=%d sid=%d",
-                            name, cmd, seq, sid, packet.getCmd(), packet.getSeq(), packet.getSid()));
+                            "%s 校验失败，expect cmd=%d sid=%d, actual cmd=%d seq=%d sid=%d",
+                            name, cmd, sid, packet.getCmd(), packet.getSeq(), packet.getSid()));
         }
+    }
+
+    private static void assertPositiveClientDownSeq(MessagePacket packet, String name) {
+        if (packet.getSeq() <= 0) {
+            throw new IllegalStateException(
+                    String.format("%s 下行 seq 校验失败，expect seq > 0, actual seq=%d", name, packet.getSeq()));
+        }
+    }
+
+    private static int assertNextClientDownSeq(int previousSeq, MessagePacket packet, String name) {
+        int expectedSeq = previousSeq + 1;
+        if (packet.getSeq() != expectedSeq) {
+            throw new IllegalStateException(
+                    String.format(
+                            "%s 下行 seq 校验失败，expect seq=%d, actual seq=%d",
+                            name, expectedSeq, packet.getSeq()));
+        }
+        return packet.getSeq();
     }
 
     private boolean failStep(String message) {

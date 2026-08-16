@@ -7,7 +7,7 @@ import ly.bot.action.RobotAction;
 import ly.bot.action.RobotActionContext;
 import ly.bot.action.RobotActionResult;
 import ly.net.NetClient;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Server;
 
@@ -22,7 +22,6 @@ public class HeartbeatAction implements RobotAction {
     @Override
     public RobotActionResult execute(RobotActionContext context) {
         try {
-            NetClient client = context.getClient();
             actionId = "heartbeat_" + System.currentTimeMillis();
             context.getSession().getLatencyStats().recordRequestSent(actionId, requestCmd());
 
@@ -30,9 +29,8 @@ public class HeartbeatAction implements RobotAction {
                     .setTime(System.currentTimeMillis())
                     .setServerId("bot-" + context.getSession().getBotId())
                     .build();
-            AbstractMessagePacket packet = context.getSession().createPacket(requestCmd(), ping);
 
-            if (!client.send(packet)) {
+            if (!context.getSession().sendActionPacket(this, ping)) {
                 logger.error("机器人心跳发送失败");
                 return RobotActionResult.fail("心跳发送失败");
             }
@@ -44,7 +42,7 @@ public class HeartbeatAction implements RobotAction {
     }
 
     @Override
-    public void onResponse(AbstractMessagePacket response, RobotActionContext context) {
+    public void onResponse(MessagePacket response, RobotActionContext context) {
         if (actionId != null) {
             context.getSession().getLatencyStats().recordResponseReceived(actionId, response.getCmd());
         }

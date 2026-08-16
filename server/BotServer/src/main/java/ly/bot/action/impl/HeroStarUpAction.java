@@ -7,7 +7,7 @@ import ly.bot.action.RobotAction;
 import ly.bot.action.RobotActionContext;
 import ly.bot.action.RobotActionResult;
 import ly.net.NetClient;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Hero;
 
@@ -33,15 +33,11 @@ public class HeroStarUpAction implements RobotAction {
                 return RobotActionResult.fail("没有可升星的英雄 uid");
             }
 
-            NetClient client = context.getClient();
             actionId = "hero_star_up_" + System.currentTimeMillis();
             context.getSession().getLatencyStats().recordRequestSent(actionId, requestCmd());
 
-            AbstractMessagePacket packet = context.getSession().createPacket(
-                    requestCmd(),
-                    Hero.CS_HeroStarUp.newBuilder().setHeroUid(heroUid).build());
-
-            if (!client.send(packet)) {
+            if (!context.getSession()
+                    .sendActionPacket(this, Hero.CS_HeroStarUp.newBuilder().setHeroUid(heroUid).build())) {
                 logger.error("英雄升星请求发送失败, heroUid: {}", heroUid);
                 return RobotActionResult.fail("英雄升星请求发送失败");
             }
@@ -53,7 +49,7 @@ public class HeroStarUpAction implements RobotAction {
     }
 
     @Override
-    public void onResponse(AbstractMessagePacket response, RobotActionContext context) {
+    public void onResponse(MessagePacket response, RobotActionContext context) {
         try {
             Hero.SC_HeroStarUp result = Hero.SC_HeroStarUp.parseFrom(response.getData());
             context.getDataStore().put("hero", "lastStarUpResult", result.getResult().name());

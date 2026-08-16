@@ -3,7 +3,7 @@ package ly.net;
 import com.google.protobuf.AbstractMessage;
 
 import ly.LoggerDef;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
@@ -22,7 +22,7 @@ public class GameConnectSession extends ConnectSession {
     }
 
     @Override
-    public void addReceivePacket(AbstractMessagePacket packet) {
+    public void addReceivePacket(MessagePacket packet) {
         super.addReceivePacket(packet);
         // LoggerDef.LogProto("receive {}|{}|{}|{}", getGuid(), packet.getSid(),
         // packet.getCmd(), packet.getLength());
@@ -30,7 +30,7 @@ public class GameConnectSession extends ConnectSession {
     }
 
     public void sendClientMsg(int cmd, long playerId, AbstractMessage msg) {
-        AbstractMessagePacket s2cPacket = MessagePacketFactory.createAbstractMessagePacket(playerId, cmd, msg, 0,
+        MessagePacket s2cPacket = MessagePacketFactory.createMessagePacket(playerId, cmd, msg, 0,
                 (int) getGuid());
         LoggerDef.LogProto("send {}|{}|{}", playerId, Cmd.CMD.forNumber(cmd).name(), CommonUtils.logProto(msg));
         addSendPacket(s2cPacket);

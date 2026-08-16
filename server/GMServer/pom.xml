@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>3.5.16</version>
         <relativePath/>
     </parent>
     <groupId>ly</groupId>
@@ -16,7 +16,8 @@
     <description>Game Management Server - 后台管理系统</description>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
         <jjwt.version>0.12.6</jjwt.version>
     </properties>
 

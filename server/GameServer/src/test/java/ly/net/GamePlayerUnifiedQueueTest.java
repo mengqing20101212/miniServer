@@ -12,7 +12,7 @@ import ly.logic.player.event.PlayerEventManager;
 import ly.logic.player.event.PlayerEventParam;
 import ly.logic.player.event.PlayerEventSource;
 import ly.logic.player.event.PlayerEventType;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Hero;
@@ -84,9 +84,9 @@ public class GamePlayerUnifiedQueueTest {
         }
     }
 
-    private AbstractMessagePacket heroListPacket(int seq) {
+    private MessagePacket heroListPacket(int seq) {
         Hero.CS_HeroList request = Hero.CS_HeroList.newBuilder().build();
-        return MessagePacketFactory.createAbstractMessagePacket(
+        return MessagePacketFactory.createMessagePacket(
                 1L, Cmd.CMD.CS_HeroList_VALUE, request, seq, 100);
     }
 

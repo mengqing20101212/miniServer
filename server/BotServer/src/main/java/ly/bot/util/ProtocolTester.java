@@ -2,7 +2,7 @@ package ly.bot.util;
 
 import ly.net.NetClient;
 import ly.net.NetService;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Login;
@@ -34,12 +34,12 @@ public class ProtocolTester {
             
             Login.csLogin loginRequest = loginBuilder.build();
             
-            // 测试创建AbstractMessagePacket
+            // 测试创建 MessagePacket
             int seq = 1; // 序列号
             int sid = 100; // 会话ID
             long guid = 123456L; // 全局唯一ID
             
-            AbstractMessagePacket packet = MessagePacketFactory.createAbstractMessagePacket(
+            MessagePacket packet = MessagePacketFactory.createMessagePacket(
                 guid, // guid
                 Cmd.CMD.CS_Login_VALUE, // 登录命令
                 loginRequest, // protobuf数据
@@ -52,7 +52,7 @@ public class ProtocolTester {
             System.out.println("- SID: " + packet.getSid());
             System.out.println("- 序列号: " + packet.getSeq());
             System.out.println("- 数据长度: " + (packet.getData() != null ? packet.getData().length : 0));
-            // 注意：AbstractMessagePacket有getGuid方法但现在可用
+            // MessagePacket 保留 guid 字段，Bot 可以用它校验玩家或账号标识。
             System.out.println("- GUID: " + packet.getGuid());
             
             logger.info("登录协议封包测试完成");
@@ -73,7 +73,7 @@ public class ProtocolTester {
         System.out.println("5. 处理服务器响应");
         
         System.out.println("\n关键点:");
-        System.out.println("- 使用MessagePacketFactory.createAbstractMessagePacket()创建客户端到服务器的消息包");
+        System.out.println("- 使用MessagePacketFactory.createMessagePacket()创建客户端到服务器的消息包");
         System.out.println("- 正确设置GUID、CMD、序列号、SID和protobuf数据");
         System.out.println("- 使用NetClient.getSendSeq()获取递增的序列号");
         System.out.println("- 使用NetClient.getSid()获取会话ID");

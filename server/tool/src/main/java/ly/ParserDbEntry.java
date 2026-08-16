@@ -70,7 +70,10 @@ public class ParserDbEntry {
 
   private String absPath(String relativePath) {
     // 拼接 baseDir + relativePath，然后规范化
-    java.io.File f = new java.io.File(baseDir, relativePath);
+    java.io.File f = new java.io.File(relativePath);
+    if (!f.isAbsolute()) {
+      f = new java.io.File(baseDir, relativePath);
+    }
     try {
       return f.getCanonicalPath();
     } catch (Exception e) {

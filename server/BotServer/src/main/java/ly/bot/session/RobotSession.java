@@ -14,7 +14,9 @@ import com.google.protobuf.AbstractMessage;
 
 import io.netty.channel.EventLoopGroup;
 import ly.LoggerDef;
+import ly.bot.action.RobotAction;
 import ly.bot.action.RobotActionContext;
+import ly.bot.action.RobotActionRegistry;
 import ly.bot.action.RobotActionResult;
 import ly.bot.action.impl.HeartbeatAction;
 import ly.bot.action.impl.LoginAction;
@@ -32,7 +34,7 @@ import ly.bot.state.impl.LoggedInState;
 import ly.bot.stats.PacketLatencyStats;
 import ly.net.NetClient;
 import ly.net.NetService;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.Login;
@@ -60,7 +62,7 @@ public class RobotSession {
     private static ly.bot.http.HttpServerListClient globalHttpClient;
 
     // 消息队列，用于处理服务器响应
-    private final BlockingQueue<AbstractMessagePacket> messageQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<MessagePacket> messageQueue = new LinkedBlockingQueue<>();
 
     private volatile boolean isLoginSuccess = false;
     private volatile boolean isGateConnected = false;
@@ -73,6 +75,9 @@ public class RobotSession {
 
     // 模块管理器
     private ModuleManager moduleManager;
+
+    // Action 响应分发表，收到下行包后按 response cmd 回调对应 Action。
+    private final RobotActionRegistry actionRegistry = new RobotActionRegistry();
 
     // 玩家信息
     private PlayerInfo playerInfo;
@@ -184,7 +189,7 @@ public class RobotSession {
         }
     }
 
-    private PlayerInfo buildPlayerInfoFromLoginResponse(AbstractMessagePacket response) {
+    private PlayerInfo buildPlayerInfoFromLoginResponse(MessagePacket response) {
         try {
             Login.scLogin login = Login.scLogin.parseFrom(response.getData());
             return new PlayerInfo(
@@ -362,7 +367,7 @@ public class RobotSession {
     /**
      * 处理登录响应
      */
-    public void handleLoginResponse(AbstractMessagePacket response) {
+    public void handleLoginResponse(MessagePacket response) {
         logger.info("机器人 #{} 收到登录响应: {}", botId, response);
 
         if (response.getCmd() == Cmd.CMD.SC_Login_VALUE) {
@@ -400,6 +405,7 @@ public class RobotSession {
                 new ly.bot.module.impl.CombatModule(),
                 new ly.bot.module.impl.CurrencyModule(),
                 new ly.bot.module.impl.GachaModule());
+        modules.forEach(module -> module.setupActions().forEach(actionRegistry::register));
 
         // 初始化模块管理器
         this.moduleManager = new ModuleManager(modules, this, gateClient);
@@ -541,17 +547,34 @@ public class RobotSession {
      * seq 和 sid 都由当前 Gate 连接统一维护，Action 不再重复拼这些公共字段。
      * </p>
      */
-    public AbstractMessagePacket createPacket(int cmd, AbstractMessage message) {
+    public MessagePacket createPacket(int cmd, AbstractMessage message) {
         if (gateClient == null) {
             throw new IllegalStateException("Gate 连接尚未初始化，不能创建协议包");
         }
         long guid = playerInfo != null ? playerInfo.getPlayerId() : accountId;
-        return MessagePacketFactory.createAbstractMessagePacket(
+        return MessagePacketFactory.createMessagePacket(
                 guid,
                 cmd,
                 message,
                 gateClient.getSendSeq(),
                 gateClient.isReady() ? gateClient.getSid() : 0);
+    }
+
+    /**
+     * 发送 Action 请求并登记本次待回包。
+     *
+     * <p>
+     * Bot 的普通客户端协议没有 RPC callId，服务端回包也不会回显上行 seq。
+     * 因此发包成功后按 responseCmd 记录 FIFO pending，回包时优先交给本次请求对应的 Action。
+     * </p>
+     */
+    public boolean sendActionPacket(RobotAction action, AbstractMessage message) {
+        MessagePacket packet = createPacket(action.requestCmd(), message);
+        if (!gateClient.send(packet)) {
+            return false;
+        }
+        actionRegistry.registerPending(action, packet);
+        return true;
     }
 
     public int getBotId() {
@@ -566,7 +589,7 @@ public class RobotSession {
             while (running.get()) {
                 try {
                     // 从NetClient获取响应包并放入队列
-                    AbstractMessagePacket response = gateClient != null ? gateClient.readPacket() : null;
+                    MessagePacket response = gateClient != null ? gateClient.readPacket() : null;
                     if (response != null) {
                         // 将响应包放入消息队列
                         messageQueue.offer(response);
@@ -593,7 +616,7 @@ public class RobotSession {
         try {
             // 处理队列中的所有消息
             while (!messageQueue.isEmpty()) {
-                AbstractMessagePacket response = messageQueue.poll();
+                MessagePacket response = messageQueue.poll();
                 if (response != null) {
                     handleResponse(response);
                 }
@@ -606,16 +629,21 @@ public class RobotSession {
     /**
      * 处理服务器响应
      */
-    private void handleResponse(AbstractMessagePacket response) {
+    private void handleResponse(MessagePacket response) {
         try {
             switch (response.getCmd()) {
                 case ly.proto.Cmd.CMD.SC_Login_VALUE:
                     handleLoginResponse(response);
                     return;
                 case ly.proto.Cmd.CMD.SC_RpcPing_VALUE: // RPC心跳响应
-                    new HeartbeatAction().onResponse(response, new RobotActionContext(gateClient, this));
+                    if (!actionRegistry.dispatch(response, new RobotActionContext(gateClient, this))) {
+                        new HeartbeatAction().onResponse(response, new RobotActionContext(gateClient, this));
+                    }
                     return;
                 default:
+                    if (actionRegistry.dispatch(response, new RobotActionContext(gateClient, this))) {
+                        return;
+                    }
                     // 对于未知响应，可以根据需要创建通用处理命令
                     logger.debug("收到未知命令响应: {}", response.getCmd());
                     return;

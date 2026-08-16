@@ -14,7 +14,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -179,22 +182,12 @@ public class ConfigService {
 
   public void loadAllConfig(Logger logger, String configDir) {
     long startTime = System.currentTimeMillis();
-    logger.info("开始加载配置表, managerCount={}", configManagerList.size());
-    configManagerList.forEach(
-        configManager -> {
-          long loadConfigBeginTime = System.currentTimeMillis();
-          try {
-            configManager.loadConfig(logger, configDir);
-          } catch (Exception e) {
-            logger.error("加载配置表失败，manager={}", configManager.getClass().getSimpleName(), e);
-            throw new RuntimeException("加载配置表失败:" + configManager.getClass().getSimpleName(), e);
-          }
-          long loadConfigEndTime = System.currentTimeMillis();
-          logger.info(
-              "加载策划表 {} 耗时 {}ms",
-              configManager.getClass().getSimpleName(),
-              loadConfigEndTime - loadConfigBeginTime);
-        });
+    logger.info("开始加载配置表, managerCount={}, parallel=true", configManagerList.size());
+    try {
+      loadManagersParallel(logger, configDir, false);
+    } catch (ConfigLoadException e) {
+      throw new RuntimeException("加载配置表失败", e);
+    }
     logger.info("加载配置表完成, cost={}ms", System.currentTimeMillis() - startTime);
   }
 
@@ -218,18 +211,78 @@ public class ConfigService {
         version,
         configDir,
         configManagerList.size());
-    for (InterfaceConfigManagerProxy configManager : configManagerList) {
-      long loadConfigBeginTime = System.currentTimeMillis();
-      configManager.loadStandbyConfig(logger, configDir);
-      long loadConfigEndTime = System.currentTimeMillis();
-      logger.info(
-          "加载备用策划表 {} 耗时 {}ms",
-          configManager.getClass().getSimpleName(),
-          loadConfigEndTime - loadConfigBeginTime);
-    }
+    loadManagersParallel(logger, configDir, true);
     standbyVersion = version;
     standbyLoaded = true;
     logger.info("加载备用配置表完成, version={}, cost={}ms", version, System.currentTimeMillis() - startTime);
+  }
+
+  /**
+   * 并发加载所有配置表。
+   *
+   * <p>
+   * 每个生成的 ConfigManager 都只写自己的 A/B Impl，表与表之间没有共享写状态。
+   * 用虚拟线程并发加载可以把大量文件 IO 和表头校验时间并行化；任意一张表失败都会取消
+   * 剩余加载任务并向上抛出，启动或热更准备不能继续。
+   * </p>
+   */
+  private void loadManagersParallel(Logger logger, String configDir, boolean standby)
+      throws ConfigLoadException {
+    List<Future<?>> futures = new ArrayList<>(configManagerList.size());
+    try (ExecutorService executor =
+        Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("config-load-", 0).factory())) {
+      for (InterfaceConfigManagerProxy configManager : configManagerList) {
+        futures.add(executor.submit(() -> loadOneManager(logger, configDir, configManager, standby)));
+      }
+      for (int i = 0; i < futures.size(); i++) {
+        waitManagerLoad(logger, configManagerList.get(i), futures.get(i), futures, standby);
+      }
+    }
+  }
+
+  private void loadOneManager(
+      Logger logger, String configDir, InterfaceConfigManagerProxy configManager, boolean standby)
+      throws ConfigLoadException {
+    long beginTime = System.currentTimeMillis();
+    String managerName = configManager.getClass().getSimpleName();
+    if (standby) {
+      configManager.loadStandbyConfig(logger, configDir);
+      logger.info("加载备用策划表 {} 耗时 {}ms", managerName, System.currentTimeMillis() - beginTime);
+    } else {
+      configManager.loadConfig(logger, configDir);
+      logger.info("加载策划表 {} 耗时 {}ms", managerName, System.currentTimeMillis() - beginTime);
+    }
+  }
+
+  private void waitManagerLoad(
+      Logger logger,
+      InterfaceConfigManagerProxy configManager,
+      Future<?> future,
+      List<Future<?>> allFutures,
+      boolean standby)
+      throws ConfigLoadException {
+    String managerName = configManager.getClass().getSimpleName();
+    try {
+      future.get();
+    } catch (InterruptedException e) {
+      cancelLoads(allFutures);
+      Thread.currentThread().interrupt();
+      throw new ConfigLoadException("配置表加载被中断:" + managerName);
+    } catch (ExecutionException e) {
+      cancelLoads(allFutures);
+      Throwable cause = e.getCause() == null ? e : e.getCause();
+      String prefix = standby ? "加载备用配置表失败:" : "加载配置表失败:";
+      logger.error("{}{}", prefix, managerName, cause);
+      throw new ConfigLoadException(prefix + managerName + ", reason=" + cause.getMessage());
+    }
+  }
+
+  private void cancelLoads(List<Future<?>> futures) {
+    for (Future<?> future : futures) {
+      if (!future.isDone()) {
+        future.cancel(true);
+      }
+    }
   }
 
   public void scheduleSwitch(

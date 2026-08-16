@@ -1,6 +1,9 @@
-# Net 模块 Packet 收敛方案（去掉 type，去掉 flags，统一包头）
+# Net 模块 Packet 收敛记录（去掉 type，去掉 flags，统一包头）
 
 > 目标：`ly.net.packet` 收敛为一个包类；协议头只保留最核心字段，降低认知负担。
+
+> 当前状态：统一包头和 `CMD_ACK` 已在代码中落地。运行时统一使用
+> `MessagePacket` + `MessagePacketFactory`，旧 `C2SMessagePacket` 备份文件已删除。
 
 ## 1. 约束（按你的要求）
 
@@ -57,30 +60,27 @@
 
 ---
 
-## 4. 迁移方案（兼容优先）
+## 4. 已落地的迁移结果
 
-由于旧协议包含 `type`，建议两阶段：
+- `MessagePacket` 已使用固定 22 字节包头：
+  `[length:2][cmd:4][sid:4][seq:4][guid:8][time:4][data:N]`
+- `CommonEncoder` / `CommonDecoder` 已按固定头编解码。
+- ACK 已改为普通包：`cmd = CMD_ACK`。
+- 旧 `C2SMessagePacket.java.bak3` 已删除，不再保留失效备份代码。
 
-### 阶段 A：兼容期
+### 保留项
 
-- `CommonDecoder` 同时支持旧协议和新协议（通过版本/握手协商区分）。
-- 编码默认发旧协议；灰度逐步切新协议。
-
-### 阶段 B：收口期
-
-- 全节点升级后切到新协议。
-- 删除旧包类：`C2S/S2C/S2S/ConnectionAck`。
-- 删除旧解码分支。
+- 无。旧的 `createAbstractMessagePacket(...)` 兼容入口已经删除，后续统一使用 `createMessagePacket(...)`。
 
 ---
 
 ## 5. 代码改造清单
 
-1. 新增 `ly.net.packet.MessagePacket`（唯一实现类）。
-2. `MessagePacketFactory` 收敛为统一构造。
-3. `CommonEncoder/CommonDecoder` 改为固定头编解码。
-4. `HandlerContext` / 各 Router 泛型改用 `MessagePacket`。
-5. `ConnectionAckPacket` 下线，改 `CMD_ACK`。
+1. 已完成：`MessagePacket` 成为唯一运行时包实现。
+2. 已完成：`MessagePacketFactory` 收敛为统一构造。
+3. 已完成：`CommonEncoder/CommonDecoder` 改为固定头编解码。
+4. 已完成：ACK 下线独立类型，改用 `CMD_ACK`。
+5. 已完成：`AbstractMessagePacket` 重命名为 `MessagePacket`，同步更新引用。
 
 ---
 
@@ -95,16 +95,13 @@
 
 ## 7. 推进顺序
 
-1. 落地 `MessagePacket` + 编解码器（兼容旧协议）。
-2. 逐模块替换引用（Gate -> Game -> Bot -> RPC）。
-3. 删除旧类与兼容逻辑。
+1. 已完成：落地统一包头 + 编解码器。
+2. 已完成：Gate / Game / Bot / RPC 都使用统一包。
+3. 已完成：删除旧备份类与旧 ACK 类型。
+4. 已完成：类名和主要工厂方法命名收口；旧工厂方法兼容入口已删除。
 
 ---
 
 ## 8. 下一步可执行项
 
-如你确认，我下一步直接给你提交代码补丁：
-
-- `MessagePacket` 新类（22字节统一头）
-- `CommonEncoder/CommonDecoder` 最小改造
-- `CMD_ACK` 替代 `ConnectionAckPacket`
+当前没有必须立即执行的 Packet 结构改造。

@@ -9,7 +9,7 @@ import ly.bot.action.RobotAction;
 import ly.bot.action.RobotActionContext;
 import ly.bot.action.RobotActionResult;
 import ly.net.NetClient;
-import ly.net.packet.AbstractMessagePacket;
+import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Hero;
 
@@ -37,16 +37,13 @@ public class HeroLevelUpAction implements RobotAction {
                 return RobotActionResult.fail("没有可升级的英雄 uid");
             }
 
-            NetClient client = context.getClient();
             actionId = "hero_level_up_" + System.currentTimeMillis();
             context.getSession().getLatencyStats().recordRequestSent(actionId, requestCmd());
 
             Hero.CS_HeroLevelUp.Builder builder = Hero.CS_HeroLevelUp.newBuilder().setHeroUid(heroUid);
             expItemIds.forEach(builder::addExpItemIds);
 
-            AbstractMessagePacket packet = context.getSession().createPacket(requestCmd(), builder.build());
-
-            if (!client.send(packet)) {
+            if (!context.getSession().sendActionPacket(this, builder.build())) {
                 logger.error("英雄升级请求发送失败, heroUid: {}", heroUid);
                 return RobotActionResult.fail("英雄升级请求发送失败");
             }
@@ -58,7 +55,7 @@ public class HeroLevelUpAction implements RobotAction {
     }
 
     @Override
-    public void onResponse(AbstractMessagePacket response, RobotActionContext context) {
+    public void onResponse(MessagePacket response, RobotActionContext context) {
         try {
             Hero.SC_HeroLevelUp result = Hero.SC_HeroLevelUp.parseFrom(response.getData());
             context.getDataStore().put("hero", "lastLevelUpResult", result.getResult().name());
