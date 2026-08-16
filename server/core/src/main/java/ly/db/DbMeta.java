@@ -33,5 +33,8 @@ public class DbMeta {
 
     /** 指定建表时使用的数据库列类型；为空时按 Java 字段类型自动推导。 */
     String columnType() default "";
+
+    /** 普通字段是否允许为 NULL；主键始终为 NOT NULL。 */
+    boolean nullable() default true;
   }
 }

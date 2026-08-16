@@ -54,13 +54,9 @@ public class PlayerManager {
     }
 
     private Player createNewPlayer(PlayerEntry entry) {
-        boolean needFlushInitialModules = entry.getModules() == null || entry.getModules().length == 0;
         Player player = new Player();
         player.setPlayerData(new PlayerData(entry));
         player.initAllModules();
-        if (needFlushInitialModules) {
-            PlayerEntryHelper.update(entry, "modules");
-        }
         LoggerDef.SystemLogger.info(String.format("Player create successfully! playerId:%d, playerName:%s, account:%s", player.getPlayerId(), player.getPlayerName(), player.getAccount()));
         return player;
     }
@@ -80,7 +76,6 @@ public class PlayerManager {
             throw new IllegalStateException("create player save db failed, account=" + csLogin.getAccount());
         }
         Player newPlayer = createNewPlayer(entry);
-        PlayerEntryHelper.update(entry, "modules");
         registerAccountPlayer(newPlayer);
         newPlayer.setStatus(PlayerStatusEnum.CREATE);
         LoggerDef.SystemLogger.info(String.format("PlayerManager create new player pid:%d, playerName:%s, account:%s ", newPlayer.getPlayerId(), newPlayer.getPlayerName(), newPlayer.getAccount()));
@@ -140,6 +135,14 @@ public class PlayerManager {
 
     public void addOnlinePlayer(Player player) {
         playerMap.put(player.getPlayerId(), player);
+    }
+
+    public void flushAllPlayerModules() {
+        for (Player player : playerMap.values()) {
+            if (player != null && player.getPlayerData() != null) {
+                player.getPlayerData().flushAsync();
+            }
+        }
     }
 
     public void dispatchEventToPlayer(long playerId, PlayerEventSource source, long sourcePlayerId, PlayerEventType eventType, Object... args) {

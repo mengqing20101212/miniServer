@@ -7,6 +7,7 @@ import java.util.List;
 import ly.db.entry.PlayerEntry;
 import ly.logic.player.Player;
 import ly.logic.player.PlayerData;
+import ly.logic.player.PlayerDataTestFactory;
 import ly.logic.player.event.IPlayerEvent;
 import ly.logic.player.event.PlayerEventManager;
 import ly.logic.player.event.PlayerEventParam;
@@ -95,6 +96,6 @@ public class GamePlayerUnifiedQueueTest {
         entry.setId(1L);
         entry.setAccount("queue-test");
         entry.setName("QueueTest");
-        return new PlayerData(entry);
+        return PlayerDataTestFactory.create(entry);
     }
 }

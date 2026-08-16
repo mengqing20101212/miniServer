@@ -66,6 +66,7 @@ public class Player {
                     .makeLogBegin(String.format("Player-%s-%d-InitModules", getAccount(), getPlayerId()), 1000);
 
             for (ModuleEnum moduleEnum : ModuleEnum.values()) {
+                boolean moduleDataMissing = !playerData.hasModuleData(moduleEnum);
                 TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(
                         String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()),
                         50);
@@ -74,17 +75,14 @@ public class Player {
                 module.init(this);
                 module.onLoadData();
                 playerData.putModule(moduleEnum, module);
+                if (moduleDataMissing) {
+                    module.saveData();
+                }
                 moduleInitLog.LogEnd();
             }
 
-            // 初始化完成后落一次模块快照，避免老号 modules 为空或新号只有空壳数据。
-            for (ModuleEnum moduleEnum : ModuleEnum.values()) {
-                AbstractModule module = playerData.getModule(moduleEnum);
-                if (module != null) {
-                    module.saveData();
-                }
-            }
-            playerData.getPlayerEntry().asyncUpdate();
+            // 老 BLOB 数据和新初始化模块统一迁移到模块表，不再回写总 modules BLOB。
+            playerData.flushAsync();
 
             log.LogEnd();
 

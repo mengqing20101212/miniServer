@@ -139,6 +139,7 @@ public class GmPlayerController implements IGameController {
       }
       byte[] moduleBytes = serializeModule(player, moduleEnum, module);
       player.getPlayerData().markModuleDirty(moduleEnum, moduleBytes);
+      player.getPlayerData().flushAsync();
       return GmPlayer.scGmUpdatePlayerModule.newBuilder()
           .setCode(OK)
           .setPlayerId(player.getPlayerId())

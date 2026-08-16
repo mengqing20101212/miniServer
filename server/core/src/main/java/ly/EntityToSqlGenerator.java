@@ -195,7 +195,7 @@ public class EntityToSqlGenerator {
         
         Field[] fields = entityClass.getDeclaredFields();
         List<String> columnDefinitions = new ArrayList<>();
-        String primaryKey = null;
+        List<String> primaryKeys = new ArrayList<>();
         
         for (Field field : fields) {
             if (field.isAnnotationPresent(DbMeta.DbField.class)) {
@@ -207,11 +207,7 @@ public class EntityToSqlGenerator {
                     if (field.isAnnotationPresent(DbMeta.DbMasterKey.class)) {
                         DbMeta.DbMasterKey masterKey = field.getAnnotation(DbMeta.DbMasterKey.class);
                         String keyName = masterKey.name().isEmpty() ? field.getName() : masterKey.name();
-                        if (masterKey.autoIncrement()) {
-                            primaryKey = "`" + keyName + "`";
-                        } else {
-                            primaryKey = "`" + keyName + "`";
-                        }
+                        primaryKeys.add("`" + keyName + "`");
                     }
                 }
             }
@@ -227,8 +223,8 @@ public class EntityToSqlGenerator {
         }
         
         // 添加主键约束
-        if (primaryKey != null) {
-            sql.append(",\n  PRIMARY KEY (").append(primaryKey).append(")");
+        if (!primaryKeys.isEmpty()) {
+            sql.append(",\n  PRIMARY KEY (").append(String.join(", ", primaryKeys)).append(")");
         }
         
         sql.append("\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
@@ -262,9 +258,10 @@ public class EntityToSqlGenerator {
                 columnDef.append(" AUTO_INCREMENT");
             }
             columnDef.append(" NOT NULL");
-        } else {
-            // 普通字段，默认允许为空，除非特别指定
+        } else if (dbField.nullable()) {
             columnDef.append(" DEFAULT NULL");
+        } else {
+            columnDef.append(" NOT NULL");
         }
         
         return columnDef.toString();

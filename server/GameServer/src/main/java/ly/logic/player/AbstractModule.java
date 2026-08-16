@@ -19,11 +19,7 @@ public abstract class AbstractModule implements IModule, IPlayerEvent {
         getRegisterEventTypes().forEach(eventType -> player.getEventManager().register(eventType, this));
     }
 
-    /**
-     * 把当前模块数据序列化回 PlayerEntry.modules。
-     *
-     * <p>这里只负责更新内存里的 PlayerEntry 并标记脏数据，真正 DB 落库仍然走现有异步保存流程。
-     */
+    /** 序列化当前模块并标记模块级快照为脏，数据库写入由统一刷新流程完成。 */
     @SuppressWarnings("unchecked")
     protected boolean saveModuleData(ModuleEnum moduleType, Object moduleData) {
         if (player == null || player.getPlayerData() == null || moduleType == null || moduleData == null) {

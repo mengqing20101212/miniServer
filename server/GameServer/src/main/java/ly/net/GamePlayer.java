@@ -284,7 +284,17 @@ public class GamePlayer {
                     workItem.getEvent() == null ? null : workItem.getEvent().getEventType(),
                     e);
         } finally {
+            flushPlayerModules();
             markWorkFinished();
+        }
+    }
+
+    private void flushPlayerModules() {
+        if (player == null || player.getPlayerData() == null) {
+            return;
+        }
+        if (!player.getPlayerData().flushAsync()) {
+            LoggerDef.DbLogger.error("enqueue player module flush failed, playerId={}", playerId);
         }
     }
 

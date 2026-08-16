@@ -129,12 +129,24 @@ CREATE TABLE IF NOT EXISTS `player` (
   `logoutTime` DATETIME DEFAULT NULL,
   `level` INT DEFAULT NULL,
   `vipLevel` INT DEFAULT NULL,
-  `modules` BLOB DEFAULT NULL,
+  `modules` MEDIUMBLOB DEFAULT NULL,
   `guidId` BIGINT DEFAULT NULL,
   `account` VARCHAR(255) DEFAULT NULL
 ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `player_module` (
+  `player_id` BIGINT NOT NULL,
+  `module_id` INT NOT NULL,
+  `data_version` INT NOT NULL,
+  `revision` BIGINT NOT NULL,
+  `module_data` MEDIUMBLOB NOT NULL,
+  `update_time` DATETIME(6) NOT NULL
+,
+  PRIMARY KEY (`player_id`, `module_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 CREATE TABLE IF NOT EXISTS `share_daily` (
   `id` INT AUTO_INCREMENT NOT NULL,

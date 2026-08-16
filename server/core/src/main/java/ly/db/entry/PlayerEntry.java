@@ -43,7 +43,7 @@ public class PlayerEntry extends AbstractEntry {
   private Integer vipLevel;
 
   /**各个模块的养成数据*/
-  @DbMeta.DbField(name="modules")
+  @DbMeta.DbField(name="modules", columnType="MEDIUMBLOB")
   private byte[] modules;
 
   /**工会id*/

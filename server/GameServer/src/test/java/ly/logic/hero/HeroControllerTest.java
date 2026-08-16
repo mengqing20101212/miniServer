@@ -6,7 +6,7 @@ import ly.logic.hero.module.HeroModule;
 import ly.logic.player.ModuleEnum;
 import ly.logic.player.Player;
 import ly.logic.player.PlayerData;
-import ly.logic.player.PlayerModuleData;
+import ly.logic.player.PlayerDataTestFactory;
 import ly.logic.resource.module.ResourceModule;
 import ly.logic.resource.module.ResourceModuleData;
 import ly.net.GameConnectSession;
@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,8 +61,7 @@ public class HeroControllerTest {
         mockPlayer = new Player();
         // 连接 GamePlayer（Player.sendMsg 需要）
         setField(mockPlayer, "gamePlayer", mockGamePlayer);
-        // 使用 Unsafe 创建 PlayerData 避免触发 ProtobufProxy
-        PlayerData mockPlayerData = allocatePlayerData();
+        PlayerData mockPlayerData = testPlayerData();
         mockPlayer.setPlayerData(mockPlayerData);
 
         // 初始化英雄模块和资源模块
@@ -129,32 +127,11 @@ public class HeroControllerTest {
         return heroIds.get(index % heroIds.size());
     }
 
-    /**
-     * Create a PlayerData instance WITHOUT calling its constructor (which triggers
-     * protobuf).
-     * Uses sun.misc.Unsafe.allocateInstance().
-     */
-    private static PlayerData allocatePlayerData() throws Exception {
-        java.lang.reflect.Field f = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
-        f.setAccessible(true);
-        sun.misc.Unsafe unsafe = (sun.misc.Unsafe) f.get(null);
-        PlayerData pd = (PlayerData) unsafe.allocateInstance(PlayerData.class);
-        // Manually initialize the moduleData field (normally done in constructor)
-        Field moduleDataField = PlayerData.class.getDeclaredField("moduleData");
-        moduleDataField.setAccessible(true);
-        moduleDataField.set(pd, new PlayerModuleData());
-        // Manually initialize the modules field (normally done in constructor)
-        Field modulesField = PlayerData.class.getDeclaredField("modules");
-        modulesField.setAccessible(true);
-        modulesField.set(pd, new HashMap<>());
-        // Manually initialize playerEntry (normally done in constructor)
-        Field playerEntryField = PlayerData.class.getDeclaredField("playerEntry");
-        playerEntryField.setAccessible(true);
+    private static PlayerData testPlayerData() {
         ly.db.entry.PlayerEntry entry = new ly.db.entry.PlayerEntry();
         entry.setId(100001L);
         entry.setAccount("test_account");
-        playerEntryField.set(pd, entry);
-        return pd;
+        return PlayerDataTestFactory.create(entry);
     }
 
     /**
@@ -174,7 +151,7 @@ public class HeroControllerTest {
         heroController.handleHeroList(mockContext, request);
 
         // 验证返回的消息
-        MockMessagePacket sentMessage = mockGamePlayer.getLastSentMessage();
+        MockMessagePacket sentMessage = mockGamePlayer.getSentMessage(Cmd.CMD.SC_HeroList_VALUE);
         assertNotNull("应发送消息", sentMessage);
         assertEquals("消息 CMD 应为 SC_HeroList", Cmd.CMD.SC_HeroList_VALUE, sentMessage.cmd);
 
@@ -203,7 +180,7 @@ public class HeroControllerTest {
         heroController.handleHeroLevelUp(mockContext, request);
 
         // 验证返回的消息
-        MockMessagePacket sentMessage = mockGamePlayer.getLastSentMessage();
+        MockMessagePacket sentMessage = mockGamePlayer.getSentMessage(Cmd.CMD.SC_HeroLevelUp_VALUE);
         assertNotNull("应发送消息", sentMessage);
         assertEquals("消息 CMD 应为 SC_HeroLevelUp", Cmd.CMD.SC_HeroLevelUp_VALUE, sentMessage.cmd);
 
@@ -278,7 +255,7 @@ public class HeroControllerTest {
         heroController.handleHeroStarUp(mockContext, request);
 
         // 验证返回的消息
-        MockMessagePacket sentMessage = mockGamePlayer.getLastSentMessage();
+        MockMessagePacket sentMessage = mockGamePlayer.getSentMessage(Cmd.CMD.SC_HeroStarUp_VALUE);
         assertNotNull("应发送消息", sentMessage);
         assertEquals("消息 CMD 应为 SC_HeroStarUp", Cmd.CMD.SC_HeroStarUp_VALUE, sentMessage.cmd);
     }
@@ -318,7 +295,7 @@ public class HeroControllerTest {
         heroController.handleHeroAwaken(mockContext, request);
 
         // 验证返回的消息
-        MockMessagePacket sentMessage = mockGamePlayer.getLastSentMessage();
+        MockMessagePacket sentMessage = mockGamePlayer.getSentMessage(Cmd.CMD.SC_HeroAwaken_VALUE);
         assertNotNull("应发送消息", sentMessage);
         assertEquals("消息 CMD 应为 SC_HeroAwaken", Cmd.CMD.SC_HeroAwaken_VALUE, sentMessage.cmd);
 
@@ -360,7 +337,7 @@ public class HeroControllerTest {
         heroController.handleHeroAdd(mockContext, request);
 
         // 验证返回的消息
-        MockMessagePacket sentMessage = mockGamePlayer.getLastSentMessage();
+        MockMessagePacket sentMessage = mockGamePlayer.getSentMessage(Cmd.CMD.SC_HeroAdd_VALUE);
         assertNotNull("应发送消息", sentMessage);
         assertEquals("消息 CMD 应为 SC_HeroAdd", Cmd.CMD.SC_HeroAdd_VALUE, sentMessage.cmd);
 
@@ -390,7 +367,7 @@ public class HeroControllerTest {
         heroController.handleHeroAdd(mockContext, request);
 
         // 验证返回的消息
-        MockMessagePacket sentMessage = mockGamePlayer.getLastSentMessage();
+        MockMessagePacket sentMessage = mockGamePlayer.getSentMessage(Cmd.CMD.SC_HeroAdd_VALUE);
         assertNotNull("应发送消息", sentMessage);
 
         // 验证响应结果
@@ -493,6 +470,10 @@ public class HeroControllerTest {
                 return null;
             }
             return sentMessages.values().iterator().next();
+        }
+
+        public MockMessagePacket getSentMessage(int cmd) {
+            return sentMessages.get(cmd);
         }
 
         public long getPlayerId() {

@@ -217,6 +217,40 @@ public class MysqlConnector {
     return resultList;
   }
 
+  /**
+   * 执行不允许降级为空结果的查询。
+   *
+   * <p>用于持久化主数据读取；查询失败时抛出异常，避免调用方把数据库故障误判为没有数据。
+   */
+  public List<Map<String, Object>> selectStrict(String sql, Object... params) {
+    long startTime = System.currentTimeMillis();
+    List<Map<String, Object>> resultList = new ArrayList<>();
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement st = connection.prepareStatement(sql)) {
+      addSqlParams(params, st);
+      try (ResultSet rs = st.executeQuery()) {
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+        while (rs.next()) {
+          Map<String, Object> row = new HashMap<>();
+          for (int i = 1; i <= columnCount; i++) {
+            row.put(metaData.getColumnName(i), rs.getObject(i));
+          }
+          resultList.add(row);
+        }
+      }
+      return resultList;
+    } catch (Exception e) {
+      throw new IllegalStateException(
+          String.format("execute strict SQL(%s) failed, params:%s", sql, getParamStr(params)), e);
+    } finally {
+      long cost = System.currentTimeMillis() - startTime;
+      if (cost >= SQL_MAX_OPT_TIMEOUT) {
+        logger.warn("select strict SQL cost too long, sql:{}, params:{}, cost:{} ms", sql, getParamStr(params), cost);
+      }
+    }
+  }
+
   private static void addSqlParams(Object[] params, PreparedStatement st) throws Exception {
     if (params != null && params.length > 0) {
       for (int i = 0; i < params.length; i++) {
@@ -279,6 +313,74 @@ public class MysqlConnector {
           String.format(
               "batchExecute cost(%d ms) too long, successCount:%d size:%d",
               System.currentTimeMillis() - startTime, successCount, sqls.size()));
+    }
+  }
+
+  /**
+   * 在同一个事务中批量执行同一条参数化 SQL。
+   *
+   * <p>任意一条执行失败都会回滚整个批次，适合保存同一次玩家操作涉及的多个模块。
+   */
+  public boolean executeBatchTransaction(String sql, List<Object[]> paramList) {
+    if (sql == null || sql.isBlank() || paramList == null || paramList.isEmpty()) {
+      return false;
+    }
+    long startTime = System.currentTimeMillis();
+    Connection connection = null;
+    try {
+      connection = dataSource.getConnection();
+      connection.setAutoCommit(false);
+      try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        for (Object[] params : paramList) {
+          addSqlParams(params, statement);
+          statement.addBatch();
+        }
+        statement.executeBatch();
+      }
+      connection.commit();
+      return true;
+    } catch (Exception e) {
+      rollbackQuietly(connection);
+      logger.error(
+          "execute batch transaction error, sql:{}, size:{}, error:{}",
+          sql,
+          paramList.size(),
+          e.getMessage(),
+          e);
+      return false;
+    } finally {
+      closeTransactionConnection(connection);
+      long cost = System.currentTimeMillis() - startTime;
+      if (cost >= SQL_MAX_OPT_TIMEOUT) {
+        logger.warn("execute batch transaction cost too long, sql:{}, size:{}, cost:{} ms", sql, paramList.size(), cost);
+      }
+    }
+  }
+
+  private void rollbackQuietly(Connection connection) {
+    if (connection == null) {
+      return;
+    }
+    try {
+      connection.rollback();
+    } catch (Exception rollbackError) {
+      logger.error("rollback batch transaction failed", rollbackError);
+    }
+  }
+
+  private void closeTransactionConnection(Connection connection) {
+    if (connection == null) {
+      return;
+    }
+    try {
+      connection.setAutoCommit(true);
+    } catch (Exception resetError) {
+      logger.warn("reset transaction autoCommit failed: {}", resetError.getMessage());
+    }
+    try {
+      connection.close();
+    } catch (Exception closeError) {
+      logger.warn("close transaction connection failed: {}", closeError.getMessage());
     }
   }
 
