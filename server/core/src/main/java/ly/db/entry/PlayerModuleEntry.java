@@ -6,18 +6,20 @@ import ly.db.AbstractEntry;
 import ly.db.DbMeta;
 
 /** 玩家模块分行持久化对象。 */
-@DbMeta.DbTable(name = "player_module")
+@DbMeta.DbTable(name = "player_module", uniqueKeys = {"player_id,module_id"})
 public final class PlayerModuleEntry extends AbstractEntry {
   private static final String[] DIRTY_FIELDS = {
       "player_id", "module_id", "data_version", "revision", "module_data", "update_time"
   };
 
-  @DbMeta.DbMasterKey(name = "player_id")
-  @DbMeta.DbField(name = "player_id")
+  @DbMeta.DbMasterKey(name = "id", autoIncrement = true)
+  @DbMeta.DbField(name = "id")
+  private Long id;
+
+  @DbMeta.DbField(name = "player_id", nullable = false)
   private Long playerId;
 
-  @DbMeta.DbMasterKey(name = "module_id")
-  @DbMeta.DbField(name = "module_id")
+  @DbMeta.DbField(name = "module_id", nullable = false)
   private Integer moduleId;
 
   @DbMeta.DbField(name = "data_version", nullable = false)
@@ -37,6 +39,7 @@ public final class PlayerModuleEntry extends AbstractEntry {
   }
 
   public PlayerModuleEntry(
+      Long id,
       long playerId,
       int moduleId,
       int dataVersion,
@@ -44,6 +47,7 @@ public final class PlayerModuleEntry extends AbstractEntry {
       byte[] moduleData,
       LocalDateTime updateTime) {
     this();
+    this.id = id;
     setPlayerId(playerId);
     setModuleId(moduleId);
     setDataVersion(dataVersion);
@@ -58,7 +62,15 @@ public final class PlayerModuleEntry extends AbstractEntry {
   }
 
   public PlayerModuleEntry snapshot() {
-    return new PlayerModuleEntry(playerId, moduleId, dataVersion, revision, moduleData, updateTime);
+    return new PlayerModuleEntry(id, playerId, moduleId, dataVersion, revision, moduleData, updateTime);
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 
   public Long getPlayerId() {

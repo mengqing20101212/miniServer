@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `player` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `player_module` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
   `player_id` BIGINT NOT NULL,
   `module_id` INT NOT NULL,
   `data_version` INT NOT NULL,
@@ -50,7 +51,8 @@ CREATE TABLE IF NOT EXISTS `player_module` (
   `module_data` MEDIUMBLOB NOT NULL,
   `update_time` DATETIME(6) NOT NULL
 ,
-  PRIMARY KEY (`player_id`, `module_id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_player_module_player_id_module_id` (`player_id`, `module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

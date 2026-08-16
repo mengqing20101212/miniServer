@@ -11,6 +11,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 /**
  * 数据库实体到建表 SQL 的生成器。
@@ -225,6 +226,26 @@ public class EntityToSqlGenerator {
         // 添加主键约束
         if (!primaryKeys.isEmpty()) {
             sql.append(",\n  PRIMARY KEY (").append(String.join(", ", primaryKeys)).append(")");
+        }
+
+        DbMeta.DbTable table = entityClass.getAnnotation(DbMeta.DbTable.class);
+        for (String uniqueKey : table.uniqueKeys()) {
+            List<String> columns = Arrays.stream(uniqueKey.split(","))
+                    .map(String::trim)
+                    .filter(column -> !column.isEmpty())
+                    .toList();
+            if (columns.isEmpty()) {
+                continue;
+            }
+            String indexName = "uk_" + tableName + "_" + String.join("_", columns);
+            String quotedColumns = columns.stream()
+                    .map(column -> "`" + column + "`")
+                    .collect(Collectors.joining(", "));
+            sql.append(",\n  UNIQUE KEY `")
+                    .append(indexName)
+                    .append("` (")
+                    .append(quotedColumns)
+                    .append(")");
         }
         
         sql.append("\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");

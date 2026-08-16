@@ -13,6 +13,9 @@ public class DbMeta {
   @Target(ElementType.TYPE)
   public @interface DbTable {
     String name() default "";
+
+    /** 复合唯一键定义，每个元素是一组数据库列名。 */
+    String[] uniqueKeys() default {};
   }
 
   /** 数据库主键字段注解。 */

@@ -69,6 +69,7 @@ public class PlayerData {
                             moduleType,
                             new ModuleState(
                                     new PlayerModuleEntry(
+                                            null,
                                             getPlayerId(),
                                             moduleType.getModuleId(),
                                             moduleType.getDataVersion(),
@@ -119,6 +120,7 @@ public class PlayerData {
                 moduleType,
                 new ModuleState(
                         new PlayerModuleEntry(
+                                previous == null ? null : previous.entry.getId(),
                                 getPlayerId(),
                                 moduleType.getModuleId(),
                                 moduleType.getDataVersion(),
@@ -146,7 +148,9 @@ public class PlayerData {
         for (Map.Entry<ModuleEnum, ModuleState> entry : moduleStates.entrySet()) {
             ModuleState state = entry.getValue();
             long revision = state.entry.getRevision();
-            if (revision <= state.persistedRevision || revision <= state.submittedRevision) {
+            if (revision <= state.persistedRevision
+                    || revision <= state.submittedRevision
+                    || state.submittedRevision > state.persistedRevision) {
                 continue;
             }
             state.submittedRevision = revision;
@@ -160,6 +164,9 @@ public class PlayerData {
             ModuleEnum moduleType = ModuleEnum.fromModuleId(snapshot.getModuleId());
             ModuleState state = moduleStates.get(moduleType);
             if (state != null) {
+                if (state.entry.getId() == null && snapshot.getId() != null) {
+                    state.entry.setId(snapshot.getId());
+                }
                 state.persistedRevision = Math.max(state.persistedRevision, snapshot.getRevision());
             }
         }

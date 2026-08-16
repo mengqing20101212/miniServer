@@ -1,7 +1,5 @@
 package ly.logic.player.persistence;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,20 +10,9 @@ import ly.db.entry.PlayerModuleEntry;
 /** 基于 MySQL 的模块级持久化实现。 */
 public final class MysqlPlayerModuleStore implements PlayerModuleStore {
     private static final String SELECT_SQL = """
-            SELECT player_id, module_id, data_version, revision, module_data, update_time
+            SELECT id, player_id, module_id, data_version, revision, module_data, update_time
             FROM player_module
             WHERE player_id=?
-            """;
-
-    private static final String UPSERT_SQL = """
-            INSERT INTO player_module
-                (player_id, module_id, data_version, revision, module_data, update_time)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-                data_version=IF(VALUES(revision) >= revision, VALUES(data_version), data_version),
-                module_data=IF(VALUES(revision) >= revision, VALUES(module_data), module_data),
-                update_time=IF(VALUES(revision) >= revision, VALUES(update_time), update_time),
-                revision=GREATEST(revision, VALUES(revision))
             """;
 
     @Override
@@ -48,21 +35,18 @@ public final class MysqlPlayerModuleStore implements PlayerModuleStore {
         if (modules == null || modules.isEmpty()) {
             return true;
         }
-        List<Object[]> params = new ArrayList<>(modules.size());
         for (PlayerModuleEntry module : modules) {
             if (module.getPlayerId() == null || module.getPlayerId() != playerId) {
                 throw new IllegalArgumentException("player module entry belongs to another player: " + module.getPlayerId());
             }
-            params.add(new Object[] {
-                    playerId,
-                    module.getModuleId(),
-                    module.getDataVersion(),
-                    module.getRevision(),
-                    module.getModuleData(),
-                    Timestamp.valueOf(module.getUpdateTime())
-            });
+            boolean success = module.getId() == null
+                    ? MysqlService.getInstance().save(module)
+                    : MysqlService.getInstance().update(module);
+            if (!success) {
+                return false;
+            }
         }
-        return MysqlService.getInstance().getMysqlConnector().executeBatchTransaction(UPSERT_SQL, params);
+        return true;
     }
 
 }

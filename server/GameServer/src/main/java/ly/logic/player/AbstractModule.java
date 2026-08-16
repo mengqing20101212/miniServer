@@ -19,6 +19,17 @@ public abstract class AbstractModule implements IModule, IPlayerEvent {
         getRegisterEventTypes().forEach(eventType -> player.getEventManager().register(eventType, this));
     }
 
+    /** 统一完成模块挂载、数据初始化，以及缺失模块记录的首次创建。 */
+    public final void init(Player player, ModuleEnum moduleType, boolean moduleDataMissing) {
+        init(player);
+        onLoadData();
+        player.getPlayerData().putModule(moduleType, this);
+        if (moduleDataMissing && !saveData()) {
+            throw new IllegalStateException(
+                    "initialize player module failed, playerId=" + player.getPlayerId() + ", module=" + moduleType);
+        }
+    }
+
     /** 序列化当前模块并标记模块级快照为脏，数据库写入由统一刷新流程完成。 */
     @SuppressWarnings("unchecked")
     protected boolean saveModuleData(ModuleEnum moduleType, Object moduleData) {

@@ -73,12 +73,7 @@ public class Player {
                         String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()),
                         50);
                 AbstractModule module = createModuleInstance(moduleEnum, moduleEntry);
-                module.init(this);
-                module.onLoadData();
-                playerData.putModule(moduleEnum, module);
-                if (moduleDataMissing) {
-                    module.saveData();
-                }
+                module.init(this, moduleEnum, moduleDataMissing);
                 moduleInitLog.LogEnd();
             }
 

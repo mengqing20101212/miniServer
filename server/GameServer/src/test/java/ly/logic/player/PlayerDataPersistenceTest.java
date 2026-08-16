@@ -114,6 +114,26 @@ public class PlayerDataPersistenceTest {
     }
 
     @Test
+    public void waitsForInsertIdBeforeSubmittingANewerRevision() {
+        RecordingStore store = new RecordingStore();
+        PlayerData playerData = new PlayerData(
+                playerEntry(1006L), new PlayerModulePersistenceService(store, false));
+
+        playerData.markModuleDirty(ModuleEnum.HERO_MODULE, new byte[] {1});
+        List<PlayerModuleEntry> first = playerData.prepareDirtyModuleSnapshots();
+        playerData.markModuleDirty(ModuleEnum.HERO_MODULE, new byte[] {2});
+
+        assertTrue(playerData.prepareDirtyModuleSnapshots().isEmpty());
+        first.getFirst().setId(9001L);
+        playerData.markModulesPersisted(first);
+
+        List<PlayerModuleEntry> second = playerData.prepareDirtyModuleSnapshots();
+        assertEquals(1, second.size());
+        assertEquals(9001L, second.getFirst().getId().longValue());
+        assertArrayEquals(new byte[] {2}, second.getFirst().getModuleData());
+    }
+
+    @Test
     public void retriesBatchWhenStoreThrows() throws Exception {
         RetryingStore store = new RetryingStore();
         PlayerModulePersistenceService service = new PlayerModulePersistenceService(store, true);
@@ -138,6 +158,7 @@ public class PlayerDataPersistenceTest {
     private static PlayerModuleEntry moduleEntry(
             long playerId, ModuleEnum moduleType, long revision, byte[] moduleData) {
         return new PlayerModuleEntry(
+                10000L + moduleType.getModuleId(),
                 playerId,
                 moduleType.getModuleId(),
                 moduleType.getDataVersion(),

@@ -15,7 +15,7 @@ import org.junit.Test;
 
 public class PlayerModuleSchemaGenerationTest {
     @Test
-    public void generatesCompositeKeyAndModuleBlobConstraints() throws Exception {
+    public void generatesAutoIncrementKeyAndModuleBlobConstraints() throws Exception {
         EntityToSqlGenerator generator = new EntityToSqlGenerator();
         Method method = EntityToSqlGenerator.class.getDeclaredMethod("generateCreateTableSql", Class.class);
         method.setAccessible(true);
@@ -23,7 +23,10 @@ public class PlayerModuleSchemaGenerationTest {
         String moduleSql = (String) method.invoke(generator, PlayerModuleEntry.class);
         String playerSql = (String) method.invoke(generator, PlayerEntry.class);
 
-        assertTrue(moduleSql.contains("PRIMARY KEY (`player_id`, `module_id`)"));
+        assertTrue(moduleSql.contains("`id` BIGINT AUTO_INCREMENT NOT NULL"));
+        assertTrue(moduleSql.contains("PRIMARY KEY (`id`)"));
+        assertTrue(moduleSql.contains(
+                "UNIQUE KEY `uk_player_module_player_id_module_id` (`player_id`, `module_id`)"));
         assertTrue(moduleSql.contains("`module_data` MEDIUMBLOB NOT NULL"));
         assertTrue(moduleSql.contains("`update_time` DATETIME(6) NOT NULL"));
         assertTrue(playerSql.contains("`modules` MEDIUMBLOB DEFAULT NULL"));
@@ -35,6 +38,7 @@ public class PlayerModuleSchemaGenerationTest {
         PlayerModuleEntry entry = MysqlService.packetEntry(
                 Map.of(
                         "player_id", 101L,
+                        "id", 88L,
                         "module_id", 2,
                         "data_version", 1,
                         "revision", 7L,
@@ -42,6 +46,7 @@ public class PlayerModuleSchemaGenerationTest {
                         "update_time", Timestamp.valueOf(updateTime)),
                 PlayerModuleEntry.class);
 
+        assertEquals(88L, entry.getId().longValue());
         assertEquals(101L, entry.getPlayerId().longValue());
         assertEquals(2, entry.getModuleId().intValue());
         assertEquals(7L, entry.getRevision().longValue());

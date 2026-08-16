@@ -104,6 +104,7 @@ public final class PlayerModulePersistenceService {
                 if (success) {
                     task.owner.markModulesPersisted(task.snapshots);
                     pendingTasks.decrementAndGet();
+                    task.owner.flushAsync();
                     continue;
                 }
                 retryOrRelease(task, null);
