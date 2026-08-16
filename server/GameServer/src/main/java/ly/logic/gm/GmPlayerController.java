@@ -1,7 +1,5 @@
 package ly.logic.gm;
 
-import com.baidu.bjf.remoting.protobuf.Codec;
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.google.protobuf.AbstractMessage;
 import ly.LoggerDef;
 import ly.logic.player.AbstractModule;
@@ -137,8 +135,10 @@ public class GmPlayerController implements IGameController {
       for (GmPlayer.gmPlayerFieldChange change : request.getChangesList()) {
         GmPlayerReflectionUtils.patch(module, change.getPath(), change.getNewValue());
       }
-      byte[] moduleBytes = serializeModule(player, moduleEnum, module);
-      player.getPlayerData().markModuleDirty(moduleEnum, moduleBytes);
+      if (!module.saveData()) {
+        return updateError(
+            player.getPlayerId(), moduleEnum.name(), SAVE_UNSUPPORTED, "模块暂不支持持久化");
+      }
       player.getPlayerData().flushAsync();
       return GmPlayer.scGmUpdatePlayerModule.newBuilder()
           .setCode(OK)
@@ -153,21 +153,6 @@ public class GmPlayerController implements IGameController {
           moduleEnum.name(),
           e);
       return updateError(player.getPlayerId(), moduleEnum.name(), PATCH_FAILED, e.getMessage());
-    }
-  }
-
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  private byte[] serializeModule(Player player, ModuleEnum moduleEnum, AbstractModule module) {
-    try {
-      Codec codec = ProtobufProxy.create(module.getClass());
-      return codec.encode(module);
-    } catch (Exception ignored) {
-      boolean saved = module.saveData();
-      byte[] moduleBytes = player.getPlayerData().getModuleData(moduleEnum);
-      if (saved && moduleBytes != null) {
-        return moduleBytes;
-      }
-      throw new IllegalStateException("模块暂不支持 GM 编辑后持久化: " + moduleEnum.name());
     }
   }
 

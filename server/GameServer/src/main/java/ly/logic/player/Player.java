@@ -1,7 +1,5 @@
 package ly.logic.player;
 
-import com.baidu.bjf.remoting.protobuf.Codec;
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.google.protobuf.AbstractMessage;
 
 import ly.LoggerDef;
@@ -69,11 +67,15 @@ public class Player {
             for (ModuleEnum moduleEnum : ModuleEnum.values()) {
                 PlayerModuleEntry moduleEntry = playerData.getModuleEntry(moduleEnum);
                 boolean moduleDataMissing = moduleEntry == null || moduleEntry.getModuleData().length == 0;
+                if (moduleEntry == null) {
+                    moduleEntry = playerData.getOrCreateModuleEntry(moduleEnum);
+                }
                 TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(
                         String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()),
                         50);
                 AbstractModule module = createModuleInstance(moduleEnum, moduleEntry);
-                module.init(this, moduleEnum, moduleDataMissing);
+                moduleDataMissing = moduleDataMissing || moduleEntry.getModuleData().length == 0;
+                module.init(this, moduleEnum, moduleEntry, moduleDataMissing);
                 moduleInitLog.LogEnd();
             }
 
@@ -101,14 +103,14 @@ public class Player {
             return moduleClass.getDeclaredConstructor().newInstance();
         }
         try {
-            Codec<?> codec = ProtobufProxy.create(moduleClass);
-            return (AbstractModule) codec.decode(moduleData);
+            return AbstractModule.deserialize(moduleClass, moduleData);
         } catch (Exception e) {
             LoggerDef.SystemLogger.warn(
                     "init module fallback, playerId={}, module={}, reason={}",
                     getPlayerId(),
                     moduleClass.getSimpleName(),
                     e.getMessage());
+            moduleEntry.setModuleData(new byte[0]);
             return moduleClass.getDeclaredConstructor().newInstance();
         }
     }

@@ -46,4 +46,13 @@ public enum ModuleEnum {
         }
         return null;
     }
+
+    public static ModuleEnum fromModuleClass(Class<? extends AbstractModule> moduleClass) {
+        for (ModuleEnum module : values()) {
+            if (module.module.getClass() == moduleClass) {
+                return module;
+            }
+        }
+        return null;
+    }
 }

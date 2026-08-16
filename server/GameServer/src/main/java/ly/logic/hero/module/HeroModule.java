@@ -12,7 +12,6 @@ import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import ly.config.HeroInfoConfig;
 import ly.config.HeroInfoConfigManager;
 import ly.logic.player.AbstractModule;
-import ly.logic.player.ModuleEnum;
 import ly.logic.player.event.PlayerEventParam;
 import ly.logic.player.event.PlayerEventType;
 
@@ -33,12 +32,6 @@ public class HeroModule extends AbstractModule {
     @Override
     public void onLoadData() {
         // 框架自动反序列化，无需特殊逻辑
-    }
-
-    @Override
-    public boolean saveData() {
-        // 框架定时自动保存，无需特殊逻辑
-        return saveModuleData(ModuleEnum.HERO_MODULE, this);
     }
 
     @Override

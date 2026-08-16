@@ -1,18 +1,13 @@
 package ly.logic.resource.module;
 
-import com.baidu.bjf.remoting.protobuf.Codec;
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import ly.config.ResourceType;
 import ly.logic.player.AbstractModule;
-import ly.logic.player.ModuleEnum;
 import ly.proto.Resource;
 
 import ly.logic.player.event.PlayerEventParam;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import ly.logic.player.event.PlayerEventType;
 
@@ -24,20 +19,8 @@ public class ResourceModule extends AbstractModule {
 
     @Override
     public void onLoadData() {
-        byte[] data = player.getPlayerData().getModuleData(ModuleEnum.RESOURCE_MODULE);
-        if (data != null && data.length > 0) {
-            try {
-                Codec<ResourceModuleData> codec = ProtobufProxy.create(ResourceModuleData.class);
-                moduleData = codec.decode(data);
-            } catch (Exception e) {
-                System.err.println("Error loading ResourceModuleData for player " + player.getPlayerId() + ": " + e.getMessage());
-                moduleData = new ResourceModuleData();
-                // 初始化默认资源
-                initDefaultResources();
-            }
-        } else {
+        if (moduleData == null) {
             moduleData = new ResourceModuleData();
-            // 初始化默认资源
             initDefaultResources();
         }
     }
@@ -51,8 +34,18 @@ public class ResourceModule extends AbstractModule {
     }
 
     @Override
-    public boolean saveData() {
-        return saveModuleData(ModuleEnum.RESOURCE_MODULE, moduleData);
+    protected Object getModuleDataForPersistence() {
+        return moduleData;
+    }
+
+    @Override
+    protected Class<?> getModuleDataClass() {
+        return ResourceModuleData.class;
+    }
+
+    @Override
+    protected void loadModuleData(Object moduleData) {
+        this.moduleData = (ResourceModuleData) moduleData;
     }
 
     @Override

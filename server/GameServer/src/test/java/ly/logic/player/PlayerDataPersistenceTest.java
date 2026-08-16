@@ -19,6 +19,8 @@ import ly.logic.hero.module.HeroBean;
 import ly.logic.hero.module.HeroModule;
 import ly.logic.player.persistence.PlayerModulePersistenceService;
 import ly.logic.player.persistence.PlayerModuleStore;
+import ly.logic.resource.module.ResourceModule;
+import ly.logic.resource.module.ResourceModuleData;
 import org.junit.Test;
 
 public class PlayerDataPersistenceTest {
@@ -88,6 +90,35 @@ public class PlayerDataPersistenceTest {
     }
 
     @Test
+    public void deserializesLegacyResourcePayloadThroughAbstractModule() throws Exception {
+        ResourceModuleData storedData = new ResourceModuleData();
+        storedData.resources.put(7, 99L);
+        byte[] moduleData = ProtobufProxy.create(ResourceModuleData.class).encode(storedData);
+
+        ResourceModule module = (ResourceModule) AbstractModule.deserialize(ResourceModule.class, moduleData);
+
+        assertEquals(99L, module.getResource(7));
+    }
+
+    @Test
+    public void moduleSaveUpdatesItsManagedEntry() {
+        RecordingStore store = new RecordingStore();
+        PlayerData playerData = new PlayerData(
+                playerEntry(1007L), new PlayerModulePersistenceService(store, false));
+        Player player = new Player();
+        player.setPlayerData(playerData);
+        PlayerModuleEntry entry = playerData.getOrCreateModuleEntry(ModuleEnum.HERO_MODULE);
+        HeroModule module = new HeroModule();
+        module.init(player, ModuleEnum.HERO_MODULE, entry, false);
+
+        assertTrue(module.saveData());
+
+        assertTrue(entry == playerData.getModuleEntry(ModuleEnum.HERO_MODULE));
+        assertEquals(1L, entry.getRevision().longValue());
+        assertTrue(entry.getModuleData().length > 0);
+    }
+
+    @Test
     public void snapshotsOnlyDirtyModuleAndReleasesItAfterFailure() {
         RecordingStore store = new RecordingStore();
         store.loaded.put(
@@ -100,7 +131,7 @@ public class PlayerDataPersistenceTest {
         PlayerData playerData = new PlayerData(playerEntry(1003L), service);
         byte[] changed = {6, 7};
 
-        playerData.markModuleDirty(ModuleEnum.HERO_MODULE, changed);
+        playerData.markModuleDirty(playerData.getOrCreateModuleEntry(ModuleEnum.HERO_MODULE), changed);
         changed[0] = 99;
         List<PlayerModuleEntry> snapshots = playerData.prepareDirtyModuleSnapshots();
 
@@ -119,9 +150,11 @@ public class PlayerDataPersistenceTest {
         PlayerData playerData = new PlayerData(
                 playerEntry(1006L), new PlayerModulePersistenceService(store, false));
 
-        playerData.markModuleDirty(ModuleEnum.HERO_MODULE, new byte[] {1});
+        playerData.markModuleDirty(
+                playerData.getOrCreateModuleEntry(ModuleEnum.HERO_MODULE), new byte[] {1});
         List<PlayerModuleEntry> first = playerData.prepareDirtyModuleSnapshots();
-        playerData.markModuleDirty(ModuleEnum.HERO_MODULE, new byte[] {2});
+        playerData.markModuleDirty(
+                playerData.getOrCreateModuleEntry(ModuleEnum.HERO_MODULE), new byte[] {2});
 
         assertTrue(playerData.prepareDirtyModuleSnapshots().isEmpty());
         first.getFirst().setId(9001L);
@@ -138,8 +171,10 @@ public class PlayerDataPersistenceTest {
         RetryingStore store = new RetryingStore();
         PlayerModulePersistenceService service = new PlayerModulePersistenceService(store, true);
         PlayerData playerData = new PlayerData(playerEntry(1004L), service);
-        playerData.markModuleDirty(ModuleEnum.HERO_MODULE, new byte[] {8});
-        playerData.markModuleDirty(ModuleEnum.RESOURCE_MODULE, new byte[] {9});
+        playerData.markModuleDirty(
+                playerData.getOrCreateModuleEntry(ModuleEnum.HERO_MODULE), new byte[] {8});
+        playerData.markModuleDirty(
+                playerData.getOrCreateModuleEntry(ModuleEnum.RESOURCE_MODULE), new byte[] {9});
 
         assertTrue(playerData.flushAsync());
         assertTrue(store.success.await(3, TimeUnit.SECONDS));

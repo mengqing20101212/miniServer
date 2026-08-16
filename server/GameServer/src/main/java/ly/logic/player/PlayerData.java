@@ -92,7 +92,24 @@ public class PlayerData {
 
     public synchronized PlayerModuleEntry getModuleEntry(ModuleEnum moduleType) {
         ModuleState state = moduleStates.get(moduleType);
-        return state == null ? null : state.entry.snapshot();
+        return state == null ? null : state.entry;
+    }
+
+    public synchronized PlayerModuleEntry getOrCreateModuleEntry(ModuleEnum moduleType) {
+        ModuleState state = moduleStates.get(moduleType);
+        if (state != null) {
+            return state.entry;
+        }
+        PlayerModuleEntry entry = new PlayerModuleEntry(
+                null,
+                getPlayerId(),
+                moduleType.getModuleId(),
+                moduleType.getDataVersion(),
+                0L,
+                new byte[0],
+                LocalDateTime.now());
+        moduleStates.put(moduleType, new ModuleState(entry, 0L, 0L));
+        return entry;
     }
 
     public void putModule(ModuleEnum moduleType, AbstractModule module) {
@@ -108,27 +125,19 @@ public class PlayerData {
     }
 
     /** 更新单个模块的内存快照并递增修订号，实际持久化由任务结束时的批量刷新完成。 */
-    public synchronized void markModuleDirty(ModuleEnum moduleType, byte[] moduleBytes) {
-        if (moduleType == null || moduleBytes == null) {
-            throw new IllegalArgumentException("moduleType and moduleBytes are required");
+    public synchronized void markModuleDirty(PlayerModuleEntry moduleEntry, byte[] moduleBytes) {
+        if (moduleEntry == null || moduleBytes == null) {
+            throw new IllegalArgumentException("moduleEntry and moduleBytes are required");
         }
-        ModuleState previous = moduleStates.get(moduleType);
-        long revision = previous == null ? 1L : previous.entry.getRevision() + 1L;
-        long persistedRevision = previous == null ? 0L : previous.persistedRevision;
-        long submittedRevision = previous == null ? 0L : previous.submittedRevision;
-        moduleStates.put(
-                moduleType,
-                new ModuleState(
-                        new PlayerModuleEntry(
-                                previous == null ? null : previous.entry.getId(),
-                                getPlayerId(),
-                                moduleType.getModuleId(),
-                                moduleType.getDataVersion(),
-                                revision,
-                                moduleBytes,
-                                LocalDateTime.now()),
-                        persistedRevision,
-                        submittedRevision));
+        ModuleEnum moduleType = ModuleEnum.fromModuleId(moduleEntry.getModuleId());
+        ModuleState state = moduleStates.get(moduleType);
+        if (state == null || state.entry != moduleEntry) {
+            throw new IllegalArgumentException("moduleEntry is not owned by this player");
+        }
+        moduleEntry.setDataVersion(moduleType.getDataVersion());
+        moduleEntry.setRevision(moduleEntry.getRevision() + 1L);
+        moduleEntry.setModuleData(moduleBytes);
+        moduleEntry.setUpdateTime(LocalDateTime.now());
     }
 
     public boolean flushAsync() {
