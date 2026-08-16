@@ -40,8 +40,6 @@ public class PlayerData {
         Map<Integer, PlayerModuleEntry> storedModules = persistenceService.load(playerEntry.getId());
         if (storedModules != null && !storedModules.isEmpty()) {
             loadStoredModules(storedModules, loadedEntries);
-        } else {
-            loadLegacyModules(loadedEntries);
         }
         return loadedEntries;
     }
@@ -59,30 +57,15 @@ public class PlayerData {
         }
     }
 
-    private void loadLegacyModules(Map<ModuleEnum, PlayerModuleEntry> loadedEntries) {
+    PlayerModuleData loadLegacyModuleData() {
         Codec<PlayerModuleData> moduleDataCodec = ProtobufProxy
                 .create(PlayerModuleData.class);
         try {
             byte[] legacyBytes = playerEntry.getModules();
             if (legacyBytes == null || legacyBytes.length == 0) {
-                return;
+                return null;
             }
-            PlayerModuleData legacyData = moduleDataCodec.decode(legacyBytes);
-            for (ModuleEnum moduleType : ModuleEnum.values()) {
-                byte[] moduleBytes = legacyData.getModuleData(moduleType.getName());
-                if (moduleBytes != null && moduleBytes.length > 0) {
-                    loadedEntries.put(
-                            moduleType,
-                            new PlayerModuleEntry(
-                                    null,
-                                    getPlayerId(),
-                                    moduleType.getModuleId(),
-                                    moduleType.getDataVersion(),
-                                    1L,
-                                    moduleBytes,
-                                    LocalDateTime.now()));
-                }
-            }
+            return moduleDataCodec.decode(legacyBytes);
         } catch (Exception e) {
             throw new IllegalStateException("decode legacy player modules failed, playerId=" + playerEntry.getId(), e);
         }
@@ -128,9 +111,10 @@ public class PlayerData {
     }
 
     public boolean flushAsync() {
+        boolean legacyMigrationFinished = finishLegacyMigrationIfReady();
         List<PlayerModuleEntry> snapshots = prepareDirtyModuleSnapshots();
         if (snapshots.isEmpty()) {
-            return true;
+            return legacyMigrationFinished;
         }
         if (persistenceService.submit(this, snapshots)) {
             return true;
@@ -169,6 +153,7 @@ public class PlayerData {
             }
             submittedModules.remove(moduleType);
         }
+        finishLegacyMigrationIfReady();
     }
 
     public synchronized void releaseSubmittedModules(List<PlayerModuleEntry> snapshots) {
@@ -180,5 +165,22 @@ public class PlayerData {
 
     public long getPlayerId() {
         return playerEntry.getId();
+    }
+
+    private synchronized boolean finishLegacyMigrationIfReady() {
+        byte[] legacyBytes = playerEntry.getModules();
+        if (legacyBytes == null || legacyBytes.length == 0) {
+            return true;
+        }
+        if (!submittedModules.isEmpty() || modules.size() != ModuleEnum.values().length) {
+            return true;
+        }
+        for (AbstractModule module : modules.values()) {
+            PlayerModuleEntry entry = module.getModuleEntry();
+            if (entry == null || entry.getId() == null || entry.getDirtyFieldNames().length > 0) {
+                return true;
+            }
+        }
+        return persistenceService.clearLegacyModuleData(playerEntry);
     }
 }

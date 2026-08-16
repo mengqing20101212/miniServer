@@ -26,28 +26,39 @@ import org.junit.Test;
 public class PlayerDataPersistenceTest {
 
     @Test
-    public void migratesLegacyBlobIntoOneSnapshotPerModule() throws Exception {
+    public void migratesLegacyBlobThroughRuntimeModules() throws Exception {
         RecordingStore store = new RecordingStore();
         PlayerEntry entry = playerEntry(1001L);
+        HeroModule legacyHero = new HeroModule();
+        HeroBean hero = new HeroBean();
+        hero.heroUid = 101L;
+        hero.heroId = 7;
+        legacyHero.heroList.add(hero);
+        ResourceModuleData legacyResources = new ResourceModuleData();
+        legacyResources.resources.put(1, 500L);
         PlayerModuleData legacy = new PlayerModuleData();
-        legacy.addModuleData(ModuleEnum.HERO_MODULE.getName(), new byte[] {1, 2});
-        legacy.addModuleData(ModuleEnum.RESOURCE_MODULE.getName(), new byte[] {3, 4});
+        legacy.addModuleData(
+                ModuleEnum.HERO_MODULE.getName(),
+                ProtobufProxy.create(HeroModule.class).encode(legacyHero));
+        legacy.addModuleData(
+                ModuleEnum.RESOURCE_MODULE.getName(),
+                ProtobufProxy.create(ResourceModuleData.class).encode(legacyResources));
         entry.setModules(ProtobufProxy.create(PlayerModuleData.class).encode(legacy));
 
-        PlayerModulePersistenceService service = new PlayerModulePersistenceService(store, false);
+        PlayerModulePersistenceService service = new PlayerModulePersistenceService(store, true);
         PlayerData playerData = new PlayerData(entry, service);
         Player player = player(playerData);
-        Map<ModuleEnum, PlayerModuleEntry> loadedModules = playerData.loadModuleEntries();
-        mountModule(player, ModuleEnum.HERO_MODULE, loadedModules.get(ModuleEnum.HERO_MODULE));
-        mountModule(player, ModuleEnum.RESOURCE_MODULE, loadedModules.get(ModuleEnum.RESOURCE_MODULE));
+        player.initAllModules();
 
-        assertArrayEquals(new byte[] {1, 2}, loadedModules.get(ModuleEnum.HERO_MODULE).getModuleData());
-        assertArrayEquals(new byte[] {3, 4}, loadedModules.get(ModuleEnum.RESOURCE_MODULE).getModuleData());
-        List<PlayerModuleEntry> snapshots = playerData.prepareDirtyModuleSnapshots();
-        assertEquals(2, snapshots.size());
-        assertTrue(service.persistNow(playerData, snapshots));
+        assertTrue(store.legacyCleared.await(3, TimeUnit.SECONDS));
+        service.shutdown(3_000L);
+        HeroModule runtimeHero = (HeroModule) playerData.getModule(ModuleEnum.HERO_MODULE);
+        ResourceModule runtimeResources = (ResourceModule) playerData.getModule(ModuleEnum.RESOURCE_MODULE);
+        assertEquals(101L, runtimeHero.getHeroList().getFirst().heroUid);
+        assertEquals(500L, runtimeResources.getResource(1));
         assertEquals(1, store.savedBatches.size());
-        assertEquals(2, store.savedBatches.getFirst().size());
+        assertEquals(ModuleEnum.values().length, store.savedBatches.getFirst().size());
+        assertNull(entry.getModules());
         assertTrue(playerData.prepareDirtyModuleSnapshots().isEmpty());
     }
 
@@ -69,6 +80,49 @@ public class PlayerDataPersistenceTest {
         assertArrayEquals(new byte[] {9}, loadedModules.get(ModuleEnum.HERO_MODULE).getModuleData());
         assertNull(loadedModules.get(ModuleEnum.RESOURCE_MODULE));
         assertTrue(playerData.prepareDirtyModuleSnapshots().isEmpty());
+    }
+
+    @Test
+    public void resumesPartialLegacyMigrationWithoutOverwritingStoredModules() throws Exception {
+        RecordingStore store = new RecordingStore();
+        HeroModule storedHero = new HeroModule();
+        HeroBean hero = new HeroBean();
+        hero.heroUid = 202L;
+        hero.heroId = 9;
+        storedHero.heroList.add(hero);
+        store.loaded.put(
+                ModuleEnum.HERO_MODULE.getModuleId(),
+                moduleEntry(
+                        1008L,
+                        ModuleEnum.HERO_MODULE,
+                        4L,
+                        ProtobufProxy.create(HeroModule.class).encode(storedHero)));
+
+        ResourceModuleData legacyResources = new ResourceModuleData();
+        legacyResources.resources.put(2, 800L);
+        PlayerModuleData legacy = new PlayerModuleData();
+        legacy.addModuleData(
+                ModuleEnum.RESOURCE_MODULE.getName(),
+                ProtobufProxy.create(ResourceModuleData.class).encode(legacyResources));
+        PlayerEntry entry = playerEntry(1008L);
+        entry.setModules(ProtobufProxy.create(PlayerModuleData.class).encode(legacy));
+
+        PlayerModulePersistenceService service = new PlayerModulePersistenceService(store, true);
+        PlayerData playerData = new PlayerData(entry, service);
+        Player player = player(playerData);
+        player.initAllModules();
+
+        assertTrue(store.legacyCleared.await(3, TimeUnit.SECONDS));
+        service.shutdown(3_000L);
+        HeroModule runtimeHero = (HeroModule) playerData.getModule(ModuleEnum.HERO_MODULE);
+        ResourceModule runtimeResources = (ResourceModule) playerData.getModule(ModuleEnum.RESOURCE_MODULE);
+        assertEquals(202L, runtimeHero.getHeroList().getFirst().heroUid);
+        assertEquals(800L, runtimeResources.getResource(2));
+        assertEquals(1, store.savedBatches.size());
+        assertEquals(ModuleEnum.values().length - 1, store.savedBatches.getFirst().size());
+        assertTrue(store.savedBatches.getFirst().stream()
+                .noneMatch(module -> module.getModuleId() == ModuleEnum.HERO_MODULE.getModuleId()));
+        assertNull(entry.getModules());
     }
 
     @Test
@@ -233,7 +287,9 @@ public class PlayerDataPersistenceTest {
     private static class RecordingStore implements PlayerModuleStore {
         private final Map<Integer, PlayerModuleEntry> loaded = new HashMap<>();
         private final List<List<PlayerModuleEntry>> savedBatches = new ArrayList<>();
+        private final CountDownLatch legacyCleared = new CountDownLatch(1);
         private boolean saveResult = true;
+        private long nextId = 20_000L;
 
         @Override
         public Map<Integer, PlayerModuleEntry> load(long playerId) {
@@ -243,7 +299,20 @@ public class PlayerDataPersistenceTest {
         @Override
         public boolean saveBatch(long playerId, List<PlayerModuleEntry> modules) {
             savedBatches.add(List.copyOf(modules));
+            if (saveResult) {
+                modules.stream()
+                        .filter(module -> module.getId() == null)
+                        .forEach(module -> module.setId(nextId++));
+            }
             return saveResult;
+        }
+
+        @Override
+        public boolean clearLegacyModuleData(PlayerEntry playerEntry) {
+            playerEntry.setModules(null);
+            playerEntry.markPersisted();
+            legacyCleared.countDown();
+            return true;
         }
     }
 

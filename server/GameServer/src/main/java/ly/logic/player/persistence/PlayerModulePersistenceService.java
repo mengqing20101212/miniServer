@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import ly.LoggerDef;
+import ly.db.entry.PlayerEntry;
 import ly.db.entry.PlayerModuleEntry;
 import ly.logic.player.PlayerData;
 
@@ -48,6 +49,10 @@ public final class PlayerModulePersistenceService {
 
     public Map<Integer, PlayerModuleEntry> load(long playerId) {
         return store.load(playerId);
+    }
+
+    public boolean clearLegacyModuleData(PlayerEntry playerEntry) {
+        return store.clearLegacyModuleData(playerEntry);
     }
 
     public boolean submit(PlayerData owner, List<PlayerModuleEntry> snapshots) {

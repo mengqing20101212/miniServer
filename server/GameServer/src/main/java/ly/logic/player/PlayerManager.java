@@ -1,7 +1,5 @@
 package ly.logic.player;
 
-import com.baidu.bjf.remoting.protobuf.Codec;
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import ly.ServerContext;
 import ly.LoggerDef;
 import ly.db.entry.LoginEntry;
@@ -71,7 +69,6 @@ public class PlayerManager {
         entry.setViplevel(0);
         entry.setGuidid(0L);
         entry.setName(csLogin.getPlayerName());
-        entry.setModules(createDefaultModules());
         if (!PlayerEntryHelper.save(entry)) {
             throw new IllegalStateException("create player save db failed, account=" + csLogin.getAccount());
         }
@@ -160,13 +157,4 @@ public class PlayerManager {
         }
     }
 
-    private byte[] createDefaultModules() {
-        try {
-            Codec<PlayerModuleData> codec = ProtobufProxy.create(PlayerModuleData.class);
-            return codec.encode(new PlayerModuleData());
-        } catch (Exception e) {
-            LoggerDef.SystemLogger.warn("create default player modules failed", e);
-            return null;
-        }
-    }
 }

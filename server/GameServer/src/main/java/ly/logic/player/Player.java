@@ -66,18 +66,21 @@ public class Player {
             TimeStatisticsUtils.TimeStatisticsLog log = TimeStatisticsUtils
                     .makeLogBegin(String.format("Player-%s-%d-InitModules", getAccount(), getPlayerId()), 1000);
             Map<ModuleEnum, PlayerModuleEntry> loadedEntries = playerData.loadModuleEntries();
+            PlayerModuleData legacyData = playerData.loadLegacyModuleData();
 
             for (ModuleEnum moduleEnum : ModuleEnum.values()) {
                 PlayerModuleEntry moduleEntry = loadedEntries.get(moduleEnum);
-                boolean moduleDataMissing = moduleEntry == null || moduleEntry.getModuleData().length == 0;
+                byte[] moduleBytes = moduleEntry == null
+                        ? getLegacyModuleData(legacyData, moduleEnum)
+                        : moduleEntry.getModuleData();
                 if (moduleEntry == null) {
                     moduleEntry = playerData.createModuleEntry(moduleEnum);
                 }
                 TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(
                         String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()),
                         50);
-                AbstractModule module = createModuleInstance(moduleEnum, moduleEntry);
-                moduleDataMissing = moduleDataMissing || moduleEntry.getModuleData().length == 0;
+                AbstractModule module = createModuleInstance(moduleEnum, moduleEntry, moduleBytes);
+                boolean moduleDataMissing = moduleEntry.getModuleData().length == 0;
                 module.init(this, moduleEnum, moduleEntry, moduleDataMissing);
                 moduleInitLog.LogEnd();
             }
@@ -99,9 +102,15 @@ public class Player {
 
     }
 
-    private AbstractModule createModuleInstance(ModuleEnum moduleEnum, PlayerModuleEntry moduleEntry) throws Exception {
+    private byte[] getLegacyModuleData(PlayerModuleData legacyData, ModuleEnum moduleEnum) {
+        return legacyData == null ? null : legacyData.getModuleData(moduleEnum.getName());
+    }
+
+    private AbstractModule createModuleInstance(
+            ModuleEnum moduleEnum,
+            PlayerModuleEntry moduleEntry,
+            byte[] moduleData) throws Exception {
         Class<? extends AbstractModule> moduleClass = moduleEnum.getModule().getClass();
-        byte[] moduleData = moduleEntry == null ? null : moduleEntry.getModuleData();
         if (moduleData == null || moduleData.length == 0) {
             return moduleClass.getDeclaredConstructor().newInstance();
         }

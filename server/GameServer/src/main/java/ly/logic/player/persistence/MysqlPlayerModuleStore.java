@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import ly.db.MysqlConnector;
 import ly.db.MysqlService;
+import ly.db.entry.PlayerEntry;
+import ly.db.entry.PlayerEntryHelper;
 import ly.db.entry.PlayerModuleEntry;
 
 /** 基于 MySQL 的模块级持久化实现。 */
@@ -47,6 +49,17 @@ public final class MysqlPlayerModuleStore implements PlayerModuleStore {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean clearLegacyModuleData(PlayerEntry playerEntry) {
+        byte[] legacyData = playerEntry.getModules();
+        playerEntry.setModules(null);
+        if (PlayerEntryHelper.update(playerEntry, "modules")) {
+            return true;
+        }
+        playerEntry.setModules(legacyData);
+        return false;
     }
 
 }
