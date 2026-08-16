@@ -5,6 +5,7 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.google.protobuf.AbstractMessage;
 
 import ly.LoggerDef;
+import ly.db.entry.PlayerModuleEntry;
 import ly.logic.player.event.PlayerEventManager;
 import ly.logic.player.event.PlayerEventParam;
 import ly.logic.player.event.PlayerEventSource;
@@ -66,12 +67,12 @@ public class Player {
                     .makeLogBegin(String.format("Player-%s-%d-InitModules", getAccount(), getPlayerId()), 1000);
 
             for (ModuleEnum moduleEnum : ModuleEnum.values()) {
-                boolean moduleDataMissing = !playerData.hasModuleData(moduleEnum);
+                PlayerModuleEntry moduleEntry = playerData.getModuleEntry(moduleEnum);
+                boolean moduleDataMissing = moduleEntry == null || moduleEntry.getModuleData().length == 0;
                 TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(
                         String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()),
                         50);
-                byte[] moduleData = playerData.getModuleData(moduleEnum);
-                AbstractModule module = createModuleInstance(moduleEnum, moduleData);
+                AbstractModule module = createModuleInstance(moduleEnum, moduleEntry);
                 module.init(this);
                 module.onLoadData();
                 playerData.putModule(moduleEnum, module);
@@ -98,8 +99,9 @@ public class Player {
 
     }
 
-    private AbstractModule createModuleInstance(ModuleEnum moduleEnum, byte[] moduleData) throws Exception {
+    private AbstractModule createModuleInstance(ModuleEnum moduleEnum, PlayerModuleEntry moduleEntry) throws Exception {
         Class<? extends AbstractModule> moduleClass = moduleEnum.getModule().getClass();
+        byte[] moduleData = moduleEntry == null ? null : moduleEntry.getModuleData();
         if (moduleData == null || moduleData.length == 0) {
             return moduleClass.getDeclaredConstructor().newInstance();
         }

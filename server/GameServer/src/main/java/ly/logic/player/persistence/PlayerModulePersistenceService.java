@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import ly.LoggerDef;
+import ly.db.entry.PlayerModuleEntry;
 import ly.logic.player.PlayerData;
 
 /** 异步保存玩家模块快照，并对失败批次做有限退避重试。 */
@@ -45,11 +46,11 @@ public final class PlayerModulePersistenceService {
         }
     }
 
-    public Map<Integer, PlayerModuleRecord> load(long playerId) {
+    public Map<Integer, PlayerModuleEntry> load(long playerId) {
         return store.load(playerId);
     }
 
-    public boolean submit(PlayerData owner, List<PlayerModuleRecord> snapshots) {
+    public boolean submit(PlayerData owner, List<PlayerModuleEntry> snapshots) {
         if (!accepting.get() || owner == null || snapshots == null || snapshots.isEmpty()) {
             return false;
         }
@@ -64,7 +65,7 @@ public final class PlayerModulePersistenceService {
     }
 
     /** 同步执行一次，供测试和受控停服刷新使用。 */
-    public boolean persistNow(PlayerData owner, List<PlayerModuleRecord> snapshots) {
+    public boolean persistNow(PlayerData owner, List<PlayerModuleEntry> snapshots) {
         if (owner == null || snapshots == null || snapshots.isEmpty()) {
             return true;
         }
@@ -138,13 +139,13 @@ public final class PlayerModulePersistenceService {
 
     private static final class PersistTask implements Delayed {
         private final PlayerData owner;
-        private final List<PlayerModuleRecord> snapshots;
+        private final List<PlayerModuleEntry> snapshots;
         private int retryCount;
         private long nextAttemptAt = System.currentTimeMillis();
 
-        private PersistTask(PlayerData owner, List<PlayerModuleRecord> snapshots) {
+        private PersistTask(PlayerData owner, List<PlayerModuleEntry> snapshots) {
             this.owner = owner;
-            this.snapshots = List.copyOf(snapshots);
+            this.snapshots = snapshots.stream().map(PlayerModuleEntry::snapshot).toList();
         }
 
         @Override

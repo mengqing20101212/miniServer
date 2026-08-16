@@ -1,9 +1,8 @@
 package ly.logic.player;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,8 +10,8 @@ import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 
 import ly.db.entry.PlayerEntry;
+import ly.db.entry.PlayerModuleEntry;
 import ly.logic.player.persistence.PlayerModulePersistenceService;
-import ly.logic.player.persistence.PlayerModuleRecord;
 
 /**
  * 游戏服玩家相关模型，承载玩家连接状态、持久化数据或模块数据。
@@ -21,7 +20,7 @@ public class PlayerData {
     final PlayerEntry playerEntry;
     private final PlayerModulePersistenceService persistenceService;
     private final Map<ModuleEnum, ModuleState> moduleStates = new EnumMap<>(ModuleEnum.class);
-    private final Map<String, AbstractModule> modules = new HashMap<>();
+    private final Map<ModuleEnum, AbstractModule> modules = new EnumMap<>(ModuleEnum.class);
 
     public PlayerData(PlayerEntry playerEntry) {
         this(playerEntry, PlayerModulePersistenceService.getInstance());
@@ -33,7 +32,7 @@ public class PlayerData {
         }
         this.playerEntry = playerEntry;
         this.persistenceService = persistenceService;
-        Map<Integer, PlayerModuleRecord> storedModules = persistenceService.load(playerEntry.getId());
+        Map<Integer, PlayerModuleEntry> storedModules = persistenceService.load(playerEntry.getId());
         if (storedModules != null && !storedModules.isEmpty()) {
             loadStoredModules(storedModules);
             return;
@@ -41,15 +40,16 @@ public class PlayerData {
         loadLegacyModules();
     }
 
-    private void loadStoredModules(Map<Integer, PlayerModuleRecord> storedModules) {
-        for (PlayerModuleRecord record : storedModules.values()) {
-            ModuleEnum moduleType = ModuleEnum.fromModuleId(record.moduleId());
+    private void loadStoredModules(Map<Integer, PlayerModuleEntry> storedModules) {
+        for (PlayerModuleEntry entry : storedModules.values()) {
+            ModuleEnum moduleType = ModuleEnum.fromModuleId(entry.getModuleId());
             if (moduleType == null) {
                 continue;
             }
+            long revision = entry.getRevision();
             moduleStates.put(
                     moduleType,
-                    new ModuleState(record.dataVersion(), record.revision(), record.revision(), record.revision(), record.data()));
+                    new ModuleState(entry.snapshot(), revision, revision));
         }
     }
 
@@ -67,7 +67,16 @@ public class PlayerData {
                 if (moduleBytes != null && moduleBytes.length > 0) {
                     moduleStates.put(
                             moduleType,
-                            new ModuleState(moduleType.getDataVersion(), 1L, 0L, 0L, moduleBytes));
+                            new ModuleState(
+                                    new PlayerModuleEntry(
+                                            getPlayerId(),
+                                            moduleType.getModuleId(),
+                                            moduleType.getDataVersion(),
+                                            1L,
+                                            moduleBytes,
+                                            LocalDateTime.now()),
+                                    0L,
+                                    0L));
                 }
             }
         } catch (Exception e) {
@@ -77,20 +86,20 @@ public class PlayerData {
 
     public synchronized byte[] getModuleData(ModuleEnum moduleType) {
         ModuleState state = moduleStates.get(moduleType);
-        return state == null ? null : Arrays.copyOf(state.data, state.data.length);
+        return state == null ? null : state.entry.getModuleData();
     }
 
-    public synchronized boolean hasModuleData(ModuleEnum moduleType) {
+    public synchronized PlayerModuleEntry getModuleEntry(ModuleEnum moduleType) {
         ModuleState state = moduleStates.get(moduleType);
-        return state != null && state.data.length > 0;
+        return state == null ? null : state.entry.snapshot();
     }
 
     public void putModule(ModuleEnum moduleType, AbstractModule module) {
-        modules.put(moduleType.getName(), module);
+        modules.put(moduleType, module);
     }
 
     public AbstractModule getModule(ModuleEnum moduleType) {
-        return modules.get(moduleType.getName());
+        return modules.get(moduleType);
     }
 
     public PlayerEntry getPlayerEntry() {
@@ -103,16 +112,25 @@ public class PlayerData {
             throw new IllegalArgumentException("moduleType and moduleBytes are required");
         }
         ModuleState previous = moduleStates.get(moduleType);
-        long revision = previous == null ? 1L : previous.revision + 1L;
+        long revision = previous == null ? 1L : previous.entry.getRevision() + 1L;
         long persistedRevision = previous == null ? 0L : previous.persistedRevision;
         long submittedRevision = previous == null ? 0L : previous.submittedRevision;
         moduleStates.put(
                 moduleType,
-                new ModuleState(moduleType.getDataVersion(), revision, persistedRevision, submittedRevision, moduleBytes));
+                new ModuleState(
+                        new PlayerModuleEntry(
+                                getPlayerId(),
+                                moduleType.getModuleId(),
+                                moduleType.getDataVersion(),
+                                revision,
+                                moduleBytes,
+                                LocalDateTime.now()),
+                        persistedRevision,
+                        submittedRevision));
     }
 
     public boolean flushAsync() {
-        List<PlayerModuleRecord> snapshots = prepareDirtyModuleSnapshots();
+        List<PlayerModuleEntry> snapshots = prepareDirtyModuleSnapshots();
         if (snapshots.isEmpty()) {
             return true;
         }
@@ -123,35 +141,35 @@ public class PlayerData {
         return false;
     }
 
-    public synchronized List<PlayerModuleRecord> prepareDirtyModuleSnapshots() {
-        List<PlayerModuleRecord> snapshots = new ArrayList<>();
+    public synchronized List<PlayerModuleEntry> prepareDirtyModuleSnapshots() {
+        List<PlayerModuleEntry> snapshots = new ArrayList<>();
         for (Map.Entry<ModuleEnum, ModuleState> entry : moduleStates.entrySet()) {
             ModuleState state = entry.getValue();
-            if (state.revision <= state.persistedRevision || state.revision <= state.submittedRevision) {
+            long revision = state.entry.getRevision();
+            if (revision <= state.persistedRevision || revision <= state.submittedRevision) {
                 continue;
             }
-            state.submittedRevision = state.revision;
-            snapshots.add(new PlayerModuleRecord(
-                    entry.getKey().getModuleId(), state.dataVersion, state.revision, state.data));
+            state.submittedRevision = revision;
+            snapshots.add(state.entry.snapshot());
         }
         return snapshots;
     }
 
-    public synchronized void markModulesPersisted(List<PlayerModuleRecord> snapshots) {
-        for (PlayerModuleRecord snapshot : snapshots) {
-            ModuleEnum moduleType = ModuleEnum.fromModuleId(snapshot.moduleId());
+    public synchronized void markModulesPersisted(List<PlayerModuleEntry> snapshots) {
+        for (PlayerModuleEntry snapshot : snapshots) {
+            ModuleEnum moduleType = ModuleEnum.fromModuleId(snapshot.getModuleId());
             ModuleState state = moduleStates.get(moduleType);
             if (state != null) {
-                state.persistedRevision = Math.max(state.persistedRevision, snapshot.revision());
+                state.persistedRevision = Math.max(state.persistedRevision, snapshot.getRevision());
             }
         }
     }
 
-    public synchronized void releaseSubmittedModules(List<PlayerModuleRecord> snapshots) {
-        for (PlayerModuleRecord snapshot : snapshots) {
-            ModuleEnum moduleType = ModuleEnum.fromModuleId(snapshot.moduleId());
+    public synchronized void releaseSubmittedModules(List<PlayerModuleEntry> snapshots) {
+        for (PlayerModuleEntry snapshot : snapshots) {
+            ModuleEnum moduleType = ModuleEnum.fromModuleId(snapshot.getModuleId());
             ModuleState state = moduleStates.get(moduleType);
-            if (state != null && state.submittedRevision <= snapshot.revision()) {
+            if (state != null && state.submittedRevision <= snapshot.getRevision()) {
                 state.submittedRevision = state.persistedRevision;
             }
         }
@@ -162,23 +180,17 @@ public class PlayerData {
     }
 
     private static final class ModuleState {
-        private final int dataVersion;
-        private long revision;
+        private final PlayerModuleEntry entry;
         private long persistedRevision;
         private long submittedRevision;
-        private final byte[] data;
 
         private ModuleState(
-                int dataVersion,
-                long revision,
+                PlayerModuleEntry entry,
                 long persistedRevision,
-                long submittedRevision,
-                byte[] data) {
-            this.dataVersion = dataVersion;
-            this.revision = revision;
+                long submittedRevision) {
+            this.entry = entry;
             this.persistedRevision = persistedRevision;
             this.submittedRevision = submittedRevision;
-            this.data = Arrays.copyOf(data, data.length);
         }
     }
 

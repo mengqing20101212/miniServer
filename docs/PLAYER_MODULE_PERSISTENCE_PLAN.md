@@ -141,6 +141,7 @@ FROM player;
 
 - `ModuleEnum` 使用显式稳定 `module_id` 和 `data_version`。
 - 新增 `player_module` 联合主键表，单个模块使用 `MEDIUMBLOB` 保存。
+- `PlayerModuleEntry` 作为真实数据库行对象参与加载和保存，读取后按 `module_id` 反序列化为运行期 `AbstractModule`。
 - 玩家登录优先读取模块表；模块表无数据时读取旧 `player.modules`，并在初始化后异步迁移。
 - 模块保存使用不可变字节快照和单调递增 `revision`，旧批次晚到不会覆盖新版本。
 - 每次玩家消息、事件或协程任务结束时，把本次变更的全部模块放在同一个 MySQL 事务中 UPSERT。
