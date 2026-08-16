@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>临时脚本</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f5f6f8; color: #20252b; }
+        .workspace { max-width: 1680px; margin: 0 auto; padding: 20px; }
+        .panel { background: #fff; border: 1px solid #dfe3e8; border-radius: 6px; }
+        .editor { min-height: 520px; resize: vertical; font: 13px/1.55 Consolas, "SFMono-Regular", monospace; }
+        .json-editor { min-height: 96px; resize: vertical; font: 13px/1.5 Consolas, "SFMono-Regular", monospace; }
+        .result { min-height: 76px; max-height: 220px; overflow: auto; white-space: pre-wrap; }
+        .table-wrap { overflow-x: auto; }
+        td { vertical-align: middle; }
+        .status-SUCCEEDED { color: #157347; font-weight: 600; }
+        .status-FAILED { color: #b02a37; font-weight: 600; }
+        .status-DISPATCHED, .status-COMPILED, .status-CREATED { color: #8a5a00; font-weight: 600; }
+    </style>
+</head>
+<body>
+<main class="workspace">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="m-0">临时脚本</h4>
+        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="refreshAll()">刷新</button>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-xl-8">
+            <section class="panel p-3">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="targetServerId" class="form-label">目标服务器</label>
+                        <select id="targetServerId" class="form-select"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="entryClass" class="form-label">入口类</label>
+                        <input id="entryClass" class="form-control" value="scripts.EmergencyFix">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="argumentsJson" class="form-label">执行参数 JSON</label>
+                    <textarea id="argumentsJson" class="form-control json-editor">{}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="source" class="form-label">Groovy 源码</label>
+                    <textarea id="source" class="form-control editor" spellcheck="false">package scripts
+
+import ly.script.GmRuntimeScript
+import ly.script.GmScriptContext
+import ly.script.ScriptResult
+
+class EmergencyFix implements GmRuntimeScript {
+    @Override
+    ScriptResult execute(GmScriptContext context) {
+        // 通过静态 getInstance 或反射获取本次脚本需要的业务对象。
+        return ScriptResult.success("执行完成", [serverId: context.serverId])
+    }
+}</textarea>
+                </div>
+                <div class="d-flex gap-2 justify-content-end">
+                    <button id="validateBtn" class="btn btn-outline-primary" type="button" onclick="validateScript()">编译检测</button>
+                    <button id="executeBtn" class="btn btn-danger" type="button" onclick="executeScript()">确认执行</button>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-xl-4">
+            <section class="panel p-3 mb-3">
+                <h6>处理结果</h6>
+                <pre id="result" class="result bg-light border rounded p-2 mb-0">等待操作</pre>
+            </section>
+            <section class="panel p-3">
+                <h6>本次约束</h6>
+                <dl class="row small mb-0">
+                    <dt class="col-5">编译位置</dt><dd class="col-7">GMServer</dd>
+                    <dt class="col-5">下发内容</dt><dd class="col-7">class bundle</dd>
+                    <dt class="col-5">执行次数</dt><dd class="col-7">一次</dd>
+                    <dt class="col-5">目标缓存</dt><dd class="col-7">不缓存</dd>
+                    <dt class="col-5">持久化行为</dt><dd class="col-7">由脚本决定</dd>
+                </dl>
+            </section>
+        </div>
+    </div>
+
+    <section class="panel p-3 mt-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="m-0">最近执行记录</h6>
+            <span class="text-muted small">最多 100 条</span>
+        </div>
+        <div class="table-wrap">
+            <table class="table table-sm table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>执行 ID</th>
+                    <th>目标服务器</th>
+                    <th>入口类</th>
+                    <th>状态</th>
+                    <th>操作人</th>
+                    <th>耗时</th>
+                    <th>结果 / 错误</th>
+                    <th>时间</th>
+                </tr>
+                </thead>
+                <tbody id="historyRows"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script>
+function tokenHeaders(contentType) {
+    var token = localStorage.getItem('gm_token') || localStorage.getItem('token') || localStorage.getItem('jwt') || '';
+    var headers = token ? {'Authorization': 'Bearer ' + token} : {};
+    if (contentType) headers['Content-Type'] = contentType;
+    return headers;
+}
+
+function escapeHtml(value) {
+    return (value == null ? '' : String(value)).replace(/[&<>"']/g, function(ch) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+    });
+}
+
+function requestBody() {
+    return {
+        targetServerId: document.getElementById('targetServerId').value,
+        entryClass: document.getElementById('entryClass').value.trim(),
+        argumentsJson: document.getElementById('argumentsJson').value.trim(),
+        source: document.getElementById('source').value
+    };
+}
+
+function showResult(value, isError) {
+    var target = document.getElementById('result');
+    target.className = 'result border rounded p-2 mb-0 ' + (isError ? 'bg-danger-subtle text-danger-emphasis' : 'bg-light');
+    target.textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+}
+
+async function api(url, options) {
+    var response = await fetch(url, options || {headers: tokenHeaders()});
+    var payload = await response.json();
+    if (!response.ok || payload.code !== 200) {
+        throw new Error(payload.message || ('HTTP ' + response.status));
+    }
+    return payload.data;
+}
+
+async function loadServers() {
+    try {
+        var servers = await api('/api/runtime-script/servers', {headers: tokenHeaders()});
+        var select = document.getElementById('targetServerId');
+        var selected = select.value;
+        select.innerHTML = '';
+        servers.forEach(function(server) {
+            var option = document.createElement('option');
+            option.value = server.serverId;
+            option.textContent = server.serverId + ' [' + server.serverType + '] ' + server.ip + ':' + server.port;
+            select.appendChild(option);
+        });
+        if (servers.some(function(server) { return server.serverId === selected; })) select.value = selected;
+    } catch (error) {
+        showResult(error.message, true);
+    }
+}
+
+async function loadHistory() {
+    try {
+        var rows = await api('/api/runtime-script/history', {headers: tokenHeaders()});
+        document.getElementById('historyRows').innerHTML = rows.map(function(item) {
+            var detail = item.errorMessage || item.resultJson || item.compileMessage || '';
+            return '<tr>' +
+                '<td class="text-nowrap">' + escapeHtml(item.executionId) + '</td>' +
+                '<td>' + escapeHtml(item.targetServerId) + '</td>' +
+                '<td>' + escapeHtml(item.entryClass) + '</td>' +
+                '<td class="status-' + escapeHtml(item.status) + '">' + escapeHtml(item.status) + '</td>' +
+                '<td>' + escapeHtml(item.operator) + '</td>' +
+                '<td class="text-nowrap">' + escapeHtml(item.elapsedMillis == null ? '' : item.elapsedMillis + ' ms') + '</td>' +
+                '<td style="min-width:240px;max-width:420px;white-space:pre-wrap">' + escapeHtml(detail) + '</td>' +
+                '<td class="text-nowrap">' + escapeHtml(item.updateTime || item.createTime || '') + '</td>' +
+                '</tr>';
+        }).join('');
+    } catch (error) {
+        showResult(error.message, true);
+    }
+}
+
+async function validateScript() {
+    var button = document.getElementById('validateBtn');
+    button.disabled = true;
+    try {
+        var body = requestBody();
+        var result = await api('/api/runtime-script/validate', {
+            method: 'POST',
+            headers: tokenHeaders('application/json'),
+            body: JSON.stringify({source: body.source, entryClass: body.entryClass})
+        });
+        showResult({status: 'COMPILED', compile: result}, false);
+    } catch (error) {
+        showResult(error.message, true);
+    } finally {
+        button.disabled = false;
+    }
+}
+
+async function executeScript() {
+    var body = requestBody();
+    if (!body.targetServerId) {
+        showResult('没有可用的目标服务器', true);
+        return;
+    }
+    var typed = prompt('请输入目标服务器 ID 以确认一次性执行：\n' + body.targetServerId);
+    if (typed !== body.targetServerId) {
+        showResult('目标服务器确认未通过', true);
+        return;
+    }
+    var button = document.getElementById('executeBtn');
+    button.disabled = true;
+    try {
+        var result = await api('/api/runtime-script/execute', {
+            method: 'POST',
+            headers: tokenHeaders('application/json'),
+            body: JSON.stringify(body)
+        });
+        showResult(result, result.status !== 'SUCCEEDED');
+        await loadHistory();
+    } catch (error) {
+        showResult(error.message, true);
+        await loadHistory();
+    } finally {
+        button.disabled = false;
+    }
+}
+
+function refreshAll() {
+    loadServers();
+    loadHistory();
+}
+
+refreshAll();
+</script>
+</body>
+</html>

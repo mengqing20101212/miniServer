@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS `login` (
   `last_logout_time` DATETIME DEFAULT NULL,
   `token` VARCHAR(255) DEFAULT NULL,
   `channel` VARCHAR(255) DEFAULT NULL,
-  `players` VARCHAR(255) DEFAULT NULL
+  `players` VARCHAR(255) DEFAULT NULL,
+  `assigned_game_server_id` VARCHAR(255) DEFAULT NULL
 ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

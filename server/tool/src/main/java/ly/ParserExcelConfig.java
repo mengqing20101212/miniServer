@@ -27,10 +27,18 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 /** Excel 配置表生成器，负责生成 serverConfig 文本、不可变 Config、Manager 和 Checker。 */
 public class ParserExcelConfig {
   final String excelFileDir;
+  final File serverConfigDir;
+  final boolean generateJavaSources;
   List<String> excelFileList = new ArrayList<>(256);
 
   public ParserExcelConfig(String excelFileDir) {
+    this(excelFileDir, Path.of(excelFileDir, "serverConfig").toString(), true);
+  }
+
+  public ParserExcelConfig(String excelFileDir, String serverConfigDir, boolean generateJavaSources) {
     this.excelFileDir = excelFileDir;
+    this.serverConfigDir = Path.of(serverConfigDir).toAbsolutePath().normalize().toFile();
+    this.generateJavaSources = generateJavaSources;
   }
 
   public void startParser() {
@@ -57,7 +65,9 @@ public class ParserExcelConfig {
     if (!excelConfig.parser()) {
       return false;
     }
-    excelConfig.createJavaFile();
+    if (generateJavaSources) {
+      excelConfig.createJavaFile();
+    }
     return true;
   }
 
@@ -248,7 +258,7 @@ public class ParserExcelConfig {
     }
 
     private void writeServerLineConfig(StringBuilder text) throws IOException {
-      File dir = new File(excelFileDir + File.separator + "serverConfig");
+      File dir = serverConfigDir;
       if (!dir.exists() && !dir.mkdirs()) {
         throw new IOException("创建 serverConfig 目录失败:" + dir.getAbsolutePath());
       }
@@ -831,6 +841,10 @@ public class ParserExcelConfig {
   }
 
   public static void main(String[] args) {
+    if (args != null && args.length == 3 && "--data-only".equals(args[0])) {
+      new ParserExcelConfig(args[1], args[2], false).startParser();
+      return;
+    }
     String dir = args != null && args.length > 0 ? args[0] : "D:\\WORK\\me\\miniServer\\excel";
     new ParserExcelConfig(dir).startParser();
   }

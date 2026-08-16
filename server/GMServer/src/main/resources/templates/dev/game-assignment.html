@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>开发服分配</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<main class="container-fluid p-4">
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <h4 class="m-0 me-auto">开发服分配</h4>
+    <input id="keyword" class="form-control form-control-sm" style="max-width:260px" placeholder="搜索账号">
+    <button class="btn btn-outline-secondary btn-sm" onclick="loadRows()">查询</button>
+  </div>
+  <div class="table-responsive border">
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead><tr><th>账号</th><th>分配的 GameServer</th><th>节点状态</th><th style="width:100px">操作</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</main>
+<script>
+function headers() {
+  const token = localStorage.getItem('gm_token') || localStorage.getItem('token') || localStorage.getItem('jwt') || '';
+  return Object.assign({'Content-Type':'application/json'}, token ? {'Authorization':'Bearer ' + token} : {});
+}
+function esc(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+async function loadRows() {
+  const keyword = document.getElementById('keyword').value.trim();
+  const response = await fetch('/api/dev-game-assignment/list?keyword=' + encodeURIComponent(keyword), {headers:headers()});
+  const body = await response.json();
+  document.getElementById('rows').innerHTML = (body.data || []).map((item, index) =>
+    `<tr><td>${esc(item.account)}</td><td><input id="server-${index}" class="form-control form-control-sm" value="${esc(item.serverId)}" placeholder="game-local-name"></td>` +
+    `<td class="${item.online ? 'text-success' : 'text-muted'}">${item.online ? '在线' : '离线/未分配'}</td>` +
+    `<td><button class="btn btn-primary btn-sm" onclick="save('${esc(item.account)}', ${index})">保存</button></td></tr>`
+  ).join('');
+}
+async function save(account, index) {
+  const serverId = document.getElementById('server-' + index).value.trim();
+  const response = await fetch('/api/dev-game-assignment/assign', {method:'POST', headers:headers(), body:JSON.stringify({account, serverId})});
+  const body = await response.json();
+  if (body.code !== 200) { alert(body.message || '保存失败'); return; }
+  await loadRows();
+}
+document.getElementById('keyword').addEventListener('keydown', event => { if (event.key === 'Enter') loadRows(); });
+loadRows();
+</script>
+</body>
+</html>

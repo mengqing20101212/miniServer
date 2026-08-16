@@ -13,7 +13,7 @@ long blocking operations should still be kept out of critical sections where pra
 ## Build contract
 
 - Required runtime and compiler: JDK 25
-- Required Maven: 3.9 or newer
+- Required Maven: 4.0.0-rc-5, pinned by the Maven Wrapper under `server/`
 - Bytecode target: `--release 25`
 - Spring Boot modules: Spring Boot 3.5.x
 - CI distribution: Temurin 25
@@ -29,14 +29,14 @@ $env:JAVA_HOME = "D:\Soft\env\Java\jdk-25"
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 java -version
 cd server
-mvn clean verify
+.\mvnw.cmd clean verify
 ```
 
 Build one service and all of its local dependencies from the reactor root:
 
 ```powershell
 cd server
-mvn -pl GameServer -am clean verify
+.\mvnw.cmd -pl GameServer -am clean verify
 ```
 
 ## Verification

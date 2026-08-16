@@ -16,7 +16,7 @@ pushd "%SCRIPT_DIR%server" || (
 	exit /b 1
 )
 
-mvn clean package -DskipTests %*
+call mvnw.cmd clean package -DskipTests %*
 set "RC=%ERRORLEVEL%"
 popd
 endlocal

@@ -5,6 +5,8 @@ import java.util.concurrent.TimeUnit;
 import ly.GateClientManager;
 import ly.LoggerDef;
 import ly.ProtoMessageFactory;
+import ly.db.entry.LoginEntry;
+import ly.db.entry.LoginEntryHelper;
 import ly.net.GateClient;
 import ly.net.GateConnectSession;
 import ly.net.HandlerContext;
@@ -43,6 +45,13 @@ public class GateLoginController implements IGateController {
                             "GateLoginController invalid token {} for account {}",
                             request.getToken(),
                             request.getAccount());
+                    sendClientErrorCode(context, ErrorMsg.ErrorCode.PARAM_ERROR);
+                    return;
+                }
+                if (!isAssignedGameServer(request.getAccount(), request.getGameServerId())) {
+                    LoggerDef.SystemLogger.error(
+                            "GateLoginController rejected unassigned game server, account={}, requestedServerId={}",
+                            request.getAccount(), request.getGameServerId());
                     sendClientErrorCode(context, ErrorMsg.ErrorCode.PARAM_ERROR);
                     return;
                 }
@@ -143,5 +152,18 @@ public class GateLoginController implements IGateController {
     private boolean checkToken(String token, String account) {
         String cacheTokens = RedisUtils.get(RedisKeys.LOGIN_ACCOUNT_TOKEN_KEY.getKey(account));
         return cacheTokens != null && cacheTokens.equals(token);
+    }
+
+    private boolean isAssignedGameServer(String account, String requestedServerId) {
+        if (account == null || requestedServerId == null || requestedServerId.isBlank()) {
+            return false;
+        }
+        java.util.List<LoginEntry> entries =
+                LoginEntryHelper.select(new String[] {"account"}, account);
+        if (entries.isEmpty()) {
+            return false;
+        }
+        String assignedServerId = entries.get(0).getAssignedGameServerId();
+        return assignedServerId != null && assignedServerId.equals(requestedServerId);
     }
 }

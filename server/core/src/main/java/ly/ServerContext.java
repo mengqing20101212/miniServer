@@ -14,10 +14,12 @@ import ly.net.NetService;
 import ly.redis.RedisUtils;
 import ly.rpc.RpcService;
 import ly.security.SecurityBanService;
+import ly.script.RuntimeScriptController;
 import ly.startup.StartupSkillLoader;
 import ly.db.AutoTableService;
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -82,6 +84,9 @@ public class ServerContext {
         SERVER_ID = serverId;
         ENV = env;
 
+        // Every server receives the same one-shot emergency script route from Core.
+        addController(new RuntimeScriptController());
+
         // 尽早启动 JVM 死锁检测器，覆盖后续 Nacos、配置表、Redis、MySQL、Netty 等所有线程。
         DeadlockDetector.start();
         
@@ -96,7 +101,8 @@ public class ServerContext {
         // 配置校验通过后再初始化外部依赖，避免以错误端口或错误数据库参数启动。
         StartupSkillLoader.validateServerConfig(serverType, serverConfig);
         // 标准化路径分隔符，兼容 Nacos 中使用 Windows 路径格式（D:\WORK\...）在 Linux 下运行
-        String configPath = serverConfig.configPath.replace('\\', '/');
+        String configPath = resolveConfigPath(serverConfig.configPath);
+        serverConfig.configPath = configPath;
         initCoreDependencies(configPath);
         
         // 启动自动建表服务
@@ -108,13 +114,35 @@ public class ServerContext {
         NetService.getInstance().startUp(gameObjectProvider, serverConfig.serverPort);
         // 当前服务器端口绑定完成后再补发可靠 RPC，避免目标服处理后回包找不到本服连接。
         RpcService.getInstance().replayReliableMessagesOnStartup();
-        try {
-            NacosService.getInstance().startConfigHotUpdateListener();
-        } catch (Exception e) {
-            logger.error("配置热更监听启动失败", e);
-            throw new RuntimeException("配置热更监听启动失败", e);
+        if (StartupSkillLoader.isLocalConfigMode()) {
+            logger.info("LOCAL_CONFIG 模式已启用，配置目录={}，不监听 GM 配置热更", configPath);
+        } else {
+            try {
+                NacosService.getInstance().startConfigHotUpdateListener();
+            } catch (Exception e) {
+                logger.error("配置热更监听启动失败", e);
+                throw new RuntimeException("配置热更监听启动失败", e);
+            }
         }
         logger.info("服务器 启动成功 耗时: " + (System.currentTimeMillis() - startTime) + "ms");
+    }
+
+    private static String resolveConfigPath(String configuredPath) {
+        if (configuredPath == null || configuredPath.isBlank()) {
+            throw new IllegalStateException("服务器配置 configPath 不能为空");
+        }
+        String resolved = configuredPath;
+        if (resolved.contains("${PROJECT_ROOT}")) {
+            if (!StartupSkillLoader.isLocalConfigMode()) {
+                throw new IllegalStateException("${PROJECT_ROOT} 只能在 LOCAL_CONFIG 模式使用");
+            }
+            String projectRoot = System.getProperty(StartupSkillLoader.PROJECT_ROOT_PROPERTY);
+            if (projectRoot == null || projectRoot.isBlank()) {
+                throw new IllegalStateException("LOCAL_CONFIG 模式缺少 -Dminiserver.projectRoot");
+            }
+            resolved = resolved.replace("${PROJECT_ROOT}", Path.of(projectRoot).toAbsolutePath().normalize().toString());
+        }
+        return Path.of(resolved.replace('\\', '/')).toAbsolutePath().normalize().toString();
     }
 
     /**

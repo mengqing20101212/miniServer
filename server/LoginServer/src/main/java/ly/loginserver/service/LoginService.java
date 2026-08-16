@@ -92,13 +92,17 @@ public class LoginService {
         return serverNode;
     }
 
-    public List<ServerListResult.ServerNode> selectGameServerList() {
+    public List<ServerListResult.ServerNode> selectGameServerList(String account) {
+        LoginEntry loginEntry = loadFromDB(account);
+        if (loginEntry == null || loginEntry.getAssignedGameServerId() == null
+                || loginEntry.getAssignedGameServerId().isBlank()) {
+            logger.warn("账号未分配 GameServer, account={}", account);
+            return List.of();
+        }
+        String assignedServerId = loginEntry.getAssignedGameServerId().trim();
         List<NacosServerNode> list =
                 NacosService.getInstance().getNodeList(ServerTypeEnum.GAME).stream()
-                        .filter(
-                                node -> {
-                                    return node.canUse();
-                                })
+                        .filter(node -> node.canUse() && assignedServerId.equals(node.getServerId()))
                         .collect(Collectors.toList());
         List<ServerListResult.ServerNode> serverNodeList = new ArrayList<>();
         for (NacosServerNode node : list) {

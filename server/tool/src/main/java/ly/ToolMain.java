@@ -11,12 +11,22 @@ import java.nio.file.StandardCopyOption;
  */
 public class ToolMain {
   public static void main(String[] args) {
+    if (args == null || args.length == 0) {
+      printUsage();
+      return;
+    }
     String type = args[0];
     if (type.equals("parserExcelConfig")) {
+      requireArgs(args, 2, "parserExcelConfig <excel-dir>");
       String excelFileDir = args[1];
       System.out.println("开始解析 策划表 ");
       new ParserExcelConfig(excelFileDir).startParser();
       System.out.println("解析 策划表 完成");
+    } else if (type.equals("buildConfigData")) {
+      requireArgs(args, 3, "buildConfigData <excel-dir> <output-dir>");
+      System.out.println("开始生成运行时配置");
+      new ParserExcelConfig(args[1], args[2], false).startParser();
+      System.out.println("生成运行时配置完成");
     } else if (type.equals("ParserProto")) {
       new ParserProto("D:\\WORK\\me\\miniServer\\proto").parser();
     } else if (type.equals("parserDbEntry")) {
@@ -31,6 +41,19 @@ public class ToolMain {
       System.out.println("此功能已集成到服务器启动流程中，会在启动时自动执行");
     }
     System.out.println("Hello, World!");
+  }
+
+  private static void requireArgs(String[] args, int count, String usage) {
+    if (args.length != count) {
+      throw new IllegalArgumentException("用法: " + usage);
+    }
+  }
+
+  private static void printUsage() {
+    System.out.println("用法:");
+    System.out.println("  buildConfigData <excel-dir> <output-dir>");
+    System.out.println("  parserExcelConfig <excel-dir>");
+    System.out.println("  parserDbEntry <module>");
   }
 
   public static void copyFile(String srcFile, String destFile) {

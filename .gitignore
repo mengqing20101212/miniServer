@@ -13,3 +13,7 @@ runlogs/
 dependency-reduced-pom.xml
 logs/system.log
 logs/net.log
+/local-dev/.env
+/local-dev/logs/
+/local-dev/run/
+/local-dev/work/

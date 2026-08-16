@@ -89,7 +89,7 @@
 
 ### `start_app.bat`
 - 状态：已跟踪
-- 内容：切到 `server/` 后执行 `mvn clean package -DskipTests`
+- 内容：切到 `server/` 后执行 `mvnw.cmd clean package -DskipTests`
 - 判断：虽然简单，但作为 Windows 下快速构建入口仍有价值
 - 建议：保留
 

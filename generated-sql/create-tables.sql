@@ -124,7 +124,8 @@ CREATE TABLE IF NOT EXISTS `login` (
   `last_logout_time` DATETIME DEFAULT NULL,
   `token` VARCHAR(255) DEFAULT NULL,
   `channel` VARCHAR(255) DEFAULT NULL,
-  `players` VARCHAR(255) DEFAULT NULL
+  `players` VARCHAR(255) DEFAULT NULL,
+  `assigned_game_server_id` VARCHAR(255) DEFAULT NULL
 ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -276,3 +277,22 @@ CREATE TABLE IF NOT EXISTS `user_info` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `gm_runtime_script` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `execution_id` VARCHAR(255) DEFAULT NULL,
+  `target_server_id` VARCHAR(255) DEFAULT NULL,
+  `entry_class` VARCHAR(255) DEFAULT NULL,
+  `source_code` LONGTEXT DEFAULT NULL,
+  `arguments_json` LONGTEXT DEFAULT NULL,
+  `class_sha256` VARCHAR(255) DEFAULT NULL,
+  `status` VARCHAR(255) DEFAULT NULL,
+  `compile_message` LONGTEXT DEFAULT NULL,
+  `result_json` LONGTEXT DEFAULT NULL,
+  `error_message` LONGTEXT DEFAULT NULL,
+  `operator` VARCHAR(255) DEFAULT NULL,
+  `elapsed_millis` BIGINT DEFAULT NULL,
+  `create_time` DATETIME DEFAULT NULL,
+  `update_time` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_gm_runtime_script_execution_id` (`execution_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

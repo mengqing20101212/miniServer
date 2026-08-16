@@ -43,8 +43,8 @@ miniServer/
 
 ## 环境要求
 
-- JDK 21
-- Maven 3.9 或兼容版本
+- JDK 25
+- Maven 4.0.0-rc-5（通过 `server/mvnw` 或 `server/mvnw.cmd` 使用）
 - MySQL
 - Redis 或 KeyDB
 - Nacos 2.x
@@ -57,17 +57,17 @@ miniServer/
 
 ```powershell
 cd server
-mvn -DskipTests install
+.\mvnw.cmd -DskipTests install
 ```
 
 只编译部分模块时使用 `-pl` 和 `-am`：
 
 ```powershell
 cd server
-mvn -DskipTests compile -pl GameServer -am
-mvn -DskipTests compile -pl GateServer -am
-mvn -DskipTests compile -pl BotServer -am
-mvn -DskipTests compile -pl GMServer -am
+.\mvnw.cmd -DskipTests compile -pl GameServer -am
+.\mvnw.cmd -DskipTests compile -pl GateServer -am
+.\mvnw.cmd -DskipTests compile -pl BotServer -am
+.\mvnw.cmd -DskipTests compile -pl GMServer -am
 ```
 
 如果 VSCode 出现 Java 编译缓存和 Maven 不一致，可以执行 `Java: Clean Java Language Server Workspace` 后重新导入。

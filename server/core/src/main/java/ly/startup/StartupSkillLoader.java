@@ -17,6 +17,8 @@ import java.util.Objects;
  * 启动配置加载器，从 STARTUP.SKILL.md 读取默认参数并校验各服务启动配置。
  */
 public final class StartupSkillLoader {
+    public static final String LOCAL_CONFIG_PROPERTY = "miniserver.localConfig";
+    public static final String PROJECT_ROOT_PROPERTY = "miniserver.projectRoot";
     private static final String SKILL_FILE_NAME = "STARTUP.SKILL.md";
     private static final ObjectMapper YAML_MAPPER = new ObjectMapper(new YAMLFactory());
     private static volatile StartupSkill cachedSkill;
@@ -105,6 +107,9 @@ public final class StartupSkillLoader {
         if (serverConfig == null) {
             throw new IllegalArgumentException("serverConfig 不能为空");
         }
+        if (isLocalConfigMode() && serverType == ServerTypeEnum.GAME) {
+            return;
+        }
         StartupServer section = getServerSection(loadRequired(), serverType);
         if (section.netPort != null && section.netPort > 0 && serverConfig.serverPort != section.netPort) {
             throw new IllegalStateException(
@@ -127,9 +132,18 @@ public final class StartupSkillLoader {
         String env = section.env;
         String serverId = section.serverId;
         if (cli != null) {
-            requireEquals(nacosUrl, cli.nacosUrl, "startup.nacos.url", "cli.nacosUrl");
-            requireEquals(env, cli.env, "startup." + serverType.getType().toLowerCase() + ".env", "cli.env");
-            requireEquals(serverId, cli.serverId, "startup." + serverType.getType().toLowerCase() + ".serverId", "cli.serverId");
+            if (isLocalConfigMode() && serverType == ServerTypeEnum.GAME) {
+                requireNonBlank(cli.nacosUrl, "cli.nacosUrl", cachedPath);
+                requireNonBlank(cli.env, "cli.env", cachedPath);
+                requireNonBlank(cli.serverId, "cli.serverId", cachedPath);
+                nacosUrl = cli.nacosUrl;
+                env = cli.env;
+                serverId = cli.serverId;
+            } else {
+                requireEquals(nacosUrl, cli.nacosUrl, "startup.nacos.url", "cli.nacosUrl");
+                requireEquals(env, cli.env, "startup." + serverType.getType().toLowerCase() + ".env", "cli.env");
+                requireEquals(serverId, cli.serverId, "startup." + serverType.getType().toLowerCase() + ".serverId", "cli.serverId");
+            }
         }
         return new ResolvedServerArgs(nacosUrl, section.serverType, serverId, env, section.netPort, section.springPort);
     }
@@ -260,6 +274,10 @@ public final class StartupSkillLoader {
             throw new IllegalArgumentException("启动参数与 skill 不一致, " + expectedField + "=" + expected
                     + ", " + actualField + "=" + actual);
         }
+    }
+
+    public static boolean isLocalConfigMode() {
+        return Boolean.parseBoolean(System.getProperty(LOCAL_CONFIG_PROPERTY, "false"));
     }
 
     public static final class ResolvedServerArgs {

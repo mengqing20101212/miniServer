@@ -5,6 +5,7 @@ import ly.LoggerDef;
 import ly.ProtoMessageFactory;
 import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
+import ly.proto.Server;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -96,6 +97,10 @@ public class HandlerRouterManager {
     @SuppressWarnings("unchecked")
     public static void execute(ConnectSession session, MessagePacket packet) {
         final int cmd = packet.getCmd();
+        if (cmd == Cmd.CMD.CS_Server2Server_VALUE) {
+            executeServer2ServerRpc(session, packet);
+            return;
+        }
         HandlerRouterManager instance = HandlerRouterManager.getInstance();
         RouterHolder<?, ?, ?> holder = instance.getHandlerRouter(cmd);
 
@@ -139,5 +144,25 @@ public class HandlerRouterManager {
         } catch (Throwable e) {
             LoggerDef.SystemLogger.error("execute cmd={} error", cmd, e);
         }
+    }
+
+    private static void executeServer2ServerRpc(ConnectSession session, MessagePacket packet) {
+        Server.csServer2Server request =
+                (Server.csServer2Server)
+                        ProtoMessageFactory.createProtoMessage(
+                                Cmd.CMD.CS_Server2Server_VALUE, packet.getData());
+        if (request == null || request.getType() != Server.ServerMsgType.protobufMsg) {
+            LoggerDef.SystemLogger.error("execute generic S2S rpc fail, invalid request");
+            return;
+        }
+        MessagePacket innerPacket =
+                new MessagePacket(
+                        packet.getGuid(),
+                        request.getCmd(),
+                        packet.getSid(),
+                        0,
+                        request.getData().toByteArray());
+        Server2ServerRpcContext.run(
+                request.getCallId(), () -> HandlerRouterManager.execute(session, innerPacket));
     }
 }

@@ -60,9 +60,9 @@ server/config/src/main/java/ly/config/Hero*Config*.java  ← 生成 Java
 ### 重新生成配置（当 Excel 修改后）
 
 ```bash
-# 1. 构建 tool 模块（Windows JDK 21）
+# 1. 构建 tool 模块（Windows JDK 25）
 cd /mnt/d/WORK/me/miniServer/server
-cmd.exe /c "D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -DskipTests install -pl tool -am"
+cmd.exe /c "mvnw.cmd -DskipTests install -pl tool -am"
 
 # 2. 运行生成器
 cmd.exe /c "D:\Soft\env\Java\jdk-25\bin\java.exe -cp target\tool-1.0-SNAPSHOT.jar ly.ParserExcelConfig"
@@ -105,7 +105,7 @@ cmd.exe /c "D:\Soft\env\Java\jdk-25\bin\java.exe -cp target\tool-1.0-SNAPSHOT.ja
 
 5. **全量 clean 构建** — `-rf :GameServer` 不够，必须：
    ```bash
-   mvn.cmd clean test -pl GameServer -am
+   mvnw.cmd clean test -pl GameServer -am
    ```
 
 ### 已知字段名变更案例（heroStar）
@@ -130,17 +130,17 @@ Excel 改版后旧字段名（过时）→ 新字段名：
 
 ```bash
 # 完整构建（跳过测试）
-cmd.exe /c "cd /d D:\WORK\me\miniServer\server && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -DskipTests install"
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server && mvnw.cmd -DskipTests install"
 ```
 
 ### 单模块构建
 
 ```bash
 # 构建 GameServer 及其依赖
-cmd.exe /c "cd /d D:\WORK\me\miniServer\server && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -DskipTests install -pl GameServer -am"
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server && mvnw.cmd -DskipTests install -pl GameServer -am"
 
 # clean 构建（解决缓存问题）
-cmd.exe /c "cd /d D:\WORK\me\miniServer\server && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd clean install -pl GameServer -am"
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server && mvnw.cmd clean install -pl GameServer -am"
 ```
 
 ### 编译错误处理
@@ -170,10 +170,10 @@ cmd.exe /c "cd /d D:\WORK\me\miniServer\server && D:\Soft\env\apache-maven-3.9.1
 cmd.exe /c "cd /d D:\WORK\me\miniServer\server\LoginServer && D:\Soft\env\Java\jdk-25\bin\java.exe -jar target\LoginServer-0.0.1-SNAPSHOT.jar"
 
 # GateServer（mvn exec）
-cmd.exe /c "cd /d D:\WORK\me\miniServer\server\GateServer && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -q exec:java"
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server\GateServer && ..\mvnw.cmd -q exec:java"
 
 # GameServer（mvn exec）
-cmd.exe /c "cd /d D:\WORK\me\miniServer\server\GameServer && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd -q exec:java"
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server\GameServer && ..\mvnw.cmd -q exec:java"
 
 # BotServer（验证登录流程）
 cmd.exe /c "cd /d D:\WORK\me\miniServer\server\BotServer && D:\Soft\env\Java\jdk-25\bin\java.exe -jar target\BotServer-1.0-SNAPSHOT-shaded.jar --run-bots 127.0.0.1 8889 1"
@@ -294,7 +294,7 @@ public boolean isSwitched() {
 
 ```bash
 # 全量构建并运行所有测试
-cmd.exe /c "cd /d D:\WORK\me\miniServer\server && D:\Soft\env\apache-maven-3.9.15\bin\mvn.cmd clean test -pl GameServer -am"
+cmd.exe /c "cd /d D:\WORK\me\miniServer\server && mvnw.cmd clean test -pl GameServer -am"
 
 # 指定测试类
 cmd.exe /c "... -Dtest="ly.logic.hero.HeroControllerTest" -Dsurefire.failIfNoSpecifiedTests=false"

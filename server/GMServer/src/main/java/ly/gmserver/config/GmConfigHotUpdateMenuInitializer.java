@@ -21,6 +21,8 @@ public class GmConfigHotUpdateMenuInitializer implements ApplicationRunner {
       return;
     }
     ensureMenu("配表热更", "config:hot-update", configRoot.getId(), "/gm/config/hot-update", "fas fa-upload", 951);
+    ensureMenu("开发服分配", "dev:game-assignment", configRoot.getId(), "/gm/dev/game-assignment", "fas fa-server", 952);
+    ensureMenu("临时脚本", "runtime-script:execute", configRoot.getId(), "/gm/runtime-script", "fas fa-code", 953);
   }
 
   private GmMenuEntry ensureMenu(

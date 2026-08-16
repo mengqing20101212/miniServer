@@ -52,7 +52,7 @@ public class LoginController {
         ServerListResult result = new ServerListResult();
         result.setPlayers(loginService.getPlayers(account));
         result.setGate(loginService.selectGate());
-        result.setGameServerList(loginService.selectGameServerList());
+        result.setGameServerList(loginService.selectGameServerList(account));
         LoginEntry entry = loginService.getLoginEntry(account);
         if (entry != null) {
             result.setAccountId(entry.getId());

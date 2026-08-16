@@ -9,7 +9,7 @@ import ly.db.DbMeta;
 @DbMeta.DbTable(name = "login")
 public class LoginEntry extends AbstractEntry {
   private static final String[] DIRTY_FIELDS = {
-      "id", "account", "create_time", "last_login_time", "last_logout_time", "token", "channel", "players"
+      "id", "account", "create_time", "last_login_time", "last_logout_time", "token", "channel", "players", "assigned_game_server_id"
   };
 
 
@@ -45,6 +45,10 @@ public class LoginEntry extends AbstractEntry {
   /**该账号下面所有的角色Id信息*/
   @DbMeta.DbField(name="players")
   private String players;
+
+  /**开发环境中由服务器开发分配的个人 GameServer。*/
+  @DbMeta.DbField(name="assigned_game_server_id")
+  private String assigned_game_server_id;
   public LoginEntry() {
     initDirtyState(DIRTY_FIELDS.length);
   }
@@ -134,8 +138,16 @@ public class LoginEntry extends AbstractEntry {
     autoAddCurVersion();
     markFieldDirty(7);
   }
-  public String getPlayers() {
+ public String getPlayers() {
     return players;
+  }
+ public void setAssignedGameServerId(String AssignedGameServerId) {
+    this.assigned_game_server_id = AssignedGameServerId;
+    autoAddCurVersion();
+    markFieldDirty(8);
+  }
+  public String getAssignedGameServerId() {
+    return assigned_game_server_id;
   }
 
   // @@@@@自定义方法开始区@@@@@
@@ -153,7 +165,8 @@ public class LoginEntry extends AbstractEntry {
         ", last_logout_time="+last_logout_time+
         ", token="+token+
         ", channel="+channel+
-        ", players="+players
+        ", players="+players+
+        ", assigned_game_server_id="+assigned_game_server_id
         + '}';
   }
 }

@@ -88,6 +88,16 @@ public class PageController {
         return "player/detail";
     }
 
+    @GetMapping("/dev/game-assignment")
+    public String devGameAssignment() {
+        return "dev/game-assignment";
+    }
+
+    @GetMapping("/runtime-script")
+    public String runtimeScript() {
+        return "runtime-script/index";
+    }
+
     @GetMapping("/admin/dashboard")
     public String dashboard() {
         return "admin/list";

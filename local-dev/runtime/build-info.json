@@ -1,0 +1,9 @@
+{
+  "appVersion": "dev-local-1",
+  "sourceCommit": "20076eb69383",
+  "configSchemaMin": 1,
+  "configSchemaMax": 1,
+  "configBuilderVersion": 1,
+  "buildTime": "2026-07-12T18:31:56+08:00",
+  "javaVersion": 25
+}

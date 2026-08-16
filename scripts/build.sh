@@ -7,10 +7,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 SERVER_DIR="$PROJECT_ROOT/server"
 
-JAVA="/usr/lib/jvm/java-21-openjdk-amd64/bin/java"
-MVN="/mnt/d/Soft/env/apache-maven-3.9.15/bin/mvn"
-
-export JAVA_HOME="/usr/lib/jvm/java-21-openjdk-amd64"
+export JAVA_HOME="${JAVA_HOME:-/mnt/d/Soft/env/Java/jdk-25}"
+JAVA="$JAVA_HOME/bin/java"
+MVN="$SERVER_DIR/mvnw"
 export LANG="zh_CN.UTF-8"
 export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8"
 
@@ -20,7 +19,7 @@ echo "目录: $SERVER_DIR"
 
 cd "$SERVER_DIR"
 
-$MVN -DskipTests install
+sh "$MVN" -DskipTests install
 
 echo ""
 echo "=== 构建完成 ==="

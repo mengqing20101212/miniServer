@@ -13,6 +13,7 @@ public class ServerConfig {
   public int serverPort;
   public String serverIp;
   public String runModule;
+  public String runtimeScriptSecret;
 
   public String serverId;
 
@@ -58,6 +59,14 @@ public class ServerConfig {
 
   public String getRunModule() {
     return runModule;
+  }
+
+  public String getRuntimeScriptSecret() {
+    return runtimeScriptSecret;
+  }
+
+  public void setRuntimeScriptSecret(String runtimeScriptSecret) {
+    this.runtimeScriptSecret = runtimeScriptSecret;
   }
 
   public void setRunModule(String runModule) {

@@ -1,0 +1,26 @@
+syntax = "proto3";
+option java_package = "ly.proto";
+option java_outer_classname = "GmRuntimeScriptProto";
+
+message csGmRuntimeScriptExecute {
+  string executionId = 1;
+  string targetServerId = 2;
+  string entryClass = 3;
+  string operator = 4;
+  string argumentsJson = 5;
+  bytes classBundle = 6;
+  string sha256 = 7;
+  int64 expireAtMillis = 8;
+  string signature = 9;
+}
+
+message scGmRuntimeScriptExecute {
+  int32 code = 1;
+  string error = 2;
+  string executionId = 3;
+  string serverId = 4;
+  bool success = 5;
+  string message = 6;
+  string resultJson = 7;
+  int64 elapsedMillis = 8;
+}

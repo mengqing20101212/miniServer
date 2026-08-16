@@ -286,6 +286,22 @@ public final class Cmd {
     SC_GmUpdatePlayerModule(10010),
     /**
      * <pre>
+     * GM 推送一次性运行时脚本
+     * </pre>
+     *
+     * <code>CS_GmRuntimeScriptExecute = 10011;</code>
+     */
+    CS_GmRuntimeScriptExecute(10011),
+    /**
+     * <pre>
+     * 一次性运行时脚本执行结果
+     * </pre>
+     *
+     * <code>SC_GmRuntimeScriptExecute = 10012;</code>
+     */
+    SC_GmRuntimeScriptExecute(10012),
+    /**
+     * <pre>
      *maxServeMsgId 服务器之间通信消息号最大值
      * </pre>
      *
@@ -557,6 +573,22 @@ public final class Cmd {
     public static final int SC_GmUpdatePlayerModule_VALUE = 10010;
     /**
      * <pre>
+     * GM 推送一次性运行时脚本
+     * </pre>
+     *
+     * <code>CS_GmRuntimeScriptExecute = 10011;</code>
+     */
+    public static final int CS_GmRuntimeScriptExecute_VALUE = 10011;
+    /**
+     * <pre>
+     * 一次性运行时脚本执行结果
+     * </pre>
+     *
+     * <code>SC_GmRuntimeScriptExecute = 10012;</code>
+     */
+    public static final int SC_GmRuntimeScriptExecute_VALUE = 10012;
+    /**
+     * <pre>
      *maxServeMsgId 服务器之间通信消息号最大值
      * </pre>
      *
@@ -622,6 +654,8 @@ public final class Cmd {
         case 10008: return SC_GmPlayerDetail;
         case 10009: return CS_GmUpdatePlayerModule;
         case 10010: return SC_GmUpdatePlayerModule;
+        case 10011: return CS_GmRuntimeScriptExecute;
+        case 10012: return SC_GmRuntimeScriptExecute;
         case 20000: return MaxServeMsgId;
         default: return null;
       }
@@ -688,7 +722,7 @@ public final class Cmd {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\tCmd.proto*\277\005\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_" +
+      "\n\tCmd.proto*\377\005\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_" +
       "Login\020e\022\014\n\010SC_Login\020f\022\r\n\tCS_Logout\020g\022\r\n\t" +
       "SC_Logout\020h\022\021\n\014CS_ErrorCode\020\311\001\022\021\n\014SC_Err" +
       "orCode\020\312\001\022\020\n\013CS_HeroList\020\351\007\022\020\n\013SC_HeroLi" +
@@ -705,8 +739,10 @@ public final class Cmd {
       "\n\027SC_Gate2GameRpcGameCall\020\226N\022\026\n\021CS_GmPla" +
       "yerDetail\020\227N\022\026\n\021SC_GmPlayerDetail\020\230N\022\034\n\027" +
       "CS_GmUpdatePlayerModule\020\231N\022\034\n\027SC_GmUpdat" +
-      "ePlayerModule\020\232N\022\023\n\rMaxServeMsgId\020\240\234\001B\n\n" +
-      "\010ly.protob\006proto3"
+      "ePlayerModule\020\232N\022\036\n\031CS_GmRuntimeScriptEx" +
+      "ecute\020\233N\022\036\n\031SC_GmRuntimeScriptExecute\020\234N" +
+      "\022\023\n\rMaxServeMsgId\020\240\234\001B\n\n\010ly.protob\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

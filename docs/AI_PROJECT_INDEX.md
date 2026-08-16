@@ -11,6 +11,7 @@
 - `docs/JAVA_SOURCE_INDEX.md`：按当前源码树重新扫描得到的 Java 源码索引。
 - `server/doc/module_index.md`：模块级阅读指南。
 - `server/doc/net_packet_unification_plan.md`：网络包统一改造设计记录。
+- `docs/PLAYER_MODULE_PERSISTENCE_PLAN.md`：玩家模块从单一 BLOB 演进到模块级持久化的设计方案，尚未实施。
 - `docs/ROOT_LOOSE_FILES_AUDIT.md`：根目录散落文件审计与清理记录。
 - `nacos-config.txt`：旧的 localhost Nacos 说明，只能作为历史参考。
 

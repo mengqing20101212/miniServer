@@ -52,8 +52,10 @@ public class OperationLogAspect {
                     String className = signature.getDeclaringType().getSimpleName();
                     String methodName = signature.getName();
                     String action = className + "." + methodName;
-                    String detail = String.format("args=%s, duration=%dms",
-                        Arrays.toString(joinPoint.getArgs()), duration);
+                    String detail = path.startsWith("/api/runtime-script")
+                        ? String.format("runtime script request redacted, duration=%dms", duration)
+                        : String.format("args=%s, duration=%dms",
+                            Arrays.toString(joinPoint.getArgs()), duration);
 
                     String ip = getClientIp(request);
 

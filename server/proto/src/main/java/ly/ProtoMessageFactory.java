@@ -15,6 +15,12 @@ public class ProtoMessageFactory {
       switch (cmd) {
         case Cmd.CMD.CS_ErrorCode_VALUE ->{return ErrorMsg.csErrorCode.parseFrom(data);}
         case Cmd.CMD.SC_ErrorCode_VALUE ->{return ErrorMsg.scErrorCode.parseFrom(data);}
+        case Cmd.CMD.CS_GmPlayerDetail_VALUE ->{return GmPlayer.csGmPlayerDetail.parseFrom(data);}
+        case Cmd.CMD.SC_GmPlayerDetail_VALUE ->{return GmPlayer.scGmPlayerDetail.parseFrom(data);}
+        case Cmd.CMD.CS_GmUpdatePlayerModule_VALUE ->{return GmPlayer.csGmUpdatePlayerModule.parseFrom(data);}
+        case Cmd.CMD.SC_GmUpdatePlayerModule_VALUE ->{return GmPlayer.scGmUpdatePlayerModule.parseFrom(data);}
+        case Cmd.CMD.CS_GmRuntimeScriptExecute_VALUE ->{return GmRuntimeScriptProto.csGmRuntimeScriptExecute.parseFrom(data);}
+        case Cmd.CMD.SC_GmRuntimeScriptExecute_VALUE ->{return GmRuntimeScriptProto.scGmRuntimeScriptExecute.parseFrom(data);}
         case Cmd.CMD.CS_HeroList_VALUE ->{return Hero.CS_HeroList.parseFrom(data);}
         case Cmd.CMD.SC_HeroList_VALUE ->{return Hero.SC_HeroList.parseFrom(data);}
         case Cmd.CMD.CS_HeroLevelUp_VALUE ->{return Hero.CS_HeroLevelUp.parseFrom(data);}
@@ -41,10 +47,6 @@ public class ProtoMessageFactory {
         case Cmd.CMD.SC_RpcPing_VALUE ->{return Server.scRpcPing.parseFrom(data);}
         case Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE ->{return Server.csGate2GameRpcGameCall.parseFrom(data);}
         case Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE ->{return Server.scGate2GameRpcGameCall.parseFrom(data);}
-        case Cmd.CMD.CS_GmPlayerDetail_VALUE ->{return GmPlayer.csGmPlayerDetail.parseFrom(data);}
-        case Cmd.CMD.SC_GmPlayerDetail_VALUE ->{return GmPlayer.scGmPlayerDetail.parseFrom(data);}
-        case Cmd.CMD.CS_GmUpdatePlayerModule_VALUE ->{return GmPlayer.csGmUpdatePlayerModule.parseFrom(data);}
-        case Cmd.CMD.SC_GmUpdatePlayerModule_VALUE ->{return GmPlayer.scGmUpdatePlayerModule.parseFrom(data);}
       }
     } catch (InvalidProtocolBufferException e) {
       e.printStackTrace();

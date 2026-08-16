@@ -135,6 +135,12 @@
             <version>3.2.0</version>
         </dependency>
 
+        <!-- Runtime only on target servers; Groovy compilation happens in GMServer. -->
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy</artifactId>
+        </dependency>
+
         <!-- JUnit for testing -->
         <dependency>
             <groupId>junit</groupId>
