@@ -20,14 +20,14 @@ public abstract class AbstractModule implements IModule, IPlayerEvent {
     protected transient PlayerModuleEntry moduleEntry;
 
     public void init(Player player) {
-        this.player = player;
-        if (player != null && player.getPlayerData() != null) {
-            ModuleEnum moduleType = ModuleEnum.fromModuleClass(getClass());
-            if (moduleType != null) {
-                this.moduleEntry = player.getPlayerData().getOrCreateModuleEntry(moduleType);
-            }
+        if (player == null || player.getPlayerData() == null) {
+            throw new IllegalArgumentException("player and playerData are required");
         }
-        getRegisterEventTypes().forEach(eventType -> player.getEventManager().register(eventType, this));
+        ModuleEnum moduleType = ModuleEnum.fromModuleClass(getClass());
+        if (moduleType == null) {
+            throw new IllegalArgumentException("unregistered module class: " + getClass().getName());
+        }
+        init(player, moduleType, player.getPlayerData().createModuleEntry(moduleType), false);
     }
 
     /** 统一完成模块挂载、数据初始化，以及缺失模块记录的首次创建。 */
@@ -66,6 +66,10 @@ public abstract class AbstractModule implements IModule, IPlayerEvent {
     /** 独立数据对象解码后的装配入口；直接恢复模块自身时不调用。 */
     protected void loadModuleData(Object moduleData) {
         throw new IllegalStateException("module data loader is not implemented: " + getClass().getName());
+    }
+
+    final PlayerModuleEntry getModuleEntry() {
+        return moduleEntry;
     }
 
     /** 统一序列化当前模块并更新绑定的 Entry。 */

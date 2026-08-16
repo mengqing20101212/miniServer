@@ -1,5 +1,7 @@
 package ly.logic.player;
 
+import java.util.Map;
+
 import com.google.protobuf.AbstractMessage;
 
 import ly.LoggerDef;
@@ -63,12 +65,13 @@ public class Player {
 
             TimeStatisticsUtils.TimeStatisticsLog log = TimeStatisticsUtils
                     .makeLogBegin(String.format("Player-%s-%d-InitModules", getAccount(), getPlayerId()), 1000);
+            Map<ModuleEnum, PlayerModuleEntry> loadedEntries = playerData.loadModuleEntries();
 
             for (ModuleEnum moduleEnum : ModuleEnum.values()) {
-                PlayerModuleEntry moduleEntry = playerData.getModuleEntry(moduleEnum);
+                PlayerModuleEntry moduleEntry = loadedEntries.get(moduleEnum);
                 boolean moduleDataMissing = moduleEntry == null || moduleEntry.getModuleData().length == 0;
                 if (moduleEntry == null) {
-                    moduleEntry = playerData.getOrCreateModuleEntry(moduleEnum);
+                    moduleEntry = playerData.createModuleEntry(moduleEnum);
                 }
                 TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(
                         String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()),

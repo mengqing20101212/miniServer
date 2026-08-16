@@ -36,9 +36,13 @@ public class PlayerDataPersistenceTest {
 
         PlayerModulePersistenceService service = new PlayerModulePersistenceService(store, false);
         PlayerData playerData = new PlayerData(entry, service);
+        Player player = player(playerData);
+        Map<ModuleEnum, PlayerModuleEntry> loadedModules = playerData.loadModuleEntries();
+        mountModule(player, ModuleEnum.HERO_MODULE, loadedModules.get(ModuleEnum.HERO_MODULE));
+        mountModule(player, ModuleEnum.RESOURCE_MODULE, loadedModules.get(ModuleEnum.RESOURCE_MODULE));
 
-        assertArrayEquals(new byte[] {1, 2}, playerData.getModuleData(ModuleEnum.HERO_MODULE));
-        assertArrayEquals(new byte[] {3, 4}, playerData.getModuleData(ModuleEnum.RESOURCE_MODULE));
+        assertArrayEquals(new byte[] {1, 2}, loadedModules.get(ModuleEnum.HERO_MODULE).getModuleData());
+        assertArrayEquals(new byte[] {3, 4}, loadedModules.get(ModuleEnum.RESOURCE_MODULE).getModuleData());
         List<PlayerModuleEntry> snapshots = playerData.prepareDirtyModuleSnapshots();
         assertEquals(2, snapshots.size());
         assertTrue(service.persistNow(playerData, snapshots));
@@ -59,9 +63,11 @@ public class PlayerDataPersistenceTest {
         entry.setModules(ProtobufProxy.create(PlayerModuleData.class).encode(legacy));
 
         PlayerData playerData = new PlayerData(entry, new PlayerModulePersistenceService(store, false));
+        Map<ModuleEnum, PlayerModuleEntry> loadedModules = playerData.loadModuleEntries();
+        mountModule(player(playerData), ModuleEnum.HERO_MODULE, loadedModules.get(ModuleEnum.HERO_MODULE));
 
-        assertArrayEquals(new byte[] {9}, playerData.getModuleData(ModuleEnum.HERO_MODULE));
-        assertNull(playerData.getModuleData(ModuleEnum.RESOURCE_MODULE));
+        assertArrayEquals(new byte[] {9}, loadedModules.get(ModuleEnum.HERO_MODULE).getModuleData());
+        assertNull(loadedModules.get(ModuleEnum.RESOURCE_MODULE));
         assertTrue(playerData.prepareDirtyModuleSnapshots().isEmpty());
     }
 
@@ -105,15 +111,14 @@ public class PlayerDataPersistenceTest {
         RecordingStore store = new RecordingStore();
         PlayerData playerData = new PlayerData(
                 playerEntry(1007L), new PlayerModulePersistenceService(store, false));
-        Player player = new Player();
-        player.setPlayerData(playerData);
-        PlayerModuleEntry entry = playerData.getOrCreateModuleEntry(ModuleEnum.HERO_MODULE);
+        Player player = player(playerData);
+        PlayerModuleEntry entry = playerData.createModuleEntry(ModuleEnum.HERO_MODULE);
         HeroModule module = new HeroModule();
         module.init(player, ModuleEnum.HERO_MODULE, entry, false);
 
         assertTrue(module.saveData());
 
-        assertTrue(entry == playerData.getModuleEntry(ModuleEnum.HERO_MODULE));
+        assertTrue(entry == ((AbstractModule) module).getModuleEntry());
         assertEquals(1L, entry.getRevision().longValue());
         assertTrue(entry.getModuleData().length > 0);
     }
@@ -129,9 +134,12 @@ public class PlayerDataPersistenceTest {
                 moduleEntry(1003L, ModuleEnum.RESOURCE_MODULE, 3L, new byte[] {2}));
         PlayerModulePersistenceService service = new PlayerModulePersistenceService(store, false);
         PlayerData playerData = new PlayerData(playerEntry(1003L), service);
+        Player player = player(playerData);
+        PlayerModuleEntry heroEntry = playerData.loadModuleEntries().get(ModuleEnum.HERO_MODULE);
+        mountModule(player, ModuleEnum.HERO_MODULE, heroEntry);
         byte[] changed = {6, 7};
 
-        playerData.markModuleDirty(playerData.getOrCreateModuleEntry(ModuleEnum.HERO_MODULE), changed);
+        playerData.markModuleDirty(heroEntry, changed);
         changed[0] = 99;
         List<PlayerModuleEntry> snapshots = playerData.prepareDirtyModuleSnapshots();
 
@@ -149,12 +157,12 @@ public class PlayerDataPersistenceTest {
         RecordingStore store = new RecordingStore();
         PlayerData playerData = new PlayerData(
                 playerEntry(1006L), new PlayerModulePersistenceService(store, false));
+        PlayerModuleEntry heroEntry = playerData.createModuleEntry(ModuleEnum.HERO_MODULE);
+        mountModule(player(playerData), ModuleEnum.HERO_MODULE, heroEntry);
 
-        playerData.markModuleDirty(
-                playerData.getOrCreateModuleEntry(ModuleEnum.HERO_MODULE), new byte[] {1});
+        playerData.markModuleDirty(heroEntry, new byte[] {1});
         List<PlayerModuleEntry> first = playerData.prepareDirtyModuleSnapshots();
-        playerData.markModuleDirty(
-                playerData.getOrCreateModuleEntry(ModuleEnum.HERO_MODULE), new byte[] {2});
+        playerData.markModuleDirty(heroEntry, new byte[] {2});
 
         assertTrue(playerData.prepareDirtyModuleSnapshots().isEmpty());
         first.getFirst().setId(9001L);
@@ -171,10 +179,13 @@ public class PlayerDataPersistenceTest {
         RetryingStore store = new RetryingStore();
         PlayerModulePersistenceService service = new PlayerModulePersistenceService(store, true);
         PlayerData playerData = new PlayerData(playerEntry(1004L), service);
-        playerData.markModuleDirty(
-                playerData.getOrCreateModuleEntry(ModuleEnum.HERO_MODULE), new byte[] {8});
-        playerData.markModuleDirty(
-                playerData.getOrCreateModuleEntry(ModuleEnum.RESOURCE_MODULE), new byte[] {9});
+        Player player = player(playerData);
+        PlayerModuleEntry heroEntry = playerData.createModuleEntry(ModuleEnum.HERO_MODULE);
+        PlayerModuleEntry resourceEntry = playerData.createModuleEntry(ModuleEnum.RESOURCE_MODULE);
+        mountModule(player, ModuleEnum.HERO_MODULE, heroEntry);
+        mountModule(player, ModuleEnum.RESOURCE_MODULE, resourceEntry);
+        playerData.markModuleDirty(heroEntry, new byte[] {8});
+        playerData.markModuleDirty(resourceEntry, new byte[] {9});
 
         assertTrue(playerData.flushAsync());
         assertTrue(store.success.await(3, TimeUnit.SECONDS));
@@ -188,6 +199,23 @@ public class PlayerDataPersistenceTest {
         PlayerEntry entry = new PlayerEntry();
         entry.setId(playerId);
         return entry;
+    }
+
+    private static Player player(PlayerData playerData) {
+        Player player = new Player();
+        player.setPlayerData(playerData);
+        return player;
+    }
+
+    private static AbstractModule mountModule(
+            Player player, ModuleEnum moduleType, PlayerModuleEntry moduleEntry) {
+        try {
+            AbstractModule module = moduleType.getModule().getClass().getDeclaredConstructor().newInstance();
+            module.init(player, moduleType, moduleEntry, false);
+            return module;
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError(e);
+        }
     }
 
     private static PlayerModuleEntry moduleEntry(

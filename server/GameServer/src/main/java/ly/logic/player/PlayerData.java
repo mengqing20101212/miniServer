@@ -20,7 +20,6 @@ import ly.logic.player.persistence.PlayerModulePersistenceService;
 public class PlayerData {
     final PlayerEntry playerEntry;
     private final PlayerModulePersistenceService persistenceService;
-    private final Map<ModuleEnum, PlayerModuleEntry> moduleEntries = new EnumMap<>(ModuleEnum.class);
     private final EnumSet<ModuleEnum> submittedModules = EnumSet.noneOf(ModuleEnum.class);
     private final Map<ModuleEnum, AbstractModule> modules = new EnumMap<>(ModuleEnum.class);
 
@@ -34,26 +33,33 @@ public class PlayerData {
         }
         this.playerEntry = playerEntry;
         this.persistenceService = persistenceService;
-        Map<Integer, PlayerModuleEntry> storedModules = persistenceService.load(playerEntry.getId());
-        if (storedModules != null && !storedModules.isEmpty()) {
-            loadStoredModules(storedModules);
-            return;
-        }
-        loadLegacyModules();
     }
 
-    private void loadStoredModules(Map<Integer, PlayerModuleEntry> storedModules) {
+    Map<ModuleEnum, PlayerModuleEntry> loadModuleEntries() {
+        Map<ModuleEnum, PlayerModuleEntry> loadedEntries = new EnumMap<>(ModuleEnum.class);
+        Map<Integer, PlayerModuleEntry> storedModules = persistenceService.load(playerEntry.getId());
+        if (storedModules != null && !storedModules.isEmpty()) {
+            loadStoredModules(storedModules, loadedEntries);
+        } else {
+            loadLegacyModules(loadedEntries);
+        }
+        return loadedEntries;
+    }
+
+    private void loadStoredModules(
+            Map<Integer, PlayerModuleEntry> storedModules,
+            Map<ModuleEnum, PlayerModuleEntry> loadedEntries) {
         for (PlayerModuleEntry entry : storedModules.values()) {
             ModuleEnum moduleType = ModuleEnum.fromModuleId(entry.getModuleId());
             if (moduleType == null) {
                 continue;
             }
             entry.markPersisted();
-            moduleEntries.put(moduleType, entry);
+            loadedEntries.put(moduleType, entry);
         }
     }
 
-    private void loadLegacyModules() {
+    private void loadLegacyModules(Map<ModuleEnum, PlayerModuleEntry> loadedEntries) {
         Codec<PlayerModuleData> moduleDataCodec = ProtobufProxy
                 .create(PlayerModuleData.class);
         try {
@@ -65,7 +71,7 @@ public class PlayerData {
             for (ModuleEnum moduleType : ModuleEnum.values()) {
                 byte[] moduleBytes = legacyData.getModuleData(moduleType.getName());
                 if (moduleBytes != null && moduleBytes.length > 0) {
-                    moduleEntries.put(
+                    loadedEntries.put(
                             moduleType,
                             new PlayerModuleEntry(
                                     null,
@@ -82,21 +88,8 @@ public class PlayerData {
         }
     }
 
-    public synchronized byte[] getModuleData(ModuleEnum moduleType) {
-        PlayerModuleEntry entry = moduleEntries.get(moduleType);
-        return entry == null ? null : entry.getModuleData();
-    }
-
-    public synchronized PlayerModuleEntry getModuleEntry(ModuleEnum moduleType) {
-        return moduleEntries.get(moduleType);
-    }
-
-    public synchronized PlayerModuleEntry getOrCreateModuleEntry(ModuleEnum moduleType) {
-        PlayerModuleEntry existing = moduleEntries.get(moduleType);
-        if (existing != null) {
-            return existing;
-        }
-        PlayerModuleEntry entry = new PlayerModuleEntry(
+    PlayerModuleEntry createModuleEntry(ModuleEnum moduleType) {
+        return new PlayerModuleEntry(
                 null,
                 getPlayerId(),
                 moduleType.getModuleId(),
@@ -104,8 +97,6 @@ public class PlayerData {
                 0L,
                 new byte[0],
                 LocalDateTime.now());
-        moduleEntries.put(moduleType, entry);
-        return entry;
     }
 
     public void putModule(ModuleEnum moduleType, AbstractModule module) {
@@ -126,7 +117,8 @@ public class PlayerData {
             throw new IllegalArgumentException("moduleEntry and moduleBytes are required");
         }
         ModuleEnum moduleType = ModuleEnum.fromModuleId(moduleEntry.getModuleId());
-        if (moduleEntries.get(moduleType) != moduleEntry) {
+        AbstractModule module = modules.get(moduleType);
+        if (module == null || module.getModuleEntry() != moduleEntry) {
             throw new IllegalArgumentException("moduleEntry is not owned by this player");
         }
         moduleEntry.setDataVersion(moduleType.getDataVersion());
@@ -149,9 +141,9 @@ public class PlayerData {
 
     public synchronized List<PlayerModuleEntry> prepareDirtyModuleSnapshots() {
         List<PlayerModuleEntry> snapshots = new ArrayList<>();
-        for (Map.Entry<ModuleEnum, PlayerModuleEntry> entry : moduleEntries.entrySet()) {
+        for (Map.Entry<ModuleEnum, AbstractModule> entry : modules.entrySet()) {
             ModuleEnum moduleType = entry.getKey();
-            PlayerModuleEntry moduleEntry = entry.getValue();
+            PlayerModuleEntry moduleEntry = entry.getValue().getModuleEntry();
             if (submittedModules.contains(moduleType)
                     || moduleEntry.getDirtyFieldNames().length == 0) {
                 continue;
@@ -165,7 +157,8 @@ public class PlayerData {
     public synchronized void markModulesPersisted(List<PlayerModuleEntry> snapshots) {
         for (PlayerModuleEntry snapshot : snapshots) {
             ModuleEnum moduleType = ModuleEnum.fromModuleId(snapshot.getModuleId());
-            PlayerModuleEntry entry = moduleEntries.get(moduleType);
+            AbstractModule module = modules.get(moduleType);
+            PlayerModuleEntry entry = module == null ? null : module.getModuleEntry();
             if (entry != null) {
                 if (entry.getId() == null && snapshot.getId() != null) {
                     entry.setId(snapshot.getId());
