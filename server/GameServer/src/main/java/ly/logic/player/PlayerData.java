@@ -3,6 +3,7 @@ package ly.logic.player;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,8 @@ import ly.logic.player.persistence.PlayerModulePersistenceService;
 public class PlayerData {
     final PlayerEntry playerEntry;
     private final PlayerModulePersistenceService persistenceService;
-    private final Map<ModuleEnum, ModuleState> moduleStates = new EnumMap<>(ModuleEnum.class);
+    private final Map<ModuleEnum, PlayerModuleEntry> moduleEntries = new EnumMap<>(ModuleEnum.class);
+    private final EnumSet<ModuleEnum> submittedModules = EnumSet.noneOf(ModuleEnum.class);
     private final Map<ModuleEnum, AbstractModule> modules = new EnumMap<>(ModuleEnum.class);
 
     public PlayerData(PlayerEntry playerEntry) {
@@ -46,10 +48,8 @@ public class PlayerData {
             if (moduleType == null) {
                 continue;
             }
-            long revision = entry.getRevision();
-            moduleStates.put(
-                    moduleType,
-                    new ModuleState(entry.snapshot(), revision, revision));
+            entry.markPersisted();
+            moduleEntries.put(moduleType, entry);
         }
     }
 
@@ -65,19 +65,16 @@ public class PlayerData {
             for (ModuleEnum moduleType : ModuleEnum.values()) {
                 byte[] moduleBytes = legacyData.getModuleData(moduleType.getName());
                 if (moduleBytes != null && moduleBytes.length > 0) {
-                    moduleStates.put(
+                    moduleEntries.put(
                             moduleType,
-                            new ModuleState(
-                                    new PlayerModuleEntry(
-                                            null,
-                                            getPlayerId(),
-                                            moduleType.getModuleId(),
-                                            moduleType.getDataVersion(),
-                                            1L,
-                                            moduleBytes,
-                                            LocalDateTime.now()),
-                                    0L,
-                                    0L));
+                            new PlayerModuleEntry(
+                                    null,
+                                    getPlayerId(),
+                                    moduleType.getModuleId(),
+                                    moduleType.getDataVersion(),
+                                    1L,
+                                    moduleBytes,
+                                    LocalDateTime.now()));
                 }
             }
         } catch (Exception e) {
@@ -86,19 +83,18 @@ public class PlayerData {
     }
 
     public synchronized byte[] getModuleData(ModuleEnum moduleType) {
-        ModuleState state = moduleStates.get(moduleType);
-        return state == null ? null : state.entry.getModuleData();
+        PlayerModuleEntry entry = moduleEntries.get(moduleType);
+        return entry == null ? null : entry.getModuleData();
     }
 
     public synchronized PlayerModuleEntry getModuleEntry(ModuleEnum moduleType) {
-        ModuleState state = moduleStates.get(moduleType);
-        return state == null ? null : state.entry;
+        return moduleEntries.get(moduleType);
     }
 
     public synchronized PlayerModuleEntry getOrCreateModuleEntry(ModuleEnum moduleType) {
-        ModuleState state = moduleStates.get(moduleType);
-        if (state != null) {
-            return state.entry;
+        PlayerModuleEntry existing = moduleEntries.get(moduleType);
+        if (existing != null) {
+            return existing;
         }
         PlayerModuleEntry entry = new PlayerModuleEntry(
                 null,
@@ -108,7 +104,7 @@ public class PlayerData {
                 0L,
                 new byte[0],
                 LocalDateTime.now());
-        moduleStates.put(moduleType, new ModuleState(entry, 0L, 0L));
+        moduleEntries.put(moduleType, entry);
         return entry;
     }
 
@@ -130,8 +126,7 @@ public class PlayerData {
             throw new IllegalArgumentException("moduleEntry and moduleBytes are required");
         }
         ModuleEnum moduleType = ModuleEnum.fromModuleId(moduleEntry.getModuleId());
-        ModuleState state = moduleStates.get(moduleType);
-        if (state == null || state.entry != moduleEntry) {
+        if (moduleEntries.get(moduleType) != moduleEntry) {
             throw new IllegalArgumentException("moduleEntry is not owned by this player");
         }
         moduleEntry.setDataVersion(moduleType.getDataVersion());
@@ -154,16 +149,15 @@ public class PlayerData {
 
     public synchronized List<PlayerModuleEntry> prepareDirtyModuleSnapshots() {
         List<PlayerModuleEntry> snapshots = new ArrayList<>();
-        for (Map.Entry<ModuleEnum, ModuleState> entry : moduleStates.entrySet()) {
-            ModuleState state = entry.getValue();
-            long revision = state.entry.getRevision();
-            if (revision <= state.persistedRevision
-                    || revision <= state.submittedRevision
-                    || state.submittedRevision > state.persistedRevision) {
+        for (Map.Entry<ModuleEnum, PlayerModuleEntry> entry : moduleEntries.entrySet()) {
+            ModuleEnum moduleType = entry.getKey();
+            PlayerModuleEntry moduleEntry = entry.getValue();
+            if (submittedModules.contains(moduleType)
+                    || moduleEntry.getDirtyFieldNames().length == 0) {
                 continue;
             }
-            state.submittedRevision = revision;
-            snapshots.add(state.entry.snapshot());
+            submittedModules.add(moduleType);
+            snapshots.add(moduleEntry.snapshot());
         }
         return snapshots;
     }
@@ -171,43 +165,27 @@ public class PlayerData {
     public synchronized void markModulesPersisted(List<PlayerModuleEntry> snapshots) {
         for (PlayerModuleEntry snapshot : snapshots) {
             ModuleEnum moduleType = ModuleEnum.fromModuleId(snapshot.getModuleId());
-            ModuleState state = moduleStates.get(moduleType);
-            if (state != null) {
-                if (state.entry.getId() == null && snapshot.getId() != null) {
-                    state.entry.setId(snapshot.getId());
+            PlayerModuleEntry entry = moduleEntries.get(moduleType);
+            if (entry != null) {
+                if (entry.getId() == null && snapshot.getId() != null) {
+                    entry.setId(snapshot.getId());
                 }
-                state.persistedRevision = Math.max(state.persistedRevision, snapshot.getRevision());
+                if (entry.getRevision().equals(snapshot.getRevision())) {
+                    entry.markPersisted();
+                }
             }
+            submittedModules.remove(moduleType);
         }
     }
 
     public synchronized void releaseSubmittedModules(List<PlayerModuleEntry> snapshots) {
         for (PlayerModuleEntry snapshot : snapshots) {
             ModuleEnum moduleType = ModuleEnum.fromModuleId(snapshot.getModuleId());
-            ModuleState state = moduleStates.get(moduleType);
-            if (state != null && state.submittedRevision <= snapshot.getRevision()) {
-                state.submittedRevision = state.persistedRevision;
-            }
+            submittedModules.remove(moduleType);
         }
     }
 
     public long getPlayerId() {
         return playerEntry.getId();
     }
-
-    private static final class ModuleState {
-        private final PlayerModuleEntry entry;
-        private long persistedRevision;
-        private long submittedRevision;
-
-        private ModuleState(
-                PlayerModuleEntry entry,
-                long persistedRevision,
-                long submittedRevision) {
-            this.entry = entry;
-            this.persistedRevision = persistedRevision;
-            this.submittedRevision = submittedRevision;
-        }
-    }
-
 }
