@@ -1,6 +1,6 @@
 # MiniServer AI 项目索引
 
-更新时间：2026-06-06
+更新时间：2026-08-19
 
 ## 当前可信入口
 
@@ -12,6 +12,8 @@
 - `server/doc/module_index.md`：模块级阅读指南。
 - `server/doc/net_packet_unification_plan.md`：网络包统一改造设计记录。
 - `docs/PLAYER_MODULE_PERSISTENCE_PLAN.md`：玩家模块从单一 BLOB 演进到模块级持久化的设计方案，尚未实施。
+- `docs/SLG_MINISERVER_FOUNDATION.md`：SLG 场景运行时第一阶段基础骨架和线程边界说明。
+- `server/SceneServer/`：独立场景服工程，包含公共、本服、跨服场景代码、玩家独立战争迷雾、Region/Portal 两级异步 A*、热点 Region 单线程迁移、行军/集结状态机、玩家场景投影恢复和周期线程负载日志。
 - `docs/ROOT_LOOSE_FILES_AUDIT.md`：根目录散落文件审计与清理记录。
 - `nacos-config.txt`：旧的 localhost Nacos 说明，只能作为历史参考。
 
@@ -23,8 +25,8 @@
 
 - 仓库根目录：`miniServer`
 - Maven 聚合工程：`server/pom.xml`
-- 当前 Maven 模块数：9
-- 当前 Java 源码文件数：1656 个，不包含 `target/`
+- 当前 Maven 模块数：10
+- 当前 Java 源码文件数：1803 个，不包含 `target/` 和 `.gradle/`
 
 当前聚合模块：
 
@@ -34,9 +36,10 @@
 4. `core`
 5. `LoginServer`
 6. `GameServer`
-7. `GateServer`
-8. `BotServer`
-9. `GMServer`
+7. `SceneServer`
+8. `GateServer`
+9. `BotServer`
+10. `GMServer`
 
 ## 模块职责
 
@@ -45,7 +48,8 @@
 - `tool`：Excel、proto、DB Entry/Helper 等离线生成工具。
 - `core`：网络、RPC、Nacos、MySQL、Redis、配置、工具类等公共运行时基础。
 - `LoginServer`：Spring Boot 登录和服务器列表服务。
-- `GameServer`：游戏逻辑、玩家生命周期、业务消息处理。
+- `GameServer`：游戏逻辑、玩家生命周期和玩家养成业务。
+- `SceneServer`：地图状态权威，承载公共场景运行时、本服/跨服场景、AOI 分层同步、玩家独立战争迷雾、Region/Portal 两级异步 A*、热点 Region 单线程迁移、行军/集结、玩家投影异步入库/启动恢复和线程负载观测。
 - `GateServer`：客户端网关、连接管理、登录和游戏消息转发。
 - `BotServer`：机器人客户端、协议验证和压力测试。
 - `GMServer`：Spring Boot 后台管理服务，包含 Thymeleaf 页面、JWT 鉴权、管理员/角色/菜单管理和操作日志。

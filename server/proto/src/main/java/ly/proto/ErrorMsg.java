@@ -118,7 +118,7 @@ public final class ErrorMsg {
     PLAYER_NOT_EXIST(11),
     /**
      * <pre>
-     *英雄不存在
+     * 英雄相关错误码 5000-5099
      * </pre>
      *
      * <code>HERO_NOT_FOUND = 5001;</code>
@@ -196,6 +196,62 @@ public final class ErrorMsg {
      * <code>HERO_ALREADY_EXISTS = 5010;</code>
      */
     HERO_ALREADY_EXISTS(5010),
+    /**
+     * <pre>
+     * 场景相关错误码 6000-6099
+     * </pre>
+     *
+     * <code>SCENE_NOT_FOUND = 6001;</code>
+     */
+    SCENE_NOT_FOUND(6001),
+    /**
+     * <pre>
+     *场景坐标越界
+     * </pre>
+     *
+     * <code>SCENE_OUT_OF_BOUNDS = 6002;</code>
+     */
+    SCENE_OUT_OF_BOUNDS(6002),
+    /**
+     * <pre>
+     *场景尚未完成启动或恢复
+     * </pre>
+     *
+     * <code>SCENE_NOT_READY = 6003;</code>
+     */
+    SCENE_NOT_READY(6003),
+    /**
+     * <pre>
+     *当前阶段不支持该场景操作
+     * </pre>
+     *
+     * <code>SCENE_UNSUPPORTED = 6004;</code>
+     */
+    SCENE_UNSUPPORTED(6004),
+    /**
+     * <pre>
+     *地形阻挡或约束下不存在可达路径
+     * </pre>
+     *
+     * <code>SCENE_PATH_NOT_FOUND = 6005;</code>
+     */
+    SCENE_PATH_NOT_FOUND(6005),
+    /**
+     * <pre>
+     *寻路超过最大搜索节点数
+     * </pre>
+     *
+     * <code>SCENE_PATH_LIMIT_EXCEEDED = 6006;</code>
+     */
+    SCENE_PATH_LIMIT_EXCEEDED(6006),
+    /**
+     * <pre>
+     *目标点不在允许的战争迷雾范围内
+     * </pre>
+     *
+     * <code>SCENE_FOG_BLOCKED = 6007;</code>
+     */
+    SCENE_FOG_BLOCKED(6007),
     UNRECOGNIZED(-1),
     ;
 
@@ -297,7 +353,7 @@ public final class ErrorMsg {
     public static final int PLAYER_NOT_EXIST_VALUE = 11;
     /**
      * <pre>
-     *英雄不存在
+     * 英雄相关错误码 5000-5099
      * </pre>
      *
      * <code>HERO_NOT_FOUND = 5001;</code>
@@ -375,6 +431,63 @@ public final class ErrorMsg {
      * <code>HERO_ALREADY_EXISTS = 5010;</code>
      */
     public static final int HERO_ALREADY_EXISTS_VALUE = 5010;
+    /**
+     * <pre>
+     * 场景相关错误码 6000-6099
+     * </pre>
+     *
+     * <code>SCENE_NOT_FOUND = 6001;</code>
+     */
+    public static final int SCENE_NOT_FOUND_VALUE = 6001;
+    /**
+     * <pre>
+     *场景坐标越界
+     * </pre>
+     *
+     * <code>SCENE_OUT_OF_BOUNDS = 6002;</code>
+     */
+    public static final int SCENE_OUT_OF_BOUNDS_VALUE = 6002;
+    /**
+     * <pre>
+     *场景尚未完成启动或恢复
+     * </pre>
+     *
+     * <code>SCENE_NOT_READY = 6003;</code>
+     */
+    public static final int SCENE_NOT_READY_VALUE = 6003;
+    /**
+     * <pre>
+     *当前阶段不支持该场景操作
+     * </pre>
+     *
+     * <code>SCENE_UNSUPPORTED = 6004;</code>
+     */
+    public static final int SCENE_UNSUPPORTED_VALUE = 6004;
+    /**
+     * <pre>
+     *地形阻挡或约束下不存在可达路径
+     * </pre>
+     *
+     * <code>SCENE_PATH_NOT_FOUND = 6005;</code>
+     */
+    public static final int SCENE_PATH_NOT_FOUND_VALUE = 6005;
+    /**
+     * <pre>
+     *寻路超过最大搜索节点数
+     * </pre>
+     *
+     * <code>SCENE_PATH_LIMIT_EXCEEDED = 6006;</code>
+     */
+    public static final int SCENE_PATH_LIMIT_EXCEEDED_VALUE = 6006;
+    /**
+     * <pre>
+     *目标点不在允许的战争迷雾范围内
+     * </pre>
+     *
+     * <code>SCENE_FOG_BLOCKED = 6007;</code>
+     */
+    public static final int SCENE_FOG_BLOCKED_VALUE = 6007;
+
 
     public final int getNumber() {
       if (this == UNRECOGNIZED) {
@@ -422,6 +535,13 @@ public final class ErrorMsg {
         case 5008: return AWAKEN_CONDITION_NOT_MET;
         case 5009: return HERO_SLOT_FULL;
         case 5010: return HERO_ALREADY_EXISTS;
+        case 6001: return SCENE_NOT_FOUND;
+        case 6002: return SCENE_OUT_OF_BOUNDS;
+        case 6003: return SCENE_NOT_READY;
+        case 6004: return SCENE_UNSUPPORTED;
+        case 6005: return SCENE_PATH_NOT_FOUND;
+        case 6006: return SCENE_PATH_LIMIT_EXCEEDED;
+        case 6007: return SCENE_FOG_BLOCKED;
         default: return null;
       }
     }
@@ -1533,13 +1653,23 @@ public final class ErrorMsg {
     java.lang.String[] descriptorData = {
       "\n\016ErrorMsg.proto\"\r\n\013csErrorCode\";\n\013scErr" +
       "orCode\022\r\n\005msgId\030\001 \001(\005\022\035\n\terrorCode\030\002 \001(\016" +
-      "2\n.ErrorCode*\355\001\n\tErrorCode\022\006\n\002Ok\020\000\022\n\n\006FA" +
+      "2\n.ErrorCode*\376\004\n\tErrorCode\022\006\n\002Ok\020\000\022\n\n\006FA" +
       "ILED\020\001\022\020\n\014SYSTEM_ERROR\020\002\022\017\n\013PARAM_ERROR\020" +
       "\003\022\021\n\rACCOUNT_ERROR\020\004\022\022\n\016PASSWORD_ERROR\020\005" +
       "\022\025\n\021ACCOUNT_FORBIDDEN\020\006\022\022\n\016ACCOUNT_ONLIN" +
       "E\020\007\022\030\n\024ACCOUNT_NOT_REGISTER\020\010\022\026\n\022PLAYER_" +
       "NAME_EXISTS\020\t\022\017\n\013TOKEN_ERROR\020\n\022\024\n\020PLAYER" +
-      "_NOT_EXIST\020\013B\n\n\010ly.protob\006proto3"
+      "_NOT_EXIST\020\013\022\023\n\016HERO_NOT_FOUND\020\211\'\022\024\n\017HER" +
+      "O_NOT_BELONG\020\212\'\022\030\n\023RESOURCE_NOT_ENOUGH\020\213" +
+      "\'\022\016\n\tLEVEL_MAX\020\214\'\022\r\n\010STAR_MAX\020\215\'\022\017\n\nAWAK" +
+      "EN_MAX\020\216\'\022\033\n\026STAR_CONDITION_NOT_MET\020\217\'\022\035" +
+      "\n\030AWAKEN_CONDITION_NOT_MET\020\220\'\022\023\n\016HERO_SL" +
+      "OT_FULL\020\221\'\022\030\n\023HERO_ALREADY_EXISTS\020\222\'\022\024\n\017" +
+      "SCENE_NOT_FOUND\020\361.\022\030\n\023SCENE_OUT_OF_BOUND" +
+      "S\020\362.\022\024\n\017SCENE_NOT_READY\020\363.\022\026\n\021SCENE_UNSU" +
+      "PPORTED\020\364.\022\031\n\024SCENE_PATH_NOT_FOUND\020\365.\022\036\n" +
+      "\031SCENE_PATH_LIMIT_EXCEEDED\020\366.\022\026\n\021SCENE_F" +
+      "OG_BLOCKED\020\367.B\n\n\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -889,7 +889,7 @@ DynamicMapState
 - 查询静态地图不会创建动态对象。
 - 玩家占领、采集、驻军、战斗、建造等真正改变状态的操作才创建动态状态。
 - 动态对象没有业务意义后要回收，不能让动态对象数量只增不减。
-- 资源点、怪物、农田、掉落物统一抽象为类型明确的 `SceneObject`，不使用无类型的 `Object`。
+- 资源点、怪物、农田、掉落物统一抽象为类型明确的 `SceneObject`；对象的 `state` 使用类型化 Java 状态对象承载扩展属性，不再把内存模型序列化成 JSON 字符串。
 - 不为每个格子创建独立的 Java Timer，统一使用时间轮或到期事件队列。
 
 #### 11.1.2 Chunk、Region 和 SceneShard
@@ -942,6 +942,24 @@ SceneShard
 - 第一阶段不做不同进程之间的地图分片；未来容量不足时，再把 SceneShard 迁移成独立进程。
 - 高交互的战争区域、关隘、世界 Boss 区域尽量作为完整业务 Zone，由一个 Shard 独占。
 
+热点 Region 的进程内迁移使用独立的 `SceneRegion-Migration-*` 单线程编排，不能由监控线程直接搬动 HashMap：
+
+```text
+RegionDirectory 冻结 regionId 路由并生成 ownershipVersion
+  -> 新到达的坐标命令进入 Region 暂存队列
+  -> 源 SceneShard Tick 导出对象、格子/AOI 索引、观察者和个人迷雾
+  -> 迁移线程校验交接包，不修改 SceneObject
+  -> 目标 SceneShard Tick 重建对象、AOI 和迷雾索引
+  -> RegionDirectory 切换唯一 owner
+  -> 暂存命令按 FIFO 释放到目标 Shard
+```
+
+- 迁移失败时先把交接包装回源 Shard，再保持原 owner 并释放暂存命令，不能留下无所有者 Region。
+- 跨 Shard 的 AOI、迷雾和对象统计在迁移期间等待稳定所有权，不能读到半迁移状态。
+- 进程内迁移交接 Java 对象的独占所有权，不做 JSON 序列化；跨进程方案必须另行定义二进制快照、落盘点和恢复协议。
+- 当前先提供显式 `migrateRegionAsync(regionId, targetShard)`。自动均衡必须要求连续多个采样周期过阈值，并配置迁移收益、最小驻留时间和冷却时间，防止热点块来回抖动。
+- 热点 Region 最好由策划边界和交互范围共同确定；世界 Boss、关隘等高交互中心尽量位于 Region 内部，但即使处于边界也不能让多个 Shard 同时修改同一事件。
+
 #### 11.1.3 主线程与异步线程职责
 
 这里的“主线程”指 `SceneShard EventLoop`，不是 JVM 的 `main` 方法线程。
@@ -966,6 +984,8 @@ Async Executors
   ├── DB/Redis IO
   # 复杂路径搜索或大规模计算
   ├── Pathfinding Pool
+  # 热点 Region 迁移编排；数据导出/安装仍在 SceneShard Tick
+  ├── Region Migration Thread
   # BattleServer 返回的战斗结果处理
   ├── Battle Callback Pool
   # 日志、统计、排行榜和非关键广播
@@ -1013,6 +1033,94 @@ Player-A
 - 到期的行军、资源刷新和掉落事件。
 - 当前活跃的动态对象。
 - 当前 AOI 订阅范围发生的变化。
+
+#### 11.1.5 每个玩家独立的战争迷雾
+
+战争迷雾不能只挂在在线 AOI 订阅对象上，也不能按联盟共用一份。每个玩家在每个场景都有独立的永久探索位图：
+
+```text
+PlayerSceneFog
+  ├── playerId                 # 玩家归属，禁止与其他玩家共享
+  ├── sceneId                  # 本服世界、跨服世界分别记录
+  ├── visibleBlocks            # 当前在线视野，只在 SceneShard 内存中存在
+  ├── discoveredBlocks         # 历史已探索区域，离线后仍保留
+  └── fogVersion               # 防止异步旧快照覆盖新探索结果
+```
+
+- 相机移动只更新 `visibleBlocks` 和 AOI 块注册，同时将新块 OR 到该玩家自己的 `discoveredBlocks`。
+- 玩家离线只释放 `visibleBlocks`，不能删除 `discoveredBlocks`；永久探索异步落库成功后才能回收内存。
+- 登录/进入场景时异步加载 `playerId + sceneId` 位图，然后回投 SceneShard 恢复。
+- 联盟共享视野、侦察报告和瞭望塔视野属于可过期的临时情报层；可以在下发时合并，但不能写进个人永久探索记录。
+
+地图寻路复用同一套 Region 索引，但不能只在 Region 中心点之间连线：
+
+```text
+静态地图加载完成
+  -> 扫描相邻 Region 公共边界
+  -> 连续可通行边界生成 Portal 候选区
+  -> Region A* 选择粗路径
+  -> 粗路径扩成一圈缓冲走廊
+  -> 格子 A* 计算每块的实际入口、出口和块内路径
+  -> 结果回投起点所属 SceneShard Tick
+```
+
+- Region 边只有在公共边界两侧存在相邻可行走格时才成立，山脉、河流、城墙和关闭的城门会切断边。
+- 实际出口是最终路径在当前 Region 的最后一个格，实际入口是下一 Region 的第一个格，两者必须在公共边界两侧相邻。
+- Region 粗路径和格子细路径都应用当前玩家自己的战争迷雾；粗路径不能借此穿过未探索块。
+- Region 内部可能被障碍切成多个连通分量，因此细路径失败时必须使用剩余节点预算回退搜索，不能仅凭 Region 有 Portal 就认定必然可达。
+- 动态建筑、部队占格和临时路障必须由 SceneShard 生成不可变快照后交给寻路线程，异步线程禁止直接访问可变地图对象。
+
+#### 11.1.6 行军、车辆标签、目标标签与集结攻城
+
+地图上的“车辆”统一建模为行军对象。类型表达业务目的，标签表达当前特征，目标标签表达目标允许什么操作：
+
+```text
+March
+  ├── type                     # 攻击、集结成员、集结主车、增援、驻军、采集、侦察、运输、返程
+  ├── tagMask                  # 单人、友方、敌方、隐身、高优先级、返程中、等待战斗、不可召回
+  ├── target
+  │   ├── targetType           # 城市、建筑、资源、怪物、部队、坐标、跨服对象等
+  │   ├── targetTagMask        # 可攻击、可集结、可增援、可采集、可占领、可侦察等
+  │   └── targetVersion        # 防止异步结果命中过期目标
+  ├── armySnapshotVersion      # GameServer 冻结部队时的版本
+  ├── path/pathIndex           # SceneServer 权威路径和当前位置
+  └── departAt/arrivalAt       # 服务端计算时间，客户端只做表现
+```
+
+经典联盟集结流程：
+
+1. GameServer 校验联盟、行军槽和队伍，冻结部队摘要。
+2. SceneServer 创建集结；成员车分别寻路到集结点，到达后从 `JOINING` 变为 `READY`。
+3. 发车时间到后，SceneShard 一次性冻结参战名单；未赶到的成员标记 `EXCLUDED`。
+4. 集结主车前往目标，抵达后请求无状态 BattleServer，集结进入 `BATTLE_PENDING`。
+5. BattleServer 先落库战斗结果，再返回唯一 `battleResultId`；SceneShard 幂等应用，重复结果不能重复扣兵、扣城防或发奖。
+6. 城市耐久和归属由目标服务更新；伤兵、奖励、战报分别投递到对应玩家 GameServer 队列。
+7. 每个成员独立返城，全部参战成员结束后回收集结对象。
+
+所有创建、加入、到达、发车、战斗结果和返程变更都在所属 SceneShard 串行执行。复杂寻路、BattleServer RPC 和持久化可以异步，但结果必须带 `requestId/battleResultId + aggregateId + objectVersion + targetVersion` 回投 SceneShard 校验。
+
+#### 11.1.7 玩家场景投影、地图恢复和线程负载日志
+
+SceneServer 不读取整份玩家养成 BLOB，而是使用 `player_scene` 投影恢复地图：
+
+```text
+GameServer 玩家完整数据
+  -> 城市/迁城业务产生 player_scene 投影
+  -> 按 playerId 固定分区异步入库
+  -> scene_id + player_id 唯一键
+  -> revision 条件 UPSERT 防止旧快照覆盖新数据
+
+SceneServer 启动
+  -> 初始化静态地图紧凑数组
+  -> 按 scene_id/player_id 分页读取投影
+  -> 恢复玩家主城对象
+  -> 恢复每个玩家独立的战争迷雾
+  -> 全部成功后启动 Tick 并对外 ready
+```
+
+同一个玩家的失败写入必须在原队列位置退避重试，后续 revision 不得越过。Future 成功后才能清除内存脏标记；永久失败时停止对应持久化分区并报警。数据库加载失败、坏坐标和重复对象 ID 必须中断 SceneServer 启动，禁止降级成空地图。
+
+线上默认周期输出：每个 SceneShard 的忙碌率、Tick 平均/最大耗时、慢 Tick、命令队列、对象/观察者数量；寻路线程池活跃数、积压和耗时；Region 迁移线程的队列、成功/失败/拒绝数和平均/最大耗时；`SceneShard-Tick-*`、`ScenePath-CPU-*`、`SceneRegion-Migration-*` 平台线程 CPU、阻塞与等待变化。逻辑分片指标和实际线程 CPU 必须同时观察。
 
 ### 11.2 自研 TCP 统一通信方案
 

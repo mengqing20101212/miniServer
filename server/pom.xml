@@ -31,6 +31,7 @@
         <module>core</module>
         <module>LoginServer</module>
         <module>GameServer</module>
+        <module>SceneServer</module>
         <module>GateServer</module>
         <module>BotServer</module>
         <module>GMServer</module>

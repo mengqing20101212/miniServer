@@ -1,0 +1,448 @@
+syntax = "proto3";
+option java_package = "ly.proto";
+
+import "ErrorMsg.proto";
+
+// SceneServer 本服和跨服共用的服务器间 RPC 消息。
+enum SceneScope {
+  // 普通分区服地图，由本服 SceneServer 管理。
+  SCENE_SCOPE_LOCAL = 0;
+  // 跨服活动或战争地图，由同一 SceneServer 的跨服业务入口管理。
+  SCENE_SCOPE_CROSS = 1;
+}
+
+enum SceneObjectKind {
+  // 玩家实体。
+  SCENE_OBJECT_PLAYER = 0;
+  // 资源点。
+  SCENE_OBJECT_RESOURCE = 1;
+  // 怪物。
+  SCENE_OBJECT_MONSTER = 2;
+  // 农田或生产地块。
+  SCENE_OBJECT_FARM = 3;
+  // 掉落物。
+  SCENE_OBJECT_DROP = 4;
+  // 建筑。
+  SCENE_OBJECT_BUILDING = 5;
+  // 纯表现装饰物；远景不会同步单体数据。
+  SCENE_OBJECT_DECORATION = 6;
+  // 地图上移动的部队/车辆。
+  SCENE_OBJECT_MARCH = 7;
+  // 联盟集结点或已经发出的集结主车。
+  SCENE_OBJECT_RALLY = 8;
+}
+
+// 行军/车辆类型，决定服务端状态机和目标能力校验。
+enum SceneMarchType {
+  SCENE_MARCH_ATTACK = 0;
+  SCENE_MARCH_RALLY_MEMBER = 1;
+  SCENE_MARCH_RALLY_ARMY = 2;
+  SCENE_MARCH_REINFORCE = 3;
+  SCENE_MARCH_GARRISON = 4;
+  SCENE_MARCH_GATHER = 5;
+  SCENE_MARCH_SCOUT = 6;
+  SCENE_MARCH_TRANSPORT = 7;
+  SCENE_MARCH_RETURN = 8;
+}
+
+enum SceneMarchStatus {
+  SCENE_MARCH_PREPARING = 0;
+  SCENE_MARCH_MOVING = 1;
+  SCENE_MARCH_WAITING_RALLY = 2;
+  SCENE_MARCH_ARRIVED = 3;
+  SCENE_MARCH_BATTLE_PENDING = 4;
+  SCENE_MARCH_RETURNING = 5;
+  SCENE_MARCH_FINISHED = 6;
+  SCENE_MARCH_CANCELLED = 7;
+}
+
+enum SceneTargetType {
+  SCENE_TARGET_POINT = 0;
+  SCENE_TARGET_PLAYER_CITY = 1;
+  SCENE_TARGET_ALLIANCE_CITY = 2;
+  SCENE_TARGET_ALLIANCE_BUILDING = 3;
+  SCENE_TARGET_RESOURCE = 4;
+  SCENE_TARGET_MONSTER = 5;
+  SCENE_TARGET_RALLY_CAMP = 6;
+  SCENE_TARGET_TROOP = 7;
+  SCENE_TARGET_CROSS_SERVER_OBJECT = 8;
+}
+
+enum SceneRallyStatus {
+  SCENE_RALLY_RECRUITING = 0;
+  SCENE_RALLY_MOVING = 1;
+  SCENE_RALLY_BATTLE_PENDING = 2;
+  SCENE_RALLY_RETURNING = 3;
+  SCENE_RALLY_FINISHED = 4;
+  SCENE_RALLY_CANCELLED = 5;
+}
+
+enum SceneRallyMemberStatus {
+  SCENE_RALLY_MEMBER_JOINING = 0;
+  SCENE_RALLY_MEMBER_READY = 1;
+  SCENE_RALLY_MEMBER_MOVING = 2;
+  SCENE_RALLY_MEMBER_BATTLE_PENDING = 3;
+  SCENE_RALLY_MEMBER_RETURNING = 4;
+  SCENE_RALLY_MEMBER_FINISHED = 5;
+  SCENE_RALLY_MEMBER_LEFT = 6;
+  SCENE_RALLY_MEMBER_EXCLUDED = 7;
+}
+
+// 地图缩放层级决定服务器返回单体明细还是块级聚合数据。
+enum SceneViewLevel {
+  // 近景：同步视野块内全部动态对象。
+  SCENE_VIEW_DETAIL = 0;
+  // 中景：同步玩家、怪物、建筑和战斗对象，同时返回块聚合。
+  SCENE_VIEW_REGION = 1;
+  // 世界视图：只同步战略对象和块聚合，避免下发海量小对象。
+  SCENE_VIEW_WORLD = 2;
+}
+
+// 寻路时使用的战争迷雾约束。
+enum SceneFogPolicy {
+  // 系统寻路，不检查玩家迷雾。
+  SCENE_FOG_IGNORE = 0;
+  // 只能经过玩家历史探索过的 AOI 块。
+  SCENE_FOG_DISCOVERED_ONLY = 1;
+  // 只能经过玩家当前可见的 AOI 块。
+  SCENE_FOG_VISIBLE_ONLY = 2;
+}
+
+// 场景坐标值对象；协议中所有成对坐标都复用该结构。
+message ScenePoint {
+  // X 坐标。
+  int32 x = 1;
+  // Y 坐标。
+  int32 y = 2;
+}
+
+message SceneObjectSnapshot {
+  // 动态对象唯一 ID。
+  int64 object_id = 1;
+  // 动态对象业务类型。
+  SceneObjectKind kind = 2;
+  // 所属玩家、联盟或 0（系统对象）。
+  int64 owner_id = 3;
+  // 对象所在格子坐标。
+  ScenePoint point = 4;
+  // 对象状态版本，用于客户端增量更新和去重。
+  int32 state_version = 5;
+  // AOI 数据标签位掩码，可同时标记玩家、战斗对象、战略对象等属性。
+  uint64 data_tag_mask = 6;
+  // kind=MARCH 时携带的车辆明细；远景可只保留通用摘要。
+  SceneMarchSnapshot march = 7;
+  // kind=RALLY 时携带的集结明细。
+  SceneRallySnapshot rally = 8;
+}
+
+// 行军目标及其能力标签；target_version 用于抵御到达前目标迁移或换主。
+message SceneMarchTarget {
+  int64 target_id = 1;
+  SceneTargetType type = 2;
+  ScenePoint point = 3;
+  // ATTACKABLE、RALLYABLE、REINFORCEABLE 等目标标签位掩码。
+  uint64 tag_mask = 4;
+  int64 target_version = 5;
+}
+
+message SceneMarchSnapshot {
+  int64 march_id = 1;
+  int64 owner_player_id = 2;
+  int64 alliance_id = 3;
+  SceneMarchType type = 4;
+  // SOLO、RALLY_MEMBER、HOSTILE、RETURNING 等车辆标签位掩码。
+  uint64 tag_mask = 5;
+  SceneMarchStatus status = 6;
+  ScenePoint origin = 7;
+  SceneMarchTarget target = 8;
+  repeated ScenePoint path = 9;
+  int32 path_index = 10;
+  int32 troop_count = 11;
+  int64 power = 12;
+  // GameServer 发车时冻结的部队快照版本。
+  int64 army_snapshot_version = 13;
+  int64 depart_at_millis = 14;
+  int64 arrival_at_millis = 15;
+  int32 state_version = 16;
+}
+
+message SceneRallyMemberSnapshot {
+  int64 player_id = 1;
+  int64 march_id = 2;
+  int32 troop_count = 3;
+  int64 power = 4;
+  int64 army_snapshot_version = 5;
+  SceneRallyMemberStatus status = 6;
+  int32 remaining_troops = 7;
+}
+
+message SceneRallySnapshot {
+  int64 rally_id = 1;
+  int64 leader_player_id = 2;
+  int64 alliance_id = 3;
+  ScenePoint assembly_point = 4;
+  SceneMarchTarget target = 5;
+  int32 capacity = 6;
+  int32 minimum_members = 7;
+  int64 launch_at_millis = 8;
+  SceneRallyStatus status = 9;
+  repeated SceneRallyMemberSnapshot members = 10;
+  // 已消费的 BattleServer 结果 ID，用于重放去重。
+  int64 applied_battle_result_id = 11;
+  bool victory = 12;
+  int32 state_version = 13;
+}
+
+// 集结发车时冻结的 BattleServer 输入；发车后成员变化不能改写该快照。
+message SceneRallyLaunchSnapshot {
+  int64 rally_id = 1;
+  int64 leader_player_id = 2;
+  int64 alliance_id = 3;
+  ScenePoint assembly_point = 4;
+  SceneMarchTarget target = 5;
+  repeated SceneRallyMemberSnapshot members = 6;
+  int32 total_troops = 7;
+  int64 total_power = 8;
+  int64 launched_at_millis = 9;
+  int32 rally_version = 10;
+}
+
+message SceneRallyMemberBattleResult {
+  int64 player_id = 1;
+  int32 remaining_troops = 2;
+}
+
+// BattleServer 已落库后回传的幂等结果摘要。
+message SceneRallyBattleResult {
+  int64 battle_result_id = 1;
+  int64 rally_id = 2;
+  int64 target_id = 3;
+  int64 target_version = 4;
+  bool victory = 5;
+  int32 target_durability_loss = 6;
+  repeated SceneRallyMemberBattleResult member_results = 7;
+}
+
+// 一个 AOI/Region 块的聚合数据。
+message SceneBlockSnapshot {
+  // 全图线性块编号，计算方式为 blockY * blockColumns + blockX。
+  int32 block_index = 1;
+  // 块坐标，不是地图格坐标。
+  ScenePoint block_point = 2;
+  // 当前是否在玩家视野中。
+  bool visible = 3;
+  // 玩家是否曾经探索过该块。
+  bool discovered = 4;
+  // 当前块中的动态对象总数；远景可以只显示聚合值。
+  int32 object_count = 5;
+  // 当前块内所有对象标签的并集。
+  uint64 data_tag_mask = 6;
+}
+
+message csSceneQuery {
+  // 目标场景，空值使用当前模式默认场景。
+  string scene_id = 1;
+  // 本服或跨服场景边界。
+  SceneScope scope = 2;
+  // 查询中心坐标。
+  ScenePoint point = 3;
+  // 查询半径；第一阶段先返回中心格，后续接入 AOI/Region 查询。
+  int32 radius = 4;
+}
+
+message scSceneQuery {
+  // 查询结果码。
+  ErrorCode result = 1;
+  // 实际返回的场景 ID。
+  string scene_id = 2;
+  // 中心格静态地形类型。
+  int32 terrain = 3;
+  // 中心格静态配置 ID。
+  int32 config_id = 4;
+  // 中心格静态标志位。
+  int32 flags = 5;
+  // 中心格资源/怪物刷新规则 ID。
+  int32 spawn_rule_id = 6;
+  // 中心格上的动态对象快照。
+  repeated SceneObjectSnapshot objects = 7;
+}
+
+message csSceneEnter {
+  // 目标场景，空值使用本服或跨服默认场景。
+  string scene_id = 1;
+  // 本服或跨服场景边界。
+  SceneScope scope = 2;
+  // 要进入场景的玩家 ID。
+  int64 player_id = 3;
+  // 进入坐标。
+  ScenePoint point = 4;
+  // 业务幂等请求 ID。
+  int64 request_id = 5;
+}
+
+message scSceneEnter {
+  // 进入结果码。
+  ErrorCode result = 1;
+  // 实际处理的场景 ID。
+  string scene_id = 2;
+  // 玩家当前所属 SceneShard。
+  int32 shard_index = 3;
+  // 服务端确认的当前坐标。
+  ScenePoint current_point = 4;
+  // 原样返回业务幂等请求 ID。
+  int64 request_id = 5;
+}
+
+message csSceneMove {
+  // 目标场景。
+  string scene_id = 1;
+  // 本服或跨服场景边界。
+  SceneScope scope = 2;
+  // 要移动的玩家 ID。
+  int64 player_id = 3;
+  // 目标坐标。
+  ScenePoint target_point = 4;
+  // 业务幂等请求 ID。
+  int64 request_id = 5;
+}
+
+message scSceneMove {
+  // 移动结果码。
+  ErrorCode result = 1;
+  // 实际处理的场景 ID。
+  string scene_id = 2;
+  // 玩家当前所属 SceneShard。
+  int32 shard_index = 3;
+  // 服务端确认的当前坐标。
+  ScenePoint current_point = 4;
+  // 原样返回业务幂等请求 ID。
+  int64 request_id = 5;
+}
+
+message csSceneMetrics {
+  // 目标场景。
+  string scene_id = 1;
+  // 本服或跨服场景边界。
+  SceneScope scope = 2;
+}
+
+message scSceneMetrics {
+  // 指标查询结果码。
+  ErrorCode result = 1;
+  // 实际处理的场景 ID。
+  string scene_id = 2;
+  // 地图宽度，第一阶段默认 1000。
+  int32 width = 3;
+  // 地图高度，第一阶段默认 1000。
+  int32 height = 4;
+  // 当前逻辑分片数量。
+  int32 shard_count = 5;
+  // 已完成的最大场景 tick。
+  int64 tick_number = 6;
+  // 最近一次 tick 时间戳。
+  int64 last_tick_millis = 7;
+  // 当前动态对象数量。
+  int32 object_count = 8;
+  // 配置的在线基线，第一阶段默认 10000。
+  int32 online_target = 9;
+}
+
+message csSceneLeave {
+  // 目标场景。
+  string scene_id = 1;
+  // 本服或跨服场景边界。
+  SceneScope scope = 2;
+  // 要离开场景的玩家 ID。
+  int64 player_id = 3;
+  // 业务幂等请求 ID。
+  int64 request_id = 4;
+}
+
+message scSceneLeave {
+  // 离开结果码。
+  ErrorCode result = 1;
+  // 实际处理的场景 ID。
+  string scene_id = 2;
+  // 已离开场景的玩家 ID。
+  int64 player_id = 3;
+  // 原样返回业务幂等请求 ID。
+  int64 request_id = 4;
+}
+
+message csSceneView {
+  // 目标场景。
+  string scene_id = 1;
+  // 本服或跨服场景边界。
+  SceneScope scope = 2;
+  // 移动视野的玩家 ID。
+  int64 player_id = 3;
+  // 相机/视野中心格；可以与玩家实体坐标不同。
+  ScenePoint center_point = 4;
+  // 视野半径，单位为 AOI 块而不是格子。
+  int32 radius_blocks = 5;
+  // 客户端当前缩放层级。
+  SceneViewLevel view_level = 6;
+  // 可选对象标签过滤，0 表示使用缩放层默认标签。
+  uint64 requested_tag_mask = 7;
+  // 业务幂等请求 ID。
+  int64 request_id = 8;
+}
+
+message scSceneView {
+  // 视野更新结果码。
+  ErrorCode result = 1;
+  // 实际处理的场景 ID。
+  string scene_id = 2;
+  // 玩家 ID。
+  int64 player_id = 3;
+  // 服务端确认的视野中心块坐标。
+  ScenePoint center_block = 4;
+  // 实际使用的数据层级。
+  SceneViewLevel view_level = 5;
+  // 生成快照时各分片已完成的最大 Tick。
+  int64 tick_number = 6;
+  // 当前层级允许下发的对象明细。
+  repeated SceneObjectSnapshot objects = 7;
+  // 当前视野内的块级聚合数据。
+  repeated SceneBlockSnapshot blocks = 8;
+  // 历史探索过的块编号，用于客户端绘制战争迷雾。
+  repeated int32 discovered_block_indices = 9;
+  // 原样返回业务幂等请求 ID。
+  int64 request_id = 10;
+}
+
+message csScenePathFind {
+  // 目标场景。
+  string scene_id = 1;
+  // 本服或跨服场景边界。
+  SceneScope scope = 2;
+  // 发起寻路的玩家 ID，用于读取其战争迷雾快照。
+  int64 player_id = 3;
+  // 寻路起点。
+  ScenePoint start_point = 4;
+  // 寻路终点。
+  ScenePoint target_point = 5;
+  // 是否限制在已探索或当前可见区域。
+  SceneFogPolicy fog_policy = 6;
+  // 最大搜索节点数；0 使用服务器默认值，防止复杂请求无限占用 CPU。
+  int32 max_visited_nodes = 7;
+  // 业务幂等请求 ID。
+  int64 request_id = 8;
+}
+
+message scScenePathFind {
+  // 寻路结果码。
+  ErrorCode result = 1;
+  // 实际处理的场景 ID。
+  string scene_id = 2;
+  // 原样返回业务幂等请求 ID。
+  int64 request_id = 3;
+  // 从起点到终点的完整格子路径，包含首尾点。
+  repeated ScenePoint points = 4;
+  // 按地形代价计算出的总移动成本。
+  int32 total_cost = 5;
+  // 本次 A* 实际展开的节点数。
+  int32 visited_nodes = 6;
+  // A* 完成后回投到的 SceneShard Tick。
+  int64 completed_tick = 7;
+}

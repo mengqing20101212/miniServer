@@ -55,6 +55,26 @@ CREATE TABLE IF NOT EXISTS `player_module` (
   UNIQUE KEY `uk_player_module_player_id_module_id` (`player_id`, `module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `player_scene` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `player_id` BIGINT NOT NULL,
+  `scene_id` VARCHAR(255) NOT NULL,
+  `city_object_id` BIGINT NOT NULL,
+  `alliance_id` BIGINT NOT NULL,
+  `city_x` INT NOT NULL,
+  `city_y` INT NOT NULL,
+  `city_level` INT NOT NULL,
+  `city_state_version` INT NOT NULL,
+  `fog_data` MEDIUMBLOB NOT NULL,
+  `data_version` INT NOT NULL,
+  `revision` BIGINT NOT NULL,
+  `deleted` INT NOT NULL,
+  `update_time` DATETIME(6) NOT NULL
+,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_player_scene_scene_id_player_id` (`scene_id`, `player_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `rank_history` (
   `id` BIGINT AUTO_INCREMENT NOT NULL,
   `rank_key` VARCHAR(255) DEFAULT NULL,

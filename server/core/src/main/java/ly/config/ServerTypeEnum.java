@@ -9,6 +9,7 @@ public enum ServerTypeEnum {
     GMSERVER("gm", "GM管理后台服务器"),
     LOGIN("LOGIN", "登录服务器"),
     GATE("GATE", "网关服务器"),
+    SCENE("SCENE", "场景服务器"),
     CROSS("CROSS", "跨服玩法"),
     RECHARGE("RECHARGE", "充值服务器"),
     UNKNOWN("UNKNOWN", "未知");

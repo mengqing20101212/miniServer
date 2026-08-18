@@ -1,28 +1,29 @@
 # Java Source Index
 
-生成时间: 2026-06-06 14:34:48 CST
+生成时间: 2026-08-19 00:06:35 CST
 
-Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
+Java 文件总数: 1803 (server 目录: 1802, 仓库其他位置: 1)
 
-说明: 本索引基于当前仓库实时扫描生成，按模块汇总，并列出每个模块下全部 Java 文件的路径、源码类别、包名与主类型。
+说明: 本索引由 `scripts/generate-java-source-index.ps1` 基于当前仓库实时扫描生成，排除 `target/` 和 `.gradle/`。
 
 ## 汇总
 
-- main 源码: 1632 files
-- test 源码: 23 files
+- main 源码: 1758 files
+- test 源码: 45 files
 - other 位置源码: 0 files
 
 ## 模块概览
 
 - config: 1385 files, 3 packages
-- proto: 8 files, 2 packages
+- proto: 12 files, 2 packages
 - tool: 6 files, 1 packages
-- core: 97 files, 15 packages
+- core: 127 files, 20 packages
 - LoginServer: 9 files, 4 packages
-- GameServer: 46 files, 9 packages
-- GateServer: 10 files, 3 packages
-- BotServer: 50 files, 22 packages
-- GMServer: 44 files, 8 packages
+- GameServer: 73 files, 14 packages
+- SceneServer: 84 files, 8 packages
+- GateServer: 9 files, 3 packages
+- BotServer: 43 files, 19 packages
+- GMServer: 54 files, 8 packages
 
 ## 各模块详细索引
 
@@ -36,11 +37,6 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 
 - [main] `src/main/java/ly/AbstractConfigChecker.java` — `ly` — AbstractConfigChecker
 - [main] `src/main/java/ly/AbstractConfigManger.java` — `ly` — AbstractConfigManger
-- [main] `src/main/java/ly/ConfigColumnMeta.java` — `ly` — ConfigColumnMeta
-- [main] `src/main/java/ly/ConfigLoadException.java` — `ly` — ConfigLoadException
-- [main] `src/main/java/ly/ConfigService.java` — `ly` — ConfigService
-- [main] `src/main/java/ly/InterfaceConfigManagerProxy.java` — `ly` — InterfaceConfigManagerProxy
-- [main] `src/main/java/ly/Main.java` — `ly` — Main
 - [main] `src/main/java/ly/config/AbnormalStateConfig.java` — `ly.config` — AbnormalStateConfig
 - [main] `src/main/java/ly/config/AbnormalStateConfigChecker.java` — `ly.config` — AbnormalStateConfigChecker
 - [main] `src/main/java/ly/config/AbnormalStateConfigCheckerBase.java` — `ly.config` — AbnormalStateConfigCheckerBase
@@ -221,6 +217,10 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/config/AwakenDecomposeConfigChecker.java` — `ly.config` — AwakenDecomposeConfigChecker
 - [main] `src/main/java/ly/config/AwakenDecomposeConfigCheckerBase.java` — `ly.config` — AwakenDecomposeConfigCheckerBase
 - [main] `src/main/java/ly/config/AwakenDecomposeConfigManager.java` — `ly.config` — AwakenDecomposeConfigManager
+- [main] `src/main/java/ly/config/Battle_typeConfig.java` — `ly.config` — Battle_typeConfig
+- [main] `src/main/java/ly/config/Battle_typeConfigChecker.java` — `ly.config` — Battle_typeConfigChecker
+- [main] `src/main/java/ly/config/Battle_typeConfigCheckerBase.java` — `ly.config` — Battle_typeConfigCheckerBase
+- [main] `src/main/java/ly/config/Battle_typeConfigManager.java` — `ly.config` — Battle_typeConfigManager
 - [main] `src/main/java/ly/config/BattleControlConfig.java` — `ly.config` — BattleControlConfig
 - [main] `src/main/java/ly/config/BattleControlConfigChecker.java` — `ly.config` — BattleControlConfigChecker
 - [main] `src/main/java/ly/config/BattleControlConfigCheckerBase.java` — `ly.config` — BattleControlConfigCheckerBase
@@ -233,10 +233,6 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/config/BattleQuestionConfigChecker.java` — `ly.config` — BattleQuestionConfigChecker
 - [main] `src/main/java/ly/config/BattleQuestionConfigCheckerBase.java` — `ly.config` — BattleQuestionConfigCheckerBase
 - [main] `src/main/java/ly/config/BattleQuestionConfigManager.java` — `ly.config` — BattleQuestionConfigManager
-- [main] `src/main/java/ly/config/Battle_typeConfig.java` — `ly.config` — Battle_typeConfig
-- [main] `src/main/java/ly/config/Battle_typeConfigChecker.java` — `ly.config` — Battle_typeConfigChecker
-- [main] `src/main/java/ly/config/Battle_typeConfigCheckerBase.java` — `ly.config` — Battle_typeConfigCheckerBase
-- [main] `src/main/java/ly/config/Battle_typeConfigManager.java` — `ly.config` — Battle_typeConfigManager
 - [main] `src/main/java/ly/config/BGMConfig.java` — `ly.config` — BGMConfig
 - [main] `src/main/java/ly/config/BGMConfigChecker.java` — `ly.config` — BGMConfigChecker
 - [main] `src/main/java/ly/config/BGMConfigCheckerBase.java` — `ly.config` — BGMConfigCheckerBase
@@ -433,14 +429,14 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/config/DailyrechargeConfigChecker.java` — `ly.config` — DailyrechargeConfigChecker
 - [main] `src/main/java/ly/config/DailyrechargeConfigCheckerBase.java` — `ly.config` — DailyrechargeConfigCheckerBase
 - [main] `src/main/java/ly/config/DailyrechargeConfigManager.java` — `ly.config` — DailyrechargeConfigManager
-- [main] `src/main/java/ly/config/DeviceConfig.java` — `ly.config` — DeviceConfig
-- [main] `src/main/java/ly/config/DeviceConfigChecker.java` — `ly.config` — DeviceConfigChecker
-- [main] `src/main/java/ly/config/DeviceConfigCheckerBase.java` — `ly.config` — DeviceConfigCheckerBase
-- [main] `src/main/java/ly/config/DeviceConfigManager.java` — `ly.config` — DeviceConfigManager
 - [main] `src/main/java/ly/config/Device_switchConfig.java` — `ly.config` — Device_switchConfig
 - [main] `src/main/java/ly/config/Device_switchConfigChecker.java` — `ly.config` — Device_switchConfigChecker
 - [main] `src/main/java/ly/config/Device_switchConfigCheckerBase.java` — `ly.config` — Device_switchConfigCheckerBase
 - [main] `src/main/java/ly/config/Device_switchConfigManager.java` — `ly.config` — Device_switchConfigManager
+- [main] `src/main/java/ly/config/DeviceConfig.java` — `ly.config` — DeviceConfig
+- [main] `src/main/java/ly/config/DeviceConfigChecker.java` — `ly.config` — DeviceConfigChecker
+- [main] `src/main/java/ly/config/DeviceConfigCheckerBase.java` — `ly.config` — DeviceConfigCheckerBase
+- [main] `src/main/java/ly/config/DeviceConfigManager.java` — `ly.config` — DeviceConfigManager
 - [main] `src/main/java/ly/config/DictsConfig.java` — `ly.config` — DictsConfig
 - [main] `src/main/java/ly/config/DictsConfigChecker.java` — `ly.config` — DictsConfigChecker
 - [main] `src/main/java/ly/config/DictsConfigCheckerBase.java` — `ly.config` — DictsConfigCheckerBase
@@ -1053,7 +1049,6 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/config/ReserverecruitConfigChecker.java` — `ly.config` — ReserverecruitConfigChecker
 - [main] `src/main/java/ly/config/ReserverecruitConfigCheckerBase.java` — `ly.config` — ReserverecruitConfigCheckerBase
 - [main] `src/main/java/ly/config/ReserverecruitConfigManager.java` — `ly.config` — ReserverecruitConfigManager
-- [main] `src/main/java/ly/config/ResourceType.java` — `ly.config` — ResourceType
 - [main] `src/main/java/ly/config/Resource_index1Config.java` — `ly.config` — Resource_index1Config
 - [main] `src/main/java/ly/config/Resource_index1ConfigChecker.java` — `ly.config` — Resource_index1ConfigChecker
 - [main] `src/main/java/ly/config/Resource_index1ConfigCheckerBase.java` — `ly.config` — Resource_index1ConfigCheckerBase
@@ -1062,6 +1057,7 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/config/Resource_index2ConfigChecker.java` — `ly.config` — Resource_index2ConfigChecker
 - [main] `src/main/java/ly/config/Resource_index2ConfigCheckerBase.java` — `ly.config` — Resource_index2ConfigCheckerBase
 - [main] `src/main/java/ly/config/Resource_index2ConfigManager.java` — `ly.config` — Resource_index2ConfigManager
+- [main] `src/main/java/ly/config/ResourceType.java` — `ly.config` — ResourceType
 - [main] `src/main/java/ly/config/ResRecoveryConfig.java` — `ly.config` — ResRecoveryConfig
 - [main] `src/main/java/ly/config/ResRecoveryConfigChecker.java` — `ly.config` — ResRecoveryConfigChecker
 - [main] `src/main/java/ly/config/ResRecoveryConfigCheckerBase.java` — `ly.config` — ResRecoveryConfigCheckerBase
@@ -1418,24 +1414,33 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/config/WhiteaccountConfigChecker.java` — `ly.config` — WhiteaccountConfigChecker
 - [main] `src/main/java/ly/config/WhiteaccountConfigCheckerBase.java` — `ly.config` — WhiteaccountConfigCheckerBase
 - [main] `src/main/java/ly/config/WhiteaccountConfigManager.java` — `ly.config` — WhiteaccountConfigManager
+- [main] `src/main/java/ly/ConfigColumnMeta.java` — `ly` — ConfigColumnMeta
+- [main] `src/main/java/ly/ConfigLoadException.java` — `ly` — ConfigLoadException
+- [main] `src/main/java/ly/ConfigService.java` — `ly` — ConfigService
+- [main] `src/main/java/ly/InterfaceConfigManagerProxy.java` — `ly` — InterfaceConfigManagerProxy
+- [main] `src/main/java/ly/Main.java` — `ly` — Main
 - [main] `src/main/java/ly/utils/KV.java` — `ly.utils` — KV
 
 ### proto
 
-- 文件数: 8
+- 文件数: 12
 - 包数: 2
-- main/test: 8/0
+- main/test: 12/0
 
 #### main 源码
 
 - [main] `src/main/java/ly/Main.java` — `ly` — Main
-- [main] `src/main/java/ly/ProtoMessageFactory.java` — `ly` — ProtoMessageFactory
 - [main] `src/main/java/ly/proto/Cmd.java` — `ly.proto` — Cmd
 - [main] `src/main/java/ly/proto/ErrorMsg.java` — `ly.proto` — ErrorMsg
+- [main] `src/main/java/ly/proto/GmPlayer.java` — `ly.proto` — GmPlayer
+- [main] `src/main/java/ly/proto/GmRuntimeScriptProto.java` — `ly.proto` — GmRuntimeScriptProto
 - [main] `src/main/java/ly/proto/Hero.java` — `ly.proto` — Hero
 - [main] `src/main/java/ly/proto/Login.java` — `ly.proto` — Login
+- [main] `src/main/java/ly/proto/Move.java` — `ly.proto` — Move
 - [main] `src/main/java/ly/proto/Resource.java` — `ly.proto` — Resource
+- [main] `src/main/java/ly/proto/Scene.java` — `ly.proto` — Scene
 - [main] `src/main/java/ly/proto/Server.java` — `ly.proto` — Server
+- [main] `src/main/java/ly/ProtoMessageFactory.java` — `ly` — ProtoMessageFactory
 
 ### tool
 
@@ -1457,38 +1462,33 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 
 ### core
 
-- 文件数: 97
-- 包数: 15
-- main/test: 86/11
+- 文件数: 127
+- 包数: 20
+- main/test: 110/17
 
 #### main 源码
 
-- [main] `src/main/java/ly/EntityToSqlGenerator.java` — `ly` — EntityToSqlGenerator
-- [main] `src/main/java/ly/IServer.java` — `ly` — IServer
-- [main] `src/main/java/ly/LoggerDef.java` — `ly` — LoggerDef
-- [main] `src/main/java/ly/Main.java` — `ly` — Main
-- [main] `src/main/java/ly/ServerContext.java` — `ly` — ServerContext
-- [main] `src/main/java/ly/StandaloneServer.java` — `ly` — StandaloneServer
-- [main] `src/main/java/ly/TestEntityToSql.java` — `ly` — TestEntityToSql
 - [main] `src/main/java/ly/cache/CacheService.java` — `ly.cache` — CacheService
 - [main] `src/main/java/ly/config/DbConfig.java` — `ly.config` — DbConfig
+- [main] `src/main/java/ly/config/hotupdate/ConfigHotUpdateCommand.java` — `ly.config.hotupdate` — ConfigHotUpdateCommand
+- [main] `src/main/java/ly/config/hotupdate/ConfigHotUpdateRuntime.java` — `ly.config.hotupdate` — ConfigHotUpdateRuntime
 - [main] `src/main/java/ly/config/RedisConfig.java` — `ly.config` — RedisConfig
 - [main] `src/main/java/ly/config/RunModuleEnum.java` — `ly.config` — RunModuleEnum
 - [main] `src/main/java/ly/config/ServerConfig.java` — `ly.config` — ServerConfig
 - [main] `src/main/java/ly/config/ServerTypeEnum.java` — `ly.config` — ServerTypeEnum
-- [main] `src/main/java/ly/config/hotupdate/ConfigHotUpdateCommand.java` — `ly.config.hotupdate` — ConfigHotUpdateCommand
-- [main] `src/main/java/ly/config/hotupdate/ConfigHotUpdateRuntime.java` — `ly.config.hotupdate` — ConfigHotUpdateRuntime
 - [main] `src/main/java/ly/db/AbstractEntry.java` — `ly.db` — AbstractEntry
 - [main] `src/main/java/ly/db/AutoTableService.java` — `ly.db` — AutoTableService
 - [main] `src/main/java/ly/db/DbMeta.java` — `ly.db` — DbMeta
-- [main] `src/main/java/ly/db/MysqlConnector.java` — `ly.db` — MysqlConnector
-- [main] `src/main/java/ly/db/MysqlService.java` — `ly.db` — MysqlService
 - [main] `src/main/java/ly/db/entry/GameItemEntry.java` — `ly.db.entry` — GameItemEntry
 - [main] `src/main/java/ly/db/entry/GameItemEntryHelper.java` — `ly.db.entry` — GameItemEntryHelper
 - [main] `src/main/java/ly/db/entry/LoginEntry.java` — `ly.db.entry` — LoginEntry
 - [main] `src/main/java/ly/db/entry/LoginEntryHelper.java` — `ly.db.entry` — LoginEntryHelper
 - [main] `src/main/java/ly/db/entry/PlayerEntry.java` — `ly.db.entry` — PlayerEntry
 - [main] `src/main/java/ly/db/entry/PlayerEntryHelper.java` — `ly.db.entry` — PlayerEntryHelper
+- [main] `src/main/java/ly/db/entry/PlayerModuleEntry.java` — `ly.db.entry` — PlayerModuleEntry
+- [main] `src/main/java/ly/db/entry/PlayerSceneEntry.java` — `ly.db.entry` — PlayerSceneEntry
+- [main] `src/main/java/ly/db/entry/RankHistoryEntry.java` — `ly.db.entry` — RankHistoryEntry
+- [main] `src/main/java/ly/db/entry/RankHistoryEntryHelper.java` — `ly.db.entry` — RankHistoryEntryHelper
 - [main] `src/main/java/ly/db/entry/SecurityBanEntry.java` — `ly.db.entry` — SecurityBanEntry
 - [main] `src/main/java/ly/db/entry/SecurityBanEntryHelper.java` — `ly.db.entry` — SecurityBanEntryHelper
 - [main] `src/main/java/ly/db/entry/SecurityEventLogEntry.java` — `ly.db.entry` — SecurityEventLogEntry
@@ -1503,8 +1503,15 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/db/entry/ShareWeekEntryHelper.java` — `ly.db.entry` — ShareWeekEntryHelper
 - [main] `src/main/java/ly/db/entry/UserInfoEntry.java` — `ly.db.entry` — UserInfoEntry
 - [main] `src/main/java/ly/db/entry/UserInfoEntryHelper.java` — `ly.db.entry` — UserInfoEntryHelper
+- [main] `src/main/java/ly/db/MysqlConnector.java` — `ly.db` — MysqlConnector
+- [main] `src/main/java/ly/db/MysqlService.java` — `ly.db` — MysqlService
+- [main] `src/main/java/ly/EntityToSqlGenerator.java` — `ly` — EntityToSqlGenerator
 - [main] `src/main/java/ly/game/MiniPlayer.java` — `ly.game` — MiniPlayer
 - [main] `src/main/java/ly/game/MiniPlayerHelper.java` — `ly.game` — MiniPlayerHelper
+- [main] `src/main/java/ly/IServer.java` — `ly` — IServer
+- [main] `src/main/java/ly/LoggerDef.java` — `ly` — LoggerDef
+- [main] `src/main/java/ly/Main.java` — `ly` — Main
+- [main] `src/main/java/ly/monitor/DeadlockDetector.java` — `ly.monitor` — DeadlockDetector
 - [main] `src/main/java/ly/nacos/NacosServerNode.java` — `ly.nacos` — NacosServerNode
 - [main] `src/main/java/ly/nacos/NacosService.java` — `ly.nacos` — NacosService
 - [main] `src/main/java/ly/net/ClientHandler.java` — `ly.net` — ClientHandler
@@ -1522,9 +1529,10 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/net/NetClientManager.java` — `ly.net` — NetClientManager
 - [main] `src/main/java/ly/net/NetServer.java` — `ly.net` — NetServer
 - [main] `src/main/java/ly/net/NetService.java` — `ly.net` — NetService
-- [main] `src/main/java/ly/net/ServerHandler.java` — `ly.net` — ServerHandler
 - [main] `src/main/java/ly/net/packet/MessagePacket.java` — `ly.net.packet` — MessagePacket
 - [main] `src/main/java/ly/net/packet/MessagePacketFactory.java` — `ly.net.packet` — MessagePacketFactory
+- [main] `src/main/java/ly/net/Server2ServerRpcContext.java` — `ly.net` — Server2ServerRpcContext
+- [main] `src/main/java/ly/net/ServerHandler.java` — `ly.net` — ServerHandler
 - [main] `src/main/java/ly/redis/RedisKeys.java` — `ly.redis` — RedisKeys
 - [main] `src/main/java/ly/redis/RedisUtils.java` — `ly.redis` — RedisUtils
 - [main] `src/main/java/ly/rpc/ReliableRpcMessage.java` — `ly.rpc` — ReliableRpcMessage
@@ -1534,9 +1542,20 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/rpc/RpcNodeConnector.java` — `ly.rpc` — RpcNodeConnector
 - [main] `src/main/java/ly/rpc/RpcService.java` — `ly.rpc` — RpcService
 - [main] `src/main/java/ly/rpc/RpcUtils.java` — `ly.rpc` — RpcUtils
+- [main] `src/main/java/ly/script/ClassBundleCodec.java` — `ly.script` — ClassBundleCodec
+- [main] `src/main/java/ly/script/GmRuntimeScript.java` — `ly.script` — GmRuntimeScript
+- [main] `src/main/java/ly/script/GmScriptContext.java` — `ly.script` — GmScriptContext
+- [main] `src/main/java/ly/script/RuntimeScriptClassLoader.java` — `ly.script` — RuntimeScriptClassLoader
+- [main] `src/main/java/ly/script/RuntimeScriptController.java` — `ly.script` — RuntimeScriptController
+- [main] `src/main/java/ly/script/RuntimeScriptExecutor.java` — `ly.script` — RuntimeScriptExecutor
+- [main] `src/main/java/ly/script/RuntimeScriptSignature.java` — `ly.script` — RuntimeScriptSignature
+- [main] `src/main/java/ly/script/ScriptResult.java` — `ly.script` — ScriptResult
 - [main] `src/main/java/ly/security/SecurityBanService.java` — `ly.security` — SecurityBanService
 - [main] `src/main/java/ly/security/SecurityBanType.java` — `ly.security` — SecurityBanType
+- [main] `src/main/java/ly/ServerContext.java` — `ly` — ServerContext
+- [main] `src/main/java/ly/StandaloneServer.java` — `ly` — StandaloneServer
 - [main] `src/main/java/ly/startup/StartupSkillLoader.java` — `ly.startup` — StartupSkillLoader
+- [main] `src/main/java/ly/TestEntityToSql.java` — `ly` — TestEntityToSql
 - [main] `src/main/java/ly/utils/BitSwitchState.java` — `ly.utils` — BitSwitchState
 - [main] `src/main/java/ly/utils/BitUtils.java` — `ly.utils` — BitUtils
 - [main] `src/main/java/ly/utils/CommonUtils.java` — `ly.utils` — CommonUtils
@@ -1545,6 +1564,16 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/utils/KV.java` — `ly.utils` — KV
 - [main] `src/main/java/ly/utils/KVDemo.java` — `ly.utils` — KVDemo
 - [main] `src/main/java/ly/utils/RandomUtils.java` — `ly.utils` — RandomUtils
+- [main] `src/main/java/ly/utils/rank/AbstractRank.java` — `ly.utils.rank` — AbstractRank
+- [main] `src/main/java/ly/utils/rank/RankConfig.java` — `ly.utils.rank` — RankConfig
+- [main] `src/main/java/ly/utils/rank/RankEntry.java` — `ly.utils.rank` — RankEntry
+- [main] `src/main/java/ly/utils/rank/RankMemberCodec.java` — `ly.utils.rank` — RankMemberCodec
+- [main] `src/main/java/ly/utils/rank/RankScoreCodec.java` — `ly.utils.rank` — RankScoreCodec
+- [main] `src/main/java/ly/utils/rank/RankService.java` — `ly.utils.rank` — RankService
+- [main] `src/main/java/ly/utils/rank/RankType.java` — `ly.utils.rank` — RankType
+- [main] `src/main/java/ly/utils/rank/RankUpdateTask.java` — `ly.utils.rank` — RankUpdateTask
+- [main] `src/main/java/ly/utils/rank/RankUpdateType.java` — `ly.utils.rank` — RankUpdateType
+- [main] `src/main/java/ly/utils/rank/RankUtils.java` — `ly.utils.rank` — RankUtils
 - [main] `src/main/java/ly/utils/ThreeGateTest.java` — `ly.utils` — ThreeGateTest
 - [main] `src/main/java/ly/utils/TimeStatisticsUtils.java` — `ly.utils` — TimeStatisticsUtils
 - [main] `src/main/java/ly/utils/TimeUtils.java` — `ly.utils` — TimeUtils
@@ -1552,17 +1581,23 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 
 #### test 源码
 
-- [test] `src/test/java/TestClient.java` — `ly` — TestClient
-- [test] `src/test/java/TestServer.java` — `ly` — TestServer
 - [test] `src/test/java/ly/AutoTableServiceTest.java` — `ly` — AutoTableServiceTest
-- [test] `src/test/java/ly/EntityToSqlGeneratorSmokeTest.java` — `ly` — EntityToSqlGeneratorSmokeTest
+- [test] `src/test/java/ly/concurrent/VirtualThreadMonitorCompatibilityTest.java` — `ly.concurrent` — VirtualThreadMonitorCompatibilityTest
 - [test] `src/test/java/ly/db/AbstractEntryDirtyStateTest.java` — `ly.db` — AbstractEntryDirtyStateTest
 - [test] `src/test/java/ly/db/MysqlServiceAsyncWriteTest.java` — `ly.db` — MysqlServiceAsyncWriteTest
 - [test] `src/test/java/ly/db/MysqlServiceTypeConversionTest.java` — `ly.db` — MysqlServiceTypeConversionTest
+- [test] `src/test/java/ly/EntityToSqlGeneratorSmokeTest.java` — `ly` — EntityToSqlGeneratorSmokeTest
+- [test] `src/test/java/ly/monitor/DeadlockDetectorTest.java` — `ly.monitor` — DeadlockDetectorTest
+- [test] `src/test/java/ly/PlayerModuleSchemaGenerationTest.java` — `ly` — PlayerModuleSchemaGenerationTest
+- [test] `src/test/java/ly/PlayerSceneSchemaGenerationTest.java` — `ly` — PlayerSceneSchemaGenerationTest
 - [test] `src/test/java/ly/rpc/ReliableRpcStoreTest.java` — `ly.rpc` — ReliableRpcStoreTest
+- [test] `src/test/java/ly/script/ClassBundleCodecTest.java` — `ly.script` — ClassBundleCodecTest
 - [test] `src/test/java/ly/security/SecurityEntitySqlGeneratorTest.java` — `ly.security` — SecurityEntitySqlGeneratorTest
 - [test] `src/test/java/ly/utils/ExcelKVExample.java` — `ly.utils` — ExcelKVExample
 - [test] `src/test/java/ly/utils/KVTest.java` — `ly.utils` — KVTest
+- [test] `src/test/java/ly/utils/rank/RankMemberCodecTest.java` — `ly.utils.rank` — RankMemberCodecTest
+- [test] `src/test/java/TestClient.java` — `(default)` — TestClient
+- [test] `src/test/java/TestServer.java` — `(default)` — TestServer
 
 ### LoginServer
 
@@ -1572,11 +1607,11 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 
 #### main 源码
 
+- [main] `src/main/java/ly/loginserver/controller/LoginController.java` — `ly.loginserver.controller` — LoginController
 - [main] `src/main/java/ly/loginserver/LoginClient.java` — `ly.loginserver` — LoginClient
 - [main] `src/main/java/ly/loginserver/LoginGameObjectProvider.java` — `ly.loginserver` — LoginGameObjectProvider
 - [main] `src/main/java/ly/loginserver/LoginServerApplication.java` — `ly.loginserver` — LoginServerApplication
 - [main] `src/main/java/ly/loginserver/LoginServerConfig.java` — `ly.loginserver` — LoginServerConfig
-- [main] `src/main/java/ly/loginserver/controller/LoginController.java` — `ly.loginserver.controller` — LoginController
 - [main] `src/main/java/ly/loginserver/result/ErrorCode.java` — `ly.loginserver.result` — ErrorCode
 - [main] `src/main/java/ly/loginserver/result/LoginResult.java` — `ly.loginserver.result` — LoginResult
 - [main] `src/main/java/ly/loginserver/result/ServerListResult.java` — `ly.loginserver.result` — ServerListResult
@@ -1584,14 +1619,16 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 
 ### GameServer
 
-- 文件数: 46
-- 包数: 9
-- main/test: 37/9
+- 文件数: 73
+- 包数: 14
+- main/test: 60/13
 
 #### main 源码
 
 - [main] `src/main/java/ly/GameClientManager.java` — `ly` — GameClientManager
 - [main] `src/main/java/ly/GameServer.java` — `ly` — GameServer
+- [main] `src/main/java/ly/logic/gm/GmPlayerController.java` — `ly.logic.gm` — GmPlayerController
+- [main] `src/main/java/ly/logic/gm/GmPlayerReflectionUtils.java` — `ly.logic.gm` — GmPlayerReflectionUtils
 - [main] `src/main/java/ly/logic/hero/HeroController.java` — `ly.logic.hero` — HeroController
 - [main] `src/main/java/ly/logic/hero/module/HeroBean.java` — `ly.logic.hero.module` — HeroBean
 - [main] `src/main/java/ly/logic/hero/module/HeroModule.java` — `ly.logic.hero.module` — HeroModule
@@ -1600,11 +1637,35 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/logic/login/LoginManager.java` — `ly.logic.login` — LoginManager
 - [main] `src/main/java/ly/logic/login/LoginTask.java` — `ly.logic.login` — LoginTask
 - [main] `src/main/java/ly/logic/login/PlayerLogicModule.java` — `ly.logic.login` — PlayerLogicModule
+- [main] `src/main/java/ly/logic/move/MoveController.java` — `ly.logic.move` — MoveController
 - [main] `src/main/java/ly/logic/ping/PingController.java` — `ly.logic.ping` — PingController
 - [main] `src/main/java/ly/logic/player/AbstractModule.java` — `ly.logic.player` — AbstractModule
+- [main] `src/main/java/ly/logic/player/coroutine/CoroutineBatch.java` — `ly.logic.player.coroutine` — CoroutineBatch
+- [main] `src/main/java/ly/logic/player/coroutine/CoroutineBatchContext.java` — `ly.logic.player.coroutine` — CoroutineBatchContext
+- [main] `src/main/java/ly/logic/player/coroutine/CoroutineBatchResult.java` — `ly.logic.player.coroutine` — CoroutineBatchResult
+- [main] `src/main/java/ly/logic/player/coroutine/CoroutineDeadlockException.java` — `ly.logic.player.coroutine` — CoroutineDeadlockException
+- [main] `src/main/java/ly/logic/player/coroutine/CoroutineFailureDecision.java` — `ly.logic.player.coroutine` — CoroutineFailureDecision
+- [main] `src/main/java/ly/logic/player/coroutine/CoroutineFailureHandler.java` — `ly.logic.player.coroutine` — CoroutineFailureHandler
+- [main] `src/main/java/ly/logic/player/coroutine/CoroutineTimeoutException.java` — `ly.logic.player.coroutine` — CoroutineTimeoutException
+- [main] `src/main/java/ly/logic/player/coroutine/CoroutineUtils.java` — `ly.logic.player.coroutine` — CoroutineUtils
+- [main] `src/main/java/ly/logic/player/coroutine/CoroutineWaitGraph.java` — `ly.logic.player.coroutine` — CoroutineWaitGraph
+- [main] `src/main/java/ly/logic/player/coroutine/PlayerCoroutineInterceptor.java` — `ly.logic.player.coroutine` — PlayerCoroutineInterceptor
+- [main] `src/main/java/ly/logic/player/coroutine/PlayerCoroutineProxyFactory.java` — `ly.logic.player.coroutine` — PlayerCoroutineProxyFactory
+- [main] `src/main/java/ly/logic/player/coroutine/PlayerCoroutineTask.java` — `ly.logic.player.coroutine` — PlayerCoroutineTask
+- [main] `src/main/java/ly/logic/player/coroutine/PlayerThreadContext.java` — `ly.logic.player.coroutine` — PlayerThreadContext
+- [main] `src/main/java/ly/logic/player/event/IPlayerEvent.java` — `ly.logic.player.event` — IPlayerEvent
+- [main] `src/main/java/ly/logic/player/event/PlayerEventManager.java` — `ly.logic.player.event` — PlayerEventManager
+- [main] `src/main/java/ly/logic/player/event/PlayerEventParam.java` — `ly.logic.player.event` — PlayerEventParam
+- [main] `src/main/java/ly/logic/player/event/PlayerEventSource.java` — `ly.logic.player.event` — PlayerEventSource
+- [main] `src/main/java/ly/logic/player/event/PlayerEventType.java` — `ly.logic.player.event` — PlayerEventType
+- [main] `src/main/java/ly/logic/player/GameRpcPlayerLoadManager.java` — `ly.logic.player` — GameRpcPlayerLoadManager
+- [main] `src/main/java/ly/logic/player/GameRpcPlayerTask.java` — `ly.logic.player` — GameRpcPlayerTask
 - [main] `src/main/java/ly/logic/player/Gate2GameRpcGameCallController.java` — `ly.logic.player` — Gate2GameRpcGameCallController
 - [main] `src/main/java/ly/logic/player/IModule.java` — `ly.logic.player` — IModule
 - [main] `src/main/java/ly/logic/player/ModuleEnum.java` — `ly.logic.player` — ModuleEnum
+- [main] `src/main/java/ly/logic/player/persistence/MysqlPlayerModuleStore.java` — `ly.logic.player.persistence` — MysqlPlayerModuleStore
+- [main] `src/main/java/ly/logic/player/persistence/PlayerModulePersistenceService.java` — `ly.logic.player.persistence` — PlayerModulePersistenceService
+- [main] `src/main/java/ly/logic/player/persistence/PlayerModuleStore.java` — `ly.logic.player.persistence` — PlayerModuleStore
 - [main] `src/main/java/ly/logic/player/Player.java` — `ly.logic.player` — Player
 - [main] `src/main/java/ly/logic/player/PlayerConstant.java` — `ly.logic.player` — PlayerConstant
 - [main] `src/main/java/ly/logic/player/PlayerData.java` — `ly.logic.player` — PlayerData
@@ -1612,11 +1673,8 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/logic/player/PlayerModuleData.java` — `ly.logic.player` — PlayerModuleData
 - [main] `src/main/java/ly/logic/player/PlayerStatusEnum.java` — `ly.logic.player` — PlayerStatusEnum
 - [main] `src/main/java/ly/logic/player/PlayerUtils.java` — `ly.logic.player` — PlayerUtils
-- [main] `src/main/java/ly/logic/player/event/IPlayerEvent.java` — `ly.logic.player.event` — IPlayerEvent
-- [main] `src/main/java/ly/logic/player/event/PlayerEventManager.java` — `ly.logic.player.event` — PlayerEventManager
-- [main] `src/main/java/ly/logic/player/event/PlayerEventParam.java` — `ly.logic.player.event` — PlayerEventParam
-- [main] `src/main/java/ly/logic/player/event/PlayerEventSource.java` — `ly.logic.player.event` — PlayerEventSource
-- [main] `src/main/java/ly/logic/player/event/PlayerEventType.java` — `ly.logic.player.event` — PlayerEventType
+- [main] `src/main/java/ly/logic/rank/GameRankBootstrap.java` — `ly.logic.rank` — GameRankBootstrap
+- [main] `src/main/java/ly/logic/rank/PowerRank.java` — `ly.logic.rank` — PowerRank
 - [main] `src/main/java/ly/logic/resource/module/ResourceModule.java` — `ly.logic.resource.module` — ResourceModule
 - [main] `src/main/java/ly/logic/resource/module/ResourceModuleData.java` — `ly.logic.resource.module` — ResourceModuleData
 - [main] `src/main/java/ly/net/GameConnectSession.java` — `ly.net` — GameConnectSession
@@ -1632,19 +1690,119 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 
 - [test] `src/test/java/ly/AppTest.java` — `ly` — AppTest
 - [test] `src/test/java/ly/DatabaseConnectionTest.java` — `ly` — DatabaseConnectionTest
-- [test] `src/test/java/ly/NacosConnectionTest.java` — `ly` — NacosConnectionTest
-- [test] `src/test/java/ly/RedisConnectionTest.java` — `ly` — RedisConnectionTest
-- [test] `src/test/java/ly/SystemIntegrationTest.java` — `ly` — SystemIntegrationTest
+- [test] `src/test/java/ly/logic/gm/GmPlayerReflectionUtilsTest.java` — `ly.logic.gm` — GmPlayerReflectionUtilsTest
 - [test] `src/test/java/ly/logic/hero/HeroControllerTest.java` — `ly.logic.hero` — HeroControllerTest
 - [test] `src/test/java/ly/logic/hero/module/HeroModuleTest.java` — `ly.logic.hero.module` — HeroModuleTest
+- [test] `src/test/java/ly/logic/player/coroutine/CoroutineUtilsTest.java` — `ly.logic.player.coroutine` — CoroutineUtilsTest
+- [test] `src/test/java/ly/logic/player/PlayerDataPersistenceTest.java` — `ly.logic.player` — PlayerDataPersistenceTest
+- [test] `src/test/java/ly/logic/player/PlayerDataTestFactory.java` — `ly.logic.player` — PlayerDataTestFactory
 - [test] `src/test/java/ly/logic/resource/module/ResourceModuleTest.java` — `ly.logic.resource.module` — ResourceModuleTest
+- [test] `src/test/java/ly/NacosConnectionTest.java` — `ly` — NacosConnectionTest
 - [test] `src/test/java/ly/net/GamePlayerUnifiedQueueTest.java` — `ly.net` — GamePlayerUnifiedQueueTest
+- [test] `src/test/java/ly/RedisConnectionTest.java` — `ly` — RedisConnectionTest
+- [test] `src/test/java/ly/SystemIntegrationTest.java` — `ly` — SystemIntegrationTest
+
+### SceneServer
+
+- 文件数: 84
+- 包数: 8
+- main/test: 73/11
+
+#### main 源码
+
+- [main] `src/main/java/ly/sceneserver/bootstrap/SceneBootstrap.java` — `ly.sceneserver.bootstrap` — SceneBootstrap
+- [main] `src/main/java/ly/sceneserver/common/CommonSceneController.java` — `ly.sceneserver.common` — CommonSceneController
+- [main] `src/main/java/ly/sceneserver/common/FakeSceneDataGenerator.java` — `ly.sceneserver.common` — FakeSceneDataGenerator
+- [main] `src/main/java/ly/sceneserver/common/march/SceneMarchProtoMapper.java` — `ly.sceneserver.common.march` — SceneMarchProtoMapper
+- [main] `src/main/java/ly/sceneserver/common/march/SceneMarchSnapshot.java` — `ly.sceneserver.common.march` — SceneMarchSnapshot
+- [main] `src/main/java/ly/sceneserver/common/march/SceneMarchState.java` — `ly.sceneserver.common.march` — SceneMarchState
+- [main] `src/main/java/ly/sceneserver/common/march/SceneMarchStatus.java` — `ly.sceneserver.common.march` — SceneMarchStatus
+- [main] `src/main/java/ly/sceneserver/common/march/SceneMarchTag.java` — `ly.sceneserver.common.march` — SceneMarchTag
+- [main] `src/main/java/ly/sceneserver/common/march/SceneMarchType.java` — `ly.sceneserver.common.march` — SceneMarchType
+- [main] `src/main/java/ly/sceneserver/common/march/SceneRallyBattleResult.java` — `ly.sceneserver.common.march` — SceneRallyBattleResult
+- [main] `src/main/java/ly/sceneserver/common/march/SceneRallyLaunchSnapshot.java` — `ly.sceneserver.common.march` — SceneRallyLaunchSnapshot
+- [main] `src/main/java/ly/sceneserver/common/march/SceneRallyMember.java` — `ly.sceneserver.common.march` — SceneRallyMember
+- [main] `src/main/java/ly/sceneserver/common/march/SceneRallyMemberSnapshot.java` — `ly.sceneserver.common.march` — SceneRallyMemberSnapshot
+- [main] `src/main/java/ly/sceneserver/common/march/SceneRallyMemberStatus.java` — `ly.sceneserver.common.march` — SceneRallyMemberStatus
+- [main] `src/main/java/ly/sceneserver/common/march/SceneRallySnapshot.java` — `ly.sceneserver.common.march` — SceneRallySnapshot
+- [main] `src/main/java/ly/sceneserver/common/march/SceneRallyState.java` — `ly.sceneserver.common.march` — SceneRallyState
+- [main] `src/main/java/ly/sceneserver/common/march/SceneRallyStatus.java` — `ly.sceneserver.common.march` — SceneRallyStatus
+- [main] `src/main/java/ly/sceneserver/common/march/SceneTargetDescriptor.java` — `ly.sceneserver.common.march` — SceneTargetDescriptor
+- [main] `src/main/java/ly/sceneserver/common/march/SceneTargetTag.java` — `ly.sceneserver.common.march` — SceneTargetTag
+- [main] `src/main/java/ly/sceneserver/common/march/SceneTargetType.java` — `ly.sceneserver.common.march` — SceneTargetType
+- [main] `src/main/java/ly/sceneserver/common/persistence/FlatSceneStaticMapLoader.java` — `ly.sceneserver.common.persistence` — FlatSceneStaticMapLoader
+- [main] `src/main/java/ly/sceneserver/common/persistence/MysqlPlayerSceneStore.java` — `ly.sceneserver.common.persistence` — MysqlPlayerSceneStore
+- [main] `src/main/java/ly/sceneserver/common/persistence/PlayerSceneProjection.java` — `ly.sceneserver.common.persistence` — PlayerSceneProjection
+- [main] `src/main/java/ly/sceneserver/common/persistence/PlayerSceneStore.java` — `ly.sceneserver.common.persistence` — PlayerSceneStore
+- [main] `src/main/java/ly/sceneserver/common/persistence/ScenePlayerPersistenceService.java` — `ly.sceneserver.common.persistence` — ScenePlayerPersistenceService
+- [main] `src/main/java/ly/sceneserver/common/persistence/SceneRecoveryReport.java` — `ly.sceneserver.common.persistence` — SceneRecoveryReport
+- [main] `src/main/java/ly/sceneserver/common/persistence/SceneRecoveryService.java` — `ly.sceneserver.common.persistence` — SceneRecoveryService
+- [main] `src/main/java/ly/sceneserver/common/persistence/SceneStaticMapLoader.java` — `ly.sceneserver.common.persistence` — SceneStaticMapLoader
+- [main] `src/main/java/ly/sceneserver/common/SceneBlockSnapshot.java` — `ly.sceneserver.common` — SceneBlockSnapshot
+- [main] `src/main/java/ly/sceneserver/common/SceneConfig.java` — `ly.sceneserver.common` — SceneConfig
+- [main] `src/main/java/ly/sceneserver/common/SceneDataTag.java` — `ly.sceneserver.common` — SceneDataTag
+- [main] `src/main/java/ly/sceneserver/common/SceneFogPolicy.java` — `ly.sceneserver.common` — SceneFogPolicy
+- [main] `src/main/java/ly/sceneserver/common/SceneLoadLogger.java` — `ly.sceneserver.common` — SceneLoadLogger
+- [main] `src/main/java/ly/sceneserver/common/SceneModeService.java` — `ly.sceneserver.common` — SceneModeService
+- [main] `src/main/java/ly/sceneserver/common/SceneObject.java` — `ly.sceneserver.common` — SceneObject
+- [main] `src/main/java/ly/sceneserver/common/SceneObjectSnapshot.java` — `ly.sceneserver.common` — SceneObjectSnapshot
+- [main] `src/main/java/ly/sceneserver/common/SceneObjectType.java` — `ly.sceneserver.common` — SceneObjectType
+- [main] `src/main/java/ly/sceneserver/common/ScenePathfinder.java` — `ly.sceneserver.common` — ScenePathfinder
+- [main] `src/main/java/ly/sceneserver/common/ScenePathLoadSnapshot.java` — `ly.sceneserver.common` — ScenePathLoadSnapshot
+- [main] `src/main/java/ly/sceneserver/common/ScenePathRequest.java` — `ly.sceneserver.common` — ScenePathRequest
+- [main] `src/main/java/ly/sceneserver/common/ScenePathResult.java` — `ly.sceneserver.common` — ScenePathResult
+- [main] `src/main/java/ly/sceneserver/common/ScenePathService.java` — `ly.sceneserver.common` — ScenePathService
+- [main] `src/main/java/ly/sceneserver/common/ScenePathStatus.java` — `ly.sceneserver.common` — ScenePathStatus
+- [main] `src/main/java/ly/sceneserver/common/ScenePlayerState.java` — `ly.sceneserver.common` — ScenePlayerState
+- [main] `src/main/java/ly/sceneserver/common/ScenePoint.java` — `ly.sceneserver.common` — ScenePoint
+- [main] `src/main/java/ly/sceneserver/common/SceneRegionDirectory.java` — `ly.sceneserver.common` — SceneRegionDirectory
+- [main] `src/main/java/ly/sceneserver/common/SceneRegionGraph.java` — `ly.sceneserver.common` — SceneRegionGraph
+- [main] `src/main/java/ly/sceneserver/common/SceneRegionMigrationLoadSnapshot.java` — `ly.sceneserver.common` — SceneRegionMigrationLoadSnapshot
+- [main] `src/main/java/ly/sceneserver/common/SceneRegionMigrationResult.java` — `ly.sceneserver.common` — SceneRegionMigrationResult
+- [main] `src/main/java/ly/sceneserver/common/SceneRegionMigrationService.java` — `ly.sceneserver.common` — SceneRegionMigrationService
+- [main] `src/main/java/ly/sceneserver/common/SceneRegionPathSegment.java` — `ly.sceneserver.common` — SceneRegionPathSegment
+- [main] `src/main/java/ly/sceneserver/common/SceneRegionTransfer.java` — `ly.sceneserver.common` — SceneRegionTransfer
+- [main] `src/main/java/ly/sceneserver/common/SceneRpcSupport.java` — `ly.sceneserver.common` — SceneRpcSupport
+- [main] `src/main/java/ly/sceneserver/common/SceneRuntime.java` — `ly.sceneserver.common` — SceneRuntime
+- [main] `src/main/java/ly/sceneserver/common/SceneScope.java` — `ly.sceneserver.common` — SceneScope
+- [main] `src/main/java/ly/sceneserver/common/SceneServiceRegistry.java` — `ly.sceneserver.common` — SceneServiceRegistry
+- [main] `src/main/java/ly/sceneserver/common/SceneShard.java` — `ly.sceneserver.common` — SceneShard
+- [main] `src/main/java/ly/sceneserver/common/SceneShardLoadSnapshot.java` — `ly.sceneserver.common` — SceneShardLoadSnapshot
+- [main] `src/main/java/ly/sceneserver/common/SceneStaticMap.java` — `ly.sceneserver.common` — SceneStaticMap
+- [main] `src/main/java/ly/sceneserver/common/SceneTerrainCostProvider.java` — `ly.sceneserver.common` — SceneTerrainCostProvider
+- [main] `src/main/java/ly/sceneserver/common/SceneTerrainType.java` — `ly.sceneserver.common` — SceneTerrainType
+- [main] `src/main/java/ly/sceneserver/common/SceneTickListener.java` — `ly.sceneserver.common` — SceneTickListener
+- [main] `src/main/java/ly/sceneserver/common/SceneTileFlags.java` — `ly.sceneserver.common` — SceneTileFlags
+- [main] `src/main/java/ly/sceneserver/common/SceneViewLevel.java` — `ly.sceneserver.common` — SceneViewLevel
+- [main] `src/main/java/ly/sceneserver/common/SceneViewRequest.java` — `ly.sceneserver.common` — SceneViewRequest
+- [main] `src/main/java/ly/sceneserver/common/SceneViewSnapshot.java` — `ly.sceneserver.common` — SceneViewSnapshot
+- [main] `src/main/java/ly/sceneserver/common/SceneVisibilitySnapshot.java` — `ly.sceneserver.common` — SceneVisibilitySnapshot
+- [main] `src/main/java/ly/sceneserver/cross/CrossSceneService.java` — `ly.sceneserver.cross` — CrossSceneService
+- [main] `src/main/java/ly/sceneserver/local/LocalSceneService.java` — `ly.sceneserver.local` — LocalSceneService
+- [main] `src/main/java/ly/sceneserver/net/SceneConnectSession.java` — `ly.sceneserver.net` — SceneConnectSession
+- [main] `src/main/java/ly/sceneserver/net/SceneConnectSessionProvider.java` — `ly.sceneserver.net` — SceneConnectSessionProvider
+- [main] `src/main/java/ly/sceneserver/net/SceneRpcDispatcher.java` — `ly.sceneserver.net` — SceneRpcDispatcher
+- [main] `src/main/java/ly/sceneserver/SceneServer.java` — `ly.sceneserver` — SceneServer
+
+#### test 源码
+
+- [test] `src/test/java/ly/sceneserver/common/FakeSceneDataGeneratorTest.java` — `ly.sceneserver.common` — FakeSceneDataGeneratorTest
+- [test] `src/test/java/ly/sceneserver/common/march/SceneMarchStateTest.java` — `ly.sceneserver.common.march` — SceneMarchStateTest
+- [test] `src/test/java/ly/sceneserver/common/march/SceneRallyStateTest.java` — `ly.sceneserver.common.march` — SceneRallyStateTest
+- [test] `src/test/java/ly/sceneserver/common/persistence/ScenePlayerPersistenceServiceTest.java` — `ly.sceneserver.common.persistence` — ScenePlayerPersistenceServiceTest
+- [test] `src/test/java/ly/sceneserver/common/persistence/SceneRecoveryServiceTest.java` — `ly.sceneserver.common.persistence` — SceneRecoveryServiceTest
+- [test] `src/test/java/ly/sceneserver/common/SceneAoiTest.java` — `ly.sceneserver.common` — SceneAoiTest
+- [test] `src/test/java/ly/sceneserver/common/SceneLoadMetricsTest.java` — `ly.sceneserver.common` — SceneLoadMetricsTest
+- [test] `src/test/java/ly/sceneserver/common/ScenePathfinderTest.java` — `ly.sceneserver.common` — ScenePathfinderTest
+- [test] `src/test/java/ly/sceneserver/common/SceneProtocolAndRpcTest.java` — `ly.sceneserver.common` — SceneProtocolAndRpcTest
+- [test] `src/test/java/ly/sceneserver/common/SceneRegionMigrationTest.java` — `ly.sceneserver.common` — SceneRegionMigrationTest
+- [test] `src/test/java/ly/sceneserver/common/SceneRuntimeTest.java` — `ly.sceneserver.common` — SceneRuntimeTest
 
 ### GateServer
 
-- 文件数: 10
+- 文件数: 9
 - 包数: 3
-- main/test: 9/1
+- main/test: 8/1
 
 #### main 源码
 
@@ -1656,7 +1814,6 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/net/GateConnectSession.java` — `ly.net` — GateConnectSession
 - [main] `src/main/java/ly/net/GateConnectSessionProvider.java` — `ly.net` — GateConnectSessionProvider
 - [main] `src/main/java/ly/net/IGateController.java` — `ly.net` — IGateController
-- [main] `src/main/java/ly/net/PacketCompat.java` — `ly.net` — PacketCompat
 
 #### test 源码
 
@@ -1664,18 +1821,12 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 
 ### BotServer
 
-- 文件数: 50
-- 包数: 22
-- main/test: 50/0
+- 文件数: 43
+- 包数: 19
+- main/test: 43/0
 
 #### main 源码
 
-- [main] `src/main/java/ly/BotServer.java` — `ly` — BotServer
-- [main] `src/main/java/ly/bot/RobotManager.java` — `ly.bot` — RobotManager
-- [main] `src/main/java/ly/bot/action/RobotAction.java` — `ly.bot.action` — RobotAction
-- [main] `src/main/java/ly/bot/action/RobotActionContext.java` — `ly.bot.action` — RobotActionContext
-- [main] `src/main/java/ly/bot/action/RobotActionRegistry.java` — `ly.bot.action` — RobotActionRegistry
-- [main] `src/main/java/ly/bot/action/RobotActionResult.java` — `ly.bot.action` — RobotActionResult
 - [main] `src/main/java/ly/bot/action/impl/HeartbeatAction.java` — `ly.bot.action.impl` — HeartbeatAction
 - [main] `src/main/java/ly/bot/action/impl/HeroAddAction.java` — `ly.bot.action.impl` — HeroAddAction
 - [main] `src/main/java/ly/bot/action/impl/HeroLevelUpAction.java` — `ly.bot.action.impl` — HeroLevelUpAction
@@ -1683,23 +1834,18 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/bot/action/impl/HeroStarUpAction.java` — `ly.bot.action.impl` — HeroStarUpAction
 - [main] `src/main/java/ly/bot/action/impl/LoginAction.java` — `ly.bot.action.impl` — LoginAction
 - [main] `src/main/java/ly/bot/action/impl/MoveAction.java` — `ly.bot.action.impl` — MoveAction
-- [main] `src/main/java/ly/bot/command/RobotCommand.java` — `ly.bot.command` — RobotCommand
-- [main] `src/main/java/ly/bot/command/impl/HeartbeatCommand.java` — `ly.bot.command.impl` — HeartbeatCommand
-- [main] `src/main/java/ly/bot/command/impl/HeroAddCommand.java` — `ly.bot.command.impl` — HeroAddCommand
-- [main] `src/main/java/ly/bot/command/impl/HeroLevelUpCommand.java` — `ly.bot.command.impl` — HeroLevelUpCommand
-- [main] `src/main/java/ly/bot/command/impl/HeroListCommand.java` — `ly.bot.command.impl` — HeroListCommand
-- [main] `src/main/java/ly/bot/command/impl/HeroStarUpCommand.java` — `ly.bot.command.impl` — HeroStarUpCommand
-- [main] `src/main/java/ly/bot/command/impl/LoginCommand.java` — `ly.bot.command.impl` — LoginCommand
-- [main] `src/main/java/ly/bot/command/impl/MoveCommand.java` — `ly.bot.command.impl` — MoveCommand
+- [main] `src/main/java/ly/bot/action/impl/SimulatedCombatAction.java` — `ly.bot.action.impl` — SimulatedCombatAction
+- [main] `src/main/java/ly/bot/action/RobotAction.java` — `ly.bot.action` — RobotAction
+- [main] `src/main/java/ly/bot/action/RobotActionContext.java` — `ly.bot.action` — RobotActionContext
+- [main] `src/main/java/ly/bot/action/RobotActionRegistry.java` — `ly.bot.action` — RobotActionRegistry
+- [main] `src/main/java/ly/bot/action/RobotActionResult.java` — `ly.bot.action` — RobotActionResult
+- [main] `src/main/java/ly/bot/data/impl/ConcurrentModuleDataStore.java` — `ly.bot.data.impl` — ConcurrentModuleDataStore
 - [main] `src/main/java/ly/bot/data/ModuleDataStore.java` — `ly.bot.data` — ModuleDataStore
 - [main] `src/main/java/ly/bot/data/RobotSessionDataStore.java` — `ly.bot.data` — RobotSessionDataStore
-- [main] `src/main/java/ly/bot/data/impl/ConcurrentModuleDataStore.java` — `ly.bot.data.impl` — ConcurrentModuleDataStore
 - [main] `src/main/java/ly/bot/entity/PlayerInfo.java` — `ly.bot.entity` — PlayerInfo
-- [main] `src/main/java/ly/bot/factory/RobotCommandFactory.java` — `ly.bot.factory` — RobotCommandFactory
 - [main] `src/main/java/ly/bot/http/HttpServerListClient.java` — `ly.bot.http` — HttpServerListClient
-- [main] `src/main/java/ly/bot/module/ModuleManager.java` — `ly.bot.module` — ModuleManager
-- [main] `src/main/java/ly/bot/module/RobotModule.java` — `ly.bot.module` — RobotModule
 - [main] `src/main/java/ly/bot/module/impl/CombatModule.java` — `ly.bot.module.impl` — CombatModule
+- [main] `src/main/java/ly/bot/module/impl/CoroutinePlayerCallTestModule.java` — `ly.bot.module.impl` — CoroutinePlayerCallTestModule
 - [main] `src/main/java/ly/bot/module/impl/CurrencyModule.java` — `ly.bot.module.impl` — CurrencyModule
 - [main] `src/main/java/ly/bot/module/impl/GachaModule.java` — `ly.bot.module.impl` — GachaModule
 - [main] `src/main/java/ly/bot/module/impl/HeartbeatModule.java` — `ly.bot.module.impl` — HeartbeatModule
@@ -1707,25 +1853,29 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/bot/module/impl/LoginModule.java` — `ly.bot.module.impl` — LoginModule
 - [main] `src/main/java/ly/bot/module/impl/MovementModule.java` — `ly.bot.module.impl` — MovementModule
 - [main] `src/main/java/ly/bot/module/impl/RpcSeqSidTestModule.java` — `ly.bot.module.impl` — RpcSeqSidTestModule
-- [main] `src/main/java/ly/bot/observer/RobotObserver.java` — `ly.bot.observer` — RobotObserver
+- [main] `src/main/java/ly/bot/module/ModuleManager.java` — `ly.bot.module` — ModuleManager
+- [main] `src/main/java/ly/bot/module/RobotModule.java` — `ly.bot.module` — RobotModule
 - [main] `src/main/java/ly/bot/observer/impl/LoggingObserver.java` — `ly.bot.observer.impl` — LoggingObserver
+- [main] `src/main/java/ly/bot/observer/RobotObserver.java` — `ly.bot.observer` — RobotObserver
+- [main] `src/main/java/ly/bot/RobotManager.java` — `ly.bot` — RobotManager
 - [main] `src/main/java/ly/bot/session/RobotSession.java` — `ly.bot.session` — RobotSession
-- [main] `src/main/java/ly/bot/state/RobotContext.java` — `ly.bot.state` — RobotContext
-- [main] `src/main/java/ly/bot/state/RobotState.java` — `ly.bot.state` — RobotState
 - [main] `src/main/java/ly/bot/state/impl/ConnectedState.java` — `ly.bot.state.impl` — ConnectedState
 - [main] `src/main/java/ly/bot/state/impl/ConnectingState.java` — `ly.bot.state.impl` — ConnectingState
 - [main] `src/main/java/ly/bot/state/impl/LoggedInState.java` — `ly.bot.state.impl` — LoggedInState
+- [main] `src/main/java/ly/bot/state/RobotContext.java` — `ly.bot.state` — RobotContext
+- [main] `src/main/java/ly/bot/state/RobotState.java` — `ly.bot.state` — RobotState
 - [main] `src/main/java/ly/bot/stats/PacketLatencyStats.java` — `ly.bot.stats` — PacketLatencyStats
-- [main] `src/main/java/ly/bot/strategy/RobotBehaviorStrategy.java` — `ly.bot.strategy` — RobotBehaviorStrategy
 - [main] `src/main/java/ly/bot/strategy/impl/AggressiveBehaviorStrategy.java` — `ly.bot.strategy.impl` — AggressiveBehaviorStrategy
 - [main] `src/main/java/ly/bot/strategy/impl/NormalBehaviorStrategy.java` — `ly.bot.strategy.impl` — NormalBehaviorStrategy
+- [main] `src/main/java/ly/bot/strategy/RobotBehaviorStrategy.java` — `ly.bot.strategy` — RobotBehaviorStrategy
 - [main] `src/main/java/ly/bot/util/ProtocolTester.java` — `ly.bot.util` — ProtocolTester
+- [main] `src/main/java/ly/BotServer.java` — `ly` — BotServer
 
 ### GMServer
 
-- 文件数: 44
+- 文件数: 54
 - 包数: 8
-- main/test: 44/0
+- main/test: 53/1
 
 #### main 源码
 
@@ -1747,16 +1897,21 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/db/entry/GmRoleMenuEntryHelper.java` — `ly.db.entry` — GmRoleMenuEntryHelper
 - [main] `src/main/java/ly/db/entry/GmRolePermissionEntry.java` — `ly.db.entry` — GmRolePermissionEntry
 - [main] `src/main/java/ly/db/entry/GmRolePermissionEntryHelper.java` — `ly.db.entry` — GmRolePermissionEntryHelper
-- [main] `src/main/java/ly/gmserver/GMServerApplication.java` — `ly.gmserver` — GMServerApplication
+- [main] `src/main/java/ly/db/entry/GmRuntimeScriptEntry.java` — `ly.db.entry` — GmRuntimeScriptEntry
+- [main] `src/main/java/ly/db/entry/GmRuntimeScriptEntryHelper.java` — `ly.db.entry` — GmRuntimeScriptEntryHelper
 - [main] `src/main/java/ly/gmserver/config/GmConfigHotUpdateMenuInitializer.java` — `ly.gmserver.config` — GmConfigHotUpdateMenuInitializer
+- [main] `src/main/java/ly/gmserver/config/GmPlayerMenuInitializer.java` — `ly.gmserver.config` — GmPlayerMenuInitializer
 - [main] `src/main/java/ly/gmserver/config/GmSecurityMenuInitializer.java` — `ly.gmserver.config` — GmSecurityMenuInitializer
 - [main] `src/main/java/ly/gmserver/config/WebSecurityConfig.java` — `ly.gmserver.config` — WebSecurityConfig
 - [main] `src/main/java/ly/gmserver/controller/AdminController.java` — `ly.gmserver.controller` — AdminController
 - [main] `src/main/java/ly/gmserver/controller/ConfigHotUpdateController.java` — `ly.gmserver.controller` — ConfigHotUpdateController
+- [main] `src/main/java/ly/gmserver/controller/DevGameAssignmentController.java` — `ly.gmserver.controller` — DevGameAssignmentController
 - [main] `src/main/java/ly/gmserver/controller/LogController.java` — `ly.gmserver.controller` — LogController
 - [main] `src/main/java/ly/gmserver/controller/MenuController.java` — `ly.gmserver.controller` — MenuController
 - [main] `src/main/java/ly/gmserver/controller/PageController.java` — `ly.gmserver.controller` — PageController
+- [main] `src/main/java/ly/gmserver/controller/PlayerController.java` — `ly.gmserver.controller` — PlayerController
 - [main] `src/main/java/ly/gmserver/controller/RoleController.java` — `ly.gmserver.controller` — RoleController
+- [main] `src/main/java/ly/gmserver/controller/RuntimeScriptController.java` — `ly.gmserver.controller` — RuntimeScriptController
 - [main] `src/main/java/ly/gmserver/controller/SecurityController.java` — `ly.gmserver.controller` — SecurityController
 - [main] `src/main/java/ly/gmserver/dto/AdminVO.java` — `ly.gmserver.dto` — AdminVO
 - [main] `src/main/java/ly/gmserver/dto/ApiResponse.java` — `ly.gmserver.dto` — ApiResponse
@@ -1767,10 +1922,21 @@ Java 文件总数: 1657 (server 目录: 1656, 根目录 redis-test: 1)
 - [main] `src/main/java/ly/gmserver/dto/RoleVO.java` — `ly.gmserver.dto` — RoleVO
 - [main] `src/main/java/ly/gmserver/filter/JwtAuthFilter.java` — `ly.gmserver.filter` — JwtAuthFilter
 - [main] `src/main/java/ly/gmserver/filter/OperationLogAspect.java` — `ly.gmserver.filter` — OperationLogAspect
+- [main] `src/main/java/ly/gmserver/GMServerApplication.java` — `ly.gmserver` — GMServerApplication
 - [main] `src/main/java/ly/gmserver/service/ConfigHotUpdateService.java` — `ly.gmserver.service` — ConfigHotUpdateService
 - [main] `src/main/java/ly/gmserver/service/GmAdminService.java` — `ly.gmserver.service` — GmAdminService
 - [main] `src/main/java/ly/gmserver/service/GmMenuService.java` — `ly.gmserver.service` — GmMenuService
+- [main] `src/main/java/ly/gmserver/service/GmPlayerService.java` — `ly.gmserver.service` — GmPlayerService
 - [main] `src/main/java/ly/gmserver/service/GmRoleService.java` — `ly.gmserver.service` — GmRoleService
 - [main] `src/main/java/ly/gmserver/service/GmSecurityService.java` — `ly.gmserver.service` — GmSecurityService
+- [main] `src/main/java/ly/gmserver/service/GroovyRuntimeScriptCompiler.java` — `ly.gmserver.service` — GroovyRuntimeScriptCompiler
+- [main] `src/main/java/ly/gmserver/service/RuntimeScriptService.java` — `ly.gmserver.service` — RuntimeScriptService
 - [main] `src/main/java/ly/gmserver/util/JwtUtil.java` — `ly.gmserver.util` — JwtUtil
 
+#### test 源码
+
+- [test] `src/test/java/ly/gmserver/service/GroovyRuntimeScriptCompilerTest.java` — `ly.gmserver.service` — GroovyRuntimeScriptCompilerTest
+
+## 仓库其他 Java 源码
+
+- [main] `redis-test/src/main/java/RedisTest.java` — `(default)` — RedisTest

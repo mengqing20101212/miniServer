@@ -46,6 +46,22 @@ enum CMD{
   SC_GmUpdatePlayerModule = 10010;                                                  // GM 修改在线玩家模块字段 响应
   CS_GmRuntimeScriptExecute = 10011;                                                // GM 推送一次性运行时脚本
   SC_GmRuntimeScriptExecute = 10012;                                                // 一次性运行时脚本执行结果
+
+  // SceneServer 通用地图 RPC 12000-12099
+  CS_SceneQuery = 12001;                                                            // 查询地图对象和静态格信息
+  SC_SceneQuery = 12002;
+  CS_SceneEnter = 12003;                                                            // 实体进入场景
+  SC_SceneEnter = 12004;
+  CS_SceneMove = 12005;                                                             // 实体移动
+  SC_SceneMove = 12006;
+  CS_SceneMetrics = 12007;                                                          // 查询场景运行指标
+  SC_SceneMetrics = 12008;
+  CS_SceneLeave = 12009;                                                            // 实体离开场景
+  SC_SceneLeave = 12010;
+  CS_SceneView = 12011;                                                             // 移动 AOI 视野或切换缩放层
+  SC_SceneView = 12012;
+  CS_ScenePathFind = 12013;                                                         // 异步地形和战争迷雾 A* 寻路
+  SC_ScenePathFind = 12014;
   MaxServeMsgId = 20000;                                                         //maxServeMsgId 服务器之间通信消息号最大值
 
   ///////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用////////////////////////////////////////

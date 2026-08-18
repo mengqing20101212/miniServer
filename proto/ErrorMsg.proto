@@ -26,6 +26,15 @@ enum ErrorCode{
   AWAKEN_CONDITION_NOT_MET = 5008; //觉醒条件不满足
   HERO_SLOT_FULL = 5009; //英雄槽位已满
   HERO_ALREADY_EXISTS = 5010; //英雄已存在
+
+  // 场景相关错误码 6000-6099
+  SCENE_NOT_FOUND = 6001; //场景或场景对象不存在
+  SCENE_OUT_OF_BOUNDS = 6002; //场景坐标越界
+  SCENE_NOT_READY = 6003; //场景尚未完成启动或恢复
+  SCENE_UNSUPPORTED = 6004; //当前阶段不支持该场景操作
+  SCENE_PATH_NOT_FOUND = 6005; //地形阻挡或约束下不存在可达路径
+  SCENE_PATH_LIMIT_EXCEEDED = 6006; //寻路超过最大搜索节点数
+  SCENE_FOG_BLOCKED = 6007; //目标点不在允许的战争迷雾范围内
 }
 
 

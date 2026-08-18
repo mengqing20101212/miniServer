@@ -418,6 +418,29 @@ public class MysqlConnector {
     return result;
   }
 
+  /**
+   * 执行必须成功的 DML 并返回影响行数。
+   *
+   * <p>与 {@link #execute(String, Object...)} 不同，0 行影响也是一次成功执行，并且 SQL 异常会
+   * 抛给调用方。版本化 UPSERT 需要据此区分“旧版本被忽略”和“数据库执行失败”。
+   */
+  public int executeUpdateStrict(String sql, Object... params) {
+    long startTime = System.currentTimeMillis();
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql)) {
+      addSqlParams(params, statement);
+      return statement.executeUpdate();
+    } catch (Exception e) {
+      throw new IllegalStateException(
+          String.format("execute strict update SQL(%s) failed, params:%s", sql, getParamStr(params)), e);
+    } finally {
+      long cost = System.currentTimeMillis() - startTime;
+      if (cost >= SQL_MAX_OPT_TIMEOUT) {
+        logger.warn("strict update SQL cost too long, sql:{}, params:{}, cost:{} ms", sql, getParamStr(params), cost);
+      }
+    }
+  }
+
   private boolean isDdlSql(String sql) {
     if (sql == null) {
       return false;

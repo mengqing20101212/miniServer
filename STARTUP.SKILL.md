@@ -16,6 +16,17 @@ startup:
     serverId: "game1001"
     env: "ly"
     netPort: 9002
+  scene:
+    serverType: "SCENE"
+    serverId: "scene1001"
+    env: "ly"
+    netPort: 9101
+    loadLogSeconds: 60
+    slowTickMillis: 200
+    pathRegionPadding: 1
+    regionMigrationQueueCapacity: 128
+    restorePageSize: 1000
+    persistencePartitions: 4
   gate:
     serverType: "GATE"
     serverId: "gate1001"
@@ -50,6 +61,8 @@ startup:
 - Namespace/env: `ly`
 - LoginServer: `serverId=login`, NetServer `8888`, Spring HTTP `8889`
 - GameServer: `serverId=game1001`, NetServer `9002`
+- SceneServer: `serverId=scene1001`, NetServer `9101`
+- SceneServer load/persistence baseline: load log `60s`, slow Tick `200ms`, Region migration queue `128`, restore page `1000`, persistence partitions `4`.
 - GateServer: `serverId=gate1001`, NetServer `9001`
 - BotServer: `--run-bots 127.0.0.1 8889 1`
 
@@ -68,6 +81,7 @@ Do not start BotServer until Login/Game/Gate are actually listening on `8888`, `
 - `LoginServer.springPort` must equal `LoginServer.netPort + 1`.
 - BotServer login HTTP port must equal `LoginServer.springPort`.
 - GameServer and GateServer must use the Nacos URL, env, and serverId from this file.
+- SceneServer must use the Nacos URL, env, and serverId from this file.
 - MySQL, Redis, and business runtime config must come from Nacos, not local `application.properties`.
 - If Nacos auth is disabled, do not pass hard-coded Nacos credentials.
 

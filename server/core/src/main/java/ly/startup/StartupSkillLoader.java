@@ -153,6 +153,7 @@ public final class StartupSkillLoader {
         return switch (serverType) {
             case LOGIN -> skill.startup.login;
             case GAME -> skill.startup.game;
+            case SCENE -> skill.startup.scene;
             case GATE -> skill.startup.gate;
             case GMSERVER -> skill.startup.gm;
             default -> throw new IllegalArgumentException("不支持的 serverType: " + serverType.getType());
@@ -167,6 +168,7 @@ public final class StartupSkillLoader {
         requireNonBlank(skill.startup.nacos.url, "startup.nacos.url", skillPath);
         validateServer(skill.startup.login, ServerTypeEnum.LOGIN, skillPath);
         validateServer(skill.startup.game, ServerTypeEnum.GAME, skillPath);
+        validateServer(skill.startup.scene, ServerTypeEnum.SCENE, skillPath);
         validateServer(skill.startup.gate, ServerTypeEnum.GATE, skillPath);
         if (skill.startup.gm != null) {
             validateServer(skill.startup.gm, ServerTypeEnum.GMSERVER, skillPath);
@@ -325,6 +327,7 @@ public final class StartupSkillLoader {
         public StartupNacos nacos;
         public StartupServer login;
         public StartupServer game;
+        public StartupServer scene;
         public StartupServer gate;
         public StartupServer gm;
         public StartupBot bot;

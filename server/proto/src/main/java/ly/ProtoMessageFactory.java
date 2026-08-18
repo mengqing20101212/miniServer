@@ -41,6 +41,20 @@ public class ProtoMessageFactory {
         case Cmd.CMD.SC_ResourceQuery_VALUE ->{return Resource.SC_ResourceQuery.parseFrom(data);}
         case Cmd.CMD.SC_ResourceChange_VALUE ->{return Resource.SC_ResourceChange.parseFrom(data);}
         case Cmd.CMD.SC_ResourceBatchChange_VALUE ->{return Resource.SC_ResourceBatchChange.parseFrom(data);}
+        case Cmd.CMD.CS_SceneQuery_VALUE ->{return Scene.csSceneQuery.parseFrom(data);}
+        case Cmd.CMD.SC_SceneQuery_VALUE ->{return Scene.scSceneQuery.parseFrom(data);}
+        case Cmd.CMD.CS_SceneEnter_VALUE ->{return Scene.csSceneEnter.parseFrom(data);}
+        case Cmd.CMD.SC_SceneEnter_VALUE ->{return Scene.scSceneEnter.parseFrom(data);}
+        case Cmd.CMD.CS_SceneMove_VALUE ->{return Scene.csSceneMove.parseFrom(data);}
+        case Cmd.CMD.SC_SceneMove_VALUE ->{return Scene.scSceneMove.parseFrom(data);}
+        case Cmd.CMD.CS_SceneMetrics_VALUE ->{return Scene.csSceneMetrics.parseFrom(data);}
+        case Cmd.CMD.SC_SceneMetrics_VALUE ->{return Scene.scSceneMetrics.parseFrom(data);}
+        case Cmd.CMD.CS_SceneLeave_VALUE ->{return Scene.csSceneLeave.parseFrom(data);}
+        case Cmd.CMD.SC_SceneLeave_VALUE ->{return Scene.scSceneLeave.parseFrom(data);}
+        case Cmd.CMD.CS_SceneView_VALUE ->{return Scene.csSceneView.parseFrom(data);}
+        case Cmd.CMD.SC_SceneView_VALUE ->{return Scene.scSceneView.parseFrom(data);}
+        case Cmd.CMD.CS_ScenePathFind_VALUE ->{return Scene.csScenePathFind.parseFrom(data);}
+        case Cmd.CMD.SC_ScenePathFind_VALUE ->{return Scene.scScenePathFind.parseFrom(data);}
         case Cmd.CMD.CS_Server2Server_VALUE ->{return Server.csServer2Server.parseFrom(data);}
         case Cmd.CMD.SC_Server2Server_VALUE ->{return Server.scServer2Server.parseFrom(data);}
         case Cmd.CMD.CS_RpcPing_VALUE ->{return Server.csRpcPing.parseFrom(data);}
@@ -53,19 +67,5 @@ public class ProtoMessageFactory {
       return null;
     }
     return null;
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T extends AbstractMessage> T createProtoMessage(int cmd, byte[] data, Class<T> clazz) {
-    AbstractMessage msg = createProtoMessage(cmd, data);
-    if (msg == null) {
-      return null;
-    }
-    try {
-      return (T) msg;
-    } catch (ClassCastException e) {
-      // Return null if type doesn't match
-      return null;
-    }
   }
 }

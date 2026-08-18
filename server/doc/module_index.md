@@ -1,12 +1,12 @@
 # MiniServer 模块索引
 
-更新时间：2026-05-09
+更新时间：2026-08-18
 
 本文是当前 `server/pom.xml` 聚合工程的模块级阅读指南。
 
 ## 聚合模块
 
-`server/pom.xml` 当前聚合 9 个 Maven 模块：
+`server/pom.xml` 当前聚合 10 个 Maven 模块：
 
 1. `config`
 2. `proto`
@@ -14,15 +14,18 @@
 4. `core`
 5. `LoginServer`
 6. `GameServer`
-7. `GateServer`
-8. `BotServer`
-9. `GMServer`
+7. `SceneServer`
+8. `GateServer`
+9. `BotServer`
+10. `GMServer`
 
 ## 依赖关系概览
 
 - `core` 依赖 `config`、`proto`，并承载 Netty、Nacos、Redis、MySQL 等公共基础能力。
 - `tool` 依赖 `core`，负责各类离线生成流程。
 - `GameServer`、`GateServer`、`LoginServer`、`BotServer` 基于 `core` 构建。
+- `GameServer` 负责玩家连接、登录态和养成类业务，不再承载地图权威状态。
+- `SceneServer` 直接依赖 `config`、`proto` 和 `core`：读取场景策划表，复用通用协议与网络/RPC/Nacos 能力，并在一个工程内按 `common`、`local`、`cross` package 承载场景公共、本服和跨服逻辑。
 - `GMServer` 是 Spring Boot 后台管理服务，依赖 `core`、`config`、`proto`。
 
 ## 模块详情
@@ -116,6 +119,32 @@
 - `server/GameServer/src/main/java/ly/logic/player/Player.java`
 - `server/GameServer/src/main/java/ly/logic/player/PlayerManager.java`
 - `server/GameServer/src/main/java/ly/net/GameHandlerRouteManager.java`
+
+### SceneServer
+
+职责：地图状态权威服务，处理本服地图、跨服地图、SceneShard、AOI 分层同步、玩家独立战争迷雾、Region/Portal 两级异步 A*、热点 Region 单线程迁移、行军/集结状态机、玩家场景投影恢复、周期线程负载和场景 RPC。
+
+关键文件：
+
+- `server/SceneServer/src/main/java/ly/sceneserver/SceneServer.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/CommonSceneController.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/SceneRuntime.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/SceneShard.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/ScenePathfinder.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/SceneRegionGraph.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/SceneRegionDirectory.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/SceneRegionMigrationService.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/SceneRegionPathSegment.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/SceneViewSnapshot.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/SceneLoadLogger.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/march/SceneMarchState.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/march/SceneRallyState.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/march/SceneTargetDescriptor.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/persistence/SceneRecoveryService.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/persistence/ScenePlayerPersistenceService.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/common/persistence/MysqlPlayerSceneStore.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/local/LocalSceneService.java`
+- `server/SceneServer/src/main/java/ly/sceneserver/cross/CrossSceneService.java`
 
 ### GateServer
 

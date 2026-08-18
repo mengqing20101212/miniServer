@@ -32,6 +32,16 @@ public final class Server2ServerRpcContext {
         }
     }
 
+    /**
+     * 捕获当前服务器间 RPC 的 callId，供真正异步的 Handler 在回调线程中恢复上下文。
+     *
+     * <p>返回 0 表示当前请求不是通用 Server2Server RPC，恢复时仍可安全调用 {@link #run}。
+     */
+    public static long currentCallId() {
+        Long callId = CURRENT_CALL_ID.get();
+        return callId == null ? 0L : callId;
+    }
+
     public static MessagePacket wrapResponseIfNeeded(MessagePacket packet) {
         Long callId = CURRENT_CALL_ID.get();
         if (callId == null || callId <= 0 || packet == null) {
