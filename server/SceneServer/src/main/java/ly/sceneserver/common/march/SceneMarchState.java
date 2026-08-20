@@ -58,6 +58,45 @@ public final class SceneMarchState {
         this.armySnapshotVersion = armySnapshotVersion;
     }
 
+    /**
+     * 从已校验的数据库快照恢复权威行军状态。
+     *
+     * <p>恢复只允许在 SceneRuntime 启动 Tick 前执行；运行中仍必须通过 SceneShard 状态机修改。
+     */
+    public static SceneMarchState restore(SceneMarchSnapshot snapshot) {
+        if (snapshot == null || snapshot.status() == null || snapshot.stateVersion() <= 0
+                || snapshot.pathIndex() < 0 || snapshot.departAtMillis() < 0L
+                || snapshot.arrivalAtMillis() < 0L) {
+            throw new IllegalArgumentException("invalid persisted march snapshot");
+        }
+        if (snapshot.path().isEmpty()) {
+            if (snapshot.pathIndex() != 0) {
+                throw new IllegalArgumentException("empty march path has non-zero index");
+            }
+        } else if (snapshot.pathIndex() >= snapshot.path().size()) {
+            throw new IllegalArgumentException("march path index is outside path");
+        }
+
+        SceneMarchState state = new SceneMarchState(
+                snapshot.marchId(),
+                snapshot.ownerPlayerId(),
+                snapshot.allianceId(),
+                snapshot.type(),
+                snapshot.tagMask(),
+                snapshot.origin(),
+                snapshot.target(),
+                snapshot.troopCount(),
+                snapshot.power(),
+                snapshot.armySnapshotVersion());
+        state.status = snapshot.status();
+        state.path = List.copyOf(snapshot.path());
+        state.pathIndex = snapshot.pathIndex();
+        state.departAtMillis = snapshot.departAtMillis();
+        state.arrivalAtMillis = snapshot.arrivalAtMillis();
+        state.stateVersion = snapshot.stateVersion();
+        return state;
+    }
+
     /** 寻路完成后进入行军；速度单位是“地形代价/秒”，到达时间由服务端统一计算。 */
     public void assignPath(List<ScenePoint> path, int totalPathCost, int speedCostPerSecond, long nowMillis) {
         requireStatus(SceneMarchStatus.PREPARING);

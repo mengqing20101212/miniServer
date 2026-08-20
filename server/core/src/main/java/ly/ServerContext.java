@@ -90,7 +90,8 @@ public class ServerContext {
         // 尽早启动 JVM 死锁检测器，覆盖后续 Nacos、配置表、Redis、MySQL、Netty 等所有线程。
         DeadlockDetector.start();
         
-        // Nacos 启动会加载当前 serverId 对应的 ServerConfig，并注册服务发现实例。
+        // Nacos 启动先加载当前 serverId 对应的 ServerConfig，并订阅其他节点。
+        // 当前节点必须等配置校验和端口绑定均成功后才允许注册到服务发现。
         NacosService.getInstance().startUp(nacosUrl, serverType, serverId, env);
         
         // 检查 serverConfig 是否成功初始化
@@ -112,6 +113,8 @@ public class ServerContext {
         SecurityBanService.getInstance().loadActiveBansFromDb();
         
         NetService.getInstance().startUp(gameObjectProvider, serverConfig.serverPort);
+        // Netty 已经监听成功，此时注册的 IP/端口才是一个真正可连接的 RPC 节点。
+        NacosService.getInstance().registerCurrentServerNode();
         // 当前服务器端口绑定完成后再补发可靠 RPC，避免目标服处理后回包找不到本服连接。
         RpcService.getInstance().replayReliableMessagesOnStartup();
         if (StartupSkillLoader.isLocalConfigMode()) {

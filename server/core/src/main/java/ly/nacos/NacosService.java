@@ -33,6 +33,7 @@ import ly.ServerContext;
 import ly.config.ServerConfig;
 import ly.config.ServerTypeEnum;
 import ly.rpc.RpcService;
+import ly.startup.StartupSkillLoader;
 import ly.utils.CommonUtils;
 
 /**
@@ -72,8 +73,10 @@ public class NacosService {
     /**
      * 启动 Nacos 客户端。
      * <p>
-     * 会先读取当前节点配置，再注册当前节点实例，最后订阅同 namespace 下的节点变化。
+     * 会先读取当前节点配置，再订阅同 namespace 下的节点变化。
      * 读取配置成功后会写入 {@link ServerContext#serverConfig}，供后续服务初始化使用。
+     * 当前节点要等端口真正绑定后由 {@link #registerCurrentServerNode()} 注册，避免发现列表
+     * 暴露尚未就绪或校验失败的节点。
      */
     public void startUp(String nacosUrl, ServerTypeEnum serverType, String serverId, String env) {
         logger.info("开始启动 Nacos ");
@@ -92,10 +95,7 @@ public class NacosService {
             getServerConfig(configService, serverType, serverId);
 
             namingService = NacosFactory.createNamingService(properties);
-            // 注册当前节点实例
-            registerServerNode(namingService);
-
-            // 监听节点变化
+            // 先监听其他节点变化；当前节点会在自身端口绑定成功后注册。
             subscribeServerNode(namingService);
         } catch (Exception e) {
             System.out.println(" 服务器 Nacos 启动失败 ");
@@ -190,6 +190,24 @@ public class NacosService {
     }
 
     /**
+     * 在本服网络端口绑定成功后注册当前节点。
+     *
+     * <p>该入口刻意与 Nacos 配置加载分开：如果端口校验、数据库初始化或 Netty 绑定失败，
+     * 注册中心不会出现一个实际不可用的节点。</p>
+     */
+    public void registerCurrentServerNode() {
+        if (namingService == null) {
+            throw new IllegalStateException("Nacos NamingService 尚未初始化");
+        }
+        try {
+            registerServerNode(namingService);
+        } catch (NacosException e) {
+            throw new IllegalStateException(
+                    "注册 Nacos 节点失败, serverId=" + ServerContext.getServerId(), e);
+        }
+    }
+
+    /**
      * 注册当前服务器节点。
      * <p>
      * 服务名固定为 {@code rpc_node_list_service}，group 使用当前 ENV。注册失败会有限重试，
@@ -278,7 +296,8 @@ public class NacosService {
      * 从 Nacos 配置中心拉取当前节点配置并监听后续变更。
      * <p>
      * dataId 使用 serverId，group 使用服务器类型。Nacos SDK 偶发空返回时会降级到 HTTP
-     * 接口；仍失败时使用 gate1001/GATE 作为本地开发兜底配置。
+     * 接口；仍失败时使用 gate1001/GATE 作为共享运行参数兜底。兜底配置中的节点身份和端口
+     * 不能复用，会按 STARTUP.SKILL.md 中当前服务器的基线覆盖。
      */
     private void getServerConfig(
             ConfigService configService, ServerTypeEnum serverType, String serverId) throws Exception {
@@ -306,6 +325,12 @@ public class NacosService {
             }
             if (configStr != null && !configStr.isBlank()) {
                 parserServerConfig(configStr);
+                StartupSkillLoader.applyFallbackNodeConfig(serverType, ServerContext.serverConfig);
+                logger.warn(
+                        "未找到独立 Nacos 配置，使用 gate1001/GATE 的共享参数并覆盖节点身份，serverId={}, serverType={}, serverPort={}",
+                        serverId,
+                        serverType.getType(),
+                        ServerContext.serverConfig.serverPort);
             } else {
                 throw new RuntimeException(
                         "获取nacos 配置失败，serverId=" + serverId + ", serverType=" + serverType.getType());
@@ -412,6 +437,7 @@ public class NacosService {
         ServerContext.serverType = ServerTypeEnum.GAME;
         for (int i = 0; i < 1; i++) {
             getInstance().startUp(nacosUrl, ServerTypeEnum.getByType(serverType), serverId, env);
+            getInstance().registerCurrentServerNode();
         }
         try {
             Thread.sleep(Integer.MAX_VALUE);

@@ -105,6 +105,19 @@
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
 
+            <!--
+                BotServer 的 Shade 包会替换主 JAR。Windows 增量 package 时，如果普通 JAR
+                被判定为“无需重建”，Shade 可能再次读取上一次生成的胖包，旧依赖类就会
+                覆盖本次 reactor 中的新类。每次 package 前强制生成薄 JAR，保证胖包输入干净。
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <forceCreation>true</forceCreation>
+                </configuration>
+            </plugin>
+
             <!-- Shade plugin to create an uber-jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

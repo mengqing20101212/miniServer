@@ -68,4 +68,15 @@ public class ProtoMessageFactory {
     }
     return null;
   }
+
+  /**
+   * 按协议号反序列化消息，并校验结果是否为调用方期望的 protobuf 类型。
+   *
+   * <p>该重载供需要强类型返回值的网关/RPC 调用使用；协议号与类型不匹配时返回 {@code null}，
+   * 避免把类型转换异常留到调用方。</p>
+   */
+  public static <T extends AbstractMessage> T createProtoMessage(int cmd, byte[] data, Class<T> clazz) {
+    AbstractMessage message = createProtoMessage(cmd, data);
+    return clazz.isInstance(message) ? clazz.cast(message) : null;
+  }
 }

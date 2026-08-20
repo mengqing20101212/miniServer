@@ -11,6 +11,7 @@ enum SceneScope {
   SCENE_SCOPE_CROSS = 1;
 }
 
+// 场景动态对象分类，用于客户端反序列化对象明细和选择表现逻辑。
 enum SceneObjectKind {
   // 玩家实体。
   SCENE_OBJECT_PLAYER = 0;
@@ -34,57 +35,101 @@ enum SceneObjectKind {
 
 // 行军/车辆类型，决定服务端状态机和目标能力校验。
 enum SceneMarchType {
+  // 单支部队直接攻击目标。
   SCENE_MARCH_ATTACK = 0;
+  // 正在前往集结点、尚未并入集结主车的成员部队。
   SCENE_MARCH_RALLY_MEMBER = 1;
+  // 集结完成后由盟主统一控制的集结主车。
   SCENE_MARCH_RALLY_ARMY = 2;
+  // 前往友方城市或部队执行增援。
   SCENE_MARCH_REINFORCE = 3;
+  // 驻守城市、建筑或其他可驻防目标。
   SCENE_MARCH_GARRISON = 4;
+  // 前往资源点执行采集。
   SCENE_MARCH_GATHER = 5;
+  // 前往目标执行侦察。
   SCENE_MARCH_SCOUT = 6;
+  // 在友方目标之间运输资源。
   SCENE_MARCH_TRANSPORT = 7;
+  // 完成任务、取消任务或战斗结束后返回出发点。
   SCENE_MARCH_RETURN = 8;
 }
 
+// 行军状态机阶段；状态变更只由所属 SceneShard 的 Tick 线程提交。
 enum SceneMarchStatus {
+  // 已创建但尚未正式出发，可用于等待前置校验或集结准备。
   SCENE_MARCH_PREPARING = 0;
+  // 正在沿服务端确认的路径移动。
   SCENE_MARCH_MOVING = 1;
+  // 已到达集结点并等待集结主车发车。
   SCENE_MARCH_WAITING_RALLY = 2;
+  // 已到达普通业务目标，等待业务层处理到达事件。
   SCENE_MARCH_ARRIVED = 3;
+  // 已冻结战斗输入并等待 BattleServer 返回结果。
   SCENE_MARCH_BATTLE_PENDING = 4;
+  // 正在沿返程路径移动。
   SCENE_MARCH_RETURNING = 5;
+  // 行军生命周期正常结束。
   SCENE_MARCH_FINISHED = 6;
+  // 行军在允许取消的阶段被终止。
   SCENE_MARCH_CANCELLED = 7;
 }
 
+// 行军目标类型，用于校验攻击、增援、采集、集结等业务能力。
 enum SceneTargetType {
+  // 没有动态对象 ID 的普通地图坐标。
   SCENE_TARGET_POINT = 0;
+  // 玩家主城。
   SCENE_TARGET_PLAYER_CITY = 1;
+  // 联盟城市。
   SCENE_TARGET_ALLIANCE_CITY = 2;
+  // 联盟建筑，例如要塞、关卡或箭塔。
   SCENE_TARGET_ALLIANCE_BUILDING = 3;
+  // 可采集资源点。
   SCENE_TARGET_RESOURCE = 4;
+  // 世界怪物或首领。
   SCENE_TARGET_MONSTER = 5;
+  // 联盟集结营地或集结主车。
   SCENE_TARGET_RALLY_CAMP = 6;
+  // 地图上的其他移动部队。
   SCENE_TARGET_TROOP = 7;
+  // 跨服场景中由全局 ID 标识的动态对象。
   SCENE_TARGET_CROSS_SERVER_OBJECT = 8;
 }
 
+// 集结整体状态，由创建、发车、战斗、返程直到结束构成完整状态机。
 enum SceneRallyStatus {
+  // 正在招募成员，尚未冻结出战快照。
   SCENE_RALLY_RECRUITING = 0;
+  // 已发车并由集结主车统一移动。
   SCENE_RALLY_MOVING = 1;
+  // 已提交 BattleServer，等待幂等战斗结果。
   SCENE_RALLY_BATTLE_PENDING = 2;
+  // 战斗或取消后正在返回。
   SCENE_RALLY_RETURNING = 3;
+  // 集结正常完成且结果已经应用。
   SCENE_RALLY_FINISHED = 4;
+  // 集结在发车前或可取消阶段被终止。
   SCENE_RALLY_CANCELLED = 5;
 }
 
+// 单个集结成员在集结生命周期内的状态。
 enum SceneRallyMemberStatus {
+  // 成员部队正在前往集结点。
   SCENE_RALLY_MEMBER_JOINING = 0;
+  // 成员已到达集结点并等待主车发车。
   SCENE_RALLY_MEMBER_READY = 1;
+  // 成员已经并入集结主车共同移动。
   SCENE_RALLY_MEMBER_MOVING = 2;
+  // 成员部队快照已经提交战斗，等待结果。
   SCENE_RALLY_MEMBER_BATTLE_PENDING = 3;
+  // 成员剩余部队正在返程。
   SCENE_RALLY_MEMBER_RETURNING = 4;
+  // 成员已完成本次集结生命周期。
   SCENE_RALLY_MEMBER_FINISHED = 5;
+  // 成员在允许退出的阶段主动离开。
   SCENE_RALLY_MEMBER_LEFT = 6;
+  // 成员被集结发起者移出。
   SCENE_RALLY_MEMBER_EXCLUDED = 7;
 }
 
@@ -116,6 +161,31 @@ message ScenePoint {
   int32 y = 2;
 }
 
+// 普通动态对象的可恢复业务状态；使用明确字段和 Protobuf 扩展数据，不保存 JSON 字符串。
+message ScenePersistentObjectState {
+  // 当前消息结构版本，升级字段语义时用于迁移旧数据。
+  int32 data_version = 1;
+  // 资源、怪物、建筑或掉落物的策划配置 ID。
+  int32 config_id = 2;
+  // 生成该对象的刷新规则 ID。
+  int32 rule_id = 3;
+  // 对象等级；不需要等级的类型使用 0。
+  int32 level = 4;
+  // 资源剩余量、掉落数量等通用长整型值。
+  int64 amount = 5;
+  // 怪物血量、建筑耐久等通用生命值。
+  int64 health = 6;
+  // 下一次刷新时间戳，单位毫秒；不刷新时使用 0。
+  int64 refresh_at_millis = 7;
+  // 对象过期时间戳，单位毫秒；永不过期时使用 0。
+  int64 expire_at_millis = 8;
+  // 占领、保护、锁定、可采集等业务状态位。
+  uint64 state_flags = 9;
+  // 具体玩法扩展的 Protobuf 二进制；其解释由 config_id 和 data_version 决定。
+  bytes extension_data = 10;
+}
+
+// 场景动态对象通用快照；AOI 会按缩放层级和数据标签裁剪可选明细。
 message SceneObjectSnapshot {
   // 动态对象唯一 ID。
   int64 object_id = 1;
@@ -137,89 +207,149 @@ message SceneObjectSnapshot {
 
 // 行军目标及其能力标签；target_version 用于抵御到达前目标迁移或换主。
 message SceneMarchTarget {
+  // 目标动态对象 ID；普通坐标目标可以为 0。
   int64 target_id = 1;
+  // 目标业务类型。
   SceneTargetType type = 2;
+  // 创建行军时解析出的目标坐标。
   ScenePoint point = 3;
   // ATTACKABLE、RALLYABLE、REINFORCEABLE 等目标标签位掩码。
   uint64 tag_mask = 4;
+  // 创建行军时读取的目标状态版本，到达时必须再次校验。
   int64 target_version = 5;
 }
 
+// 地图上的单支行军/车辆快照，包含路径进度和 GameServer 冻结的部队版本。
 message SceneMarchSnapshot {
+  // SceneServer 生成的行军唯一 ID。
   int64 march_id = 1;
+  // 行军所属玩家 ID。
   int64 owner_player_id = 2;
+  // 行军所属联盟 ID；未加入联盟时为 0。
   int64 alliance_id = 3;
+  // 行军业务类型。
   SceneMarchType type = 4;
   // SOLO、RALLY_MEMBER、HOSTILE、RETURNING 等车辆标签位掩码。
   uint64 tag_mask = 5;
+  // 当前行军状态机阶段。
   SceneMarchStatus status = 6;
+  // 本段行军出发坐标。
   ScenePoint origin = 7;
+  // 已冻结的行军目标描述。
   SceneMarchTarget target = 8;
+  // SceneServer 确认的完整格子路径，包含首尾坐标。
   repeated ScenePoint path = 9;
+  // 当前已经到达的 path 下标。
   int32 path_index = 10;
+  // 发车时部队总兵力；战斗后以结果中的剩余兵力为准。
   int32 troop_count = 11;
+  // 发车时部队战力，用于展示和基础校验，不替代 BattleServer 计算。
   int64 power = 12;
   // GameServer 发车时冻结的部队快照版本。
   int64 army_snapshot_version = 13;
+  // 服务端确认的发车时间戳，单位毫秒。
   int64 depart_at_millis = 14;
+  // 按路径成本计算出的预计到达时间戳，单位毫秒。
   int64 arrival_at_millis = 15;
+  // 行军状态版本，用于客户端增量更新和服务端幂等校验。
   int32 state_version = 16;
 }
 
+// 集结中的单个成员快照；发车后保留冻结版本，不能被 GameServer 实时属性覆盖。
 message SceneRallyMemberSnapshot {
+  // 成员玩家 ID。
   int64 player_id = 1;
+  // 成员用于加入集结的行军 ID。
   int64 march_id = 2;
+  // 加入或发车时冻结的兵力。
   int32 troop_count = 3;
+  // 加入或发车时冻结的战力。
   int64 power = 4;
+  // GameServer 部队快照版本。
   int64 army_snapshot_version = 5;
+  // 成员当前状态机阶段。
   SceneRallyMemberStatus status = 6;
+  // BattleServer 返回的战后剩余兵力；战斗前通常等于 troop_count。
   int32 remaining_troops = 7;
 }
 
+// 集结在场景中的运行时快照，供 AOI、断线重连和跨服务查询使用。
 message SceneRallySnapshot {
+  // 集结唯一 ID。
   int64 rally_id = 1;
+  // 集结发起者玩家 ID。
   int64 leader_player_id = 2;
+  // 集结所属联盟 ID。
   int64 alliance_id = 3;
+  // 成员集合和主车汇合的地图坐标。
   ScenePoint assembly_point = 4;
+  // 集结最终攻击或增援目标。
   SceneMarchTarget target = 5;
+  // 集结允许的总兵力上限。
   int32 capacity = 6;
+  // 允许发车的最少成员数量。
   int32 minimum_members = 7;
+  // 计划发车时间戳，单位毫秒。
   int64 launch_at_millis = 8;
+  // 集结整体状态机阶段。
   SceneRallyStatus status = 9;
+  // 当前成员快照列表。
   repeated SceneRallyMemberSnapshot members = 10;
   // 已消费的 BattleServer 结果 ID，用于重放去重。
   int64 applied_battle_result_id = 11;
+  // 最近一次已经应用的战斗是否胜利；未产生战斗前为 false。
   bool victory = 12;
+  // 集结状态版本，用于客户端增量更新和服务端幂等校验。
   int32 state_version = 13;
 }
 
 // 集结发车时冻结的 BattleServer 输入；发车后成员变化不能改写该快照。
 message SceneRallyLaunchSnapshot {
+  // 集结唯一 ID。
   int64 rally_id = 1;
+  // 集结发起者玩家 ID。
   int64 leader_player_id = 2;
+  // 集结所属联盟 ID。
   int64 alliance_id = 3;
+  // 集结发车点。
   ScenePoint assembly_point = 4;
+  // 发车时确认的战斗目标及版本。
   SceneMarchTarget target = 5;
+  // 发车瞬间冻结的全部有效成员。
   repeated SceneRallyMemberSnapshot members = 6;
+  // 所有有效成员的冻结兵力总和。
   int32 total_troops = 7;
+  // 所有有效成员的冻结战力总和。
   int64 total_power = 8;
+  // 实际发车时间戳，单位毫秒。
   int64 launched_at_millis = 9;
+  // 发车时的集结状态版本。
   int32 rally_version = 10;
 }
 
+// BattleServer 返回的单个集结成员战后结果。
 message SceneRallyMemberBattleResult {
+  // 成员玩家 ID。
   int64 player_id = 1;
+  // 战斗结算后的剩余兵力。
   int32 remaining_troops = 2;
 }
 
 // BattleServer 已落库后回传的幂等结果摘要。
 message SceneRallyBattleResult {
+  // BattleServer 生成并持久化的全局结果 ID。
   int64 battle_result_id = 1;
+  // 本结果对应的集结 ID。
   int64 rally_id = 2;
+  // 战斗目标对象 ID。
   int64 target_id = 3;
+  // BattleServer 结算时使用的目标状态版本。
   int64 target_version = 4;
+  // 进攻方是否胜利。
   bool victory = 5;
+  // 本次战斗对目标造成的耐久损失。
   int32 target_durability_loss = 6;
+  // 各集结成员的战后结果。
   repeated SceneRallyMemberBattleResult member_results = 7;
 }
 
@@ -239,6 +369,7 @@ message SceneBlockSnapshot {
   uint64 data_tag_mask = 6;
 }
 
+// 查询指定坐标附近场景信息的请求；主要用于点选地图格和轻量服务间查询。
 message csSceneQuery {
   // 目标场景，空值使用当前模式默认场景。
   string scene_id = 1;
@@ -250,6 +381,7 @@ message csSceneQuery {
   int32 radius = 4;
 }
 
+// 指定坐标附近场景信息的查询结果。
 message scSceneQuery {
   // 查询结果码。
   ErrorCode result = 1;
@@ -267,6 +399,7 @@ message scSceneQuery {
   repeated SceneObjectSnapshot objects = 7;
 }
 
+// 玩家进入本服或跨服场景的请求。
 message csSceneEnter {
   // 目标场景，空值使用本服或跨服默认场景。
   string scene_id = 1;
@@ -280,6 +413,7 @@ message csSceneEnter {
   int64 request_id = 5;
 }
 
+// 玩家进入场景后的权威位置和所属分片。
 message scSceneEnter {
   // 进入结果码。
   ErrorCode result = 1;
@@ -293,6 +427,7 @@ message scSceneEnter {
   int64 request_id = 5;
 }
 
+// 请求把玩家场景实体移动到目标坐标；服务端仍会校验地形、迷雾和分片边界。
 message csSceneMove {
   // 目标场景。
   string scene_id = 1;
@@ -306,6 +441,7 @@ message csSceneMove {
   int64 request_id = 5;
 }
 
+// 玩家移动请求的处理结果和服务端权威坐标。
 message scSceneMove {
   // 移动结果码。
   ErrorCode result = 1;
@@ -319,6 +455,7 @@ message scSceneMove {
   int64 request_id = 5;
 }
 
+// 查询指定场景基础容量和运行指标的请求。
 message csSceneMetrics {
   // 目标场景。
   string scene_id = 1;
@@ -326,6 +463,7 @@ message csSceneMetrics {
   SceneScope scope = 2;
 }
 
+// 指定场景的地图规模、逻辑分片、Tick 和动态对象指标。
 message scSceneMetrics {
   // 指标查询结果码。
   ErrorCode result = 1;
@@ -347,6 +485,7 @@ message scSceneMetrics {
   int32 online_target = 9;
 }
 
+// 玩家主动离开、切换或退出当前场景的请求。
 message csSceneLeave {
   // 目标场景。
   string scene_id = 1;
@@ -358,6 +497,7 @@ message csSceneLeave {
   int64 request_id = 4;
 }
 
+// 玩家离开场景后的确认响应。
 message scSceneLeave {
   // 离开结果码。
   ErrorCode result = 1;
@@ -369,6 +509,7 @@ message scSceneLeave {
   int64 request_id = 4;
 }
 
+// 更新玩家相机视野、AOI 订阅块和缩放数据层级的请求。
 message csSceneView {
   // 目标场景。
   string scene_id = 1;
@@ -388,6 +529,7 @@ message csSceneView {
   int64 request_id = 8;
 }
 
+// 按玩家独立战争迷雾和缩放层级裁剪后的 AOI 视野快照。
 message scSceneView {
   // 视野更新结果码。
   ErrorCode result = 1;
@@ -411,6 +553,7 @@ message scSceneView {
   int64 request_id = 10;
 }
 
+// 提交异步 A* 寻路任务的请求；计算在线程池完成，结果回投所属 SceneShard。
 message csScenePathFind {
   // 目标场景。
   string scene_id = 1;
@@ -430,6 +573,7 @@ message csScenePathFind {
   int64 request_id = 8;
 }
 
+// A* 寻路结果，包含权威路径、计算成本和回投 Tick。
 message scScenePathFind {
   // 寻路结果码。
   ErrorCode result = 1;

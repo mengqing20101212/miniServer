@@ -50,6 +50,30 @@ public final class SceneObject {
         this.dataTagMask = dataTagMask;
     }
 
+    /**
+     * 从数据库实体恢复动态对象，并保留已经持久化的通用对象版本。
+     *
+     * <p>普通构造函数用于创建新对象，版本从 1 开始；启动恢复不能再次从 1 开始，否则下一次
+     * 异步 UPSERT 可能被数据库中的较新 revision 拒绝。
+     */
+    public static SceneObject restore(
+            long objectId,
+            SceneObjectType type,
+            long ownerId,
+            int x,
+            int y,
+            Object state,
+            int stateVersion,
+            long dataTagMask) {
+        if (stateVersion <= 0) {
+            throw new IllegalArgumentException("stateVersion must be positive");
+        }
+        SceneObject object = new SceneObject(
+                objectId, type, ownerId, x, y, state, dataTagMask);
+        object.stateVersion = stateVersion;
+        return object;
+    }
+
     public long objectId() {
         return objectId;
     }

@@ -9,7 +9,10 @@ import java.util.Arrays;
  * <p>
  * 二进制格式固定为：
  * {@code [length:2][cmd:4][sid:4][seq:4][guid:8][time:4][data:N]}。
- * {@code length} 包含自身 2 字节和后续全部字段长度，因此最小包长为 22。
+ *
+ * <p>需要特别注意：历史实现中的 {@code length} 使用 22 字节逻辑头计算，真实帧头按上述字段
+ * 相加是 26 字节，所以线上的实际帧长度始终是 {@code length + 4}。这个历史格式已经是客户端
+ * 兼容约束，当前不能直接改成 26；解码器会显式补偿这 4 字节偏移。
  * {@code data} 保存 protobuf 序列化后的业务消息，由上层根据 {@code cmd} 反序列化。
  */
 public class MessagePacket {
@@ -91,12 +94,12 @@ public class MessagePacket {
     this.guid = guid;
   }
 
-  /** 返回除 data 外的包头长度。 */
+  /** 返回历史协议用于 length 字段计算的逻辑头长度，不是真实帧头的 26 字节。 */
   protected short getHeadLength() {
     return 22;
   }
 
-  /** 计算当前包完整长度，写包前会重新计算以同步 data 长度。 */
+  /** 计算写入 length 字段的历史声明值；真实写出字节数比该值多 4。 */
   protected short getPacketLen() {
     return (short) (getHeadLength() + data.length);
   }

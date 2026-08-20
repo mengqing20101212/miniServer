@@ -1115,10 +1115,17 @@ SceneServer 启动
   -> 按 scene_id/player_id 分页读取投影
   -> 恢复玩家主城对象
   -> 恢复每个玩家独立的战争迷雾
+  -> 分页读取 scene_object / scene_march / scene_rally 实体
+  -> 恢复动态对象、未结束行军、集结及全部成员
   -> 全部成功后启动 Tick 并对外 ready
 ```
 
-同一个玩家的失败写入必须在原队列位置退避重试，后续 revision 不得越过。Future 成功后才能清除内存脏标记；永久失败时停止对应持久化分区并报警。数据库加载失败、坏坐标和重复对象 ID 必须中断 SceneServer 启动，禁止降级成空地图。
+所有需要长期保存的业务对象必须先转换成明确实体类，再通过 EntryHelper/MysqlService 更新；
+Handler、SceneShard 和 Store 禁止直接拼 SQL。普通动态对象使用 `SceneObjectEntry`，行军使用
+`SceneMarchEntry`，集结及全部成员使用单条 `SceneRallyEntry` Protobuf 聚合快照。玩家数据与场景
+聚合复用同一套固定分区 FIFO 队列；失败写入必须在原队列位置退避重试，后续 revision 不得越过。
+Future 成功后才能清除内存脏标记；永久失败时停止对应持久化分区并报警。数据库加载失败、
+Protobuf 损坏、坏坐标和重复对象 ID 必须中断 SceneServer 启动，禁止降级成空地图。
 
 线上默认周期输出：每个 SceneShard 的忙碌率、Tick 平均/最大耗时、慢 Tick、命令队列、对象/观察者数量；寻路线程池活跃数、积压和耗时；Region 迁移线程的队列、成功/失败/拒绝数和平均/最大耗时；`SceneShard-Tick-*`、`ScenePath-CPU-*`、`SceneRegion-Migration-*` 平台线程 CPU、阻塞与等待变化。逻辑分片指标和实际线程 CPU 必须同时观察。
 
@@ -1311,6 +1318,18 @@ SceneShard 内存修改
   -> 成功后清理 dirty 标记
 ```
 
+当前 MiniServer 的具体映射为：
+
+```text
+PlayerSceneProjection -> PlayerSceneEntry      # 主城和个人战争迷雾
+SceneObjectProjection -> SceneObjectEntry      # 资源、怪物、农田、掉落物、非玩家建筑
+SceneMarchProjection  -> SceneMarchEntry       # 行军完整快照
+SceneRallyProjection  -> SceneRallyEntry       # 集结和全部成员的原子快照
+```
+
+以上 Store 只负责领域投影与实体转换，SQL 生成、严格分页和 revision UPSERT 统一收敛在
+`MysqlService`。AOI 订阅、Region 路由、Tick 指标、寻路缓存和静态策划地图可重建，不落库。
+
 同一个聚合对象不能让旧快照覆盖新快照。建议保存：
 
 ```text
@@ -1445,3 +1464,26 @@ TIMEOUT / ABANDONED / COMPENSATED
 - 让异步保存具备版本、顺序、重试和幂等能力。
 - 让 BattleServer 保持计算简单，结果可以恢复和重新消费。
 - 让数据库保存“可恢复状态”，而不是成为每个 Tick 的同步依赖。
+
+### 11.5 BotServer 的 SceneServer 验收入口
+
+BotServer 直接复用项目现有 `NetClient`、包头、CMD 和 Protobuf，不再维护一套测试专用网络协议：
+
+```text
+# 功能回归：本服/跨服、边界错误、AOI、缩放分层、个人迷雾、异步 A*、移动和断线重连。
+java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
+  --test-scene-rpc 127.0.0.1 9101 false
+
+# SceneServer 以 fake-data 模式启动时，增加资源、怪物、农田、掉落物、行军和集结断言。
+java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
+  --test-scene-rpc 127.0.0.1 9101 true
+
+# 地图状态容量回归：32 条真实 TCP 连接、10000 个 playerId、每连接 128 个在途请求。
+java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
+  --test-scene-load 127.0.0.1 9101 10000 128
+```
+
+容量命令验证的是 1 万个玩家对象、AOI/迷雾状态、SceneShard 命令队列、RPC 背压和完整
+离场清理，不代表 1 万条微信 WebSocket 连接；客户端连接容量仍需由 GateServer 的机器人压测验证。
+SceneServer RPC 分发按 playerId/aggregateId 哈希到固定条带，同一聚合严格保序，不同玩家可并行
+等待对应 SceneShard Tick，禁止恢复成所有连接共享一个同步 Dispatcher 的全局串行模型。

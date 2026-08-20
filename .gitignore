@@ -9,6 +9,7 @@ runlogs/
 *.vscode
 /target/
 **/target/
+**/.gradle/
 *.LCKpom.xml~
 dependency-reduced-pom.xml
 logs/system.log

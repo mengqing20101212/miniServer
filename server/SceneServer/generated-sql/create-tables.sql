@@ -1,0 +1,270 @@
+CREATE TABLE IF NOT EXISTS `game_item` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `item_type` INT DEFAULT NULL,
+  `item_name` VARCHAR(255) DEFAULT NULL,
+  `item_desc` VARCHAR(255) DEFAULT NULL,
+  `quantity` INT DEFAULT NULL,
+  `owner_id` BIGINT DEFAULT NULL,
+  `acquire_time` DATETIME DEFAULT NULL,
+  `expire_time` DATETIME DEFAULT NULL,
+  `item_level` INT DEFAULT NULL,
+  `enhance_count` INT DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS `login` (
+  `id` INT NOT NULL,
+  `account` VARCHAR(255) DEFAULT NULL,
+  `create_time` DATETIME DEFAULT NULL,
+  `last_login_time` DATETIME DEFAULT NULL,
+  `last_logout_time` DATETIME DEFAULT NULL,
+  `token` VARCHAR(255) DEFAULT NULL,
+  `channel` VARCHAR(255) DEFAULT NULL,
+  `players` VARCHAR(255) DEFAULT NULL,
+  `assigned_game_server_id` VARCHAR(255) DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `player` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `name` VARCHAR(255) DEFAULT NULL,
+  `createTime` DATETIME DEFAULT NULL,
+  `loginTime` DATETIME DEFAULT NULL,
+  `logoutTime` DATETIME DEFAULT NULL,
+  `level` INT DEFAULT NULL,
+  `vipLevel` INT DEFAULT NULL,
+  `modules` MEDIUMBLOB DEFAULT NULL,
+  `guidId` BIGINT DEFAULT NULL,
+  `account` VARCHAR(255) DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `player_module` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `player_id` BIGINT NOT NULL,
+  `module_id` INT NOT NULL,
+  `data_version` INT NOT NULL,
+  `revision` BIGINT NOT NULL,
+  `module_data` MEDIUMBLOB NOT NULL,
+  `update_time` DATETIME(6) NOT NULL
+,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_player_module_player_id_module_id` (`player_id`, `module_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `player_scene` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `player_id` BIGINT NOT NULL,
+  `scene_id` VARCHAR(255) NOT NULL,
+  `city_object_id` BIGINT NOT NULL,
+  `alliance_id` BIGINT NOT NULL,
+  `city_x` INT NOT NULL,
+  `city_y` INT NOT NULL,
+  `city_level` INT NOT NULL,
+  `city_state_version` INT NOT NULL,
+  `fog_data` MEDIUMBLOB NOT NULL,
+  `data_version` INT NOT NULL,
+  `revision` BIGINT NOT NULL,
+  `deleted` INT NOT NULL,
+  `update_time` DATETIME(6) NOT NULL
+,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_player_scene_scene_id_player_id` (`scene_id`, `player_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `rank_history` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `rank_key` VARCHAR(255) DEFAULT NULL,
+  `player_id` BIGINT DEFAULT NULL,
+  `score` BIGINT DEFAULT NULL,
+  `score_time` BIGINT DEFAULT NULL,
+  `rank_no` INT DEFAULT NULL,
+  `reward` VARCHAR(255) DEFAULT NULL,
+  `settle_time` BIGINT DEFAULT NULL,
+  `create_time` DATETIME DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `scene_march` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `scene_id` VARCHAR(255) NOT NULL,
+  `march_id` BIGINT NOT NULL,
+  `owner_player_id` BIGINT NOT NULL,
+  `alliance_id` BIGINT NOT NULL,
+  `current_x` INT NOT NULL,
+  `current_y` INT NOT NULL,
+  `march_status` INT NOT NULL,
+  `arrival_at_millis` BIGINT NOT NULL,
+  `state_version` INT NOT NULL,
+  `snapshot_data` MEDIUMBLOB NOT NULL,
+  `data_version` INT NOT NULL,
+  `revision` BIGINT NOT NULL,
+  `deleted` INT NOT NULL,
+  `update_time` DATETIME(6) NOT NULL
+,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_scene_march_scene_id_march_id` (`scene_id`, `march_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `scene_object` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `scene_id` VARCHAR(255) NOT NULL,
+  `object_id` BIGINT NOT NULL,
+  `object_type` INT NOT NULL,
+  `owner_id` BIGINT NOT NULL,
+  `x` INT NOT NULL,
+  `y` INT NOT NULL,
+  `state_version` INT NOT NULL,
+  `data_tag_mask` BIGINT NOT NULL,
+  `state_data` MEDIUMBLOB NOT NULL,
+  `data_version` INT NOT NULL,
+  `revision` BIGINT NOT NULL,
+  `deleted` INT NOT NULL,
+  `update_time` DATETIME(6) NOT NULL
+,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_scene_object_scene_id_object_id` (`scene_id`, `object_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `scene_rally` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `scene_id` VARCHAR(255) NOT NULL,
+  `rally_id` BIGINT NOT NULL,
+  `leader_player_id` BIGINT NOT NULL,
+  `alliance_id` BIGINT NOT NULL,
+  `current_x` INT NOT NULL,
+  `current_y` INT NOT NULL,
+  `rally_status` INT NOT NULL,
+  `launch_at_millis` BIGINT NOT NULL,
+  `applied_battle_result_id` BIGINT NOT NULL,
+  `state_version` INT NOT NULL,
+  `snapshot_data` MEDIUMBLOB NOT NULL,
+  `data_version` INT NOT NULL,
+  `revision` BIGINT NOT NULL,
+  `deleted` INT NOT NULL,
+  `update_time` DATETIME(6) NOT NULL
+,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_scene_rally_scene_id_rally_id` (`scene_id`, `rally_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `security_ban` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `ban_type` INT DEFAULT NULL,
+  `target` VARCHAR(255) DEFAULT NULL,
+  `reason` VARCHAR(255) DEFAULT NULL,
+  `source` INT DEFAULT NULL,
+  `status` INT DEFAULT NULL,
+  `start_time` DATETIME DEFAULT NULL,
+  `end_time` DATETIME DEFAULT NULL,
+  `operator` VARCHAR(255) DEFAULT NULL,
+  `create_time` DATETIME DEFAULT NULL,
+  `update_time` DATETIME DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `security_event_log` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `event_type` INT DEFAULT NULL,
+  `server_id` VARCHAR(255) DEFAULT NULL,
+  `ip` VARCHAR(255) DEFAULT NULL,
+  `account` VARCHAR(255) DEFAULT NULL,
+  `account_id` BIGINT DEFAULT NULL,
+  `player_id` BIGINT DEFAULT NULL,
+  `cmd` INT DEFAULT NULL,
+  `sid` INT DEFAULT NULL,
+  `seq` INT DEFAULT NULL,
+  `reason` VARCHAR(255) DEFAULT NULL,
+  `extra` VARCHAR(255) DEFAULT NULL,
+  `create_time` DATETIME DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `share_daily` (
+  `id` INT AUTO_INCREMENT NOT NULL,
+  `code` VARCHAR(255) DEFAULT NULL,
+  `daily_time` DATE DEFAULT NULL,
+  `open` VARCHAR(255) DEFAULT NULL,
+  `high` VARCHAR(255) DEFAULT NULL,
+  `low` VARCHAR(255) DEFAULT NULL,
+  `close` VARCHAR(255) DEFAULT NULL,
+  `preclose` VARCHAR(255) DEFAULT NULL,
+  `volume` BIGINT DEFAULT NULL,
+  `amount` BIGINT DEFAULT NULL,
+  `adjustflag` INT DEFAULT NULL,
+  `turn` VARCHAR(255) DEFAULT NULL,
+  `tradestatus` INT DEFAULT NULL,
+  `pctChg` VARCHAR(255) DEFAULT NULL,
+  `peTTM` VARCHAR(255) DEFAULT NULL,
+  `pbMRQ` VARCHAR(255) DEFAULT NULL,
+  `psTTM` VARCHAR(255) DEFAULT NULL,
+  `pcfNcfTTM` VARCHAR(255) DEFAULT NULL,
+  `isST` INT DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `share_enum_config` (
+  `id` INT AUTO_INCREMENT NOT NULL,
+  `code` VARCHAR(255) DEFAULT NULL,
+  `name` VARCHAR(255) DEFAULT NULL,
+  `config_desc` VARCHAR(255) DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `share_month` (
+  `id` INT AUTO_INCREMENT NOT NULL,
+  `code` VARCHAR(255) DEFAULT NULL,
+  `daily_time` DATE DEFAULT NULL,
+  `open` VARCHAR(255) DEFAULT NULL,
+  `high` VARCHAR(255) DEFAULT NULL,
+  `low` VARCHAR(255) DEFAULT NULL,
+  `close` VARCHAR(255) DEFAULT NULL,
+  `preclose` VARCHAR(255) DEFAULT NULL,
+  `volume` BIGINT DEFAULT NULL,
+  `amount` BIGINT DEFAULT NULL,
+  `adjustflag` INT DEFAULT NULL,
+  `turn` VARCHAR(255) DEFAULT NULL,
+  `pctChg` VARCHAR(255) DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `share_week` (
+  `id` INT AUTO_INCREMENT NOT NULL,
+  `code` VARCHAR(255) DEFAULT NULL,
+  `daily_time` DATE DEFAULT NULL,
+  `open` VARCHAR(255) DEFAULT NULL,
+  `high` VARCHAR(255) DEFAULT NULL,
+  `low` VARCHAR(255) DEFAULT NULL,
+  `close` VARCHAR(255) DEFAULT NULL,
+  `preclose` VARCHAR(255) DEFAULT NULL,
+  `volume` BIGINT DEFAULT NULL,
+  `amount` BIGINT DEFAULT NULL,
+  `adjustflag` INT DEFAULT NULL,
+  `turn` VARCHAR(255) DEFAULT NULL,
+  `pctChg` VARCHAR(255) DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `user_info` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `username` VARCHAR(255) DEFAULT NULL,
+  `nickname` VARCHAR(255) DEFAULT NULL,
+  `email` VARCHAR(255) DEFAULT NULL,
+  `phone` VARCHAR(255) DEFAULT NULL,
+  `register_time` DATETIME DEFAULT NULL,
+  `last_login_time` DATETIME DEFAULT NULL,
+  `level` INT DEFAULT NULL,
+  `exp` INT DEFAULT NULL,
+  `status` INT DEFAULT NULL
+,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

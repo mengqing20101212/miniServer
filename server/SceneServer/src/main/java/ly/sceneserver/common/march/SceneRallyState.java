@@ -66,6 +66,52 @@ public final class SceneRallyState {
                 SceneRallyMemberStatus.READY));
     }
 
+    /**
+     * 从单条 Rally 聚合实体恢复集结和全部成员。
+     *
+     * <p>成员快照与集结状态来自同一个 Protobuf BLOB 和 revision，不存在跨表恢复到一半的状态。
+     */
+    public static SceneRallyState restore(SceneRallySnapshot snapshot) {
+        if (snapshot == null || snapshot.status() == null || snapshot.stateVersion() <= 0
+                || snapshot.members().isEmpty()) {
+            throw new IllegalArgumentException("invalid persisted rally snapshot");
+        }
+        SceneRallyMemberSnapshot leader = snapshot.members().stream()
+                .filter(member -> member.playerId() == snapshot.leaderPlayerId())
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("rally leader member is missing"));
+
+        SceneRallyState state = new SceneRallyState(
+                snapshot.rallyId(),
+                snapshot.leaderPlayerId(),
+                snapshot.allianceId(),
+                leader.marchId(),
+                snapshot.assemblyPoint(),
+                snapshot.target(),
+                snapshot.capacity(),
+                snapshot.minimumMembers(),
+                snapshot.launchAtMillis(),
+                leader.troopCount(),
+                leader.power(),
+                leader.armySnapshotVersion());
+        state.members.clear();
+        for (SceneRallyMemberSnapshot memberSnapshot : snapshot.members()) {
+            SceneRallyMember member = SceneRallyMember.restore(memberSnapshot);
+            if (state.members.put(memberSnapshot.playerId(), member) != null) {
+                throw new IllegalArgumentException(
+                        "duplicate rally member: " + memberSnapshot.playerId());
+            }
+        }
+        if (state.members.size() > snapshot.capacity()) {
+            throw new IllegalArgumentException("rally members exceed capacity");
+        }
+        state.status = snapshot.status();
+        state.appliedBattleResultId = snapshot.appliedBattleResultId();
+        state.victory = snapshot.victory();
+        state.stateVersion = snapshot.stateVersion();
+        return state;
+    }
+
     /** 成员加入后先行军到集结点，未到达前为 JOINING。 */
     public void join(
             long playerId,

@@ -1,6 +1,7 @@
 package ly;
 
 import ly.db.DbMeta;
+import ly.db.MysqlConnector;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -81,6 +82,43 @@ public class EntityToSqlGenerator {
             allAlterSqls.addAll(alterSqlList);
         }
         writeSqlToFile("alter-tables.sql", allAlterSqls);
+    }
+
+    /**
+     * 根据当前数据库实际列生成“只补缺失列”的 ALTER TABLE 语句。
+     *
+     * <p>启动自动建表原来只执行 {@code CREATE TABLE IF NOT EXISTS}。该语句可以创建新表，
+     * 但不会给已经存在的旧表补充后来新增的实体字段，例如 {@code login} 表新增的
+     * {@code assigned_game_server_id}。这里仍然以 Entry 实体及其 {@link DbMeta.DbField}
+     * 注解为唯一结构来源，先查 information_schema，再只生成数据库中不存在的列。
+     *
+     * <p>本方法只负责生成语句，不直接执行 DDL。执行时仍由 {@code AutoTableService}
+     * 统一记录日志和处理多个服务同时启动时可能出现的重复补列竞争。
+     */
+    public List<String> generateMissingColumnSqlsFromDatabase(
+            String packageName, MysqlConnector mysqlConnector)
+            throws IOException, ClassNotFoundException {
+        Objects.requireNonNull(mysqlConnector, "mysqlConnector");
+
+        Set<Class<?>> entityClasses = findEntityClasses(packageName);
+        Map<String, List<String>> alterTableSqls = new TreeMap<>();
+        for (Class<?> entityClass : entityClasses) {
+            String tableName = getTableName(entityClass);
+            if (tableName == null) {
+                continue;
+            }
+            List<String> existingColumns = getExistingColumns(tableName, mysqlConnector);
+            List<String> missingColumnSqls = generateAlterTableSqls(entityClass, existingColumns);
+            if (!missingColumnSqls.isEmpty()) {
+                alterTableSqls.put(tableName, missingColumnSqls);
+            }
+        }
+
+        List<String> result = new ArrayList<>();
+        for (List<String> tableSqls : alterTableSqls.values()) {
+            result.addAll(tableSqls);
+        }
+        return result;
     }
 
     /**
@@ -343,10 +381,35 @@ public class EntityToSqlGenerator {
     }
 
     /**
+     * 通过连接池查询当前 schema 中某张表的列名。
+     *
+     * <p>表名作为参数绑定，不参与 SQL 字符串拼接；查询失败时使用严格查询抛出异常，
+     * 避免把“数据库不可用”误认为“所有列都缺失”并继续生成大量无效 DDL。
+     */
+    private List<String> getExistingColumns(String tableName, MysqlConnector mysqlConnector) {
+        List<Map<String, Object>> rows = mysqlConnector.selectStrict(
+                "SELECT COLUMN_NAME FROM information_schema.COLUMNS "
+                        + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?",
+                tableName);
+        List<String> columns = new ArrayList<>(rows.size());
+        for (Map<String, Object> row : rows) {
+            Object columnName = row.get("COLUMN_NAME");
+            if (columnName != null) {
+                columns.add(columnName.toString());
+            }
+        }
+        return columns;
+    }
+
+    /**
      * 生成ALTER TABLE语句来添加缺失的列
      */
-    private List<String> generateAlterTableSqls(Class<?> entityClass, List<String> existingColumns) {
+    List<String> generateAlterTableSqls(Class<?> entityClass, List<String> existingColumns) {
         List<String> alterSqls = new ArrayList<>();
+        Set<String> normalizedExistingColumns = existingColumns.stream()
+                .filter(Objects::nonNull)
+                .map(column -> column.toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
         Field[] fields = entityClass.getDeclaredFields();
         
         for (Field field : fields) {
@@ -354,7 +417,8 @@ public class EntityToSqlGenerator {
                 DbMeta.DbField dbField = field.getAnnotation(DbMeta.DbField.class);
                 String fieldName = dbField.name().isEmpty() ? field.getName() : dbField.name();
                 
-                if (!existingColumns.contains(fieldName)) {
+                // MySQL 在 Windows 与 Linux 上的大小写行为可能不同，这里按列名忽略大小写比较。
+                if (!normalizedExistingColumns.contains(fieldName.toLowerCase(Locale.ROOT))) {
                     String columnDefinition = generateColumnDefinition(field);
                     if (columnDefinition != null) {
                         String alterSql = "ALTER TABLE `" + getTableName(entityClass) + "` ADD COLUMN " + columnDefinition + ";";
@@ -373,9 +437,14 @@ public class EntityToSqlGenerator {
     private void writeSqlToFile(String fileName, Collection<String> sqlStatements) throws IOException {
         File file = new File(targetDir, fileName);
         try (FileWriter writer = new FileWriter(file)) {
-            for (String sql : sqlStatements) {
-                writer.write(sql);
-                writer.write("\n\n");
+            Iterator<String> iterator = sqlStatements.iterator();
+            while (iterator.hasNext()) {
+                writer.write(iterator.next());
+                writer.write('\n');
+                // 语句之间保留一个空行便于审查，但文件末尾不再产生多余空白行。
+                if (iterator.hasNext()) {
+                    writer.write('\n');
+                }
             }
         }
         System.out.println("SQL文件已生成: " + file.getAbsolutePath());

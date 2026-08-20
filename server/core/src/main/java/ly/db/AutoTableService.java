@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 /**
  * 自动建表服务。
@@ -50,6 +51,16 @@ public class AutoTableService {
             
             // 尝试执行生成的SQL文件
             executeSqlFileWithMysqlConnector("./generated-sql/create-tables.sql", mysqlConnector);
+
+            // CREATE TABLE IF NOT EXISTS 只负责新表，无法升级已经存在的旧表。
+            // 这里按 Entry 实体注解和数据库当前列做差异比较，只补实体中存在而旧表缺失的列。
+            // 业务数据仍通过 Entry/Helper 保存；这里执行的是启动期 schema 迁移，不属于业务 SQL。
+            executeSqlsWithMysqlConnector(
+                    generator.generateMissingColumnSqlsFromDatabase("ly.db.entry", mysqlConnector),
+                    mysqlConnector);
+
+            // 保留项目中人工维护的复杂迁移，例如修改列类型、重建主键和唯一索引。
+            // 自动差异迁移只新增缺失列，不会擅自修改或删除已有结构。
             executeSqlFileWithMysqlConnector("./generated-sql/alter-tables.sql", mysqlConnector);
             
             System.out.println("自动建表服务执行完成！");
@@ -57,6 +68,19 @@ public class AutoTableService {
         } catch (Exception e) {
             System.err.println("自动建表服务执行失败: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 顺序执行实体差异生成的 DDL。
+     *
+     * <p>多个服务进程同时启动时，可能同时发现同一列缺失；一个进程成功补列后，其他进程
+     * 会收到“列已存在”错误。底层 execute 会记录该竞争，但不会中断剩余表的初始化。
+     */
+    private void executeSqlsWithMysqlConnector(
+            List<String> sqlStatements, MysqlConnector mysqlConnector) {
+        for (String sql : sqlStatements) {
+            executeSingleSqlWithMysqlConnector(sql, mysqlConnector);
         }
     }
     
@@ -200,6 +224,9 @@ public class AutoTableService {
             
             // 执行SQL
             executeSqlFileWithMysqlConnector("./generated-sql/create-tables.sql", mysqlConnector);
+            executeSqlsWithMysqlConnector(
+                    generator.generateMissingColumnSqlsFromDatabase("ly.db.entry", mysqlConnector),
+                    mysqlConnector);
             executeSqlFileWithMysqlConnector("./generated-sql/alter-tables.sql", mysqlConnector);
             
             System.out.println("表结构刷新完成！");

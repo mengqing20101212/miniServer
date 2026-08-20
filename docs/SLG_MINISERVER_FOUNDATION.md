@@ -18,7 +18,7 @@
 - 支持独立 CPU 线程池执行 Region/Portal 粗路径和四方向格子加权 A*，根据道路、平原、森林、山地、不可通行 flags 与个人迷雾计算每块入口、出口和块内路径。
 - 已建立攻击、集结成员、集结主车、增援、驻军、采集、侦察、运输和返程等行军类型，以及行军标签、目标类型和目标能力标签。
 - 已建立联盟集结的招募、成员赴集结点、到时冻结发车名单、主车攻城、幂等应用 BattleServer 结果、成员返程和结束状态机。
-- 已建立 `player_scene` 玩家场景投影、按玩家分区串行的异步入库服务，以及 SceneServer 启动时分页恢复主城和个人战争迷雾的流程。
+- 已建立 `player_scene`、`scene_object`、`scene_march`、`scene_rally` 实体及分页恢复流程；玩家与场景聚合分别通过固定分区 FIFO 异步入库，业务层不拼 SQL。
 - 已实现同一 SceneServer JVM 内的热点 Region 单线程迁移，迁移对象、格子/AOI 索引、观察者订阅和每个玩家独立的战争迷雾。
 - 已增加 SceneShard、寻路池、Region 迁移线程和实际平台线程的周期负载日志，可观察慢 Tick、队列积压和线程 CPU。
 - 动态对象只能由所属 SceneShard 的逻辑线程修改。
@@ -230,13 +230,53 @@ player_scene
 
 GameServer 仍然拥有玩家完整养成数据；SceneServer 拥有地图位置、AOI、迷雾和地图对象。城市升级或迁城命令完成后，业务层生成新的场景投影并增加 `revision`，不要把任意 Java 对象或 JSON 字符串写入该表。
 
+其他需要重启恢复的场景对象也必须先转换成实体类，不能由 Handler 或 Tick 线程直接调用
+`MysqlConnector`、拼接 SQL：
+
+```text
+scene_object                        # 普通稀疏动态对象实体
+  ├── scene_id + object_id         # 唯一键
+  ├── object_type / owner_id
+  ├── x / y / state_version
+  ├── data_tag_mask
+  ├── state_data                   # ScenePersistentObjectState Protobuf
+  ├── data_version / revision
+  └── deleted / update_time
+
+scene_march                         # 行军聚合实体
+  ├── scene_id + march_id          # 唯一键
+  ├── owner_player_id / alliance_id
+  ├── current_x / current_y / march_status / arrival_at_millis
+  ├── snapshot_data                # SceneMarchSnapshot Protobuf，含路径、目标、冻结部队摘要
+  ├── data_version / revision
+  └── deleted / update_time
+
+scene_rally                         # 集结聚合实体
+  ├── scene_id + rally_id          # 唯一键
+  ├── leader_player_id / alliance_id
+  ├── current_x / current_y / rally_status / launch_at_millis
+  ├── applied_battle_result_id
+  ├── snapshot_data                # SceneRallySnapshot Protobuf，原子包含全部集结成员
+  ├── data_version / revision
+  └── deleted / update_time
+```
+
+资源点、怪物、农田、掉落物和非玩家建筑使用 `SceneObjectEntry`；行军和集结分别使用
+`SceneMarchEntry`、`SceneRallyEntry`。集结成员不拆成另一张表，成员与集结状态放在同一条
+Protobuf 聚合快照中，由一次 revision UPSERT 原子更新，避免恢复出“集结已发车但成员还没更新”
+的中间状态。玩家主城和个人迷雾仍只归 `PlayerSceneEntry`，不能在 `scene_object` 重复保存。
+
+AOI 在线订阅、Region 所有权、Tick 指标、寻路缓存和静态策划地图属于可重建运行时数据，
+不需要创建实体落库。
+
 ### 异步入库顺序和成功判定
 
-`ScenePlayerPersistenceService` 按 `playerId` 哈希到固定 FIFO 分区：
+`ScenePlayerPersistenceService` 按 `playerId`、`SceneAggregatePersistenceService` 按场景和聚合 ID
+哈希到固定 FIFO 分区。两者复用同一个 `OrderedPersistenceQueue`，不维护两套重试实现：
 
 1. SceneShard 先生成不可变业务快照，`snapshotAndSubmit` 再从各分片取得该玩家最新迷雾。
 2. 同一玩家的 revision 1、2、3 一定在同一工作队列顺序执行；失败任务在原位置退避重试，后续版本不能越过。
-3. MySQL 使用 `scene_id + player_id` 唯一键和 revision 条件 UPSERT。相同 revision 重放被忽略，较小 revision 不能覆盖较新数据。
+3. Store 把投影转换成明确的 Entry/EntryHelper；MySQL 使用对应业务唯一键和 revision 条件 UPSERT。相同 revision 重放被忽略，较小 revision 不能覆盖较新数据。
 4. 返回的 `CompletableFuture` 成功，才代表数据库已经接受该版本；在成功前不能清除内存脏标记或迷雾快照。
 5. 单个分区超过最大重试次数会停止该分区并写错误/死信日志，禁止跳过失败版本继续保存后续数据。队列有容量上限，满载时显式失败并触发背压，不能无限堆积导致 OOM。
 
@@ -252,14 +292,16 @@ Nacos/Config/MySQL 初始化并完成自动建表
   -> 校验坐标、版本和严格递增分页顺序
   -> 恢复玩家主城 SceneObject
   -> 将每个玩家自己的 fog_data 分配到对应 SceneShard
+  -> 按对象 ID 分页读取 scene_object / scene_march / scene_rally
+  -> 恢复普通动态对象、未结束行军、集结及其全部成员
   -> 所有场景恢复成功后启动 Tick、负载日志和 RPC 可用状态
 ```
 
-任何数据库异常、坏坐标、重复对象 ID 或无序分页都会中断启动，不能把“加载失败”当成“数据库没有玩家”。恢复期间 RPC 返回 `SCENE_NOT_READY`。启动日志会输出场景数、静态格子数、恢复玩家/主城数、迷雾块数和耗时。
+任何数据库异常、Protobuf 损坏、坏坐标、重复对象 ID 或无序分页都会中断启动，不能把“加载失败”当成“数据库没有玩家”。恢复期间 RPC 返回 `SCENE_NOT_READY`。启动日志会输出场景数、静态格子数、恢复玩家/主城数、迷雾块数、普通对象数、行军数、集结数和耗时。
 
 `SceneStaticMapLoader` 已经成为可替换接口。当前非假数据模式使用全平原可行走加载器保证骨架可运行，假数据模式使用确定性假地图；正式接入时必须用 `config` 策划表或版本化二进制地图实现替换，并校验地图版本和校验和。
 
-当前玩家投影可以恢复主城和个人迷雾。资源点、怪物可根据静态刷新规则重新生成；未结束行军、集结、驻军和正在采集状态后续仍需独立的场景对象快照/事件表，不能塞进 `player_scene`。
+当前实体基础设施可以恢复主城、个人迷雾、普通动态对象、未结束行军和集结。静态规则能够完全重建且从未被玩家改变的资源点/怪物可以重新生成；已经产生归属、血量、数量、刷新时间等不可重建状态的对象必须保存到 `scene_object`。驻军、采集任务等新聚合后续也必须按同样方式新增明确 Entry，不能塞进 `player_scene` 或由业务直接拼 SQL。
 
 ## 周期线程负载日志
 
@@ -281,6 +323,8 @@ Nacos/Config/MySQL 初始化并完成自动建表
 -Dslg.scene.width=1000
 -Dslg.scene.height=1000
 -Dslg.scene.shards=4
+-Dslg.scene.rpc-stripes=32
+-Dslg.scene.rpc-queue-capacity=4096
 -Dslg.scene.region-size=32
 -Dslg.scene.tick-millis=100
 -Dslg.scene.path.threads=4
@@ -294,6 +338,10 @@ Nacos/Config/MySQL 初始化并完成自动建表
 -Dslg.scene.persistence.queue-capacity=5000
 -Dslg.scene.persistence.max-retries=20
 -Dslg.scene.persistence.initial-retry-millis=200
+-Dslg.scene.aggregate-persistence.partitions=4
+-Dslg.scene.aggregate-persistence.queue-capacity=10000
+-Dslg.scene.aggregate-persistence.max-retries=20
+-Dslg.scene.aggregate-persistence.initial-retry-millis=200
 -Dslg.scene.fake-data=true
 -Dslg.scene.fake-online=10000
 ```
@@ -307,6 +355,7 @@ Nacos/Config/MySQL 初始化并完成自动建表
 | 地图尺寸 | 1000 x 1000 | 1,000,000 个逻辑格子 |
 | 静态地图 | 共享一份数组 | SceneShard 不重复保存静态数组 |
 | SceneShard | 4 | 同一 SceneServer JVM 内的逻辑分片 |
+| RPC 调度条带 | 32 | 按 playerId/aggregateId 固定路由；同聚合有序、不同聚合并行 |
 | Region 迁移线程 | 1 | 串行搬运热点块，禁止直接修改场景对象 |
 | Tick | 100ms | 场景状态推进基线，禁止在 Tick 内同步 DB/RPC |
 | 在线玩家 | 10,000 | 假数据联调和容量基线，不等于最终压测结论 |
@@ -321,6 +370,7 @@ Nacos/Config/MySQL 初始化并完成自动建表
 | 集结状态 | SceneShard 串行修改 | 发车名单冻结，BattleServer 结果按 ID 幂等 |
 | 玩家投影恢复 | 1000 条/页 | 静态地图后恢复主城和每玩家独立迷雾，失败则不 ready |
 | 投影入库 | 4 个玩家哈希分区 | 同玩家 FIFO、版本 UPSERT、失败原位重试 |
+| 场景聚合入库 | 4 个场景+聚合 ID 哈希分区 | 对象/行军/集结共用 FIFO 队列，实体 revision UPSERT |
 | 负载日志 | 60 秒 | 同时输出分片忙碌率、线程池和平台线程 CPU |
 
 假数据启动示例：
@@ -333,6 +383,25 @@ Nacos/Config/MySQL 初始化并完成自动建表
 ```
 
 启动日志至少应能看到：地图场景 id、假在线玩家数量、世界对象数量、SceneShard 数量和首个 tick 指标。
+
+BotServer 提供两类真实 TCP 回归命令。功能回归覆盖本服/跨服路由、参数和越界错误、
+进入/查询/移动/离开、九宫格 AOI、缩放数据分层、每玩家独立迷雾、异步两级 A*、
+跨分片拒绝语义以及断线后的重新查询和重新订阅：
+
+```text
+# 普通 SceneServer；最后一个参数为 false 时跳过假数据专属断言。
+java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
+  --test-scene-rpc 127.0.0.1 9101 false
+
+# 假数据 SceneServer；额外检查资源、怪物、农田、掉落物、行军和集结快照。
+java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
+  --test-scene-rpc 127.0.0.1 9101 true
+
+# 32 条真实 TCP 连接批量模拟 10000 个 playerId，每连接使用 128 个请求的有界流水线。
+# 该命令验证 SceneServer 地图状态容量，不等价于 10000 条客户端 WebSocket 连接压测。
+java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
+  --test-scene-load 127.0.0.1 9101 10000 128
+```
 
 ### 验收指标
 
@@ -353,6 +422,7 @@ Nacos/Config/MySQL 初始化并完成自动建表
 - 数据库加载失败不能启动空地图；恢复完成前 RPC 必须返回 `SCENE_NOT_READY`。
 - 两个玩家的主城和迷雾可从 `player_scene` 分页恢复，恢复后的迷雾仍互相隔离。
 - 同一玩家投影的失败版本必须先重试成功，后续 revision 才能入库；旧 revision 重放不得覆盖新数据。
+- 同一场景聚合的失败版本必须原位重试；对象、行军、集结只能通过对应 Entry/Helper 更新，业务层不得出现 SQL。
 - 周期日志必须能定位具体 scene/shard 的慢 Tick 和积压，并显示寻路线程池及平台线程 CPU。
 
 ## 后续接入顺序
@@ -365,7 +435,7 @@ Nacos/Config/MySQL 初始化并完成自动建表
 6. 在已有整 Region 迁移基础上，实现跨 Region 行军对象原子转移、时间轮/最小堆到期调度和 Tick 自动推进。
 7. 增加动态建筑、部队占格和临时阻挡快照，供两级 A* 判断动态不可达；再根据压测结果增加路径缓存、Portal 预计算或跨进程分段寻路。
 8. 接入 BattleServer 请求、结果落库、战报、城市耐久/归属和玩家伤兵/奖励队列。
-9. 增加资源点、怪物、农田、掉落物、未结束行军和集结的场景快照/恢复、SceneEvent 和 Outbox。
+9. 在资源刷新、行军、集结等正式 Handler 中调用现有聚合快照 API，并增加定时脏对象批量提交、SceneEvent 和 Outbox；实体、顺序写入和启动恢复基础设施已经完成。
 10. 增加跨服活动场景；跨服场景继续复用 `SceneRuntime` 和 `SceneShard`，通过启动参数加载不同场景配置。
 
 ## 当前限制
@@ -379,5 +449,5 @@ Nacos/Config/MySQL 初始化并完成自动建表
 - A* 当前已实现 Region/Portal 粗路径和四方向格子细路径，但仍只读取静态地形与个人迷雾，不读取 Tick 中的动态部队/建筑阻挡，也未实现 JPS 或跨进程分段寻路。
 - 行军和集结已具备领域状态机、协议快照与 SceneShard 修改入口，但尚未新增客户端/服务器命令 Handler、自动 Tick 调度、单个行军跨 Region 转移和 GameServer 部队冻结链路。
 - BattleServer 的集结输入/结果 DTO 与幂等应用已定义，但真实 RPC、城市状态写入、伤兵、奖励和战报消费仍未串联。
-- `player_scene` 只恢复主城和个人迷雾；资源/怪物刷新状态、未结束行军、集结、驻军和采集尚未建立独立持久化表。
+- `player_scene`、动态对象、行军和集结已经具备实体快照与恢复基础设施；正式资源刷新、行军、集结 Handler 尚未接入定时脏数据提交，驻军和采集仍需新增独立聚合实体。
 - SceneServer 已提供服务器间 AOI/寻路协议；GameServer 到微信客户端的数据转换和增量推送仍需随客户端地图协议确定。

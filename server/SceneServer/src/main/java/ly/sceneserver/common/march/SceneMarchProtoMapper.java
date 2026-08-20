@@ -68,6 +68,51 @@ public final class SceneMarchProtoMapper {
         return builder.build();
     }
 
+    /** 从数据库中的 Protobuf 二进制恢复不可变行军快照。 */
+    public static SceneMarchSnapshot fromProto(Scene.SceneMarchSnapshot snapshot) {
+        if (snapshot == null) {
+            throw new IllegalArgumentException("snapshot cannot be null");
+        }
+        return new SceneMarchSnapshot(
+                snapshot.getMarchId(),
+                snapshot.getOwnerPlayerId(),
+                snapshot.getAllianceId(),
+                fromProto(snapshot.getType()),
+                snapshot.getTagMask(),
+                fromProto(snapshot.getStatus()),
+                fromProto(snapshot.getOrigin()),
+                fromProto(snapshot.getTarget()),
+                snapshot.getPathList().stream().map(SceneMarchProtoMapper::fromProto).toList(),
+                snapshot.getPathIndex(),
+                snapshot.getTroopCount(),
+                snapshot.getPower(),
+                snapshot.getArmySnapshotVersion(),
+                snapshot.getDepartAtMillis(),
+                snapshot.getArrivalAtMillis(),
+                snapshot.getStateVersion());
+    }
+
+    /** 从数据库中的 Protobuf 二进制恢复包含完整成员列表的集结快照。 */
+    public static SceneRallySnapshot fromProto(Scene.SceneRallySnapshot snapshot) {
+        if (snapshot == null) {
+            throw new IllegalArgumentException("snapshot cannot be null");
+        }
+        return new SceneRallySnapshot(
+                snapshot.getRallyId(),
+                snapshot.getLeaderPlayerId(),
+                snapshot.getAllianceId(),
+                fromProto(snapshot.getAssemblyPoint()),
+                fromProto(snapshot.getTarget()),
+                snapshot.getCapacity(),
+                snapshot.getMinimumMembers(),
+                snapshot.getLaunchAtMillis(),
+                fromProto(snapshot.getStatus()),
+                snapshot.getMembersList().stream().map(SceneMarchProtoMapper::fromProto).toList(),
+                snapshot.getAppliedBattleResultId(),
+                snapshot.getVictory(),
+                snapshot.getStateVersion());
+    }
+
     private static Scene.SceneMarchTarget toProto(SceneTargetDescriptor target) {
         return Scene.SceneMarchTarget.newBuilder()
                 .setTargetId(target.targetId())
@@ -157,5 +202,99 @@ public final class SceneMarchProtoMapper {
 
     private static Scene.ScenePoint toProto(ScenePoint point) {
         return Scene.ScenePoint.newBuilder().setX(point.x()).setY(point.y()).build();
+    }
+
+    private static SceneTargetDescriptor fromProto(Scene.SceneMarchTarget target) {
+        return new SceneTargetDescriptor(
+                target.getTargetId(),
+                fromProto(target.getType()),
+                fromProto(target.getPoint()),
+                target.getTagMask(),
+                target.getTargetVersion());
+    }
+
+    private static SceneRallyMemberSnapshot fromProto(Scene.SceneRallyMemberSnapshot member) {
+        return new SceneRallyMemberSnapshot(
+                member.getPlayerId(),
+                member.getMarchId(),
+                member.getTroopCount(),
+                member.getPower(),
+                member.getArmySnapshotVersion(),
+                fromProto(member.getStatus()),
+                member.getRemainingTroops());
+    }
+
+    private static SceneMarchType fromProto(Scene.SceneMarchType type) {
+        return switch (type) {
+            case SCENE_MARCH_ATTACK -> SceneMarchType.ATTACK;
+            case SCENE_MARCH_RALLY_MEMBER -> SceneMarchType.RALLY_MEMBER;
+            case SCENE_MARCH_RALLY_ARMY -> SceneMarchType.RALLY_ARMY;
+            case SCENE_MARCH_REINFORCE -> SceneMarchType.REINFORCE;
+            case SCENE_MARCH_GARRISON -> SceneMarchType.GARRISON;
+            case SCENE_MARCH_GATHER -> SceneMarchType.GATHER;
+            case SCENE_MARCH_SCOUT -> SceneMarchType.SCOUT;
+            case SCENE_MARCH_TRANSPORT -> SceneMarchType.TRANSPORT;
+            case SCENE_MARCH_RETURN -> SceneMarchType.RETURN;
+            case UNRECOGNIZED -> throw new IllegalArgumentException("unknown scene march type");
+        };
+    }
+
+    private static SceneMarchStatus fromProto(Scene.SceneMarchStatus status) {
+        return switch (status) {
+            case SCENE_MARCH_PREPARING -> SceneMarchStatus.PREPARING;
+            case SCENE_MARCH_MOVING -> SceneMarchStatus.MARCHING;
+            case SCENE_MARCH_WAITING_RALLY -> SceneMarchStatus.WAITING_RALLY;
+            case SCENE_MARCH_ARRIVED -> SceneMarchStatus.ARRIVED;
+            case SCENE_MARCH_BATTLE_PENDING -> SceneMarchStatus.BATTLE_PENDING;
+            case SCENE_MARCH_RETURNING -> SceneMarchStatus.RETURNING;
+            case SCENE_MARCH_FINISHED -> SceneMarchStatus.FINISHED;
+            case SCENE_MARCH_CANCELLED -> SceneMarchStatus.CANCELLED;
+            case UNRECOGNIZED -> throw new IllegalArgumentException("unknown scene march status");
+        };
+    }
+
+    private static SceneTargetType fromProto(Scene.SceneTargetType type) {
+        return switch (type) {
+            case SCENE_TARGET_POINT -> SceneTargetType.POINT;
+            case SCENE_TARGET_PLAYER_CITY -> SceneTargetType.PLAYER_CITY;
+            case SCENE_TARGET_ALLIANCE_CITY -> SceneTargetType.ALLIANCE_CITY;
+            case SCENE_TARGET_ALLIANCE_BUILDING -> SceneTargetType.ALLIANCE_BUILDING;
+            case SCENE_TARGET_RESOURCE -> SceneTargetType.RESOURCE;
+            case SCENE_TARGET_MONSTER -> SceneTargetType.MONSTER;
+            case SCENE_TARGET_RALLY_CAMP -> SceneTargetType.RALLY_CAMP;
+            case SCENE_TARGET_TROOP -> SceneTargetType.TROOP;
+            case SCENE_TARGET_CROSS_SERVER_OBJECT -> SceneTargetType.CROSS_SERVER_OBJECT;
+            case UNRECOGNIZED -> throw new IllegalArgumentException("unknown scene target type");
+        };
+    }
+
+    private static SceneRallyStatus fromProto(Scene.SceneRallyStatus status) {
+        return switch (status) {
+            case SCENE_RALLY_RECRUITING -> SceneRallyStatus.RECRUITING;
+            case SCENE_RALLY_MOVING -> SceneRallyStatus.MARCHING;
+            case SCENE_RALLY_BATTLE_PENDING -> SceneRallyStatus.BATTLE_PENDING;
+            case SCENE_RALLY_RETURNING -> SceneRallyStatus.RETURNING;
+            case SCENE_RALLY_FINISHED -> SceneRallyStatus.FINISHED;
+            case SCENE_RALLY_CANCELLED -> SceneRallyStatus.CANCELLED;
+            case UNRECOGNIZED -> throw new IllegalArgumentException("unknown scene rally status");
+        };
+    }
+
+    private static SceneRallyMemberStatus fromProto(Scene.SceneRallyMemberStatus status) {
+        return switch (status) {
+            case SCENE_RALLY_MEMBER_JOINING -> SceneRallyMemberStatus.JOINING;
+            case SCENE_RALLY_MEMBER_READY -> SceneRallyMemberStatus.READY;
+            case SCENE_RALLY_MEMBER_MOVING -> SceneRallyMemberStatus.MARCHING;
+            case SCENE_RALLY_MEMBER_BATTLE_PENDING -> SceneRallyMemberStatus.BATTLE_PENDING;
+            case SCENE_RALLY_MEMBER_RETURNING -> SceneRallyMemberStatus.RETURNING;
+            case SCENE_RALLY_MEMBER_FINISHED -> SceneRallyMemberStatus.FINISHED;
+            case SCENE_RALLY_MEMBER_LEFT -> SceneRallyMemberStatus.LEFT;
+            case SCENE_RALLY_MEMBER_EXCLUDED -> SceneRallyMemberStatus.EXCLUDED;
+            case UNRECOGNIZED -> throw new IllegalArgumentException("unknown scene rally member status");
+        };
+    }
+
+    private static ScenePoint fromProto(Scene.ScenePoint point) {
+        return new ScenePoint(point.getX(), point.getY());
     }
 }

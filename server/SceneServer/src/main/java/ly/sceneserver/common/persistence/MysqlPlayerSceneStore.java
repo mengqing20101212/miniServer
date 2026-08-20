@@ -3,56 +3,22 @@ package ly.sceneserver.common.persistence;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Map;
 
-import ly.db.MysqlConnector;
-import ly.db.MysqlService;
 import ly.db.entry.PlayerSceneEntry;
+import ly.db.entry.PlayerSceneEntryHelper;
 import ly.sceneserver.common.ScenePoint;
 
 /** MySQL 玩家场景投影实现，使用 revision 条件 UPSERT 防止异步旧快照覆盖新状态。 */
 public final class MysqlPlayerSceneStore implements PlayerSceneStore {
-    private static final String LOAD_SQL = """
-            SELECT id, player_id, scene_id, city_object_id, alliance_id, city_x, city_y,
-                   city_level, city_state_version, fog_data, data_version, revision, deleted, update_time
-            FROM player_scene
-            WHERE scene_id=? AND player_id>? AND deleted=0
-            ORDER BY player_id
-            LIMIT ?
-            """;
-
-    private static final String UPSERT_SQL = """
-            INSERT INTO player_scene (
-                player_id, scene_id, city_object_id, alliance_id, city_x, city_y,
-                city_level, city_state_version, fog_data, data_version, revision, deleted, update_time)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-                city_object_id=IF(VALUES(revision)>revision, VALUES(city_object_id), city_object_id),
-                alliance_id=IF(VALUES(revision)>revision, VALUES(alliance_id), alliance_id),
-                city_x=IF(VALUES(revision)>revision, VALUES(city_x), city_x),
-                city_y=IF(VALUES(revision)>revision, VALUES(city_y), city_y),
-                city_level=IF(VALUES(revision)>revision, VALUES(city_level), city_level),
-                city_state_version=IF(VALUES(revision)>revision, VALUES(city_state_version), city_state_version),
-                fog_data=IF(VALUES(revision)>revision, VALUES(fog_data), fog_data),
-                data_version=IF(VALUES(revision)>revision, VALUES(data_version), data_version),
-                deleted=IF(VALUES(revision)>revision, VALUES(deleted), deleted),
-                update_time=IF(VALUES(revision)>revision, VALUES(update_time), update_time),
-                revision=GREATEST(revision, VALUES(revision))
-            """;
-
     @Override
     public List<PlayerSceneProjection> loadActivePage(String sceneId, long afterPlayerId, int limit) {
         if (sceneId == null || sceneId.isBlank() || afterPlayerId < 0L || limit <= 0) {
             throw new IllegalArgumentException("invalid player scene page");
         }
-        MysqlConnector connector = MysqlService.getInstance().getMysqlConnector();
-        List<Map<String, Object>> rows = connector.selectStrict(LOAD_SQL, sceneId, afterPlayerId, limit);
-        ArrayList<PlayerSceneProjection> projections = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
-            PlayerSceneEntry entry = MysqlService.packetEntry(row, PlayerSceneEntry.class);
-            if (entry == null) {
-                throw new IllegalStateException("cannot decode player_scene row: " + row);
-            }
+        List<PlayerSceneEntry> entries = PlayerSceneEntryHelper.selectActivePage(
+                sceneId, afterPlayerId, limit);
+        ArrayList<PlayerSceneProjection> projections = new ArrayList<>(entries.size());
+        for (PlayerSceneEntry entry : entries) {
             projections.add(toProjection(entry));
         }
         return List.copyOf(projections);
@@ -60,21 +26,26 @@ public final class MysqlPlayerSceneStore implements PlayerSceneStore {
 
     @Override
     public void upsert(PlayerSceneProjection projection) {
-        MysqlService.getInstance().getMysqlConnector().executeUpdateStrict(
-                UPSERT_SQL,
-                projection.playerId(),
-                projection.sceneId(),
-                projection.cityObjectId(),
-                projection.allianceId(),
-                projection.cityPoint().x(),
-                projection.cityPoint().y(),
-                projection.cityLevel(),
-                projection.cityStateVersion(),
-                projection.discoveredBlocks().toByteArray(),
-                projection.dataVersion(),
-                projection.revision(),
-                projection.deleted() ? 1 : 0,
-                projection.updateTime());
+        toEntry(projection).upsertIfNewer();
+    }
+
+    /** 把业务不可变快照转换为统一数据库实体，SQL 生成和执行交给实体 Helper。 */
+    private static PlayerSceneEntry toEntry(PlayerSceneProjection projection) {
+        PlayerSceneEntry entry = new PlayerSceneEntry();
+        entry.setPlayerId(projection.playerId());
+        entry.setSceneId(projection.sceneId());
+        entry.setCityObjectId(projection.cityObjectId());
+        entry.setAllianceId(projection.allianceId());
+        entry.setCityX(projection.cityPoint().x());
+        entry.setCityY(projection.cityPoint().y());
+        entry.setCityLevel(projection.cityLevel());
+        entry.setCityStateVersion(projection.cityStateVersion());
+        entry.setFogData(projection.discoveredBlocks().toByteArray());
+        entry.setDataVersion(projection.dataVersion());
+        entry.setRevision(projection.revision());
+        entry.setDeleted(projection.deleted() ? 1 : 0);
+        entry.setUpdateTime(projection.updateTime());
+        return entry;
     }
 
     private static PlayerSceneProjection toProjection(PlayerSceneEntry entry) {

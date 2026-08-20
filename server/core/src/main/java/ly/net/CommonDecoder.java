@@ -17,6 +17,12 @@ import org.slf4j.Logger;
  */
 public class CommonDecoder extends ByteToMessageDecoder {
   static final Logger log = LoggerDef.SystemLogger;
+  /**
+   * 历史协议的 length 按 22 字节逻辑头计算，但真实编码头是 26 字节：length 自身 2 字节，
+   * 再加 cmd/sid/seq/guid/time 共 24 字节。因此完整帧实际比 length 声明值多 4 字节。
+   * 这里必须保留这个兼容偏移，不能直接修改线上 length 含义，否则旧客户端会全部断帧。
+   */
+  private static final int LEGACY_FRAME_LENGTH_BIAS = 4;
 
   @Override
   protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> list)
@@ -30,8 +36,11 @@ public class CommonDecoder extends ByteToMessageDecoder {
           in.resetReaderIndex();
           break;
         }
-        // 业务体还没到齐，恢复读指针后等待 Netty 下次继续解码。
-        if (in.readableBytes() < len - 2) {
+        // 已经消费 length 自身 2 字节，所以还需要 (len + 4 - 2) 字节。
+        // 旧实现只等待 len - 2，在高频批量发包时会提前 4 字节尝试解包，产生假解析错误，
+        // 严重时最后一个半包没有后续读事件触发重试，整条连接就一直等待响应。
+        int requiredBytesAfterLength = len + LEGACY_FRAME_LENGTH_BIAS - Short.BYTES;
+        if (in.readableBytes() < requiredBytesAfterLength) {
           in.resetReaderIndex();
           break;
         }

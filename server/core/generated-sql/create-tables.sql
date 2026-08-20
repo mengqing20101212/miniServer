@@ -89,6 +89,69 @@ CREATE TABLE IF NOT EXISTS `rank_history` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `scene_march` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `scene_id` VARCHAR(255) NOT NULL,
+  `march_id` BIGINT NOT NULL,
+  `owner_player_id` BIGINT NOT NULL,
+  `alliance_id` BIGINT NOT NULL,
+  `current_x` INT NOT NULL,
+  `current_y` INT NOT NULL,
+  `march_status` INT NOT NULL,
+  `arrival_at_millis` BIGINT NOT NULL,
+  `state_version` INT NOT NULL,
+  `snapshot_data` MEDIUMBLOB NOT NULL,
+  `data_version` INT NOT NULL,
+  `revision` BIGINT NOT NULL,
+  `deleted` INT NOT NULL,
+  `update_time` DATETIME(6) NOT NULL
+,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_scene_march_scene_id_march_id` (`scene_id`, `march_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `scene_object` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `scene_id` VARCHAR(255) NOT NULL,
+  `object_id` BIGINT NOT NULL,
+  `object_type` INT NOT NULL,
+  `owner_id` BIGINT NOT NULL,
+  `x` INT NOT NULL,
+  `y` INT NOT NULL,
+  `state_version` INT NOT NULL,
+  `data_tag_mask` BIGINT NOT NULL,
+  `state_data` MEDIUMBLOB NOT NULL,
+  `data_version` INT NOT NULL,
+  `revision` BIGINT NOT NULL,
+  `deleted` INT NOT NULL,
+  `update_time` DATETIME(6) NOT NULL
+,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_scene_object_scene_id_object_id` (`scene_id`, `object_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `scene_rally` (
+  `id` BIGINT AUTO_INCREMENT NOT NULL,
+  `scene_id` VARCHAR(255) NOT NULL,
+  `rally_id` BIGINT NOT NULL,
+  `leader_player_id` BIGINT NOT NULL,
+  `alliance_id` BIGINT NOT NULL,
+  `current_x` INT NOT NULL,
+  `current_y` INT NOT NULL,
+  `rally_status` INT NOT NULL,
+  `launch_at_millis` BIGINT NOT NULL,
+  `applied_battle_result_id` BIGINT NOT NULL,
+  `state_version` INT NOT NULL,
+  `snapshot_data` MEDIUMBLOB NOT NULL,
+  `data_version` INT NOT NULL,
+  `revision` BIGINT NOT NULL,
+  `deleted` INT NOT NULL,
+  `update_time` DATETIME(6) NOT NULL
+,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_scene_rally_scene_id_rally_id` (`scene_id`, `rally_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `security_ban` (
   `id` BIGINT AUTO_INCREMENT NOT NULL,
   `ban_type` INT DEFAULT NULL,
@@ -206,4 +269,3 @@ CREATE TABLE IF NOT EXISTS `user_info` (
 ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-

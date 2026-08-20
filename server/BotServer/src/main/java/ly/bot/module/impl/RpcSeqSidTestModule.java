@@ -29,8 +29,19 @@ public class RpcSeqSidTestModule implements RobotModule {
     private boolean success;
 
     public static boolean runStandalone(String loginHost, int loginHttpPort) {
+        return runStandalone(loginHost, loginHttpPort, null);
+    }
+
+    /**
+     * 使用指定账号执行 Login + HeroList 的真实链路断言。
+     *
+     * <p>当部署采用“账号固定归属 GameServer”策略时，调用方应传入已完成开发服分配的
+     * 测试账号；未传账号时仍保留原来的随机账号行为，便于无固定分配策略的环境使用。
+     */
+    public static boolean runStandalone(String loginHost, int loginHttpPort, String account) {
         RpcSeqSidTestModule module = new RpcSeqSidTestModule();
-        return module.runFullTest(loginHost, loginHttpPort, 0, RESPONSE_TIMEOUT_MS, false);
+        return module.runFullTest(
+                loginHost, loginHttpPort, 0, RESPONSE_TIMEOUT_MS, false, account);
     }
 
     public static boolean runReliableReplayStandalone(

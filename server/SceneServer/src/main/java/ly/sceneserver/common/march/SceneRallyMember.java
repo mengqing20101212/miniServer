@@ -30,6 +30,22 @@ final class SceneRallyMember {
         this.remainingTroops = troopCount;
     }
 
+    /** 从集结聚合快照恢复成员；成员不单独落库。 */
+    static SceneRallyMember restore(SceneRallyMemberSnapshot snapshot) {
+        if (snapshot == null) {
+            throw new IllegalArgumentException("rally member snapshot cannot be null");
+        }
+        SceneRallyMember member = new SceneRallyMember(
+                snapshot.playerId(),
+                snapshot.marchId(),
+                snapshot.troopCount(),
+                snapshot.power(),
+                snapshot.armySnapshotVersion(),
+                snapshot.status());
+        member.applyRemainingTroops(snapshot.remainingTroops());
+        return member;
+    }
+
     long playerId() {
         return playerId;
     }

@@ -74,6 +74,25 @@ public final class StartupSkillLoader {
         return resolveServerArgs(section, new CliServerArgs(args[0], args[1], args[2]), serverType);
     }
 
+    /**
+     * 把 STARTUP.SKILL.md 中的 SceneServer 运行基线写入 JVM 属性。
+     *
+     * <p>显式 {@code -D} 参数优先，便于压测时临时覆盖；没有显式参数时才使用启动文件值。
+     * 该方法必须在创建 SceneRuntime 之前调用。
+     */
+    public static void applySceneRuntimeProperties() {
+        StartupServer scene = getServerSection(loadRequired(), ServerTypeEnum.SCENE);
+        setDefaultPositiveProperty("slg.scene.load-log-seconds", scene.loadLogSeconds);
+        setDefaultPositiveProperty("slg.scene.slow-tick-millis", scene.slowTickMillis);
+        setDefaultPositiveProperty("slg.scene.path.region-padding", scene.pathRegionPadding);
+        setDefaultPositiveProperty(
+                "slg.scene.region-migration.queue-capacity",
+                scene.regionMigrationQueueCapacity);
+        setDefaultPositiveProperty("slg.scene.restore.page-size", scene.restorePageSize);
+        setDefaultPositiveProperty(
+                "slg.scene.persistence.partitions", scene.persistencePartitions);
+    }
+
     public static ResolvedBotArgs resolveBotArgs(String[] args) {
         StartupSkill skill = loadRequired();
         StartupBot bot = requireNonNull(skill.startup.bot, "startup.bot", cachedPath);
@@ -116,6 +135,24 @@ public final class StartupSkillLoader {
                     "Nacos 配置端口与 skill 不一致, serverType=" + serverType.getType()
                             + ", skill.netPort=" + section.netPort
                             + ", nacos.serverPort=" + serverConfig.serverPort);
+        }
+    }
+
+    /**
+     * 为没有独立 Nacos 配置的新服务器补齐节点身份和监听端口。
+     *
+     * <p>数据库、Redis、策划表路径等共享运行配置仍然来自 Nacos 的兜底配置；这里只覆盖
+     * 不能跨服务器复用的 {@code serverId/serverPort}，避免 SceneServer 误用 GateServer 的
+     * {@code 9001} 端口。独立 Nacos 配置创建后不会调用该方法，也就不会覆盖线上配置。</p>
+     */
+    public static void applyFallbackNodeConfig(ServerTypeEnum serverType, ServerConfig serverConfig) {
+        if (serverConfig == null) {
+            throw new IllegalArgumentException("serverConfig 不能为空");
+        }
+        StartupServer section = getServerSection(loadRequired(), serverType);
+        serverConfig.serverId = section.serverId;
+        if (section.netPort != null) {
+            serverConfig.serverPort = section.netPort;
         }
     }
 
@@ -169,6 +206,30 @@ public final class StartupSkillLoader {
         validateServer(skill.startup.login, ServerTypeEnum.LOGIN, skillPath);
         validateServer(skill.startup.game, ServerTypeEnum.GAME, skillPath);
         validateServer(skill.startup.scene, ServerTypeEnum.SCENE, skillPath);
+        validateOptionalPositive(
+                skill.startup.scene.loadLogSeconds,
+                "startup.scene.loadLogSeconds",
+                skillPath);
+        validateOptionalPositive(
+                skill.startup.scene.slowTickMillis,
+                "startup.scene.slowTickMillis",
+                skillPath);
+        validateOptionalPositive(
+                skill.startup.scene.pathRegionPadding,
+                "startup.scene.pathRegionPadding",
+                skillPath);
+        validateOptionalPositive(
+                skill.startup.scene.regionMigrationQueueCapacity,
+                "startup.scene.regionMigrationQueueCapacity",
+                skillPath);
+        validateOptionalPositive(
+                skill.startup.scene.restorePageSize,
+                "startup.scene.restorePageSize",
+                skillPath);
+        validateOptionalPositive(
+                skill.startup.scene.persistencePartitions,
+                "startup.scene.persistencePartitions",
+                skillPath);
         validateServer(skill.startup.gate, ServerTypeEnum.GATE, skillPath);
         if (skill.startup.gm != null) {
             validateServer(skill.startup.gm, ServerTypeEnum.GMSERVER, skillPath);
@@ -271,6 +332,18 @@ public final class StartupSkillLoader {
         }
     }
 
+    private static void validateOptionalPositive(Integer value, String field, Path skillPath) {
+        if (value != null) {
+            requirePositive(value, field, skillPath);
+        }
+    }
+
+    private static void setDefaultPositiveProperty(String propertyName, Integer value) {
+        if (value != null && System.getProperty(propertyName) == null) {
+            System.setProperty(propertyName, Integer.toString(value));
+        }
+    }
+
     private static void requireEquals(String expected, String actual, String expectedField, String actualField) {
         if (!Objects.equals(expected, actual)) {
             throw new IllegalArgumentException("启动参数与 skill 不一致, " + expectedField + "=" + expected
@@ -345,6 +418,18 @@ public final class StartupSkillLoader {
         public String env;
         public Integer netPort;
         public Integer springPort;
+        /** SceneServer 周期负载日志间隔，秒；其他服务器忽略。 */
+        public Integer loadLogSeconds;
+        /** SceneShard 慢 Tick 告警阈值，毫秒。 */
+        public Integer slowTickMillis;
+        /** Region 粗路径两侧扩展搜索块数。 */
+        public Integer pathRegionPadding;
+        /** 热点 Region 单线程迁移队列容量。 */
+        public Integer regionMigrationQueueCapacity;
+        /** SceneServer 启动恢复的实体分页大小。 */
+        public Integer restorePageSize;
+        /** 玩家场景投影异步持久化分区数。 */
+        public Integer persistencePartitions;
     }
 
     public static class StartupBot {

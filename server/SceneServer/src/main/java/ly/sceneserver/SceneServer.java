@@ -28,6 +28,8 @@ public final class SceneServer {
                 resolved.env,
                 new SceneConnectSessionProvider());
 
+        // 在创建 SceneRuntime 前应用 STARTUP.SKILL.md 中的 Tick、寻路、迁移和落库基线。
+        StartupSkillLoader.applySceneRuntimeProperties();
         SceneBootstrap.start();
         SceneRpcDispatcher dispatcher = new SceneRpcDispatcher();
         dispatcher.start();

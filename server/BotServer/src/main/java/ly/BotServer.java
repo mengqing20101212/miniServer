@@ -3,6 +3,8 @@ package ly;
 import ly.bot.RobotManager;
 import ly.bot.module.impl.CoroutinePlayerCallTestModule;
 import ly.bot.module.impl.RpcSeqSidTestModule;
+import ly.bot.module.impl.SceneRpcLoadTestModule;
+import ly.bot.module.impl.SceneRpcSmokeTestModule;
 import ly.bot.util.ProtocolTester;
 import ly.startup.StartupSkillLoader;
 
@@ -18,7 +20,10 @@ public class BotServer {
         if (args != null && args.length > 0 && "--test-rpc-seq-sid".equals(args[0])) {
             String loginHost = args.length >= 2 ? args[1] : "127.0.0.1";
             int loginHttpPort = args.length >= 3 ? Integer.parseInt(args[2]) : 8889;
-            boolean success = RpcSeqSidTestModule.runStandalone(loginHost, loginHttpPort);
+            // 固定分区服要求账号先由开发/GM 分配 GameServer。允许测试命令传入已分配账号，
+            // 避免临时随机账号因没有服务器归属而被 Gate 正确拒绝。
+            String account = args.length >= 4 ? args[3] : null;
+            boolean success = RpcSeqSidTestModule.runStandalone(loginHost, loginHttpPort, account);
             System.exit(success ? 0 : 1);
         }
         if (args != null && args.length > 0 && "--test-rpc-reliable-replay".equals(args[0])) {
@@ -48,6 +53,25 @@ public class BotServer {
             String loginHost = args.length >= 2 ? args[1] : "127.0.0.1";
             int loginHttpPort = args.length >= 3 ? Integer.parseInt(args[2]) : 8889;
             boolean success = CoroutinePlayerCallTestModule.runStandalone(loginHost, loginHttpPort);
+            System.exit(success ? 0 : 1);
+        }
+        if (args != null && args.length > 0 && "--test-scene-rpc".equals(args[0])) {
+            String sceneHost = args.length >= 2 ? args[1] : "127.0.0.1";
+            int scenePort = args.length >= 3 ? Integer.parseInt(args[2]) : 9101;
+            boolean requireFakeData = args.length >= 4 && Boolean.parseBoolean(args[3]);
+            boolean success = SceneRpcSmokeTestModule.runStandalone(sceneHost, scenePort, requireFakeData);
+            System.exit(success ? 0 : 1);
+        }
+        if (args != null && args.length > 0 && "--test-scene-load".equals(args[0])) {
+            String sceneHost = args.length >= 2 ? args[1] : "127.0.0.1";
+            int scenePort = args.length >= 3 ? Integer.parseInt(args[2]) : 9101;
+            int players = args.length >= 4
+                    ? Integer.parseInt(args[3])
+                    : SceneRpcLoadTestModule.defaultPlayers();
+            int batchSize = args.length >= 5
+                    ? Integer.parseInt(args[4])
+                    : SceneRpcLoadTestModule.defaultBatchSize();
+            boolean success = SceneRpcLoadTestModule.runStandalone(sceneHost, scenePort, players, batchSize);
             System.exit(success ? 0 : 1);
         }
 
@@ -96,7 +120,7 @@ public class BotServer {
 
             default:
                 System.out.println("未知命令: " + command);
-                System.out.println("可用命令: --test-protocol, --run-bots, --test-rpc-seq-sid, --test-rpc-reliable-replay, --test-coroutine-player-call");
+                System.out.println("可用命令: --test-protocol, --run-bots, --test-rpc-seq-sid, --test-rpc-reliable-replay, --test-coroutine-player-call, --test-scene-rpc, --test-scene-load");
                 break;
         }
     }

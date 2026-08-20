@@ -22,8 +22,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -551,6 +553,96 @@ public class MysqlService {
   }
 
   /**
+   * 严格查询实体列表。
+   *
+   * <p>查询条件仍然只接受实体注解中声明的数据库列名。与 {@link #selectAll(Class, String[], Object...)}
+   * 不同，本方法不会把数据库异常降级为空集合，适合玩家主数据、场景恢复数据等不能混淆“无数据”和
+   * “数据库不可用”的读取链路。
+   *
+   * @param clazz 实体类型，必须带 {@link DbMeta.DbTable}
+   * @param fields 等值查询列名，按顺序与 {@code params} 一一对应
+   * @param params 等值查询参数
+   * @return 已完成 JDBC 类型转换并标记为已持久化的实体列表
+   * @throws IllegalStateException 数据库查询失败或结果无法转换为实体
+   */
+  public <T extends AbstractEntry> List<T> selectAllStrict(
+      Class<T> clazz, String[] fields, Object... params) {
+    validateQueryArguments(clazz, fields, params);
+    MysqlConnector connector = getMysqlConnector();
+    List<Map<String, Object>> rows = connector.selectStrict(getSelectSql(clazz, fields), params);
+    return packetEntriesStrict(rows, clazz);
+  }
+
+  /**
+   * 使用游标字段执行严格的升序分页实体查询。
+   *
+   * <p>该接口用于启动恢复等大表扫描：先应用等值条件，再查询 {@code cursorField > afterCursor}，
+   * 最后按游标升序并限制返回数量。它不会使用 OFFSET，因此翻页成本不会随着页码增长。
+   *
+   * @param clazz 实体类型
+   * @param equalityFields 等值查询列，例如 {@code scene_id}、{@code deleted}
+   * @param equalityParams 与等值查询列一一对应的参数
+   * @param cursorField 单调递增的游标列，例如 {@code player_id}
+   * @param afterCursor 本页不包含的上一页末尾游标
+   * @param limit 本页最大实体数量
+   * @return 按游标升序排列的实体列表
+   */
+  public <T extends AbstractEntry> List<T> selectPageAfterStrict(
+      Class<T> clazz,
+      String[] equalityFields,
+      Object[] equalityParams,
+      String cursorField,
+      Object afterCursor,
+      int limit) {
+    validateQueryArguments(clazz, equalityFields, equalityParams);
+    requireEntityColumn(clazz, cursorField);
+    if (afterCursor == null) {
+      throw new IllegalArgumentException("afterCursor 不能为 null");
+    }
+    if (limit <= 0) {
+      throw new IllegalArgumentException("limit 必须大于 0");
+    }
+
+    Object[] safeEqualityParams = equalityParams == null ? new Object[0] : equalityParams;
+    Object[] params = new Object[safeEqualityParams.length + 2];
+    System.arraycopy(safeEqualityParams, 0, params, 0, safeEqualityParams.length);
+    params[safeEqualityParams.length] = afterCursor;
+    params[safeEqualityParams.length + 1] = limit;
+
+    String sql = getSelectPageAfterSql(clazz, equalityFields, cursorField);
+    List<Map<String, Object>> rows = getMysqlConnector().selectStrict(sql, params);
+    return packetEntriesStrict(rows, clazz);
+  }
+
+  /**
+   * 按实体唯一键执行版本化 UPSERT。
+   *
+   * <p>插入列、唯一键和版本列全部取自实体注解，业务层不需要也不允许拼接 SQL。唯一键冲突时，
+   * 只有传入实体的 {@code revisionField} 大于数据库当前值才更新其他字段；旧版本或重复版本影响
+   * 0 行也属于幂等成功。数据库异常会直接抛出，供上层异步落库队列重试或写入死信。
+   *
+   * @param entry 要保存的完整实体快照
+   * @param revisionField 用于判断新旧的数据库列名
+   * @return SQL 成功执行时始终返回 true，包括旧版本被数据库忽略的情况
+   */
+  public boolean upsertIfNewer(AbstractEntry entry, String revisionField) {
+    if (entry == null) {
+      throw new IllegalArgumentException("entry 不能为 null");
+    }
+    List<Object> params = new ArrayList<>();
+    String sql;
+    try {
+      sql = getRevisionUpsertSql(entry, revisionField, params);
+    } catch (IllegalAccessException e) {
+      throw new IllegalStateException("读取实体字段失败: " + entry.getClass().getSimpleName(), e);
+    }
+
+    getMysqlConnector().executeUpdateStrict(sql, params.toArray());
+    entry.markPersisted();
+    return true;
+  }
+
+  /**
    * 把 JDBC 查询结果封装为 Entry。
    * <p>
    * 只处理带 {@link DbMeta.DbField} 注解的字段；构造完成后会调用
@@ -633,6 +725,104 @@ public class MysqlService {
       throw new IllegalArgumentException(
           "Class " + clazz.getSimpleName() + " is missing @DbTable annotation.");
     }
+  }
+
+  /** 生成实体游标分页 SQL；保持包可见，便于不连接数据库的 SQL 结构测试。 */
+  <T extends AbstractEntry> String getSelectPageAfterSql(
+      Class<T> clazz, String[] equalityFields, String cursorField) {
+    String tableName = requireTableName(clazz);
+    requireEntityColumn(clazz, cursorField);
+    StringBuilder sql = new StringBuilder("SELECT * FROM ")
+        .append(quoteIdentifier(tableName))
+        .append(" WHERE ");
+    if (equalityFields != null) {
+      for (String field : equalityFields) {
+        requireEntityColumn(clazz, field);
+        sql.append(quoteIdentifier(field)).append("=? AND ");
+      }
+    }
+    sql.append(quoteIdentifier(cursorField)).append(">?")
+        .append(" ORDER BY ").append(quoteIdentifier(cursorField)).append(" ASC")
+        .append(" LIMIT ?");
+    return sql.toString();
+  }
+
+  /** 生成基于唯一键和版本列的实体 UPSERT SQL。 */
+  String getRevisionUpsertSql(
+      AbstractEntry entry, String revisionField, List<Object> paramList)
+      throws IllegalAccessException {
+    if (entry == null) {
+      throw new IllegalArgumentException("entry 不能为 null");
+    }
+    if (paramList == null) {
+      throw new IllegalArgumentException("paramList 不能为 null");
+    }
+
+    Class<?> clazz = entry.getClass();
+    DbMeta.DbTable table = clazz.getAnnotation(DbMeta.DbTable.class);
+    String tableName = requireTableName(clazz);
+    Field revisionJavaField = requireEntityColumn(clazz, revisionField);
+    revisionJavaField.setAccessible(true);
+    Object revisionValue = revisionJavaField.get(entry);
+    if (!(revisionValue instanceof Number)) {
+      throw new IllegalArgumentException("revision 字段必须是非空数字: " + revisionField);
+    }
+
+    Set<String> conflictKeyColumns = resolveUniqueKeyColumns(clazz, table);
+    List<String> insertColumns = new ArrayList<>();
+    String masterKeyColumn = "";
+    for (Field field : clazz.getDeclaredFields()) {
+      field.setAccessible(true);
+      if (field.isAnnotationPresent(DbMeta.DbMasterKey.class)) {
+        DbMeta.DbMasterKey masterKey = field.getAnnotation(DbMeta.DbMasterKey.class);
+        masterKeyColumn = masterKey.name();
+        if (masterKey.autoIncrement()) {
+          continue;
+        }
+        insertColumns.add(masterKey.name());
+        paramList.add(field.get(entry));
+      } else if (field.isAnnotationPresent(DbMeta.DbField.class)) {
+        String columnName = field.getAnnotation(DbMeta.DbField.class).name();
+        insertColumns.add(columnName);
+        paramList.add(field.get(entry));
+      }
+    }
+    if (!insertColumns.contains(revisionField)) {
+      throw new IllegalArgumentException("revision 字段未参与实体持久化: " + revisionField);
+    }
+
+    List<String> updateColumns = new ArrayList<>();
+    for (String column : insertColumns) {
+      if (!column.equals(masterKeyColumn)
+          && !column.equals(revisionField)
+          && !conflictKeyColumns.contains(column)) {
+        updateColumns.add(column);
+      }
+    }
+
+    StringBuilder sql = new StringBuilder("INSERT INTO ")
+        .append(quoteIdentifier(tableName)).append(" (");
+    appendQuotedColumns(sql, insertColumns);
+    sql.append(") VALUES (");
+    for (int i = 0; i < insertColumns.size(); i++) {
+      if (i > 0) {
+        sql.append(", ");
+      }
+      sql.append('?');
+    }
+    sql.append(") ON DUPLICATE KEY UPDATE ");
+
+    for (String column : updateColumns) {
+      sql.append(quoteIdentifier(column)).append("=IF(VALUES(")
+          .append(quoteIdentifier(revisionField)).append(")>")
+          .append(quoteIdentifier(revisionField)).append(",VALUES(")
+          .append(quoteIdentifier(column)).append("),")
+          .append(quoteIdentifier(column)).append("),");
+    }
+    sql.append(quoteIdentifier(revisionField)).append("=GREATEST(")
+        .append(quoteIdentifier(revisionField)).append(",VALUES(")
+        .append(quoteIdentifier(revisionField)).append("))");
+    return sql.toString();
   }
 
   /**
@@ -1005,6 +1195,117 @@ public class MysqlService {
       }
     }
     return null;
+  }
+
+  /** 校验等值查询参数和实体列，阻止业务传入任意 SQL 片段充当列名。 */
+  private <T extends AbstractEntry> void validateQueryArguments(
+      Class<T> clazz, String[] fields, Object[] params) {
+    if (clazz == null) {
+      throw new IllegalArgumentException("clazz 不能为 null");
+    }
+    int fieldCount = fields == null ? 0 : fields.length;
+    int paramCount = params == null ? 0 : params.length;
+    if (fieldCount != paramCount) {
+      throw new IllegalArgumentException(
+          "查询列数量和参数数量不一致: fields=" + fieldCount + ", params=" + paramCount);
+    }
+    requireTableName(clazz);
+    if (fields != null) {
+      for (String field : fields) {
+        requireEntityColumn(clazz, field);
+      }
+    }
+  }
+
+  /** 把严格查询结果转换为实体；任意一行转换失败都会中止整次恢复。 */
+  private <T extends AbstractEntry> List<T> packetEntriesStrict(
+      List<Map<String, Object>> rows, Class<T> clazz) {
+    if (rows == null) {
+      throw new IllegalStateException("严格实体查询返回 null: " + clazz.getSimpleName());
+    }
+    List<T> entries = new ArrayList<>(rows.size());
+    for (Map<String, Object> row : rows) {
+      T entry = packetEntry(row, clazz);
+      if (entry == null) {
+        throw new IllegalStateException(
+            "数据库行无法转换为实体: clazz=" + clazz.getSimpleName() + ", row=" + row);
+      }
+      entries.add(entry);
+    }
+    return List.copyOf(entries);
+  }
+
+  /** 读取实体表名并校验为单一数据库标识符。 */
+  private String requireTableName(Class<?> clazz) {
+    if (clazz == null) {
+      throw new IllegalArgumentException("clazz 不能为 null");
+    }
+    DbMeta.DbTable table = clazz.getAnnotation(DbMeta.DbTable.class);
+    if (table == null || table.name() == null || table.name().isBlank()) {
+      throw new IllegalArgumentException(
+          "Class " + clazz.getSimpleName() + " is missing a valid @DbTable name.");
+    }
+    quoteIdentifier(table.name());
+    return table.name();
+  }
+
+  /** 查找实体中声明的数据库列，不允许调用方注入表达式、排序语句或其他 SQL 片段。 */
+  private Field requireEntityColumn(Class<?> clazz, String columnName) {
+    if (columnName == null || columnName.isBlank()) {
+      throw new IllegalArgumentException("数据库列名不能为空");
+    }
+    quoteIdentifier(columnName);
+    Field field = getFieldByDbName(clazz, columnName);
+    if (field == null) {
+      throw new IllegalArgumentException(
+          "实体 " + clazz.getSimpleName() + " 未声明数据库列: " + columnName);
+    }
+    return field;
+  }
+
+  /**
+   * 展开实体的复合唯一键列。
+   *
+   * <p>版本化 UPSERT 必须依赖明确的业务唯一键；没有唯一键时退化为 INSERT 会破坏幂等语义，
+   * 因此这里直接拒绝执行。
+   */
+  private Set<String> resolveUniqueKeyColumns(Class<?> clazz, DbMeta.DbTable table) {
+    Set<String> columns = new HashSet<>();
+    if (table != null && table.uniqueKeys() != null) {
+      for (String uniqueKey : table.uniqueKeys()) {
+        if (uniqueKey == null || uniqueKey.isBlank()) {
+          continue;
+        }
+        for (String rawColumn : uniqueKey.split(",")) {
+          String column = rawColumn.trim();
+          requireEntityColumn(clazz, column);
+          columns.add(column);
+        }
+      }
+    }
+    if (columns.isEmpty()) {
+      throw new IllegalArgumentException(
+          "版本化 UPSERT 要求实体声明 @DbTable.uniqueKeys: " + clazz.getSimpleName());
+    }
+    return columns;
+  }
+
+  /** 追加由实体元数据产生的带反引号列名列表。 */
+  private void appendQuotedColumns(StringBuilder sql, List<String> columns) {
+    for (int i = 0; i < columns.size(); i++) {
+      if (i > 0) {
+        sql.append(", ");
+      }
+      sql.append(quoteIdentifier(columns.get(i)));
+    }
+  }
+
+  /** 只接受简单标识符，再增加 MySQL 反引号，避免元数据错误形成可执行 SQL 片段。 */
+  private String quoteIdentifier(String identifier) {
+    if (identifier == null || !identifier.matches("[A-Za-z_][A-Za-z0-9_]*")) {
+      throw new IllegalArgumentException("非法数据库标识符: " + identifier);
+    }
+    return '`' + identifier + '`';
   }
 
   private static Object convertFieldValue(Class<?> fieldType, Object value) throws Exception {

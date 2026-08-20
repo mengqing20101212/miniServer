@@ -144,6 +144,10 @@ public final class Scene {
   }
 
   /**
+   * <pre>
+   * 场景动态对象分类，用于客户端反序列化对象明细和选择表现逻辑。
+   * </pre>
+   *
    * Protobuf enum {@code SceneObjectKind}
    */
   public enum SceneObjectKind
@@ -396,38 +400,74 @@ public final class Scene {
   public enum SceneMarchType
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
+     * <pre>
+     * 单支部队直接攻击目标。
+     * </pre>
+     *
      * <code>SCENE_MARCH_ATTACK = 0;</code>
      */
     SCENE_MARCH_ATTACK(0),
     /**
+     * <pre>
+     * 正在前往集结点、尚未并入集结主车的成员部队。
+     * </pre>
+     *
      * <code>SCENE_MARCH_RALLY_MEMBER = 1;</code>
      */
     SCENE_MARCH_RALLY_MEMBER(1),
     /**
+     * <pre>
+     * 集结完成后由盟主统一控制的集结主车。
+     * </pre>
+     *
      * <code>SCENE_MARCH_RALLY_ARMY = 2;</code>
      */
     SCENE_MARCH_RALLY_ARMY(2),
     /**
+     * <pre>
+     * 前往友方城市或部队执行增援。
+     * </pre>
+     *
      * <code>SCENE_MARCH_REINFORCE = 3;</code>
      */
     SCENE_MARCH_REINFORCE(3),
     /**
+     * <pre>
+     * 驻守城市、建筑或其他可驻防目标。
+     * </pre>
+     *
      * <code>SCENE_MARCH_GARRISON = 4;</code>
      */
     SCENE_MARCH_GARRISON(4),
     /**
+     * <pre>
+     * 前往资源点执行采集。
+     * </pre>
+     *
      * <code>SCENE_MARCH_GATHER = 5;</code>
      */
     SCENE_MARCH_GATHER(5),
     /**
+     * <pre>
+     * 前往目标执行侦察。
+     * </pre>
+     *
      * <code>SCENE_MARCH_SCOUT = 6;</code>
      */
     SCENE_MARCH_SCOUT(6),
     /**
+     * <pre>
+     * 在友方目标之间运输资源。
+     * </pre>
+     *
      * <code>SCENE_MARCH_TRANSPORT = 7;</code>
      */
     SCENE_MARCH_TRANSPORT(7),
     /**
+     * <pre>
+     * 完成任务、取消任务或战斗结束后返回出发点。
+     * </pre>
+     *
      * <code>SCENE_MARCH_RETURN = 8;</code>
      */
     SCENE_MARCH_RETURN(8),
@@ -435,38 +475,74 @@ public final class Scene {
     ;
 
     /**
+     * <pre>
+     * 单支部队直接攻击目标。
+     * </pre>
+     *
      * <code>SCENE_MARCH_ATTACK = 0;</code>
      */
     public static final int SCENE_MARCH_ATTACK_VALUE = 0;
     /**
+     * <pre>
+     * 正在前往集结点、尚未并入集结主车的成员部队。
+     * </pre>
+     *
      * <code>SCENE_MARCH_RALLY_MEMBER = 1;</code>
      */
     public static final int SCENE_MARCH_RALLY_MEMBER_VALUE = 1;
     /**
+     * <pre>
+     * 集结完成后由盟主统一控制的集结主车。
+     * </pre>
+     *
      * <code>SCENE_MARCH_RALLY_ARMY = 2;</code>
      */
     public static final int SCENE_MARCH_RALLY_ARMY_VALUE = 2;
     /**
+     * <pre>
+     * 前往友方城市或部队执行增援。
+     * </pre>
+     *
      * <code>SCENE_MARCH_REINFORCE = 3;</code>
      */
     public static final int SCENE_MARCH_REINFORCE_VALUE = 3;
     /**
+     * <pre>
+     * 驻守城市、建筑或其他可驻防目标。
+     * </pre>
+     *
      * <code>SCENE_MARCH_GARRISON = 4;</code>
      */
     public static final int SCENE_MARCH_GARRISON_VALUE = 4;
     /**
+     * <pre>
+     * 前往资源点执行采集。
+     * </pre>
+     *
      * <code>SCENE_MARCH_GATHER = 5;</code>
      */
     public static final int SCENE_MARCH_GATHER_VALUE = 5;
     /**
+     * <pre>
+     * 前往目标执行侦察。
+     * </pre>
+     *
      * <code>SCENE_MARCH_SCOUT = 6;</code>
      */
     public static final int SCENE_MARCH_SCOUT_VALUE = 6;
     /**
+     * <pre>
+     * 在友方目标之间运输资源。
+     * </pre>
+     *
      * <code>SCENE_MARCH_TRANSPORT = 7;</code>
      */
     public static final int SCENE_MARCH_TRANSPORT_VALUE = 7;
     /**
+     * <pre>
+     * 完成任务、取消任务或战斗结束后返回出发点。
+     * </pre>
+     *
      * <code>SCENE_MARCH_RETURN = 8;</code>
      */
     public static final int SCENE_MARCH_RETURN_VALUE = 8;
@@ -562,39 +638,75 @@ public final class Scene {
   }
 
   /**
+   * <pre>
+   * 行军状态机阶段；状态变更只由所属 SceneShard 的 Tick 线程提交。
+   * </pre>
+   *
    * Protobuf enum {@code SceneMarchStatus}
    */
   public enum SceneMarchStatus
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
+     * <pre>
+     * 已创建但尚未正式出发，可用于等待前置校验或集结准备。
+     * </pre>
+     *
      * <code>SCENE_MARCH_PREPARING = 0;</code>
      */
     SCENE_MARCH_PREPARING(0),
     /**
+     * <pre>
+     * 正在沿服务端确认的路径移动。
+     * </pre>
+     *
      * <code>SCENE_MARCH_MOVING = 1;</code>
      */
     SCENE_MARCH_MOVING(1),
     /**
+     * <pre>
+     * 已到达集结点并等待集结主车发车。
+     * </pre>
+     *
      * <code>SCENE_MARCH_WAITING_RALLY = 2;</code>
      */
     SCENE_MARCH_WAITING_RALLY(2),
     /**
+     * <pre>
+     * 已到达普通业务目标，等待业务层处理到达事件。
+     * </pre>
+     *
      * <code>SCENE_MARCH_ARRIVED = 3;</code>
      */
     SCENE_MARCH_ARRIVED(3),
     /**
+     * <pre>
+     * 已冻结战斗输入并等待 BattleServer 返回结果。
+     * </pre>
+     *
      * <code>SCENE_MARCH_BATTLE_PENDING = 4;</code>
      */
     SCENE_MARCH_BATTLE_PENDING(4),
     /**
+     * <pre>
+     * 正在沿返程路径移动。
+     * </pre>
+     *
      * <code>SCENE_MARCH_RETURNING = 5;</code>
      */
     SCENE_MARCH_RETURNING(5),
     /**
+     * <pre>
+     * 行军生命周期正常结束。
+     * </pre>
+     *
      * <code>SCENE_MARCH_FINISHED = 6;</code>
      */
     SCENE_MARCH_FINISHED(6),
     /**
+     * <pre>
+     * 行军在允许取消的阶段被终止。
+     * </pre>
+     *
      * <code>SCENE_MARCH_CANCELLED = 7;</code>
      */
     SCENE_MARCH_CANCELLED(7),
@@ -602,34 +714,66 @@ public final class Scene {
     ;
 
     /**
+     * <pre>
+     * 已创建但尚未正式出发，可用于等待前置校验或集结准备。
+     * </pre>
+     *
      * <code>SCENE_MARCH_PREPARING = 0;</code>
      */
     public static final int SCENE_MARCH_PREPARING_VALUE = 0;
     /**
+     * <pre>
+     * 正在沿服务端确认的路径移动。
+     * </pre>
+     *
      * <code>SCENE_MARCH_MOVING = 1;</code>
      */
     public static final int SCENE_MARCH_MOVING_VALUE = 1;
     /**
+     * <pre>
+     * 已到达集结点并等待集结主车发车。
+     * </pre>
+     *
      * <code>SCENE_MARCH_WAITING_RALLY = 2;</code>
      */
     public static final int SCENE_MARCH_WAITING_RALLY_VALUE = 2;
     /**
+     * <pre>
+     * 已到达普通业务目标，等待业务层处理到达事件。
+     * </pre>
+     *
      * <code>SCENE_MARCH_ARRIVED = 3;</code>
      */
     public static final int SCENE_MARCH_ARRIVED_VALUE = 3;
     /**
+     * <pre>
+     * 已冻结战斗输入并等待 BattleServer 返回结果。
+     * </pre>
+     *
      * <code>SCENE_MARCH_BATTLE_PENDING = 4;</code>
      */
     public static final int SCENE_MARCH_BATTLE_PENDING_VALUE = 4;
     /**
+     * <pre>
+     * 正在沿返程路径移动。
+     * </pre>
+     *
      * <code>SCENE_MARCH_RETURNING = 5;</code>
      */
     public static final int SCENE_MARCH_RETURNING_VALUE = 5;
     /**
+     * <pre>
+     * 行军生命周期正常结束。
+     * </pre>
+     *
      * <code>SCENE_MARCH_FINISHED = 6;</code>
      */
     public static final int SCENE_MARCH_FINISHED_VALUE = 6;
     /**
+     * <pre>
+     * 行军在允许取消的阶段被终止。
+     * </pre>
+     *
      * <code>SCENE_MARCH_CANCELLED = 7;</code>
      */
     public static final int SCENE_MARCH_CANCELLED_VALUE = 7;
@@ -724,43 +868,83 @@ public final class Scene {
   }
 
   /**
+   * <pre>
+   * 行军目标类型，用于校验攻击、增援、采集、集结等业务能力。
+   * </pre>
+   *
    * Protobuf enum {@code SceneTargetType}
    */
   public enum SceneTargetType
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
+     * <pre>
+     * 没有动态对象 ID 的普通地图坐标。
+     * </pre>
+     *
      * <code>SCENE_TARGET_POINT = 0;</code>
      */
     SCENE_TARGET_POINT(0),
     /**
+     * <pre>
+     * 玩家主城。
+     * </pre>
+     *
      * <code>SCENE_TARGET_PLAYER_CITY = 1;</code>
      */
     SCENE_TARGET_PLAYER_CITY(1),
     /**
+     * <pre>
+     * 联盟城市。
+     * </pre>
+     *
      * <code>SCENE_TARGET_ALLIANCE_CITY = 2;</code>
      */
     SCENE_TARGET_ALLIANCE_CITY(2),
     /**
+     * <pre>
+     * 联盟建筑，例如要塞、关卡或箭塔。
+     * </pre>
+     *
      * <code>SCENE_TARGET_ALLIANCE_BUILDING = 3;</code>
      */
     SCENE_TARGET_ALLIANCE_BUILDING(3),
     /**
+     * <pre>
+     * 可采集资源点。
+     * </pre>
+     *
      * <code>SCENE_TARGET_RESOURCE = 4;</code>
      */
     SCENE_TARGET_RESOURCE(4),
     /**
+     * <pre>
+     * 世界怪物或首领。
+     * </pre>
+     *
      * <code>SCENE_TARGET_MONSTER = 5;</code>
      */
     SCENE_TARGET_MONSTER(5),
     /**
+     * <pre>
+     * 联盟集结营地或集结主车。
+     * </pre>
+     *
      * <code>SCENE_TARGET_RALLY_CAMP = 6;</code>
      */
     SCENE_TARGET_RALLY_CAMP(6),
     /**
+     * <pre>
+     * 地图上的其他移动部队。
+     * </pre>
+     *
      * <code>SCENE_TARGET_TROOP = 7;</code>
      */
     SCENE_TARGET_TROOP(7),
     /**
+     * <pre>
+     * 跨服场景中由全局 ID 标识的动态对象。
+     * </pre>
+     *
      * <code>SCENE_TARGET_CROSS_SERVER_OBJECT = 8;</code>
      */
     SCENE_TARGET_CROSS_SERVER_OBJECT(8),
@@ -768,38 +952,74 @@ public final class Scene {
     ;
 
     /**
+     * <pre>
+     * 没有动态对象 ID 的普通地图坐标。
+     * </pre>
+     *
      * <code>SCENE_TARGET_POINT = 0;</code>
      */
     public static final int SCENE_TARGET_POINT_VALUE = 0;
     /**
+     * <pre>
+     * 玩家主城。
+     * </pre>
+     *
      * <code>SCENE_TARGET_PLAYER_CITY = 1;</code>
      */
     public static final int SCENE_TARGET_PLAYER_CITY_VALUE = 1;
     /**
+     * <pre>
+     * 联盟城市。
+     * </pre>
+     *
      * <code>SCENE_TARGET_ALLIANCE_CITY = 2;</code>
      */
     public static final int SCENE_TARGET_ALLIANCE_CITY_VALUE = 2;
     /**
+     * <pre>
+     * 联盟建筑，例如要塞、关卡或箭塔。
+     * </pre>
+     *
      * <code>SCENE_TARGET_ALLIANCE_BUILDING = 3;</code>
      */
     public static final int SCENE_TARGET_ALLIANCE_BUILDING_VALUE = 3;
     /**
+     * <pre>
+     * 可采集资源点。
+     * </pre>
+     *
      * <code>SCENE_TARGET_RESOURCE = 4;</code>
      */
     public static final int SCENE_TARGET_RESOURCE_VALUE = 4;
     /**
+     * <pre>
+     * 世界怪物或首领。
+     * </pre>
+     *
      * <code>SCENE_TARGET_MONSTER = 5;</code>
      */
     public static final int SCENE_TARGET_MONSTER_VALUE = 5;
     /**
+     * <pre>
+     * 联盟集结营地或集结主车。
+     * </pre>
+     *
      * <code>SCENE_TARGET_RALLY_CAMP = 6;</code>
      */
     public static final int SCENE_TARGET_RALLY_CAMP_VALUE = 6;
     /**
+     * <pre>
+     * 地图上的其他移动部队。
+     * </pre>
+     *
      * <code>SCENE_TARGET_TROOP = 7;</code>
      */
     public static final int SCENE_TARGET_TROOP_VALUE = 7;
     /**
+     * <pre>
+     * 跨服场景中由全局 ID 标识的动态对象。
+     * </pre>
+     *
      * <code>SCENE_TARGET_CROSS_SERVER_OBJECT = 8;</code>
      */
     public static final int SCENE_TARGET_CROSS_SERVER_OBJECT_VALUE = 8;
@@ -895,31 +1115,59 @@ public final class Scene {
   }
 
   /**
+   * <pre>
+   * 集结整体状态，由创建、发车、战斗、返程直到结束构成完整状态机。
+   * </pre>
+   *
    * Protobuf enum {@code SceneRallyStatus}
    */
   public enum SceneRallyStatus
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
+     * <pre>
+     * 正在招募成员，尚未冻结出战快照。
+     * </pre>
+     *
      * <code>SCENE_RALLY_RECRUITING = 0;</code>
      */
     SCENE_RALLY_RECRUITING(0),
     /**
+     * <pre>
+     * 已发车并由集结主车统一移动。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MOVING = 1;</code>
      */
     SCENE_RALLY_MOVING(1),
     /**
+     * <pre>
+     * 已提交 BattleServer，等待幂等战斗结果。
+     * </pre>
+     *
      * <code>SCENE_RALLY_BATTLE_PENDING = 2;</code>
      */
     SCENE_RALLY_BATTLE_PENDING(2),
     /**
+     * <pre>
+     * 战斗或取消后正在返回。
+     * </pre>
+     *
      * <code>SCENE_RALLY_RETURNING = 3;</code>
      */
     SCENE_RALLY_RETURNING(3),
     /**
+     * <pre>
+     * 集结正常完成且结果已经应用。
+     * </pre>
+     *
      * <code>SCENE_RALLY_FINISHED = 4;</code>
      */
     SCENE_RALLY_FINISHED(4),
     /**
+     * <pre>
+     * 集结在发车前或可取消阶段被终止。
+     * </pre>
+     *
      * <code>SCENE_RALLY_CANCELLED = 5;</code>
      */
     SCENE_RALLY_CANCELLED(5),
@@ -927,26 +1175,50 @@ public final class Scene {
     ;
 
     /**
+     * <pre>
+     * 正在招募成员，尚未冻结出战快照。
+     * </pre>
+     *
      * <code>SCENE_RALLY_RECRUITING = 0;</code>
      */
     public static final int SCENE_RALLY_RECRUITING_VALUE = 0;
     /**
+     * <pre>
+     * 已发车并由集结主车统一移动。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MOVING = 1;</code>
      */
     public static final int SCENE_RALLY_MOVING_VALUE = 1;
     /**
+     * <pre>
+     * 已提交 BattleServer，等待幂等战斗结果。
+     * </pre>
+     *
      * <code>SCENE_RALLY_BATTLE_PENDING = 2;</code>
      */
     public static final int SCENE_RALLY_BATTLE_PENDING_VALUE = 2;
     /**
+     * <pre>
+     * 战斗或取消后正在返回。
+     * </pre>
+     *
      * <code>SCENE_RALLY_RETURNING = 3;</code>
      */
     public static final int SCENE_RALLY_RETURNING_VALUE = 3;
     /**
+     * <pre>
+     * 集结正常完成且结果已经应用。
+     * </pre>
+     *
      * <code>SCENE_RALLY_FINISHED = 4;</code>
      */
     public static final int SCENE_RALLY_FINISHED_VALUE = 4;
     /**
+     * <pre>
+     * 集结在发车前或可取消阶段被终止。
+     * </pre>
+     *
      * <code>SCENE_RALLY_CANCELLED = 5;</code>
      */
     public static final int SCENE_RALLY_CANCELLED_VALUE = 5;
@@ -1039,39 +1311,75 @@ public final class Scene {
   }
 
   /**
+   * <pre>
+   * 单个集结成员在集结生命周期内的状态。
+   * </pre>
+   *
    * Protobuf enum {@code SceneRallyMemberStatus}
    */
   public enum SceneRallyMemberStatus
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
+     * <pre>
+     * 成员部队正在前往集结点。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_JOINING = 0;</code>
      */
     SCENE_RALLY_MEMBER_JOINING(0),
     /**
+     * <pre>
+     * 成员已到达集结点并等待主车发车。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_READY = 1;</code>
      */
     SCENE_RALLY_MEMBER_READY(1),
     /**
+     * <pre>
+     * 成员已经并入集结主车共同移动。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_MOVING = 2;</code>
      */
     SCENE_RALLY_MEMBER_MOVING(2),
     /**
+     * <pre>
+     * 成员部队快照已经提交战斗，等待结果。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_BATTLE_PENDING = 3;</code>
      */
     SCENE_RALLY_MEMBER_BATTLE_PENDING(3),
     /**
+     * <pre>
+     * 成员剩余部队正在返程。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_RETURNING = 4;</code>
      */
     SCENE_RALLY_MEMBER_RETURNING(4),
     /**
+     * <pre>
+     * 成员已完成本次集结生命周期。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_FINISHED = 5;</code>
      */
     SCENE_RALLY_MEMBER_FINISHED(5),
     /**
+     * <pre>
+     * 成员在允许退出的阶段主动离开。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_LEFT = 6;</code>
      */
     SCENE_RALLY_MEMBER_LEFT(6),
     /**
+     * <pre>
+     * 成员被集结发起者移出。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_EXCLUDED = 7;</code>
      */
     SCENE_RALLY_MEMBER_EXCLUDED(7),
@@ -1079,34 +1387,66 @@ public final class Scene {
     ;
 
     /**
+     * <pre>
+     * 成员部队正在前往集结点。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_JOINING = 0;</code>
      */
     public static final int SCENE_RALLY_MEMBER_JOINING_VALUE = 0;
     /**
+     * <pre>
+     * 成员已到达集结点并等待主车发车。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_READY = 1;</code>
      */
     public static final int SCENE_RALLY_MEMBER_READY_VALUE = 1;
     /**
+     * <pre>
+     * 成员已经并入集结主车共同移动。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_MOVING = 2;</code>
      */
     public static final int SCENE_RALLY_MEMBER_MOVING_VALUE = 2;
     /**
+     * <pre>
+     * 成员部队快照已经提交战斗，等待结果。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_BATTLE_PENDING = 3;</code>
      */
     public static final int SCENE_RALLY_MEMBER_BATTLE_PENDING_VALUE = 3;
     /**
+     * <pre>
+     * 成员剩余部队正在返程。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_RETURNING = 4;</code>
      */
     public static final int SCENE_RALLY_MEMBER_RETURNING_VALUE = 4;
     /**
+     * <pre>
+     * 成员已完成本次集结生命周期。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_FINISHED = 5;</code>
      */
     public static final int SCENE_RALLY_MEMBER_FINISHED_VALUE = 5;
     /**
+     * <pre>
+     * 成员在允许退出的阶段主动离开。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_LEFT = 6;</code>
      */
     public static final int SCENE_RALLY_MEMBER_LEFT_VALUE = 6;
     /**
+     * <pre>
+     * 成员被集结发起者移出。
+     * </pre>
+     *
      * <code>SCENE_RALLY_MEMBER_EXCLUDED = 7;</code>
      */
     public static final int SCENE_RALLY_MEMBER_EXCLUDED_VALUE = 7;
@@ -2086,6 +2426,1344 @@ public final class Scene {
 
   }
 
+  public interface ScenePersistentObjectStateOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:ScenePersistentObjectState)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * 当前消息结构版本，升级字段语义时用于迁移旧数据。
+     * </pre>
+     *
+     * <code>int32 data_version = 1;</code>
+     * @return The dataVersion.
+     */
+    int getDataVersion();
+
+    /**
+     * <pre>
+     * 资源、怪物、建筑或掉落物的策划配置 ID。
+     * </pre>
+     *
+     * <code>int32 config_id = 2;</code>
+     * @return The configId.
+     */
+    int getConfigId();
+
+    /**
+     * <pre>
+     * 生成该对象的刷新规则 ID。
+     * </pre>
+     *
+     * <code>int32 rule_id = 3;</code>
+     * @return The ruleId.
+     */
+    int getRuleId();
+
+    /**
+     * <pre>
+     * 对象等级；不需要等级的类型使用 0。
+     * </pre>
+     *
+     * <code>int32 level = 4;</code>
+     * @return The level.
+     */
+    int getLevel();
+
+    /**
+     * <pre>
+     * 资源剩余量、掉落数量等通用长整型值。
+     * </pre>
+     *
+     * <code>int64 amount = 5;</code>
+     * @return The amount.
+     */
+    long getAmount();
+
+    /**
+     * <pre>
+     * 怪物血量、建筑耐久等通用生命值。
+     * </pre>
+     *
+     * <code>int64 health = 6;</code>
+     * @return The health.
+     */
+    long getHealth();
+
+    /**
+     * <pre>
+     * 下一次刷新时间戳，单位毫秒；不刷新时使用 0。
+     * </pre>
+     *
+     * <code>int64 refresh_at_millis = 7;</code>
+     * @return The refreshAtMillis.
+     */
+    long getRefreshAtMillis();
+
+    /**
+     * <pre>
+     * 对象过期时间戳，单位毫秒；永不过期时使用 0。
+     * </pre>
+     *
+     * <code>int64 expire_at_millis = 8;</code>
+     * @return The expireAtMillis.
+     */
+    long getExpireAtMillis();
+
+    /**
+     * <pre>
+     * 占领、保护、锁定、可采集等业务状态位。
+     * </pre>
+     *
+     * <code>uint64 state_flags = 9;</code>
+     * @return The stateFlags.
+     */
+    long getStateFlags();
+
+    /**
+     * <pre>
+     * 具体玩法扩展的 Protobuf 二进制；其解释由 config_id 和 data_version 决定。
+     * </pre>
+     *
+     * <code>bytes extension_data = 10;</code>
+     * @return The extensionData.
+     */
+    com.google.protobuf.ByteString getExtensionData();
+  }
+  /**
+   * <pre>
+   * 普通动态对象的可恢复业务状态；使用明确字段和 Protobuf 扩展数据，不保存 JSON 字符串。
+   * </pre>
+   *
+   * Protobuf type {@code ScenePersistentObjectState}
+   */
+  public static final class ScenePersistentObjectState extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:ScenePersistentObjectState)
+      ScenePersistentObjectStateOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ScenePersistentObjectState.newBuilder() to construct.
+    private ScenePersistentObjectState(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ScenePersistentObjectState() {
+      extensionData_ = com.google.protobuf.ByteString.EMPTY;
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new ScenePersistentObjectState();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return ly.proto.Scene.internal_static_ScenePersistentObjectState_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return ly.proto.Scene.internal_static_ScenePersistentObjectState_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              ly.proto.Scene.ScenePersistentObjectState.class, ly.proto.Scene.ScenePersistentObjectState.Builder.class);
+    }
+
+    public static final int DATA_VERSION_FIELD_NUMBER = 1;
+    private int dataVersion_ = 0;
+    /**
+     * <pre>
+     * 当前消息结构版本，升级字段语义时用于迁移旧数据。
+     * </pre>
+     *
+     * <code>int32 data_version = 1;</code>
+     * @return The dataVersion.
+     */
+    @java.lang.Override
+    public int getDataVersion() {
+      return dataVersion_;
+    }
+
+    public static final int CONFIG_ID_FIELD_NUMBER = 2;
+    private int configId_ = 0;
+    /**
+     * <pre>
+     * 资源、怪物、建筑或掉落物的策划配置 ID。
+     * </pre>
+     *
+     * <code>int32 config_id = 2;</code>
+     * @return The configId.
+     */
+    @java.lang.Override
+    public int getConfigId() {
+      return configId_;
+    }
+
+    public static final int RULE_ID_FIELD_NUMBER = 3;
+    private int ruleId_ = 0;
+    /**
+     * <pre>
+     * 生成该对象的刷新规则 ID。
+     * </pre>
+     *
+     * <code>int32 rule_id = 3;</code>
+     * @return The ruleId.
+     */
+    @java.lang.Override
+    public int getRuleId() {
+      return ruleId_;
+    }
+
+    public static final int LEVEL_FIELD_NUMBER = 4;
+    private int level_ = 0;
+    /**
+     * <pre>
+     * 对象等级；不需要等级的类型使用 0。
+     * </pre>
+     *
+     * <code>int32 level = 4;</code>
+     * @return The level.
+     */
+    @java.lang.Override
+    public int getLevel() {
+      return level_;
+    }
+
+    public static final int AMOUNT_FIELD_NUMBER = 5;
+    private long amount_ = 0L;
+    /**
+     * <pre>
+     * 资源剩余量、掉落数量等通用长整型值。
+     * </pre>
+     *
+     * <code>int64 amount = 5;</code>
+     * @return The amount.
+     */
+    @java.lang.Override
+    public long getAmount() {
+      return amount_;
+    }
+
+    public static final int HEALTH_FIELD_NUMBER = 6;
+    private long health_ = 0L;
+    /**
+     * <pre>
+     * 怪物血量、建筑耐久等通用生命值。
+     * </pre>
+     *
+     * <code>int64 health = 6;</code>
+     * @return The health.
+     */
+    @java.lang.Override
+    public long getHealth() {
+      return health_;
+    }
+
+    public static final int REFRESH_AT_MILLIS_FIELD_NUMBER = 7;
+    private long refreshAtMillis_ = 0L;
+    /**
+     * <pre>
+     * 下一次刷新时间戳，单位毫秒；不刷新时使用 0。
+     * </pre>
+     *
+     * <code>int64 refresh_at_millis = 7;</code>
+     * @return The refreshAtMillis.
+     */
+    @java.lang.Override
+    public long getRefreshAtMillis() {
+      return refreshAtMillis_;
+    }
+
+    public static final int EXPIRE_AT_MILLIS_FIELD_NUMBER = 8;
+    private long expireAtMillis_ = 0L;
+    /**
+     * <pre>
+     * 对象过期时间戳，单位毫秒；永不过期时使用 0。
+     * </pre>
+     *
+     * <code>int64 expire_at_millis = 8;</code>
+     * @return The expireAtMillis.
+     */
+    @java.lang.Override
+    public long getExpireAtMillis() {
+      return expireAtMillis_;
+    }
+
+    public static final int STATE_FLAGS_FIELD_NUMBER = 9;
+    private long stateFlags_ = 0L;
+    /**
+     * <pre>
+     * 占领、保护、锁定、可采集等业务状态位。
+     * </pre>
+     *
+     * <code>uint64 state_flags = 9;</code>
+     * @return The stateFlags.
+     */
+    @java.lang.Override
+    public long getStateFlags() {
+      return stateFlags_;
+    }
+
+    public static final int EXTENSION_DATA_FIELD_NUMBER = 10;
+    private com.google.protobuf.ByteString extensionData_ = com.google.protobuf.ByteString.EMPTY;
+    /**
+     * <pre>
+     * 具体玩法扩展的 Protobuf 二进制；其解释由 config_id 和 data_version 决定。
+     * </pre>
+     *
+     * <code>bytes extension_data = 10;</code>
+     * @return The extensionData.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString getExtensionData() {
+      return extensionData_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (dataVersion_ != 0) {
+        output.writeInt32(1, dataVersion_);
+      }
+      if (configId_ != 0) {
+        output.writeInt32(2, configId_);
+      }
+      if (ruleId_ != 0) {
+        output.writeInt32(3, ruleId_);
+      }
+      if (level_ != 0) {
+        output.writeInt32(4, level_);
+      }
+      if (amount_ != 0L) {
+        output.writeInt64(5, amount_);
+      }
+      if (health_ != 0L) {
+        output.writeInt64(6, health_);
+      }
+      if (refreshAtMillis_ != 0L) {
+        output.writeInt64(7, refreshAtMillis_);
+      }
+      if (expireAtMillis_ != 0L) {
+        output.writeInt64(8, expireAtMillis_);
+      }
+      if (stateFlags_ != 0L) {
+        output.writeUInt64(9, stateFlags_);
+      }
+      if (!extensionData_.isEmpty()) {
+        output.writeBytes(10, extensionData_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (dataVersion_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, dataVersion_);
+      }
+      if (configId_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, configId_);
+      }
+      if (ruleId_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, ruleId_);
+      }
+      if (level_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, level_);
+      }
+      if (amount_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(5, amount_);
+      }
+      if (health_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(6, health_);
+      }
+      if (refreshAtMillis_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(7, refreshAtMillis_);
+      }
+      if (expireAtMillis_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(8, expireAtMillis_);
+      }
+      if (stateFlags_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt64Size(9, stateFlags_);
+      }
+      if (!extensionData_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(10, extensionData_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof ly.proto.Scene.ScenePersistentObjectState)) {
+        return super.equals(obj);
+      }
+      ly.proto.Scene.ScenePersistentObjectState other = (ly.proto.Scene.ScenePersistentObjectState) obj;
+
+      if (getDataVersion()
+          != other.getDataVersion()) return false;
+      if (getConfigId()
+          != other.getConfigId()) return false;
+      if (getRuleId()
+          != other.getRuleId()) return false;
+      if (getLevel()
+          != other.getLevel()) return false;
+      if (getAmount()
+          != other.getAmount()) return false;
+      if (getHealth()
+          != other.getHealth()) return false;
+      if (getRefreshAtMillis()
+          != other.getRefreshAtMillis()) return false;
+      if (getExpireAtMillis()
+          != other.getExpireAtMillis()) return false;
+      if (getStateFlags()
+          != other.getStateFlags()) return false;
+      if (!getExtensionData()
+          .equals(other.getExtensionData())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + DATA_VERSION_FIELD_NUMBER;
+      hash = (53 * hash) + getDataVersion();
+      hash = (37 * hash) + CONFIG_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getConfigId();
+      hash = (37 * hash) + RULE_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRuleId();
+      hash = (37 * hash) + LEVEL_FIELD_NUMBER;
+      hash = (53 * hash) + getLevel();
+      hash = (37 * hash) + AMOUNT_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getAmount());
+      hash = (37 * hash) + HEALTH_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getHealth());
+      hash = (37 * hash) + REFRESH_AT_MILLIS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getRefreshAtMillis());
+      hash = (37 * hash) + EXPIRE_AT_MILLIS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getExpireAtMillis());
+      hash = (37 * hash) + STATE_FLAGS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getStateFlags());
+      hash = (37 * hash) + EXTENSION_DATA_FIELD_NUMBER;
+      hash = (53 * hash) + getExtensionData().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static ly.proto.Scene.ScenePersistentObjectState parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Scene.ScenePersistentObjectState parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Scene.ScenePersistentObjectState parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Scene.ScenePersistentObjectState parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Scene.ScenePersistentObjectState parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Scene.ScenePersistentObjectState parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Scene.ScenePersistentObjectState parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Scene.ScenePersistentObjectState parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static ly.proto.Scene.ScenePersistentObjectState parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static ly.proto.Scene.ScenePersistentObjectState parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static ly.proto.Scene.ScenePersistentObjectState parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Scene.ScenePersistentObjectState parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(ly.proto.Scene.ScenePersistentObjectState prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * 普通动态对象的可恢复业务状态；使用明确字段和 Protobuf 扩展数据，不保存 JSON 字符串。
+     * </pre>
+     *
+     * Protobuf type {@code ScenePersistentObjectState}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:ScenePersistentObjectState)
+        ly.proto.Scene.ScenePersistentObjectStateOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return ly.proto.Scene.internal_static_ScenePersistentObjectState_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return ly.proto.Scene.internal_static_ScenePersistentObjectState_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                ly.proto.Scene.ScenePersistentObjectState.class, ly.proto.Scene.ScenePersistentObjectState.Builder.class);
+      }
+
+      // Construct using ly.proto.Scene.ScenePersistentObjectState.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        dataVersion_ = 0;
+        configId_ = 0;
+        ruleId_ = 0;
+        level_ = 0;
+        amount_ = 0L;
+        health_ = 0L;
+        refreshAtMillis_ = 0L;
+        expireAtMillis_ = 0L;
+        stateFlags_ = 0L;
+        extensionData_ = com.google.protobuf.ByteString.EMPTY;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return ly.proto.Scene.internal_static_ScenePersistentObjectState_descriptor;
+      }
+
+      @java.lang.Override
+      public ly.proto.Scene.ScenePersistentObjectState getDefaultInstanceForType() {
+        return ly.proto.Scene.ScenePersistentObjectState.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public ly.proto.Scene.ScenePersistentObjectState build() {
+        ly.proto.Scene.ScenePersistentObjectState result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public ly.proto.Scene.ScenePersistentObjectState buildPartial() {
+        ly.proto.Scene.ScenePersistentObjectState result = new ly.proto.Scene.ScenePersistentObjectState(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(ly.proto.Scene.ScenePersistentObjectState result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.dataVersion_ = dataVersion_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.configId_ = configId_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.ruleId_ = ruleId_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.level_ = level_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.amount_ = amount_;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.health_ = health_;
+        }
+        if (((from_bitField0_ & 0x00000040) != 0)) {
+          result.refreshAtMillis_ = refreshAtMillis_;
+        }
+        if (((from_bitField0_ & 0x00000080) != 0)) {
+          result.expireAtMillis_ = expireAtMillis_;
+        }
+        if (((from_bitField0_ & 0x00000100) != 0)) {
+          result.stateFlags_ = stateFlags_;
+        }
+        if (((from_bitField0_ & 0x00000200) != 0)) {
+          result.extensionData_ = extensionData_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof ly.proto.Scene.ScenePersistentObjectState) {
+          return mergeFrom((ly.proto.Scene.ScenePersistentObjectState)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(ly.proto.Scene.ScenePersistentObjectState other) {
+        if (other == ly.proto.Scene.ScenePersistentObjectState.getDefaultInstance()) return this;
+        if (other.getDataVersion() != 0) {
+          setDataVersion(other.getDataVersion());
+        }
+        if (other.getConfigId() != 0) {
+          setConfigId(other.getConfigId());
+        }
+        if (other.getRuleId() != 0) {
+          setRuleId(other.getRuleId());
+        }
+        if (other.getLevel() != 0) {
+          setLevel(other.getLevel());
+        }
+        if (other.getAmount() != 0L) {
+          setAmount(other.getAmount());
+        }
+        if (other.getHealth() != 0L) {
+          setHealth(other.getHealth());
+        }
+        if (other.getRefreshAtMillis() != 0L) {
+          setRefreshAtMillis(other.getRefreshAtMillis());
+        }
+        if (other.getExpireAtMillis() != 0L) {
+          setExpireAtMillis(other.getExpireAtMillis());
+        }
+        if (other.getStateFlags() != 0L) {
+          setStateFlags(other.getStateFlags());
+        }
+        if (other.getExtensionData() != com.google.protobuf.ByteString.EMPTY) {
+          setExtensionData(other.getExtensionData());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                dataVersion_ = input.readInt32();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 16: {
+                configId_ = input.readInt32();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 24: {
+                ruleId_ = input.readInt32();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              case 32: {
+                level_ = input.readInt32();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
+              case 40: {
+                amount_ = input.readInt64();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 40
+              case 48: {
+                health_ = input.readInt64();
+                bitField0_ |= 0x00000020;
+                break;
+              } // case 48
+              case 56: {
+                refreshAtMillis_ = input.readInt64();
+                bitField0_ |= 0x00000040;
+                break;
+              } // case 56
+              case 64: {
+                expireAtMillis_ = input.readInt64();
+                bitField0_ |= 0x00000080;
+                break;
+              } // case 64
+              case 72: {
+                stateFlags_ = input.readUInt64();
+                bitField0_ |= 0x00000100;
+                break;
+              } // case 72
+              case 82: {
+                extensionData_ = input.readBytes();
+                bitField0_ |= 0x00000200;
+                break;
+              } // case 82
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private int dataVersion_ ;
+      /**
+       * <pre>
+       * 当前消息结构版本，升级字段语义时用于迁移旧数据。
+       * </pre>
+       *
+       * <code>int32 data_version = 1;</code>
+       * @return The dataVersion.
+       */
+      @java.lang.Override
+      public int getDataVersion() {
+        return dataVersion_;
+      }
+      /**
+       * <pre>
+       * 当前消息结构版本，升级字段语义时用于迁移旧数据。
+       * </pre>
+       *
+       * <code>int32 data_version = 1;</code>
+       * @param value The dataVersion to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDataVersion(int value) {
+
+        dataVersion_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 当前消息结构版本，升级字段语义时用于迁移旧数据。
+       * </pre>
+       *
+       * <code>int32 data_version = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearDataVersion() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        dataVersion_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int configId_ ;
+      /**
+       * <pre>
+       * 资源、怪物、建筑或掉落物的策划配置 ID。
+       * </pre>
+       *
+       * <code>int32 config_id = 2;</code>
+       * @return The configId.
+       */
+      @java.lang.Override
+      public int getConfigId() {
+        return configId_;
+      }
+      /**
+       * <pre>
+       * 资源、怪物、建筑或掉落物的策划配置 ID。
+       * </pre>
+       *
+       * <code>int32 config_id = 2;</code>
+       * @param value The configId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setConfigId(int value) {
+
+        configId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 资源、怪物、建筑或掉落物的策划配置 ID。
+       * </pre>
+       *
+       * <code>int32 config_id = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearConfigId() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        configId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int ruleId_ ;
+      /**
+       * <pre>
+       * 生成该对象的刷新规则 ID。
+       * </pre>
+       *
+       * <code>int32 rule_id = 3;</code>
+       * @return The ruleId.
+       */
+      @java.lang.Override
+      public int getRuleId() {
+        return ruleId_;
+      }
+      /**
+       * <pre>
+       * 生成该对象的刷新规则 ID。
+       * </pre>
+       *
+       * <code>int32 rule_id = 3;</code>
+       * @param value The ruleId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRuleId(int value) {
+
+        ruleId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 生成该对象的刷新规则 ID。
+       * </pre>
+       *
+       * <code>int32 rule_id = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRuleId() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        ruleId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int level_ ;
+      /**
+       * <pre>
+       * 对象等级；不需要等级的类型使用 0。
+       * </pre>
+       *
+       * <code>int32 level = 4;</code>
+       * @return The level.
+       */
+      @java.lang.Override
+      public int getLevel() {
+        return level_;
+      }
+      /**
+       * <pre>
+       * 对象等级；不需要等级的类型使用 0。
+       * </pre>
+       *
+       * <code>int32 level = 4;</code>
+       * @param value The level to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLevel(int value) {
+
+        level_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 对象等级；不需要等级的类型使用 0。
+       * </pre>
+       *
+       * <code>int32 level = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLevel() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        level_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private long amount_ ;
+      /**
+       * <pre>
+       * 资源剩余量、掉落数量等通用长整型值。
+       * </pre>
+       *
+       * <code>int64 amount = 5;</code>
+       * @return The amount.
+       */
+      @java.lang.Override
+      public long getAmount() {
+        return amount_;
+      }
+      /**
+       * <pre>
+       * 资源剩余量、掉落数量等通用长整型值。
+       * </pre>
+       *
+       * <code>int64 amount = 5;</code>
+       * @param value The amount to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAmount(long value) {
+
+        amount_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 资源剩余量、掉落数量等通用长整型值。
+       * </pre>
+       *
+       * <code>int64 amount = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAmount() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        amount_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long health_ ;
+      /**
+       * <pre>
+       * 怪物血量、建筑耐久等通用生命值。
+       * </pre>
+       *
+       * <code>int64 health = 6;</code>
+       * @return The health.
+       */
+      @java.lang.Override
+      public long getHealth() {
+        return health_;
+      }
+      /**
+       * <pre>
+       * 怪物血量、建筑耐久等通用生命值。
+       * </pre>
+       *
+       * <code>int64 health = 6;</code>
+       * @param value The health to set.
+       * @return This builder for chaining.
+       */
+      public Builder setHealth(long value) {
+
+        health_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 怪物血量、建筑耐久等通用生命值。
+       * </pre>
+       *
+       * <code>int64 health = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearHealth() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        health_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long refreshAtMillis_ ;
+      /**
+       * <pre>
+       * 下一次刷新时间戳，单位毫秒；不刷新时使用 0。
+       * </pre>
+       *
+       * <code>int64 refresh_at_millis = 7;</code>
+       * @return The refreshAtMillis.
+       */
+      @java.lang.Override
+      public long getRefreshAtMillis() {
+        return refreshAtMillis_;
+      }
+      /**
+       * <pre>
+       * 下一次刷新时间戳，单位毫秒；不刷新时使用 0。
+       * </pre>
+       *
+       * <code>int64 refresh_at_millis = 7;</code>
+       * @param value The refreshAtMillis to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRefreshAtMillis(long value) {
+
+        refreshAtMillis_ = value;
+        bitField0_ |= 0x00000040;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 下一次刷新时间戳，单位毫秒；不刷新时使用 0。
+       * </pre>
+       *
+       * <code>int64 refresh_at_millis = 7;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRefreshAtMillis() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        refreshAtMillis_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long expireAtMillis_ ;
+      /**
+       * <pre>
+       * 对象过期时间戳，单位毫秒；永不过期时使用 0。
+       * </pre>
+       *
+       * <code>int64 expire_at_millis = 8;</code>
+       * @return The expireAtMillis.
+       */
+      @java.lang.Override
+      public long getExpireAtMillis() {
+        return expireAtMillis_;
+      }
+      /**
+       * <pre>
+       * 对象过期时间戳，单位毫秒；永不过期时使用 0。
+       * </pre>
+       *
+       * <code>int64 expire_at_millis = 8;</code>
+       * @param value The expireAtMillis to set.
+       * @return This builder for chaining.
+       */
+      public Builder setExpireAtMillis(long value) {
+
+        expireAtMillis_ = value;
+        bitField0_ |= 0x00000080;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 对象过期时间戳，单位毫秒；永不过期时使用 0。
+       * </pre>
+       *
+       * <code>int64 expire_at_millis = 8;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearExpireAtMillis() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        expireAtMillis_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long stateFlags_ ;
+      /**
+       * <pre>
+       * 占领、保护、锁定、可采集等业务状态位。
+       * </pre>
+       *
+       * <code>uint64 state_flags = 9;</code>
+       * @return The stateFlags.
+       */
+      @java.lang.Override
+      public long getStateFlags() {
+        return stateFlags_;
+      }
+      /**
+       * <pre>
+       * 占领、保护、锁定、可采集等业务状态位。
+       * </pre>
+       *
+       * <code>uint64 state_flags = 9;</code>
+       * @param value The stateFlags to set.
+       * @return This builder for chaining.
+       */
+      public Builder setStateFlags(long value) {
+
+        stateFlags_ = value;
+        bitField0_ |= 0x00000100;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 占领、保护、锁定、可采集等业务状态位。
+       * </pre>
+       *
+       * <code>uint64 state_flags = 9;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearStateFlags() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        stateFlags_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString extensionData_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <pre>
+       * 具体玩法扩展的 Protobuf 二进制；其解释由 config_id 和 data_version 决定。
+       * </pre>
+       *
+       * <code>bytes extension_data = 10;</code>
+       * @return The extensionData.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString getExtensionData() {
+        return extensionData_;
+      }
+      /**
+       * <pre>
+       * 具体玩法扩展的 Protobuf 二进制；其解释由 config_id 和 data_version 决定。
+       * </pre>
+       *
+       * <code>bytes extension_data = 10;</code>
+       * @param value The extensionData to set.
+       * @return This builder for chaining.
+       */
+      public Builder setExtensionData(com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        extensionData_ = value;
+        bitField0_ |= 0x00000200;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 具体玩法扩展的 Protobuf 二进制；其解释由 config_id 和 data_version 决定。
+       * </pre>
+       *
+       * <code>bytes extension_data = 10;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearExtensionData() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        extensionData_ = getDefaultInstance().getExtensionData();
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:ScenePersistentObjectState)
+    }
+
+    // @@protoc_insertion_point(class_scope:ScenePersistentObjectState)
+    private static final ly.proto.Scene.ScenePersistentObjectState DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new ly.proto.Scene.ScenePersistentObjectState();
+    }
+
+    public static ly.proto.Scene.ScenePersistentObjectState getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ScenePersistentObjectState>
+        PARSER = new com.google.protobuf.AbstractParser<ScenePersistentObjectState>() {
+      @java.lang.Override
+      public ScenePersistentObjectState parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<ScenePersistentObjectState> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ScenePersistentObjectState> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public ly.proto.Scene.ScenePersistentObjectState getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface SceneObjectSnapshotOrBuilder extends
       // @@protoc_insertion_point(interface_extends:SceneObjectSnapshot)
       com.google.protobuf.MessageOrBuilder {
@@ -2231,6 +3909,10 @@ public final class Scene {
     ly.proto.Scene.SceneRallySnapshotOrBuilder getRallyOrBuilder();
   }
   /**
+   * <pre>
+   * 场景动态对象通用快照；AOI 会按缩放层级和数据标签裁剪可选明细。
+   * </pre>
+   *
    * Protobuf type {@code SceneObjectSnapshot}
    */
   public static final class SceneObjectSnapshot extends
@@ -2719,6 +4401,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 场景动态对象通用快照；AOI 会按缩放层级和数据标签裁剪可选明细。
+     * </pre>
+     *
      * Protobuf type {@code SceneObjectSnapshot}
      */
     public static final class Builder extends
@@ -3795,33 +5481,57 @@ public final class Scene {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * 目标动态对象 ID；普通坐标目标可以为 0。
+     * </pre>
+     *
      * <code>int64 target_id = 1;</code>
      * @return The targetId.
      */
     long getTargetId();
 
     /**
+     * <pre>
+     * 目标业务类型。
+     * </pre>
+     *
      * <code>.SceneTargetType type = 2;</code>
      * @return The enum numeric value on the wire for type.
      */
     int getTypeValue();
     /**
+     * <pre>
+     * 目标业务类型。
+     * </pre>
+     *
      * <code>.SceneTargetType type = 2;</code>
      * @return The type.
      */
     ly.proto.Scene.SceneTargetType getType();
 
     /**
+     * <pre>
+     * 创建行军时解析出的目标坐标。
+     * </pre>
+     *
      * <code>.ScenePoint point = 3;</code>
      * @return Whether the point field is set.
      */
     boolean hasPoint();
     /**
+     * <pre>
+     * 创建行军时解析出的目标坐标。
+     * </pre>
+     *
      * <code>.ScenePoint point = 3;</code>
      * @return The point.
      */
     ly.proto.Scene.ScenePoint getPoint();
     /**
+     * <pre>
+     * 创建行军时解析出的目标坐标。
+     * </pre>
+     *
      * <code>.ScenePoint point = 3;</code>
      */
     ly.proto.Scene.ScenePointOrBuilder getPointOrBuilder();
@@ -3837,6 +5547,10 @@ public final class Scene {
     long getTagMask();
 
     /**
+     * <pre>
+     * 创建行军时读取的目标状态版本，到达时必须再次校验。
+     * </pre>
+     *
      * <code>int64 target_version = 5;</code>
      * @return The targetVersion.
      */
@@ -3886,6 +5600,10 @@ public final class Scene {
     public static final int TARGET_ID_FIELD_NUMBER = 1;
     private long targetId_ = 0L;
     /**
+     * <pre>
+     * 目标动态对象 ID；普通坐标目标可以为 0。
+     * </pre>
+     *
      * <code>int64 target_id = 1;</code>
      * @return The targetId.
      */
@@ -3897,6 +5615,10 @@ public final class Scene {
     public static final int TYPE_FIELD_NUMBER = 2;
     private int type_ = 0;
     /**
+     * <pre>
+     * 目标业务类型。
+     * </pre>
+     *
      * <code>.SceneTargetType type = 2;</code>
      * @return The enum numeric value on the wire for type.
      */
@@ -3904,6 +5626,10 @@ public final class Scene {
       return type_;
     }
     /**
+     * <pre>
+     * 目标业务类型。
+     * </pre>
+     *
      * <code>.SceneTargetType type = 2;</code>
      * @return The type.
      */
@@ -3915,6 +5641,10 @@ public final class Scene {
     public static final int POINT_FIELD_NUMBER = 3;
     private ly.proto.Scene.ScenePoint point_;
     /**
+     * <pre>
+     * 创建行军时解析出的目标坐标。
+     * </pre>
+     *
      * <code>.ScenePoint point = 3;</code>
      * @return Whether the point field is set.
      */
@@ -3923,6 +5653,10 @@ public final class Scene {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
+     * <pre>
+     * 创建行军时解析出的目标坐标。
+     * </pre>
+     *
      * <code>.ScenePoint point = 3;</code>
      * @return The point.
      */
@@ -3931,6 +5665,10 @@ public final class Scene {
       return point_ == null ? ly.proto.Scene.ScenePoint.getDefaultInstance() : point_;
     }
     /**
+     * <pre>
+     * 创建行军时解析出的目标坐标。
+     * </pre>
+     *
      * <code>.ScenePoint point = 3;</code>
      */
     @java.lang.Override
@@ -3956,6 +5694,10 @@ public final class Scene {
     public static final int TARGET_VERSION_FIELD_NUMBER = 5;
     private long targetVersion_ = 0L;
     /**
+     * <pre>
+     * 创建行军时读取的目标状态版本，到达时必须再次校验。
+     * </pre>
+     *
      * <code>int64 target_version = 5;</code>
      * @return The targetVersion.
      */
@@ -4411,6 +6153,10 @@ public final class Scene {
 
       private long targetId_ ;
       /**
+       * <pre>
+       * 目标动态对象 ID；普通坐标目标可以为 0。
+       * </pre>
+       *
        * <code>int64 target_id = 1;</code>
        * @return The targetId.
        */
@@ -4419,6 +6165,10 @@ public final class Scene {
         return targetId_;
       }
       /**
+       * <pre>
+       * 目标动态对象 ID；普通坐标目标可以为 0。
+       * </pre>
+       *
        * <code>int64 target_id = 1;</code>
        * @param value The targetId to set.
        * @return This builder for chaining.
@@ -4431,6 +6181,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 目标动态对象 ID；普通坐标目标可以为 0。
+       * </pre>
+       *
        * <code>int64 target_id = 1;</code>
        * @return This builder for chaining.
        */
@@ -4443,6 +6197,10 @@ public final class Scene {
 
       private int type_ = 0;
       /**
+       * <pre>
+       * 目标业务类型。
+       * </pre>
+       *
        * <code>.SceneTargetType type = 2;</code>
        * @return The enum numeric value on the wire for type.
        */
@@ -4450,6 +6208,10 @@ public final class Scene {
         return type_;
       }
       /**
+       * <pre>
+       * 目标业务类型。
+       * </pre>
+       *
        * <code>.SceneTargetType type = 2;</code>
        * @param value The enum numeric value on the wire for type to set.
        * @return This builder for chaining.
@@ -4461,6 +6223,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 目标业务类型。
+       * </pre>
+       *
        * <code>.SceneTargetType type = 2;</code>
        * @return The type.
        */
@@ -4470,6 +6236,10 @@ public final class Scene {
         return result == null ? ly.proto.Scene.SceneTargetType.UNRECOGNIZED : result;
       }
       /**
+       * <pre>
+       * 目标业务类型。
+       * </pre>
+       *
        * <code>.SceneTargetType type = 2;</code>
        * @param value The type to set.
        * @return This builder for chaining.
@@ -4484,6 +6254,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 目标业务类型。
+       * </pre>
+       *
        * <code>.SceneTargetType type = 2;</code>
        * @return This builder for chaining.
        */
@@ -4498,6 +6272,10 @@ public final class Scene {
       private com.google.protobuf.SingleFieldBuilderV3<
           ly.proto.Scene.ScenePoint, ly.proto.Scene.ScenePoint.Builder, ly.proto.Scene.ScenePointOrBuilder> pointBuilder_;
       /**
+       * <pre>
+       * 创建行军时解析出的目标坐标。
+       * </pre>
+       *
        * <code>.ScenePoint point = 3;</code>
        * @return Whether the point field is set.
        */
@@ -4505,6 +6283,10 @@ public final class Scene {
         return ((bitField0_ & 0x00000004) != 0);
       }
       /**
+       * <pre>
+       * 创建行军时解析出的目标坐标。
+       * </pre>
+       *
        * <code>.ScenePoint point = 3;</code>
        * @return The point.
        */
@@ -4516,6 +6298,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 创建行军时解析出的目标坐标。
+       * </pre>
+       *
        * <code>.ScenePoint point = 3;</code>
        */
       public Builder setPoint(ly.proto.Scene.ScenePoint value) {
@@ -4532,6 +6318,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 创建行军时解析出的目标坐标。
+       * </pre>
+       *
        * <code>.ScenePoint point = 3;</code>
        */
       public Builder setPoint(
@@ -4546,6 +6336,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 创建行军时解析出的目标坐标。
+       * </pre>
+       *
        * <code>.ScenePoint point = 3;</code>
        */
       public Builder mergePoint(ly.proto.Scene.ScenePoint value) {
@@ -4567,6 +6361,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 创建行军时解析出的目标坐标。
+       * </pre>
+       *
        * <code>.ScenePoint point = 3;</code>
        */
       public Builder clearPoint() {
@@ -4580,6 +6378,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 创建行军时解析出的目标坐标。
+       * </pre>
+       *
        * <code>.ScenePoint point = 3;</code>
        */
       public ly.proto.Scene.ScenePoint.Builder getPointBuilder() {
@@ -4588,6 +6390,10 @@ public final class Scene {
         return getPointFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * 创建行军时解析出的目标坐标。
+       * </pre>
+       *
        * <code>.ScenePoint point = 3;</code>
        */
       public ly.proto.Scene.ScenePointOrBuilder getPointOrBuilder() {
@@ -4599,6 +6405,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 创建行军时解析出的目标坐标。
+       * </pre>
+       *
        * <code>.ScenePoint point = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -4661,6 +6471,10 @@ public final class Scene {
 
       private long targetVersion_ ;
       /**
+       * <pre>
+       * 创建行军时读取的目标状态版本，到达时必须再次校验。
+       * </pre>
+       *
        * <code>int64 target_version = 5;</code>
        * @return The targetVersion.
        */
@@ -4669,6 +6483,10 @@ public final class Scene {
         return targetVersion_;
       }
       /**
+       * <pre>
+       * 创建行军时读取的目标状态版本，到达时必须再次校验。
+       * </pre>
+       *
        * <code>int64 target_version = 5;</code>
        * @param value The targetVersion to set.
        * @return This builder for chaining.
@@ -4681,6 +6499,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 创建行军时读取的目标状态版本，到达时必须再次校验。
+       * </pre>
+       *
        * <code>int64 target_version = 5;</code>
        * @return This builder for chaining.
        */
@@ -4759,29 +6581,49 @@ public final class Scene {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * SceneServer 生成的行军唯一 ID。
+     * </pre>
+     *
      * <code>int64 march_id = 1;</code>
      * @return The marchId.
      */
     long getMarchId();
 
     /**
+     * <pre>
+     * 行军所属玩家 ID。
+     * </pre>
+     *
      * <code>int64 owner_player_id = 2;</code>
      * @return The ownerPlayerId.
      */
     long getOwnerPlayerId();
 
     /**
+     * <pre>
+     * 行军所属联盟 ID；未加入联盟时为 0。
+     * </pre>
+     *
      * <code>int64 alliance_id = 3;</code>
      * @return The allianceId.
      */
     long getAllianceId();
 
     /**
+     * <pre>
+     * 行军业务类型。
+     * </pre>
+     *
      * <code>.SceneMarchType type = 4;</code>
      * @return The enum numeric value on the wire for type.
      */
     int getTypeValue();
     /**
+     * <pre>
+     * 行军业务类型。
+     * </pre>
+     *
      * <code>.SceneMarchType type = 4;</code>
      * @return The type.
      */
@@ -4798,83 +6640,147 @@ public final class Scene {
     long getTagMask();
 
     /**
+     * <pre>
+     * 当前行军状态机阶段。
+     * </pre>
+     *
      * <code>.SceneMarchStatus status = 6;</code>
      * @return The enum numeric value on the wire for status.
      */
     int getStatusValue();
     /**
+     * <pre>
+     * 当前行军状态机阶段。
+     * </pre>
+     *
      * <code>.SceneMarchStatus status = 6;</code>
      * @return The status.
      */
     ly.proto.Scene.SceneMarchStatus getStatus();
 
     /**
+     * <pre>
+     * 本段行军出发坐标。
+     * </pre>
+     *
      * <code>.ScenePoint origin = 7;</code>
      * @return Whether the origin field is set.
      */
     boolean hasOrigin();
     /**
+     * <pre>
+     * 本段行军出发坐标。
+     * </pre>
+     *
      * <code>.ScenePoint origin = 7;</code>
      * @return The origin.
      */
     ly.proto.Scene.ScenePoint getOrigin();
     /**
+     * <pre>
+     * 本段行军出发坐标。
+     * </pre>
+     *
      * <code>.ScenePoint origin = 7;</code>
      */
     ly.proto.Scene.ScenePointOrBuilder getOriginOrBuilder();
 
     /**
+     * <pre>
+     * 已冻结的行军目标描述。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 8;</code>
      * @return Whether the target field is set.
      */
     boolean hasTarget();
     /**
+     * <pre>
+     * 已冻结的行军目标描述。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 8;</code>
      * @return The target.
      */
     ly.proto.Scene.SceneMarchTarget getTarget();
     /**
+     * <pre>
+     * 已冻结的行军目标描述。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 8;</code>
      */
     ly.proto.Scene.SceneMarchTargetOrBuilder getTargetOrBuilder();
 
     /**
+     * <pre>
+     * SceneServer 确认的完整格子路径，包含首尾坐标。
+     * </pre>
+     *
      * <code>repeated .ScenePoint path = 9;</code>
      */
     java.util.List<ly.proto.Scene.ScenePoint> 
         getPathList();
     /**
+     * <pre>
+     * SceneServer 确认的完整格子路径，包含首尾坐标。
+     * </pre>
+     *
      * <code>repeated .ScenePoint path = 9;</code>
      */
     ly.proto.Scene.ScenePoint getPath(int index);
     /**
+     * <pre>
+     * SceneServer 确认的完整格子路径，包含首尾坐标。
+     * </pre>
+     *
      * <code>repeated .ScenePoint path = 9;</code>
      */
     int getPathCount();
     /**
+     * <pre>
+     * SceneServer 确认的完整格子路径，包含首尾坐标。
+     * </pre>
+     *
      * <code>repeated .ScenePoint path = 9;</code>
      */
     java.util.List<? extends ly.proto.Scene.ScenePointOrBuilder> 
         getPathOrBuilderList();
     /**
+     * <pre>
+     * SceneServer 确认的完整格子路径，包含首尾坐标。
+     * </pre>
+     *
      * <code>repeated .ScenePoint path = 9;</code>
      */
     ly.proto.Scene.ScenePointOrBuilder getPathOrBuilder(
         int index);
 
     /**
+     * <pre>
+     * 当前已经到达的 path 下标。
+     * </pre>
+     *
      * <code>int32 path_index = 10;</code>
      * @return The pathIndex.
      */
     int getPathIndex();
 
     /**
+     * <pre>
+     * 发车时部队总兵力；战斗后以结果中的剩余兵力为准。
+     * </pre>
+     *
      * <code>int32 troop_count = 11;</code>
      * @return The troopCount.
      */
     int getTroopCount();
 
     /**
+     * <pre>
+     * 发车时部队战力，用于展示和基础校验，不替代 BattleServer 计算。
+     * </pre>
+     *
      * <code>int64 power = 12;</code>
      * @return The power.
      */
@@ -4891,24 +6797,40 @@ public final class Scene {
     long getArmySnapshotVersion();
 
     /**
+     * <pre>
+     * 服务端确认的发车时间戳，单位毫秒。
+     * </pre>
+     *
      * <code>int64 depart_at_millis = 14;</code>
      * @return The departAtMillis.
      */
     long getDepartAtMillis();
 
     /**
+     * <pre>
+     * 按路径成本计算出的预计到达时间戳，单位毫秒。
+     * </pre>
+     *
      * <code>int64 arrival_at_millis = 15;</code>
      * @return The arrivalAtMillis.
      */
     long getArrivalAtMillis();
 
     /**
+     * <pre>
+     * 行军状态版本，用于客户端增量更新和服务端幂等校验。
+     * </pre>
+     *
      * <code>int32 state_version = 16;</code>
      * @return The stateVersion.
      */
     int getStateVersion();
   }
   /**
+   * <pre>
+   * 地图上的单支行军/车辆快照，包含路径进度和 GameServer 冻结的部队版本。
+   * </pre>
+   *
    * Protobuf type {@code SceneMarchSnapshot}
    */
   public static final class SceneMarchSnapshot extends
@@ -4950,6 +6872,10 @@ public final class Scene {
     public static final int MARCH_ID_FIELD_NUMBER = 1;
     private long marchId_ = 0L;
     /**
+     * <pre>
+     * SceneServer 生成的行军唯一 ID。
+     * </pre>
+     *
      * <code>int64 march_id = 1;</code>
      * @return The marchId.
      */
@@ -4961,6 +6887,10 @@ public final class Scene {
     public static final int OWNER_PLAYER_ID_FIELD_NUMBER = 2;
     private long ownerPlayerId_ = 0L;
     /**
+     * <pre>
+     * 行军所属玩家 ID。
+     * </pre>
+     *
      * <code>int64 owner_player_id = 2;</code>
      * @return The ownerPlayerId.
      */
@@ -4972,6 +6902,10 @@ public final class Scene {
     public static final int ALLIANCE_ID_FIELD_NUMBER = 3;
     private long allianceId_ = 0L;
     /**
+     * <pre>
+     * 行军所属联盟 ID；未加入联盟时为 0。
+     * </pre>
+     *
      * <code>int64 alliance_id = 3;</code>
      * @return The allianceId.
      */
@@ -4983,6 +6917,10 @@ public final class Scene {
     public static final int TYPE_FIELD_NUMBER = 4;
     private int type_ = 0;
     /**
+     * <pre>
+     * 行军业务类型。
+     * </pre>
+     *
      * <code>.SceneMarchType type = 4;</code>
      * @return The enum numeric value on the wire for type.
      */
@@ -4990,6 +6928,10 @@ public final class Scene {
       return type_;
     }
     /**
+     * <pre>
+     * 行军业务类型。
+     * </pre>
+     *
      * <code>.SceneMarchType type = 4;</code>
      * @return The type.
      */
@@ -5016,6 +6958,10 @@ public final class Scene {
     public static final int STATUS_FIELD_NUMBER = 6;
     private int status_ = 0;
     /**
+     * <pre>
+     * 当前行军状态机阶段。
+     * </pre>
+     *
      * <code>.SceneMarchStatus status = 6;</code>
      * @return The enum numeric value on the wire for status.
      */
@@ -5023,6 +6969,10 @@ public final class Scene {
       return status_;
     }
     /**
+     * <pre>
+     * 当前行军状态机阶段。
+     * </pre>
+     *
      * <code>.SceneMarchStatus status = 6;</code>
      * @return The status.
      */
@@ -5034,6 +6984,10 @@ public final class Scene {
     public static final int ORIGIN_FIELD_NUMBER = 7;
     private ly.proto.Scene.ScenePoint origin_;
     /**
+     * <pre>
+     * 本段行军出发坐标。
+     * </pre>
+     *
      * <code>.ScenePoint origin = 7;</code>
      * @return Whether the origin field is set.
      */
@@ -5042,6 +6996,10 @@ public final class Scene {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
+     * <pre>
+     * 本段行军出发坐标。
+     * </pre>
+     *
      * <code>.ScenePoint origin = 7;</code>
      * @return The origin.
      */
@@ -5050,6 +7008,10 @@ public final class Scene {
       return origin_ == null ? ly.proto.Scene.ScenePoint.getDefaultInstance() : origin_;
     }
     /**
+     * <pre>
+     * 本段行军出发坐标。
+     * </pre>
+     *
      * <code>.ScenePoint origin = 7;</code>
      */
     @java.lang.Override
@@ -5060,6 +7022,10 @@ public final class Scene {
     public static final int TARGET_FIELD_NUMBER = 8;
     private ly.proto.Scene.SceneMarchTarget target_;
     /**
+     * <pre>
+     * 已冻结的行军目标描述。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 8;</code>
      * @return Whether the target field is set.
      */
@@ -5068,6 +7034,10 @@ public final class Scene {
       return ((bitField0_ & 0x00000002) != 0);
     }
     /**
+     * <pre>
+     * 已冻结的行军目标描述。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 8;</code>
      * @return The target.
      */
@@ -5076,6 +7046,10 @@ public final class Scene {
       return target_ == null ? ly.proto.Scene.SceneMarchTarget.getDefaultInstance() : target_;
     }
     /**
+     * <pre>
+     * 已冻结的行军目标描述。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 8;</code>
      */
     @java.lang.Override
@@ -5087,6 +7061,10 @@ public final class Scene {
     @SuppressWarnings("serial")
     private java.util.List<ly.proto.Scene.ScenePoint> path_;
     /**
+     * <pre>
+     * SceneServer 确认的完整格子路径，包含首尾坐标。
+     * </pre>
+     *
      * <code>repeated .ScenePoint path = 9;</code>
      */
     @java.lang.Override
@@ -5094,6 +7072,10 @@ public final class Scene {
       return path_;
     }
     /**
+     * <pre>
+     * SceneServer 确认的完整格子路径，包含首尾坐标。
+     * </pre>
+     *
      * <code>repeated .ScenePoint path = 9;</code>
      */
     @java.lang.Override
@@ -5102,6 +7084,10 @@ public final class Scene {
       return path_;
     }
     /**
+     * <pre>
+     * SceneServer 确认的完整格子路径，包含首尾坐标。
+     * </pre>
+     *
      * <code>repeated .ScenePoint path = 9;</code>
      */
     @java.lang.Override
@@ -5109,6 +7095,10 @@ public final class Scene {
       return path_.size();
     }
     /**
+     * <pre>
+     * SceneServer 确认的完整格子路径，包含首尾坐标。
+     * </pre>
+     *
      * <code>repeated .ScenePoint path = 9;</code>
      */
     @java.lang.Override
@@ -5116,6 +7106,10 @@ public final class Scene {
       return path_.get(index);
     }
     /**
+     * <pre>
+     * SceneServer 确认的完整格子路径，包含首尾坐标。
+     * </pre>
+     *
      * <code>repeated .ScenePoint path = 9;</code>
      */
     @java.lang.Override
@@ -5127,6 +7121,10 @@ public final class Scene {
     public static final int PATH_INDEX_FIELD_NUMBER = 10;
     private int pathIndex_ = 0;
     /**
+     * <pre>
+     * 当前已经到达的 path 下标。
+     * </pre>
+     *
      * <code>int32 path_index = 10;</code>
      * @return The pathIndex.
      */
@@ -5138,6 +7136,10 @@ public final class Scene {
     public static final int TROOP_COUNT_FIELD_NUMBER = 11;
     private int troopCount_ = 0;
     /**
+     * <pre>
+     * 发车时部队总兵力；战斗后以结果中的剩余兵力为准。
+     * </pre>
+     *
      * <code>int32 troop_count = 11;</code>
      * @return The troopCount.
      */
@@ -5149,6 +7151,10 @@ public final class Scene {
     public static final int POWER_FIELD_NUMBER = 12;
     private long power_ = 0L;
     /**
+     * <pre>
+     * 发车时部队战力，用于展示和基础校验，不替代 BattleServer 计算。
+     * </pre>
+     *
      * <code>int64 power = 12;</code>
      * @return The power.
      */
@@ -5175,6 +7181,10 @@ public final class Scene {
     public static final int DEPART_AT_MILLIS_FIELD_NUMBER = 14;
     private long departAtMillis_ = 0L;
     /**
+     * <pre>
+     * 服务端确认的发车时间戳，单位毫秒。
+     * </pre>
+     *
      * <code>int64 depart_at_millis = 14;</code>
      * @return The departAtMillis.
      */
@@ -5186,6 +7196,10 @@ public final class Scene {
     public static final int ARRIVAL_AT_MILLIS_FIELD_NUMBER = 15;
     private long arrivalAtMillis_ = 0L;
     /**
+     * <pre>
+     * 按路径成本计算出的预计到达时间戳，单位毫秒。
+     * </pre>
+     *
      * <code>int64 arrival_at_millis = 15;</code>
      * @return The arrivalAtMillis.
      */
@@ -5197,6 +7211,10 @@ public final class Scene {
     public static final int STATE_VERSION_FIELD_NUMBER = 16;
     private int stateVersion_ = 0;
     /**
+     * <pre>
+     * 行军状态版本，用于客户端增量更新和服务端幂等校验。
+     * </pre>
+     *
      * <code>int32 state_version = 16;</code>
      * @return The stateVersion.
      */
@@ -5546,6 +7564,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 地图上的单支行军/车辆快照，包含路径进度和 GameServer 冻结的部队版本。
+     * </pre>
+     *
      * Protobuf type {@code SceneMarchSnapshot}
      */
     public static final class Builder extends
@@ -5970,6 +7992,10 @@ public final class Scene {
 
       private long marchId_ ;
       /**
+       * <pre>
+       * SceneServer 生成的行军唯一 ID。
+       * </pre>
+       *
        * <code>int64 march_id = 1;</code>
        * @return The marchId.
        */
@@ -5978,6 +8004,10 @@ public final class Scene {
         return marchId_;
       }
       /**
+       * <pre>
+       * SceneServer 生成的行军唯一 ID。
+       * </pre>
+       *
        * <code>int64 march_id = 1;</code>
        * @param value The marchId to set.
        * @return This builder for chaining.
@@ -5990,6 +8020,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * SceneServer 生成的行军唯一 ID。
+       * </pre>
+       *
        * <code>int64 march_id = 1;</code>
        * @return This builder for chaining.
        */
@@ -6002,6 +8036,10 @@ public final class Scene {
 
       private long ownerPlayerId_ ;
       /**
+       * <pre>
+       * 行军所属玩家 ID。
+       * </pre>
+       *
        * <code>int64 owner_player_id = 2;</code>
        * @return The ownerPlayerId.
        */
@@ -6010,6 +8048,10 @@ public final class Scene {
         return ownerPlayerId_;
       }
       /**
+       * <pre>
+       * 行军所属玩家 ID。
+       * </pre>
+       *
        * <code>int64 owner_player_id = 2;</code>
        * @param value The ownerPlayerId to set.
        * @return This builder for chaining.
@@ -6022,6 +8064,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 行军所属玩家 ID。
+       * </pre>
+       *
        * <code>int64 owner_player_id = 2;</code>
        * @return This builder for chaining.
        */
@@ -6034,6 +8080,10 @@ public final class Scene {
 
       private long allianceId_ ;
       /**
+       * <pre>
+       * 行军所属联盟 ID；未加入联盟时为 0。
+       * </pre>
+       *
        * <code>int64 alliance_id = 3;</code>
        * @return The allianceId.
        */
@@ -6042,6 +8092,10 @@ public final class Scene {
         return allianceId_;
       }
       /**
+       * <pre>
+       * 行军所属联盟 ID；未加入联盟时为 0。
+       * </pre>
+       *
        * <code>int64 alliance_id = 3;</code>
        * @param value The allianceId to set.
        * @return This builder for chaining.
@@ -6054,6 +8108,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 行军所属联盟 ID；未加入联盟时为 0。
+       * </pre>
+       *
        * <code>int64 alliance_id = 3;</code>
        * @return This builder for chaining.
        */
@@ -6066,6 +8124,10 @@ public final class Scene {
 
       private int type_ = 0;
       /**
+       * <pre>
+       * 行军业务类型。
+       * </pre>
+       *
        * <code>.SceneMarchType type = 4;</code>
        * @return The enum numeric value on the wire for type.
        */
@@ -6073,6 +8135,10 @@ public final class Scene {
         return type_;
       }
       /**
+       * <pre>
+       * 行军业务类型。
+       * </pre>
+       *
        * <code>.SceneMarchType type = 4;</code>
        * @param value The enum numeric value on the wire for type to set.
        * @return This builder for chaining.
@@ -6084,6 +8150,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 行军业务类型。
+       * </pre>
+       *
        * <code>.SceneMarchType type = 4;</code>
        * @return The type.
        */
@@ -6093,6 +8163,10 @@ public final class Scene {
         return result == null ? ly.proto.Scene.SceneMarchType.UNRECOGNIZED : result;
       }
       /**
+       * <pre>
+       * 行军业务类型。
+       * </pre>
+       *
        * <code>.SceneMarchType type = 4;</code>
        * @param value The type to set.
        * @return This builder for chaining.
@@ -6107,6 +8181,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 行军业务类型。
+       * </pre>
+       *
        * <code>.SceneMarchType type = 4;</code>
        * @return This builder for chaining.
        */
@@ -6163,6 +8241,10 @@ public final class Scene {
 
       private int status_ = 0;
       /**
+       * <pre>
+       * 当前行军状态机阶段。
+       * </pre>
+       *
        * <code>.SceneMarchStatus status = 6;</code>
        * @return The enum numeric value on the wire for status.
        */
@@ -6170,6 +8252,10 @@ public final class Scene {
         return status_;
       }
       /**
+       * <pre>
+       * 当前行军状态机阶段。
+       * </pre>
+       *
        * <code>.SceneMarchStatus status = 6;</code>
        * @param value The enum numeric value on the wire for status to set.
        * @return This builder for chaining.
@@ -6181,6 +8267,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前行军状态机阶段。
+       * </pre>
+       *
        * <code>.SceneMarchStatus status = 6;</code>
        * @return The status.
        */
@@ -6190,6 +8280,10 @@ public final class Scene {
         return result == null ? ly.proto.Scene.SceneMarchStatus.UNRECOGNIZED : result;
       }
       /**
+       * <pre>
+       * 当前行军状态机阶段。
+       * </pre>
+       *
        * <code>.SceneMarchStatus status = 6;</code>
        * @param value The status to set.
        * @return This builder for chaining.
@@ -6204,6 +8298,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前行军状态机阶段。
+       * </pre>
+       *
        * <code>.SceneMarchStatus status = 6;</code>
        * @return This builder for chaining.
        */
@@ -6218,6 +8316,10 @@ public final class Scene {
       private com.google.protobuf.SingleFieldBuilderV3<
           ly.proto.Scene.ScenePoint, ly.proto.Scene.ScenePoint.Builder, ly.proto.Scene.ScenePointOrBuilder> originBuilder_;
       /**
+       * <pre>
+       * 本段行军出发坐标。
+       * </pre>
+       *
        * <code>.ScenePoint origin = 7;</code>
        * @return Whether the origin field is set.
        */
@@ -6225,6 +8327,10 @@ public final class Scene {
         return ((bitField0_ & 0x00000040) != 0);
       }
       /**
+       * <pre>
+       * 本段行军出发坐标。
+       * </pre>
+       *
        * <code>.ScenePoint origin = 7;</code>
        * @return The origin.
        */
@@ -6236,6 +8342,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 本段行军出发坐标。
+       * </pre>
+       *
        * <code>.ScenePoint origin = 7;</code>
        */
       public Builder setOrigin(ly.proto.Scene.ScenePoint value) {
@@ -6252,6 +8362,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 本段行军出发坐标。
+       * </pre>
+       *
        * <code>.ScenePoint origin = 7;</code>
        */
       public Builder setOrigin(
@@ -6266,6 +8380,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 本段行军出发坐标。
+       * </pre>
+       *
        * <code>.ScenePoint origin = 7;</code>
        */
       public Builder mergeOrigin(ly.proto.Scene.ScenePoint value) {
@@ -6287,6 +8405,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 本段行军出发坐标。
+       * </pre>
+       *
        * <code>.ScenePoint origin = 7;</code>
        */
       public Builder clearOrigin() {
@@ -6300,6 +8422,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 本段行军出发坐标。
+       * </pre>
+       *
        * <code>.ScenePoint origin = 7;</code>
        */
       public ly.proto.Scene.ScenePoint.Builder getOriginBuilder() {
@@ -6308,6 +8434,10 @@ public final class Scene {
         return getOriginFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * 本段行军出发坐标。
+       * </pre>
+       *
        * <code>.ScenePoint origin = 7;</code>
        */
       public ly.proto.Scene.ScenePointOrBuilder getOriginOrBuilder() {
@@ -6319,6 +8449,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 本段行军出发坐标。
+       * </pre>
+       *
        * <code>.ScenePoint origin = 7;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -6339,6 +8473,10 @@ public final class Scene {
       private com.google.protobuf.SingleFieldBuilderV3<
           ly.proto.Scene.SceneMarchTarget, ly.proto.Scene.SceneMarchTarget.Builder, ly.proto.Scene.SceneMarchTargetOrBuilder> targetBuilder_;
       /**
+       * <pre>
+       * 已冻结的行军目标描述。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 8;</code>
        * @return Whether the target field is set.
        */
@@ -6346,6 +8484,10 @@ public final class Scene {
         return ((bitField0_ & 0x00000080) != 0);
       }
       /**
+       * <pre>
+       * 已冻结的行军目标描述。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 8;</code>
        * @return The target.
        */
@@ -6357,6 +8499,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 已冻结的行军目标描述。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 8;</code>
        */
       public Builder setTarget(ly.proto.Scene.SceneMarchTarget value) {
@@ -6373,6 +8519,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 已冻结的行军目标描述。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 8;</code>
        */
       public Builder setTarget(
@@ -6387,6 +8537,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 已冻结的行军目标描述。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 8;</code>
        */
       public Builder mergeTarget(ly.proto.Scene.SceneMarchTarget value) {
@@ -6408,6 +8562,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 已冻结的行军目标描述。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 8;</code>
        */
       public Builder clearTarget() {
@@ -6421,6 +8579,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 已冻结的行军目标描述。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 8;</code>
        */
       public ly.proto.Scene.SceneMarchTarget.Builder getTargetBuilder() {
@@ -6429,6 +8591,10 @@ public final class Scene {
         return getTargetFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * 已冻结的行军目标描述。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 8;</code>
        */
       public ly.proto.Scene.SceneMarchTargetOrBuilder getTargetOrBuilder() {
@@ -6440,6 +8606,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 已冻结的行军目标描述。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -6469,6 +8639,10 @@ public final class Scene {
           ly.proto.Scene.ScenePoint, ly.proto.Scene.ScenePoint.Builder, ly.proto.Scene.ScenePointOrBuilder> pathBuilder_;
 
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public java.util.List<ly.proto.Scene.ScenePoint> getPathList() {
@@ -6479,6 +8653,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public int getPathCount() {
@@ -6489,6 +8667,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public ly.proto.Scene.ScenePoint getPath(int index) {
@@ -6499,6 +8681,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public Builder setPath(
@@ -6516,6 +8702,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public Builder setPath(
@@ -6530,6 +8720,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public Builder addPath(ly.proto.Scene.ScenePoint value) {
@@ -6546,6 +8740,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public Builder addPath(
@@ -6563,6 +8761,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public Builder addPath(
@@ -6577,6 +8779,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public Builder addPath(
@@ -6591,6 +8797,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public Builder addAllPath(
@@ -6606,6 +8816,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public Builder clearPath() {
@@ -6619,6 +8833,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public Builder removePath(int index) {
@@ -6632,6 +8850,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public ly.proto.Scene.ScenePoint.Builder getPathBuilder(
@@ -6639,6 +8861,10 @@ public final class Scene {
         return getPathFieldBuilder().getBuilder(index);
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public ly.proto.Scene.ScenePointOrBuilder getPathOrBuilder(
@@ -6649,6 +8875,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public java.util.List<? extends ly.proto.Scene.ScenePointOrBuilder> 
@@ -6660,6 +8890,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public ly.proto.Scene.ScenePoint.Builder addPathBuilder() {
@@ -6667,6 +8901,10 @@ public final class Scene {
             ly.proto.Scene.ScenePoint.getDefaultInstance());
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public ly.proto.Scene.ScenePoint.Builder addPathBuilder(
@@ -6675,6 +8913,10 @@ public final class Scene {
             index, ly.proto.Scene.ScenePoint.getDefaultInstance());
       }
       /**
+       * <pre>
+       * SceneServer 确认的完整格子路径，包含首尾坐标。
+       * </pre>
+       *
        * <code>repeated .ScenePoint path = 9;</code>
        */
       public java.util.List<ly.proto.Scene.ScenePoint.Builder> 
@@ -6698,6 +8940,10 @@ public final class Scene {
 
       private int pathIndex_ ;
       /**
+       * <pre>
+       * 当前已经到达的 path 下标。
+       * </pre>
+       *
        * <code>int32 path_index = 10;</code>
        * @return The pathIndex.
        */
@@ -6706,6 +8952,10 @@ public final class Scene {
         return pathIndex_;
       }
       /**
+       * <pre>
+       * 当前已经到达的 path 下标。
+       * </pre>
+       *
        * <code>int32 path_index = 10;</code>
        * @param value The pathIndex to set.
        * @return This builder for chaining.
@@ -6718,6 +8968,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前已经到达的 path 下标。
+       * </pre>
+       *
        * <code>int32 path_index = 10;</code>
        * @return This builder for chaining.
        */
@@ -6730,6 +8984,10 @@ public final class Scene {
 
       private int troopCount_ ;
       /**
+       * <pre>
+       * 发车时部队总兵力；战斗后以结果中的剩余兵力为准。
+       * </pre>
+       *
        * <code>int32 troop_count = 11;</code>
        * @return The troopCount.
        */
@@ -6738,6 +8996,10 @@ public final class Scene {
         return troopCount_;
       }
       /**
+       * <pre>
+       * 发车时部队总兵力；战斗后以结果中的剩余兵力为准。
+       * </pre>
+       *
        * <code>int32 troop_count = 11;</code>
        * @param value The troopCount to set.
        * @return This builder for chaining.
@@ -6750,6 +9012,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车时部队总兵力；战斗后以结果中的剩余兵力为准。
+       * </pre>
+       *
        * <code>int32 troop_count = 11;</code>
        * @return This builder for chaining.
        */
@@ -6762,6 +9028,10 @@ public final class Scene {
 
       private long power_ ;
       /**
+       * <pre>
+       * 发车时部队战力，用于展示和基础校验，不替代 BattleServer 计算。
+       * </pre>
+       *
        * <code>int64 power = 12;</code>
        * @return The power.
        */
@@ -6770,6 +9040,10 @@ public final class Scene {
         return power_;
       }
       /**
+       * <pre>
+       * 发车时部队战力，用于展示和基础校验，不替代 BattleServer 计算。
+       * </pre>
+       *
        * <code>int64 power = 12;</code>
        * @param value The power to set.
        * @return This builder for chaining.
@@ -6782,6 +9056,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车时部队战力，用于展示和基础校验，不替代 BattleServer 计算。
+       * </pre>
+       *
        * <code>int64 power = 12;</code>
        * @return This builder for chaining.
        */
@@ -6838,6 +9116,10 @@ public final class Scene {
 
       private long departAtMillis_ ;
       /**
+       * <pre>
+       * 服务端确认的发车时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 depart_at_millis = 14;</code>
        * @return The departAtMillis.
        */
@@ -6846,6 +9128,10 @@ public final class Scene {
         return departAtMillis_;
       }
       /**
+       * <pre>
+       * 服务端确认的发车时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 depart_at_millis = 14;</code>
        * @param value The departAtMillis to set.
        * @return This builder for chaining.
@@ -6858,6 +9144,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 服务端确认的发车时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 depart_at_millis = 14;</code>
        * @return This builder for chaining.
        */
@@ -6870,6 +9160,10 @@ public final class Scene {
 
       private long arrivalAtMillis_ ;
       /**
+       * <pre>
+       * 按路径成本计算出的预计到达时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 arrival_at_millis = 15;</code>
        * @return The arrivalAtMillis.
        */
@@ -6878,6 +9172,10 @@ public final class Scene {
         return arrivalAtMillis_;
       }
       /**
+       * <pre>
+       * 按路径成本计算出的预计到达时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 arrival_at_millis = 15;</code>
        * @param value The arrivalAtMillis to set.
        * @return This builder for chaining.
@@ -6890,6 +9188,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 按路径成本计算出的预计到达时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 arrival_at_millis = 15;</code>
        * @return This builder for chaining.
        */
@@ -6902,6 +9204,10 @@ public final class Scene {
 
       private int stateVersion_ ;
       /**
+       * <pre>
+       * 行军状态版本，用于客户端增量更新和服务端幂等校验。
+       * </pre>
+       *
        * <code>int32 state_version = 16;</code>
        * @return The stateVersion.
        */
@@ -6910,6 +9216,10 @@ public final class Scene {
         return stateVersion_;
       }
       /**
+       * <pre>
+       * 行军状态版本，用于客户端增量更新和服务端幂等校验。
+       * </pre>
+       *
        * <code>int32 state_version = 16;</code>
        * @param value The stateVersion to set.
        * @return This builder for chaining.
@@ -6922,6 +9232,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 行军状态版本，用于客户端增量更新和服务端幂等校验。
+       * </pre>
+       *
        * <code>int32 state_version = 16;</code>
        * @return This builder for chaining.
        */
@@ -7000,53 +9314,89 @@ public final class Scene {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * 成员玩家 ID。
+     * </pre>
+     *
      * <code>int64 player_id = 1;</code>
      * @return The playerId.
      */
     long getPlayerId();
 
     /**
+     * <pre>
+     * 成员用于加入集结的行军 ID。
+     * </pre>
+     *
      * <code>int64 march_id = 2;</code>
      * @return The marchId.
      */
     long getMarchId();
 
     /**
+     * <pre>
+     * 加入或发车时冻结的兵力。
+     * </pre>
+     *
      * <code>int32 troop_count = 3;</code>
      * @return The troopCount.
      */
     int getTroopCount();
 
     /**
+     * <pre>
+     * 加入或发车时冻结的战力。
+     * </pre>
+     *
      * <code>int64 power = 4;</code>
      * @return The power.
      */
     long getPower();
 
     /**
+     * <pre>
+     * GameServer 部队快照版本。
+     * </pre>
+     *
      * <code>int64 army_snapshot_version = 5;</code>
      * @return The armySnapshotVersion.
      */
     long getArmySnapshotVersion();
 
     /**
+     * <pre>
+     * 成员当前状态机阶段。
+     * </pre>
+     *
      * <code>.SceneRallyMemberStatus status = 6;</code>
      * @return The enum numeric value on the wire for status.
      */
     int getStatusValue();
     /**
+     * <pre>
+     * 成员当前状态机阶段。
+     * </pre>
+     *
      * <code>.SceneRallyMemberStatus status = 6;</code>
      * @return The status.
      */
     ly.proto.Scene.SceneRallyMemberStatus getStatus();
 
     /**
+     * <pre>
+     * BattleServer 返回的战后剩余兵力；战斗前通常等于 troop_count。
+     * </pre>
+     *
      * <code>int32 remaining_troops = 7;</code>
      * @return The remainingTroops.
      */
     int getRemainingTroops();
   }
   /**
+   * <pre>
+   * 集结中的单个成员快照；发车后保留冻结版本，不能被 GameServer 实时属性覆盖。
+   * </pre>
+   *
    * Protobuf type {@code SceneRallyMemberSnapshot}
    */
   public static final class SceneRallyMemberSnapshot extends
@@ -7085,6 +9435,10 @@ public final class Scene {
     public static final int PLAYER_ID_FIELD_NUMBER = 1;
     private long playerId_ = 0L;
     /**
+     * <pre>
+     * 成员玩家 ID。
+     * </pre>
+     *
      * <code>int64 player_id = 1;</code>
      * @return The playerId.
      */
@@ -7096,6 +9450,10 @@ public final class Scene {
     public static final int MARCH_ID_FIELD_NUMBER = 2;
     private long marchId_ = 0L;
     /**
+     * <pre>
+     * 成员用于加入集结的行军 ID。
+     * </pre>
+     *
      * <code>int64 march_id = 2;</code>
      * @return The marchId.
      */
@@ -7107,6 +9465,10 @@ public final class Scene {
     public static final int TROOP_COUNT_FIELD_NUMBER = 3;
     private int troopCount_ = 0;
     /**
+     * <pre>
+     * 加入或发车时冻结的兵力。
+     * </pre>
+     *
      * <code>int32 troop_count = 3;</code>
      * @return The troopCount.
      */
@@ -7118,6 +9480,10 @@ public final class Scene {
     public static final int POWER_FIELD_NUMBER = 4;
     private long power_ = 0L;
     /**
+     * <pre>
+     * 加入或发车时冻结的战力。
+     * </pre>
+     *
      * <code>int64 power = 4;</code>
      * @return The power.
      */
@@ -7129,6 +9495,10 @@ public final class Scene {
     public static final int ARMY_SNAPSHOT_VERSION_FIELD_NUMBER = 5;
     private long armySnapshotVersion_ = 0L;
     /**
+     * <pre>
+     * GameServer 部队快照版本。
+     * </pre>
+     *
      * <code>int64 army_snapshot_version = 5;</code>
      * @return The armySnapshotVersion.
      */
@@ -7140,6 +9510,10 @@ public final class Scene {
     public static final int STATUS_FIELD_NUMBER = 6;
     private int status_ = 0;
     /**
+     * <pre>
+     * 成员当前状态机阶段。
+     * </pre>
+     *
      * <code>.SceneRallyMemberStatus status = 6;</code>
      * @return The enum numeric value on the wire for status.
      */
@@ -7147,6 +9521,10 @@ public final class Scene {
       return status_;
     }
     /**
+     * <pre>
+     * 成员当前状态机阶段。
+     * </pre>
+     *
      * <code>.SceneRallyMemberStatus status = 6;</code>
      * @return The status.
      */
@@ -7158,6 +9536,10 @@ public final class Scene {
     public static final int REMAINING_TROOPS_FIELD_NUMBER = 7;
     private int remainingTroops_ = 0;
     /**
+     * <pre>
+     * BattleServer 返回的战后剩余兵力；战斗前通常等于 troop_count。
+     * </pre>
+     *
      * <code>int32 remaining_troops = 7;</code>
      * @return The remainingTroops.
      */
@@ -7393,6 +9775,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 集结中的单个成员快照；发车后保留冻结版本，不能被 GameServer 实时属性覆盖。
+     * </pre>
+     *
      * Protobuf type {@code SceneRallyMemberSnapshot}
      */
     public static final class Builder extends
@@ -7634,6 +10020,10 @@ public final class Scene {
 
       private long playerId_ ;
       /**
+       * <pre>
+       * 成员玩家 ID。
+       * </pre>
+       *
        * <code>int64 player_id = 1;</code>
        * @return The playerId.
        */
@@ -7642,6 +10032,10 @@ public final class Scene {
         return playerId_;
       }
       /**
+       * <pre>
+       * 成员玩家 ID。
+       * </pre>
+       *
        * <code>int64 player_id = 1;</code>
        * @param value The playerId to set.
        * @return This builder for chaining.
@@ -7654,6 +10048,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 成员玩家 ID。
+       * </pre>
+       *
        * <code>int64 player_id = 1;</code>
        * @return This builder for chaining.
        */
@@ -7666,6 +10064,10 @@ public final class Scene {
 
       private long marchId_ ;
       /**
+       * <pre>
+       * 成员用于加入集结的行军 ID。
+       * </pre>
+       *
        * <code>int64 march_id = 2;</code>
        * @return The marchId.
        */
@@ -7674,6 +10076,10 @@ public final class Scene {
         return marchId_;
       }
       /**
+       * <pre>
+       * 成员用于加入集结的行军 ID。
+       * </pre>
+       *
        * <code>int64 march_id = 2;</code>
        * @param value The marchId to set.
        * @return This builder for chaining.
@@ -7686,6 +10092,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 成员用于加入集结的行军 ID。
+       * </pre>
+       *
        * <code>int64 march_id = 2;</code>
        * @return This builder for chaining.
        */
@@ -7698,6 +10108,10 @@ public final class Scene {
 
       private int troopCount_ ;
       /**
+       * <pre>
+       * 加入或发车时冻结的兵力。
+       * </pre>
+       *
        * <code>int32 troop_count = 3;</code>
        * @return The troopCount.
        */
@@ -7706,6 +10120,10 @@ public final class Scene {
         return troopCount_;
       }
       /**
+       * <pre>
+       * 加入或发车时冻结的兵力。
+       * </pre>
+       *
        * <code>int32 troop_count = 3;</code>
        * @param value The troopCount to set.
        * @return This builder for chaining.
@@ -7718,6 +10136,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 加入或发车时冻结的兵力。
+       * </pre>
+       *
        * <code>int32 troop_count = 3;</code>
        * @return This builder for chaining.
        */
@@ -7730,6 +10152,10 @@ public final class Scene {
 
       private long power_ ;
       /**
+       * <pre>
+       * 加入或发车时冻结的战力。
+       * </pre>
+       *
        * <code>int64 power = 4;</code>
        * @return The power.
        */
@@ -7738,6 +10164,10 @@ public final class Scene {
         return power_;
       }
       /**
+       * <pre>
+       * 加入或发车时冻结的战力。
+       * </pre>
+       *
        * <code>int64 power = 4;</code>
        * @param value The power to set.
        * @return This builder for chaining.
@@ -7750,6 +10180,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 加入或发车时冻结的战力。
+       * </pre>
+       *
        * <code>int64 power = 4;</code>
        * @return This builder for chaining.
        */
@@ -7762,6 +10196,10 @@ public final class Scene {
 
       private long armySnapshotVersion_ ;
       /**
+       * <pre>
+       * GameServer 部队快照版本。
+       * </pre>
+       *
        * <code>int64 army_snapshot_version = 5;</code>
        * @return The armySnapshotVersion.
        */
@@ -7770,6 +10208,10 @@ public final class Scene {
         return armySnapshotVersion_;
       }
       /**
+       * <pre>
+       * GameServer 部队快照版本。
+       * </pre>
+       *
        * <code>int64 army_snapshot_version = 5;</code>
        * @param value The armySnapshotVersion to set.
        * @return This builder for chaining.
@@ -7782,6 +10224,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * GameServer 部队快照版本。
+       * </pre>
+       *
        * <code>int64 army_snapshot_version = 5;</code>
        * @return This builder for chaining.
        */
@@ -7794,6 +10240,10 @@ public final class Scene {
 
       private int status_ = 0;
       /**
+       * <pre>
+       * 成员当前状态机阶段。
+       * </pre>
+       *
        * <code>.SceneRallyMemberStatus status = 6;</code>
        * @return The enum numeric value on the wire for status.
        */
@@ -7801,6 +10251,10 @@ public final class Scene {
         return status_;
       }
       /**
+       * <pre>
+       * 成员当前状态机阶段。
+       * </pre>
+       *
        * <code>.SceneRallyMemberStatus status = 6;</code>
        * @param value The enum numeric value on the wire for status to set.
        * @return This builder for chaining.
@@ -7812,6 +10266,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 成员当前状态机阶段。
+       * </pre>
+       *
        * <code>.SceneRallyMemberStatus status = 6;</code>
        * @return The status.
        */
@@ -7821,6 +10279,10 @@ public final class Scene {
         return result == null ? ly.proto.Scene.SceneRallyMemberStatus.UNRECOGNIZED : result;
       }
       /**
+       * <pre>
+       * 成员当前状态机阶段。
+       * </pre>
+       *
        * <code>.SceneRallyMemberStatus status = 6;</code>
        * @param value The status to set.
        * @return This builder for chaining.
@@ -7835,6 +10297,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 成员当前状态机阶段。
+       * </pre>
+       *
        * <code>.SceneRallyMemberStatus status = 6;</code>
        * @return This builder for chaining.
        */
@@ -7847,6 +10313,10 @@ public final class Scene {
 
       private int remainingTroops_ ;
       /**
+       * <pre>
+       * BattleServer 返回的战后剩余兵力；战斗前通常等于 troop_count。
+       * </pre>
+       *
        * <code>int32 remaining_troops = 7;</code>
        * @return The remainingTroops.
        */
@@ -7855,6 +10325,10 @@ public final class Scene {
         return remainingTroops_;
       }
       /**
+       * <pre>
+       * BattleServer 返回的战后剩余兵力；战斗前通常等于 troop_count。
+       * </pre>
+       *
        * <code>int32 remaining_troops = 7;</code>
        * @param value The remainingTroops to set.
        * @return This builder for chaining.
@@ -7867,6 +10341,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * BattleServer 返回的战后剩余兵力；战斗前通常等于 troop_count。
+       * </pre>
+       *
        * <code>int32 remaining_troops = 7;</code>
        * @return This builder for chaining.
        */
@@ -7945,101 +10423,177 @@ public final class Scene {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * 集结唯一 ID。
+     * </pre>
+     *
      * <code>int64 rally_id = 1;</code>
      * @return The rallyId.
      */
     long getRallyId();
 
     /**
+     * <pre>
+     * 集结发起者玩家 ID。
+     * </pre>
+     *
      * <code>int64 leader_player_id = 2;</code>
      * @return The leaderPlayerId.
      */
     long getLeaderPlayerId();
 
     /**
+     * <pre>
+     * 集结所属联盟 ID。
+     * </pre>
+     *
      * <code>int64 alliance_id = 3;</code>
      * @return The allianceId.
      */
     long getAllianceId();
 
     /**
+     * <pre>
+     * 成员集合和主车汇合的地图坐标。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      * @return Whether the assemblyPoint field is set.
      */
     boolean hasAssemblyPoint();
     /**
+     * <pre>
+     * 成员集合和主车汇合的地图坐标。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      * @return The assemblyPoint.
      */
     ly.proto.Scene.ScenePoint getAssemblyPoint();
     /**
+     * <pre>
+     * 成员集合和主车汇合的地图坐标。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      */
     ly.proto.Scene.ScenePointOrBuilder getAssemblyPointOrBuilder();
 
     /**
+     * <pre>
+     * 集结最终攻击或增援目标。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      * @return Whether the target field is set.
      */
     boolean hasTarget();
     /**
+     * <pre>
+     * 集结最终攻击或增援目标。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      * @return The target.
      */
     ly.proto.Scene.SceneMarchTarget getTarget();
     /**
+     * <pre>
+     * 集结最终攻击或增援目标。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      */
     ly.proto.Scene.SceneMarchTargetOrBuilder getTargetOrBuilder();
 
     /**
+     * <pre>
+     * 集结允许的总兵力上限。
+     * </pre>
+     *
      * <code>int32 capacity = 6;</code>
      * @return The capacity.
      */
     int getCapacity();
 
     /**
+     * <pre>
+     * 允许发车的最少成员数量。
+     * </pre>
+     *
      * <code>int32 minimum_members = 7;</code>
      * @return The minimumMembers.
      */
     int getMinimumMembers();
 
     /**
+     * <pre>
+     * 计划发车时间戳，单位毫秒。
+     * </pre>
+     *
      * <code>int64 launch_at_millis = 8;</code>
      * @return The launchAtMillis.
      */
     long getLaunchAtMillis();
 
     /**
+     * <pre>
+     * 集结整体状态机阶段。
+     * </pre>
+     *
      * <code>.SceneRallyStatus status = 9;</code>
      * @return The enum numeric value on the wire for status.
      */
     int getStatusValue();
     /**
+     * <pre>
+     * 集结整体状态机阶段。
+     * </pre>
+     *
      * <code>.SceneRallyStatus status = 9;</code>
      * @return The status.
      */
     ly.proto.Scene.SceneRallyStatus getStatus();
 
     /**
+     * <pre>
+     * 当前成员快照列表。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
      */
     java.util.List<ly.proto.Scene.SceneRallyMemberSnapshot> 
         getMembersList();
     /**
+     * <pre>
+     * 当前成员快照列表。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
      */
     ly.proto.Scene.SceneRallyMemberSnapshot getMembers(int index);
     /**
+     * <pre>
+     * 当前成员快照列表。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
      */
     int getMembersCount();
     /**
+     * <pre>
+     * 当前成员快照列表。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
      */
     java.util.List<? extends ly.proto.Scene.SceneRallyMemberSnapshotOrBuilder> 
         getMembersOrBuilderList();
     /**
+     * <pre>
+     * 当前成员快照列表。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
      */
     ly.proto.Scene.SceneRallyMemberSnapshotOrBuilder getMembersOrBuilder(
@@ -8056,18 +10610,30 @@ public final class Scene {
     long getAppliedBattleResultId();
 
     /**
+     * <pre>
+     * 最近一次已经应用的战斗是否胜利；未产生战斗前为 false。
+     * </pre>
+     *
      * <code>bool victory = 12;</code>
      * @return The victory.
      */
     boolean getVictory();
 
     /**
+     * <pre>
+     * 集结状态版本，用于客户端增量更新和服务端幂等校验。
+     * </pre>
+     *
      * <code>int32 state_version = 13;</code>
      * @return The stateVersion.
      */
     int getStateVersion();
   }
   /**
+   * <pre>
+   * 集结在场景中的运行时快照，供 AOI、断线重连和跨服务查询使用。
+   * </pre>
+   *
    * Protobuf type {@code SceneRallySnapshot}
    */
   public static final class SceneRallySnapshot extends
@@ -8108,6 +10674,10 @@ public final class Scene {
     public static final int RALLY_ID_FIELD_NUMBER = 1;
     private long rallyId_ = 0L;
     /**
+     * <pre>
+     * 集结唯一 ID。
+     * </pre>
+     *
      * <code>int64 rally_id = 1;</code>
      * @return The rallyId.
      */
@@ -8119,6 +10689,10 @@ public final class Scene {
     public static final int LEADER_PLAYER_ID_FIELD_NUMBER = 2;
     private long leaderPlayerId_ = 0L;
     /**
+     * <pre>
+     * 集结发起者玩家 ID。
+     * </pre>
+     *
      * <code>int64 leader_player_id = 2;</code>
      * @return The leaderPlayerId.
      */
@@ -8130,6 +10704,10 @@ public final class Scene {
     public static final int ALLIANCE_ID_FIELD_NUMBER = 3;
     private long allianceId_ = 0L;
     /**
+     * <pre>
+     * 集结所属联盟 ID。
+     * </pre>
+     *
      * <code>int64 alliance_id = 3;</code>
      * @return The allianceId.
      */
@@ -8141,6 +10719,10 @@ public final class Scene {
     public static final int ASSEMBLY_POINT_FIELD_NUMBER = 4;
     private ly.proto.Scene.ScenePoint assemblyPoint_;
     /**
+     * <pre>
+     * 成员集合和主车汇合的地图坐标。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      * @return Whether the assemblyPoint field is set.
      */
@@ -8149,6 +10731,10 @@ public final class Scene {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
+     * <pre>
+     * 成员集合和主车汇合的地图坐标。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      * @return The assemblyPoint.
      */
@@ -8157,6 +10743,10 @@ public final class Scene {
       return assemblyPoint_ == null ? ly.proto.Scene.ScenePoint.getDefaultInstance() : assemblyPoint_;
     }
     /**
+     * <pre>
+     * 成员集合和主车汇合的地图坐标。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      */
     @java.lang.Override
@@ -8167,6 +10757,10 @@ public final class Scene {
     public static final int TARGET_FIELD_NUMBER = 5;
     private ly.proto.Scene.SceneMarchTarget target_;
     /**
+     * <pre>
+     * 集结最终攻击或增援目标。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      * @return Whether the target field is set.
      */
@@ -8175,6 +10769,10 @@ public final class Scene {
       return ((bitField0_ & 0x00000002) != 0);
     }
     /**
+     * <pre>
+     * 集结最终攻击或增援目标。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      * @return The target.
      */
@@ -8183,6 +10781,10 @@ public final class Scene {
       return target_ == null ? ly.proto.Scene.SceneMarchTarget.getDefaultInstance() : target_;
     }
     /**
+     * <pre>
+     * 集结最终攻击或增援目标。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      */
     @java.lang.Override
@@ -8193,6 +10795,10 @@ public final class Scene {
     public static final int CAPACITY_FIELD_NUMBER = 6;
     private int capacity_ = 0;
     /**
+     * <pre>
+     * 集结允许的总兵力上限。
+     * </pre>
+     *
      * <code>int32 capacity = 6;</code>
      * @return The capacity.
      */
@@ -8204,6 +10810,10 @@ public final class Scene {
     public static final int MINIMUM_MEMBERS_FIELD_NUMBER = 7;
     private int minimumMembers_ = 0;
     /**
+     * <pre>
+     * 允许发车的最少成员数量。
+     * </pre>
+     *
      * <code>int32 minimum_members = 7;</code>
      * @return The minimumMembers.
      */
@@ -8215,6 +10825,10 @@ public final class Scene {
     public static final int LAUNCH_AT_MILLIS_FIELD_NUMBER = 8;
     private long launchAtMillis_ = 0L;
     /**
+     * <pre>
+     * 计划发车时间戳，单位毫秒。
+     * </pre>
+     *
      * <code>int64 launch_at_millis = 8;</code>
      * @return The launchAtMillis.
      */
@@ -8226,6 +10840,10 @@ public final class Scene {
     public static final int STATUS_FIELD_NUMBER = 9;
     private int status_ = 0;
     /**
+     * <pre>
+     * 集结整体状态机阶段。
+     * </pre>
+     *
      * <code>.SceneRallyStatus status = 9;</code>
      * @return The enum numeric value on the wire for status.
      */
@@ -8233,6 +10851,10 @@ public final class Scene {
       return status_;
     }
     /**
+     * <pre>
+     * 集结整体状态机阶段。
+     * </pre>
+     *
      * <code>.SceneRallyStatus status = 9;</code>
      * @return The status.
      */
@@ -8245,6 +10867,10 @@ public final class Scene {
     @SuppressWarnings("serial")
     private java.util.List<ly.proto.Scene.SceneRallyMemberSnapshot> members_;
     /**
+     * <pre>
+     * 当前成员快照列表。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
      */
     @java.lang.Override
@@ -8252,6 +10878,10 @@ public final class Scene {
       return members_;
     }
     /**
+     * <pre>
+     * 当前成员快照列表。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
      */
     @java.lang.Override
@@ -8260,6 +10890,10 @@ public final class Scene {
       return members_;
     }
     /**
+     * <pre>
+     * 当前成员快照列表。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
      */
     @java.lang.Override
@@ -8267,6 +10901,10 @@ public final class Scene {
       return members_.size();
     }
     /**
+     * <pre>
+     * 当前成员快照列表。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
      */
     @java.lang.Override
@@ -8274,6 +10912,10 @@ public final class Scene {
       return members_.get(index);
     }
     /**
+     * <pre>
+     * 当前成员快照列表。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
      */
     @java.lang.Override
@@ -8300,6 +10942,10 @@ public final class Scene {
     public static final int VICTORY_FIELD_NUMBER = 12;
     private boolean victory_ = false;
     /**
+     * <pre>
+     * 最近一次已经应用的战斗是否胜利；未产生战斗前为 false。
+     * </pre>
+     *
      * <code>bool victory = 12;</code>
      * @return The victory.
      */
@@ -8311,6 +10957,10 @@ public final class Scene {
     public static final int STATE_VERSION_FIELD_NUMBER = 13;
     private int stateVersion_ = 0;
     /**
+     * <pre>
+     * 集结状态版本，用于客户端增量更新和服务端幂等校验。
+     * </pre>
+     *
      * <code>int32 state_version = 13;</code>
      * @return The stateVersion.
      */
@@ -8626,6 +11276,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 集结在场景中的运行时快照，供 AOI、断线重连和跨服务查询使用。
+     * </pre>
+     *
      * Protobuf type {@code SceneRallySnapshot}
      */
     public static final class Builder extends
@@ -9014,6 +11668,10 @@ public final class Scene {
 
       private long rallyId_ ;
       /**
+       * <pre>
+       * 集结唯一 ID。
+       * </pre>
+       *
        * <code>int64 rally_id = 1;</code>
        * @return The rallyId.
        */
@@ -9022,6 +11680,10 @@ public final class Scene {
         return rallyId_;
       }
       /**
+       * <pre>
+       * 集结唯一 ID。
+       * </pre>
+       *
        * <code>int64 rally_id = 1;</code>
        * @param value The rallyId to set.
        * @return This builder for chaining.
@@ -9034,6 +11696,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结唯一 ID。
+       * </pre>
+       *
        * <code>int64 rally_id = 1;</code>
        * @return This builder for chaining.
        */
@@ -9046,6 +11712,10 @@ public final class Scene {
 
       private long leaderPlayerId_ ;
       /**
+       * <pre>
+       * 集结发起者玩家 ID。
+       * </pre>
+       *
        * <code>int64 leader_player_id = 2;</code>
        * @return The leaderPlayerId.
        */
@@ -9054,6 +11724,10 @@ public final class Scene {
         return leaderPlayerId_;
       }
       /**
+       * <pre>
+       * 集结发起者玩家 ID。
+       * </pre>
+       *
        * <code>int64 leader_player_id = 2;</code>
        * @param value The leaderPlayerId to set.
        * @return This builder for chaining.
@@ -9066,6 +11740,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结发起者玩家 ID。
+       * </pre>
+       *
        * <code>int64 leader_player_id = 2;</code>
        * @return This builder for chaining.
        */
@@ -9078,6 +11756,10 @@ public final class Scene {
 
       private long allianceId_ ;
       /**
+       * <pre>
+       * 集结所属联盟 ID。
+       * </pre>
+       *
        * <code>int64 alliance_id = 3;</code>
        * @return The allianceId.
        */
@@ -9086,6 +11768,10 @@ public final class Scene {
         return allianceId_;
       }
       /**
+       * <pre>
+       * 集结所属联盟 ID。
+       * </pre>
+       *
        * <code>int64 alliance_id = 3;</code>
        * @param value The allianceId to set.
        * @return This builder for chaining.
@@ -9098,6 +11784,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结所属联盟 ID。
+       * </pre>
+       *
        * <code>int64 alliance_id = 3;</code>
        * @return This builder for chaining.
        */
@@ -9112,6 +11802,10 @@ public final class Scene {
       private com.google.protobuf.SingleFieldBuilderV3<
           ly.proto.Scene.ScenePoint, ly.proto.Scene.ScenePoint.Builder, ly.proto.Scene.ScenePointOrBuilder> assemblyPointBuilder_;
       /**
+       * <pre>
+       * 成员集合和主车汇合的地图坐标。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        * @return Whether the assemblyPoint field is set.
        */
@@ -9119,6 +11813,10 @@ public final class Scene {
         return ((bitField0_ & 0x00000008) != 0);
       }
       /**
+       * <pre>
+       * 成员集合和主车汇合的地图坐标。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        * @return The assemblyPoint.
        */
@@ -9130,6 +11828,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 成员集合和主车汇合的地图坐标。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public Builder setAssemblyPoint(ly.proto.Scene.ScenePoint value) {
@@ -9146,6 +11848,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 成员集合和主车汇合的地图坐标。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public Builder setAssemblyPoint(
@@ -9160,6 +11866,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 成员集合和主车汇合的地图坐标。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public Builder mergeAssemblyPoint(ly.proto.Scene.ScenePoint value) {
@@ -9181,6 +11891,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 成员集合和主车汇合的地图坐标。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public Builder clearAssemblyPoint() {
@@ -9194,6 +11908,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 成员集合和主车汇合的地图坐标。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public ly.proto.Scene.ScenePoint.Builder getAssemblyPointBuilder() {
@@ -9202,6 +11920,10 @@ public final class Scene {
         return getAssemblyPointFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * 成员集合和主车汇合的地图坐标。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public ly.proto.Scene.ScenePointOrBuilder getAssemblyPointOrBuilder() {
@@ -9213,6 +11935,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 成员集合和主车汇合的地图坐标。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -9233,6 +11959,10 @@ public final class Scene {
       private com.google.protobuf.SingleFieldBuilderV3<
           ly.proto.Scene.SceneMarchTarget, ly.proto.Scene.SceneMarchTarget.Builder, ly.proto.Scene.SceneMarchTargetOrBuilder> targetBuilder_;
       /**
+       * <pre>
+       * 集结最终攻击或增援目标。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        * @return Whether the target field is set.
        */
@@ -9240,6 +11970,10 @@ public final class Scene {
         return ((bitField0_ & 0x00000010) != 0);
       }
       /**
+       * <pre>
+       * 集结最终攻击或增援目标。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        * @return The target.
        */
@@ -9251,6 +11985,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 集结最终攻击或增援目标。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public Builder setTarget(ly.proto.Scene.SceneMarchTarget value) {
@@ -9267,6 +12005,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结最终攻击或增援目标。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public Builder setTarget(
@@ -9281,6 +12023,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结最终攻击或增援目标。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public Builder mergeTarget(ly.proto.Scene.SceneMarchTarget value) {
@@ -9302,6 +12048,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结最终攻击或增援目标。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public Builder clearTarget() {
@@ -9315,6 +12065,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结最终攻击或增援目标。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public ly.proto.Scene.SceneMarchTarget.Builder getTargetBuilder() {
@@ -9323,6 +12077,10 @@ public final class Scene {
         return getTargetFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * 集结最终攻击或增援目标。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public ly.proto.Scene.SceneMarchTargetOrBuilder getTargetOrBuilder() {
@@ -9334,6 +12092,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 集结最终攻击或增援目标。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -9352,6 +12114,10 @@ public final class Scene {
 
       private int capacity_ ;
       /**
+       * <pre>
+       * 集结允许的总兵力上限。
+       * </pre>
+       *
        * <code>int32 capacity = 6;</code>
        * @return The capacity.
        */
@@ -9360,6 +12126,10 @@ public final class Scene {
         return capacity_;
       }
       /**
+       * <pre>
+       * 集结允许的总兵力上限。
+       * </pre>
+       *
        * <code>int32 capacity = 6;</code>
        * @param value The capacity to set.
        * @return This builder for chaining.
@@ -9372,6 +12142,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结允许的总兵力上限。
+       * </pre>
+       *
        * <code>int32 capacity = 6;</code>
        * @return This builder for chaining.
        */
@@ -9384,6 +12158,10 @@ public final class Scene {
 
       private int minimumMembers_ ;
       /**
+       * <pre>
+       * 允许发车的最少成员数量。
+       * </pre>
+       *
        * <code>int32 minimum_members = 7;</code>
        * @return The minimumMembers.
        */
@@ -9392,6 +12170,10 @@ public final class Scene {
         return minimumMembers_;
       }
       /**
+       * <pre>
+       * 允许发车的最少成员数量。
+       * </pre>
+       *
        * <code>int32 minimum_members = 7;</code>
        * @param value The minimumMembers to set.
        * @return This builder for chaining.
@@ -9404,6 +12186,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 允许发车的最少成员数量。
+       * </pre>
+       *
        * <code>int32 minimum_members = 7;</code>
        * @return This builder for chaining.
        */
@@ -9416,6 +12202,10 @@ public final class Scene {
 
       private long launchAtMillis_ ;
       /**
+       * <pre>
+       * 计划发车时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 launch_at_millis = 8;</code>
        * @return The launchAtMillis.
        */
@@ -9424,6 +12214,10 @@ public final class Scene {
         return launchAtMillis_;
       }
       /**
+       * <pre>
+       * 计划发车时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 launch_at_millis = 8;</code>
        * @param value The launchAtMillis to set.
        * @return This builder for chaining.
@@ -9436,6 +12230,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 计划发车时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 launch_at_millis = 8;</code>
        * @return This builder for chaining.
        */
@@ -9448,6 +12246,10 @@ public final class Scene {
 
       private int status_ = 0;
       /**
+       * <pre>
+       * 集结整体状态机阶段。
+       * </pre>
+       *
        * <code>.SceneRallyStatus status = 9;</code>
        * @return The enum numeric value on the wire for status.
        */
@@ -9455,6 +12257,10 @@ public final class Scene {
         return status_;
       }
       /**
+       * <pre>
+       * 集结整体状态机阶段。
+       * </pre>
+       *
        * <code>.SceneRallyStatus status = 9;</code>
        * @param value The enum numeric value on the wire for status to set.
        * @return This builder for chaining.
@@ -9466,6 +12272,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结整体状态机阶段。
+       * </pre>
+       *
        * <code>.SceneRallyStatus status = 9;</code>
        * @return The status.
        */
@@ -9475,6 +12285,10 @@ public final class Scene {
         return result == null ? ly.proto.Scene.SceneRallyStatus.UNRECOGNIZED : result;
       }
       /**
+       * <pre>
+       * 集结整体状态机阶段。
+       * </pre>
+       *
        * <code>.SceneRallyStatus status = 9;</code>
        * @param value The status to set.
        * @return This builder for chaining.
@@ -9489,6 +12303,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结整体状态机阶段。
+       * </pre>
+       *
        * <code>.SceneRallyStatus status = 9;</code>
        * @return This builder for chaining.
        */
@@ -9512,6 +12330,10 @@ public final class Scene {
           ly.proto.Scene.SceneRallyMemberSnapshot, ly.proto.Scene.SceneRallyMemberSnapshot.Builder, ly.proto.Scene.SceneRallyMemberSnapshotOrBuilder> membersBuilder_;
 
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public java.util.List<ly.proto.Scene.SceneRallyMemberSnapshot> getMembersList() {
@@ -9522,6 +12344,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public int getMembersCount() {
@@ -9532,6 +12358,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public ly.proto.Scene.SceneRallyMemberSnapshot getMembers(int index) {
@@ -9542,6 +12372,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public Builder setMembers(
@@ -9559,6 +12393,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public Builder setMembers(
@@ -9573,6 +12411,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public Builder addMembers(ly.proto.Scene.SceneRallyMemberSnapshot value) {
@@ -9589,6 +12431,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public Builder addMembers(
@@ -9606,6 +12452,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public Builder addMembers(
@@ -9620,6 +12470,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public Builder addMembers(
@@ -9634,6 +12488,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public Builder addAllMembers(
@@ -9649,6 +12507,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public Builder clearMembers() {
@@ -9662,6 +12524,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public Builder removeMembers(int index) {
@@ -9675,6 +12541,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public ly.proto.Scene.SceneRallyMemberSnapshot.Builder getMembersBuilder(
@@ -9682,6 +12552,10 @@ public final class Scene {
         return getMembersFieldBuilder().getBuilder(index);
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public ly.proto.Scene.SceneRallyMemberSnapshotOrBuilder getMembersOrBuilder(
@@ -9692,6 +12566,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public java.util.List<? extends ly.proto.Scene.SceneRallyMemberSnapshotOrBuilder> 
@@ -9703,6 +12581,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public ly.proto.Scene.SceneRallyMemberSnapshot.Builder addMembersBuilder() {
@@ -9710,6 +12592,10 @@ public final class Scene {
             ly.proto.Scene.SceneRallyMemberSnapshot.getDefaultInstance());
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public ly.proto.Scene.SceneRallyMemberSnapshot.Builder addMembersBuilder(
@@ -9718,6 +12604,10 @@ public final class Scene {
             index, ly.proto.Scene.SceneRallyMemberSnapshot.getDefaultInstance());
       }
       /**
+       * <pre>
+       * 当前成员快照列表。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 10;</code>
        */
       public java.util.List<ly.proto.Scene.SceneRallyMemberSnapshot.Builder> 
@@ -9785,6 +12675,10 @@ public final class Scene {
 
       private boolean victory_ ;
       /**
+       * <pre>
+       * 最近一次已经应用的战斗是否胜利；未产生战斗前为 false。
+       * </pre>
+       *
        * <code>bool victory = 12;</code>
        * @return The victory.
        */
@@ -9793,6 +12687,10 @@ public final class Scene {
         return victory_;
       }
       /**
+       * <pre>
+       * 最近一次已经应用的战斗是否胜利；未产生战斗前为 false。
+       * </pre>
+       *
        * <code>bool victory = 12;</code>
        * @param value The victory to set.
        * @return This builder for chaining.
@@ -9805,6 +12703,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 最近一次已经应用的战斗是否胜利；未产生战斗前为 false。
+       * </pre>
+       *
        * <code>bool victory = 12;</code>
        * @return This builder for chaining.
        */
@@ -9817,6 +12719,10 @@ public final class Scene {
 
       private int stateVersion_ ;
       /**
+       * <pre>
+       * 集结状态版本，用于客户端增量更新和服务端幂等校验。
+       * </pre>
+       *
        * <code>int32 state_version = 13;</code>
        * @return The stateVersion.
        */
@@ -9825,6 +12731,10 @@ public final class Scene {
         return stateVersion_;
       }
       /**
+       * <pre>
+       * 集结状态版本，用于客户端增量更新和服务端幂等校验。
+       * </pre>
+       *
        * <code>int32 state_version = 13;</code>
        * @param value The stateVersion to set.
        * @return This builder for chaining.
@@ -9837,6 +12747,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结状态版本，用于客户端增量更新和服务端幂等校验。
+       * </pre>
+       *
        * <code>int32 state_version = 13;</code>
        * @return This builder for chaining.
        */
@@ -9915,96 +12829,168 @@ public final class Scene {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * 集结唯一 ID。
+     * </pre>
+     *
      * <code>int64 rally_id = 1;</code>
      * @return The rallyId.
      */
     long getRallyId();
 
     /**
+     * <pre>
+     * 集结发起者玩家 ID。
+     * </pre>
+     *
      * <code>int64 leader_player_id = 2;</code>
      * @return The leaderPlayerId.
      */
     long getLeaderPlayerId();
 
     /**
+     * <pre>
+     * 集结所属联盟 ID。
+     * </pre>
+     *
      * <code>int64 alliance_id = 3;</code>
      * @return The allianceId.
      */
     long getAllianceId();
 
     /**
+     * <pre>
+     * 集结发车点。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      * @return Whether the assemblyPoint field is set.
      */
     boolean hasAssemblyPoint();
     /**
+     * <pre>
+     * 集结发车点。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      * @return The assemblyPoint.
      */
     ly.proto.Scene.ScenePoint getAssemblyPoint();
     /**
+     * <pre>
+     * 集结发车点。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      */
     ly.proto.Scene.ScenePointOrBuilder getAssemblyPointOrBuilder();
 
     /**
+     * <pre>
+     * 发车时确认的战斗目标及版本。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      * @return Whether the target field is set.
      */
     boolean hasTarget();
     /**
+     * <pre>
+     * 发车时确认的战斗目标及版本。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      * @return The target.
      */
     ly.proto.Scene.SceneMarchTarget getTarget();
     /**
+     * <pre>
+     * 发车时确认的战斗目标及版本。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      */
     ly.proto.Scene.SceneMarchTargetOrBuilder getTargetOrBuilder();
 
     /**
+     * <pre>
+     * 发车瞬间冻结的全部有效成员。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
      */
     java.util.List<ly.proto.Scene.SceneRallyMemberSnapshot> 
         getMembersList();
     /**
+     * <pre>
+     * 发车瞬间冻结的全部有效成员。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
      */
     ly.proto.Scene.SceneRallyMemberSnapshot getMembers(int index);
     /**
+     * <pre>
+     * 发车瞬间冻结的全部有效成员。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
      */
     int getMembersCount();
     /**
+     * <pre>
+     * 发车瞬间冻结的全部有效成员。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
      */
     java.util.List<? extends ly.proto.Scene.SceneRallyMemberSnapshotOrBuilder> 
         getMembersOrBuilderList();
     /**
+     * <pre>
+     * 发车瞬间冻结的全部有效成员。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
      */
     ly.proto.Scene.SceneRallyMemberSnapshotOrBuilder getMembersOrBuilder(
         int index);
 
     /**
+     * <pre>
+     * 所有有效成员的冻结兵力总和。
+     * </pre>
+     *
      * <code>int32 total_troops = 7;</code>
      * @return The totalTroops.
      */
     int getTotalTroops();
 
     /**
+     * <pre>
+     * 所有有效成员的冻结战力总和。
+     * </pre>
+     *
      * <code>int64 total_power = 8;</code>
      * @return The totalPower.
      */
     long getTotalPower();
 
     /**
+     * <pre>
+     * 实际发车时间戳，单位毫秒。
+     * </pre>
+     *
      * <code>int64 launched_at_millis = 9;</code>
      * @return The launchedAtMillis.
      */
     long getLaunchedAtMillis();
 
     /**
+     * <pre>
+     * 发车时的集结状态版本。
+     * </pre>
+     *
      * <code>int32 rally_version = 10;</code>
      * @return The rallyVersion.
      */
@@ -10054,6 +13040,10 @@ public final class Scene {
     public static final int RALLY_ID_FIELD_NUMBER = 1;
     private long rallyId_ = 0L;
     /**
+     * <pre>
+     * 集结唯一 ID。
+     * </pre>
+     *
      * <code>int64 rally_id = 1;</code>
      * @return The rallyId.
      */
@@ -10065,6 +13055,10 @@ public final class Scene {
     public static final int LEADER_PLAYER_ID_FIELD_NUMBER = 2;
     private long leaderPlayerId_ = 0L;
     /**
+     * <pre>
+     * 集结发起者玩家 ID。
+     * </pre>
+     *
      * <code>int64 leader_player_id = 2;</code>
      * @return The leaderPlayerId.
      */
@@ -10076,6 +13070,10 @@ public final class Scene {
     public static final int ALLIANCE_ID_FIELD_NUMBER = 3;
     private long allianceId_ = 0L;
     /**
+     * <pre>
+     * 集结所属联盟 ID。
+     * </pre>
+     *
      * <code>int64 alliance_id = 3;</code>
      * @return The allianceId.
      */
@@ -10087,6 +13085,10 @@ public final class Scene {
     public static final int ASSEMBLY_POINT_FIELD_NUMBER = 4;
     private ly.proto.Scene.ScenePoint assemblyPoint_;
     /**
+     * <pre>
+     * 集结发车点。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      * @return Whether the assemblyPoint field is set.
      */
@@ -10095,6 +13097,10 @@ public final class Scene {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
+     * <pre>
+     * 集结发车点。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      * @return The assemblyPoint.
      */
@@ -10103,6 +13109,10 @@ public final class Scene {
       return assemblyPoint_ == null ? ly.proto.Scene.ScenePoint.getDefaultInstance() : assemblyPoint_;
     }
     /**
+     * <pre>
+     * 集结发车点。
+     * </pre>
+     *
      * <code>.ScenePoint assembly_point = 4;</code>
      */
     @java.lang.Override
@@ -10113,6 +13123,10 @@ public final class Scene {
     public static final int TARGET_FIELD_NUMBER = 5;
     private ly.proto.Scene.SceneMarchTarget target_;
     /**
+     * <pre>
+     * 发车时确认的战斗目标及版本。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      * @return Whether the target field is set.
      */
@@ -10121,6 +13135,10 @@ public final class Scene {
       return ((bitField0_ & 0x00000002) != 0);
     }
     /**
+     * <pre>
+     * 发车时确认的战斗目标及版本。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      * @return The target.
      */
@@ -10129,6 +13147,10 @@ public final class Scene {
       return target_ == null ? ly.proto.Scene.SceneMarchTarget.getDefaultInstance() : target_;
     }
     /**
+     * <pre>
+     * 发车时确认的战斗目标及版本。
+     * </pre>
+     *
      * <code>.SceneMarchTarget target = 5;</code>
      */
     @java.lang.Override
@@ -10140,6 +13162,10 @@ public final class Scene {
     @SuppressWarnings("serial")
     private java.util.List<ly.proto.Scene.SceneRallyMemberSnapshot> members_;
     /**
+     * <pre>
+     * 发车瞬间冻结的全部有效成员。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
      */
     @java.lang.Override
@@ -10147,6 +13173,10 @@ public final class Scene {
       return members_;
     }
     /**
+     * <pre>
+     * 发车瞬间冻结的全部有效成员。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
      */
     @java.lang.Override
@@ -10155,6 +13185,10 @@ public final class Scene {
       return members_;
     }
     /**
+     * <pre>
+     * 发车瞬间冻结的全部有效成员。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
      */
     @java.lang.Override
@@ -10162,6 +13196,10 @@ public final class Scene {
       return members_.size();
     }
     /**
+     * <pre>
+     * 发车瞬间冻结的全部有效成员。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
      */
     @java.lang.Override
@@ -10169,6 +13207,10 @@ public final class Scene {
       return members_.get(index);
     }
     /**
+     * <pre>
+     * 发车瞬间冻结的全部有效成员。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
      */
     @java.lang.Override
@@ -10180,6 +13222,10 @@ public final class Scene {
     public static final int TOTAL_TROOPS_FIELD_NUMBER = 7;
     private int totalTroops_ = 0;
     /**
+     * <pre>
+     * 所有有效成员的冻结兵力总和。
+     * </pre>
+     *
      * <code>int32 total_troops = 7;</code>
      * @return The totalTroops.
      */
@@ -10191,6 +13237,10 @@ public final class Scene {
     public static final int TOTAL_POWER_FIELD_NUMBER = 8;
     private long totalPower_ = 0L;
     /**
+     * <pre>
+     * 所有有效成员的冻结战力总和。
+     * </pre>
+     *
      * <code>int64 total_power = 8;</code>
      * @return The totalPower.
      */
@@ -10202,6 +13252,10 @@ public final class Scene {
     public static final int LAUNCHED_AT_MILLIS_FIELD_NUMBER = 9;
     private long launchedAtMillis_ = 0L;
     /**
+     * <pre>
+     * 实际发车时间戳，单位毫秒。
+     * </pre>
+     *
      * <code>int64 launched_at_millis = 9;</code>
      * @return The launchedAtMillis.
      */
@@ -10213,6 +13267,10 @@ public final class Scene {
     public static final int RALLY_VERSION_FIELD_NUMBER = 10;
     private int rallyVersion_ = 0;
     /**
+     * <pre>
+     * 发车时的集结状态版本。
+     * </pre>
+     *
      * <code>int32 rally_version = 10;</code>
      * @return The rallyVersion.
      */
@@ -10851,6 +13909,10 @@ public final class Scene {
 
       private long rallyId_ ;
       /**
+       * <pre>
+       * 集结唯一 ID。
+       * </pre>
+       *
        * <code>int64 rally_id = 1;</code>
        * @return The rallyId.
        */
@@ -10859,6 +13921,10 @@ public final class Scene {
         return rallyId_;
       }
       /**
+       * <pre>
+       * 集结唯一 ID。
+       * </pre>
+       *
        * <code>int64 rally_id = 1;</code>
        * @param value The rallyId to set.
        * @return This builder for chaining.
@@ -10871,6 +13937,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结唯一 ID。
+       * </pre>
+       *
        * <code>int64 rally_id = 1;</code>
        * @return This builder for chaining.
        */
@@ -10883,6 +13953,10 @@ public final class Scene {
 
       private long leaderPlayerId_ ;
       /**
+       * <pre>
+       * 集结发起者玩家 ID。
+       * </pre>
+       *
        * <code>int64 leader_player_id = 2;</code>
        * @return The leaderPlayerId.
        */
@@ -10891,6 +13965,10 @@ public final class Scene {
         return leaderPlayerId_;
       }
       /**
+       * <pre>
+       * 集结发起者玩家 ID。
+       * </pre>
+       *
        * <code>int64 leader_player_id = 2;</code>
        * @param value The leaderPlayerId to set.
        * @return This builder for chaining.
@@ -10903,6 +13981,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结发起者玩家 ID。
+       * </pre>
+       *
        * <code>int64 leader_player_id = 2;</code>
        * @return This builder for chaining.
        */
@@ -10915,6 +13997,10 @@ public final class Scene {
 
       private long allianceId_ ;
       /**
+       * <pre>
+       * 集结所属联盟 ID。
+       * </pre>
+       *
        * <code>int64 alliance_id = 3;</code>
        * @return The allianceId.
        */
@@ -10923,6 +14009,10 @@ public final class Scene {
         return allianceId_;
       }
       /**
+       * <pre>
+       * 集结所属联盟 ID。
+       * </pre>
+       *
        * <code>int64 alliance_id = 3;</code>
        * @param value The allianceId to set.
        * @return This builder for chaining.
@@ -10935,6 +14025,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结所属联盟 ID。
+       * </pre>
+       *
        * <code>int64 alliance_id = 3;</code>
        * @return This builder for chaining.
        */
@@ -10949,6 +14043,10 @@ public final class Scene {
       private com.google.protobuf.SingleFieldBuilderV3<
           ly.proto.Scene.ScenePoint, ly.proto.Scene.ScenePoint.Builder, ly.proto.Scene.ScenePointOrBuilder> assemblyPointBuilder_;
       /**
+       * <pre>
+       * 集结发车点。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        * @return Whether the assemblyPoint field is set.
        */
@@ -10956,6 +14054,10 @@ public final class Scene {
         return ((bitField0_ & 0x00000008) != 0);
       }
       /**
+       * <pre>
+       * 集结发车点。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        * @return The assemblyPoint.
        */
@@ -10967,6 +14069,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 集结发车点。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public Builder setAssemblyPoint(ly.proto.Scene.ScenePoint value) {
@@ -10983,6 +14089,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结发车点。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public Builder setAssemblyPoint(
@@ -10997,6 +14107,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结发车点。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public Builder mergeAssemblyPoint(ly.proto.Scene.ScenePoint value) {
@@ -11018,6 +14132,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结发车点。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public Builder clearAssemblyPoint() {
@@ -11031,6 +14149,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 集结发车点。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public ly.proto.Scene.ScenePoint.Builder getAssemblyPointBuilder() {
@@ -11039,6 +14161,10 @@ public final class Scene {
         return getAssemblyPointFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * 集结发车点。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       public ly.proto.Scene.ScenePointOrBuilder getAssemblyPointOrBuilder() {
@@ -11050,6 +14176,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 集结发车点。
+       * </pre>
+       *
        * <code>.ScenePoint assembly_point = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -11070,6 +14200,10 @@ public final class Scene {
       private com.google.protobuf.SingleFieldBuilderV3<
           ly.proto.Scene.SceneMarchTarget, ly.proto.Scene.SceneMarchTarget.Builder, ly.proto.Scene.SceneMarchTargetOrBuilder> targetBuilder_;
       /**
+       * <pre>
+       * 发车时确认的战斗目标及版本。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        * @return Whether the target field is set.
        */
@@ -11077,6 +14211,10 @@ public final class Scene {
         return ((bitField0_ & 0x00000010) != 0);
       }
       /**
+       * <pre>
+       * 发车时确认的战斗目标及版本。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        * @return The target.
        */
@@ -11088,6 +14226,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 发车时确认的战斗目标及版本。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public Builder setTarget(ly.proto.Scene.SceneMarchTarget value) {
@@ -11104,6 +14246,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车时确认的战斗目标及版本。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public Builder setTarget(
@@ -11118,6 +14264,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车时确认的战斗目标及版本。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public Builder mergeTarget(ly.proto.Scene.SceneMarchTarget value) {
@@ -11139,6 +14289,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车时确认的战斗目标及版本。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public Builder clearTarget() {
@@ -11152,6 +14306,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车时确认的战斗目标及版本。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public ly.proto.Scene.SceneMarchTarget.Builder getTargetBuilder() {
@@ -11160,6 +14318,10 @@ public final class Scene {
         return getTargetFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * 发车时确认的战斗目标及版本。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       public ly.proto.Scene.SceneMarchTargetOrBuilder getTargetOrBuilder() {
@@ -11171,6 +14333,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 发车时确认的战斗目标及版本。
+       * </pre>
+       *
        * <code>.SceneMarchTarget target = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -11200,6 +14366,10 @@ public final class Scene {
           ly.proto.Scene.SceneRallyMemberSnapshot, ly.proto.Scene.SceneRallyMemberSnapshot.Builder, ly.proto.Scene.SceneRallyMemberSnapshotOrBuilder> membersBuilder_;
 
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public java.util.List<ly.proto.Scene.SceneRallyMemberSnapshot> getMembersList() {
@@ -11210,6 +14380,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public int getMembersCount() {
@@ -11220,6 +14394,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public ly.proto.Scene.SceneRallyMemberSnapshot getMembers(int index) {
@@ -11230,6 +14408,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public Builder setMembers(
@@ -11247,6 +14429,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public Builder setMembers(
@@ -11261,6 +14447,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public Builder addMembers(ly.proto.Scene.SceneRallyMemberSnapshot value) {
@@ -11277,6 +14467,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public Builder addMembers(
@@ -11294,6 +14488,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public Builder addMembers(
@@ -11308,6 +14506,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public Builder addMembers(
@@ -11322,6 +14524,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public Builder addAllMembers(
@@ -11337,6 +14543,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public Builder clearMembers() {
@@ -11350,6 +14560,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public Builder removeMembers(int index) {
@@ -11363,6 +14577,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public ly.proto.Scene.SceneRallyMemberSnapshot.Builder getMembersBuilder(
@@ -11370,6 +14588,10 @@ public final class Scene {
         return getMembersFieldBuilder().getBuilder(index);
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public ly.proto.Scene.SceneRallyMemberSnapshotOrBuilder getMembersOrBuilder(
@@ -11380,6 +14602,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public java.util.List<? extends ly.proto.Scene.SceneRallyMemberSnapshotOrBuilder> 
@@ -11391,6 +14617,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public ly.proto.Scene.SceneRallyMemberSnapshot.Builder addMembersBuilder() {
@@ -11398,6 +14628,10 @@ public final class Scene {
             ly.proto.Scene.SceneRallyMemberSnapshot.getDefaultInstance());
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public ly.proto.Scene.SceneRallyMemberSnapshot.Builder addMembersBuilder(
@@ -11406,6 +14640,10 @@ public final class Scene {
             index, ly.proto.Scene.SceneRallyMemberSnapshot.getDefaultInstance());
       }
       /**
+       * <pre>
+       * 发车瞬间冻结的全部有效成员。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberSnapshot members = 6;</code>
        */
       public java.util.List<ly.proto.Scene.SceneRallyMemberSnapshot.Builder> 
@@ -11429,6 +14667,10 @@ public final class Scene {
 
       private int totalTroops_ ;
       /**
+       * <pre>
+       * 所有有效成员的冻结兵力总和。
+       * </pre>
+       *
        * <code>int32 total_troops = 7;</code>
        * @return The totalTroops.
        */
@@ -11437,6 +14679,10 @@ public final class Scene {
         return totalTroops_;
       }
       /**
+       * <pre>
+       * 所有有效成员的冻结兵力总和。
+       * </pre>
+       *
        * <code>int32 total_troops = 7;</code>
        * @param value The totalTroops to set.
        * @return This builder for chaining.
@@ -11449,6 +14695,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 所有有效成员的冻结兵力总和。
+       * </pre>
+       *
        * <code>int32 total_troops = 7;</code>
        * @return This builder for chaining.
        */
@@ -11461,6 +14711,10 @@ public final class Scene {
 
       private long totalPower_ ;
       /**
+       * <pre>
+       * 所有有效成员的冻结战力总和。
+       * </pre>
+       *
        * <code>int64 total_power = 8;</code>
        * @return The totalPower.
        */
@@ -11469,6 +14723,10 @@ public final class Scene {
         return totalPower_;
       }
       /**
+       * <pre>
+       * 所有有效成员的冻结战力总和。
+       * </pre>
+       *
        * <code>int64 total_power = 8;</code>
        * @param value The totalPower to set.
        * @return This builder for chaining.
@@ -11481,6 +14739,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 所有有效成员的冻结战力总和。
+       * </pre>
+       *
        * <code>int64 total_power = 8;</code>
        * @return This builder for chaining.
        */
@@ -11493,6 +14755,10 @@ public final class Scene {
 
       private long launchedAtMillis_ ;
       /**
+       * <pre>
+       * 实际发车时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 launched_at_millis = 9;</code>
        * @return The launchedAtMillis.
        */
@@ -11501,6 +14767,10 @@ public final class Scene {
         return launchedAtMillis_;
       }
       /**
+       * <pre>
+       * 实际发车时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 launched_at_millis = 9;</code>
        * @param value The launchedAtMillis to set.
        * @return This builder for chaining.
@@ -11513,6 +14783,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 实际发车时间戳，单位毫秒。
+       * </pre>
+       *
        * <code>int64 launched_at_millis = 9;</code>
        * @return This builder for chaining.
        */
@@ -11525,6 +14799,10 @@ public final class Scene {
 
       private int rallyVersion_ ;
       /**
+       * <pre>
+       * 发车时的集结状态版本。
+       * </pre>
+       *
        * <code>int32 rally_version = 10;</code>
        * @return The rallyVersion.
        */
@@ -11533,6 +14811,10 @@ public final class Scene {
         return rallyVersion_;
       }
       /**
+       * <pre>
+       * 发车时的集结状态版本。
+       * </pre>
+       *
        * <code>int32 rally_version = 10;</code>
        * @param value The rallyVersion to set.
        * @return This builder for chaining.
@@ -11545,6 +14827,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 发车时的集结状态版本。
+       * </pre>
+       *
        * <code>int32 rally_version = 10;</code>
        * @return This builder for chaining.
        */
@@ -11623,18 +14909,30 @@ public final class Scene {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * 成员玩家 ID。
+     * </pre>
+     *
      * <code>int64 player_id = 1;</code>
      * @return The playerId.
      */
     long getPlayerId();
 
     /**
+     * <pre>
+     * 战斗结算后的剩余兵力。
+     * </pre>
+     *
      * <code>int32 remaining_troops = 2;</code>
      * @return The remainingTroops.
      */
     int getRemainingTroops();
   }
   /**
+   * <pre>
+   * BattleServer 返回的单个集结成员战后结果。
+   * </pre>
+   *
    * Protobuf type {@code SceneRallyMemberBattleResult}
    */
   public static final class SceneRallyMemberBattleResult extends
@@ -11672,6 +14970,10 @@ public final class Scene {
     public static final int PLAYER_ID_FIELD_NUMBER = 1;
     private long playerId_ = 0L;
     /**
+     * <pre>
+     * 成员玩家 ID。
+     * </pre>
+     *
      * <code>int64 player_id = 1;</code>
      * @return The playerId.
      */
@@ -11683,6 +14985,10 @@ public final class Scene {
     public static final int REMAINING_TROOPS_FIELD_NUMBER = 2;
     private int remainingTroops_ = 0;
     /**
+     * <pre>
+     * 战斗结算后的剩余兵力。
+     * </pre>
+     *
      * <code>int32 remaining_troops = 2;</code>
      * @return The remainingTroops.
      */
@@ -11861,6 +15167,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * BattleServer 返回的单个集结成员战后结果。
+     * </pre>
+     *
      * Protobuf type {@code SceneRallyMemberBattleResult}
      */
     public static final class Builder extends
@@ -12042,6 +15352,10 @@ public final class Scene {
 
       private long playerId_ ;
       /**
+       * <pre>
+       * 成员玩家 ID。
+       * </pre>
+       *
        * <code>int64 player_id = 1;</code>
        * @return The playerId.
        */
@@ -12050,6 +15364,10 @@ public final class Scene {
         return playerId_;
       }
       /**
+       * <pre>
+       * 成员玩家 ID。
+       * </pre>
+       *
        * <code>int64 player_id = 1;</code>
        * @param value The playerId to set.
        * @return This builder for chaining.
@@ -12062,6 +15380,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 成员玩家 ID。
+       * </pre>
+       *
        * <code>int64 player_id = 1;</code>
        * @return This builder for chaining.
        */
@@ -12074,6 +15396,10 @@ public final class Scene {
 
       private int remainingTroops_ ;
       /**
+       * <pre>
+       * 战斗结算后的剩余兵力。
+       * </pre>
+       *
        * <code>int32 remaining_troops = 2;</code>
        * @return The remainingTroops.
        */
@@ -12082,6 +15408,10 @@ public final class Scene {
         return remainingTroops_;
       }
       /**
+       * <pre>
+       * 战斗结算后的剩余兵力。
+       * </pre>
+       *
        * <code>int32 remaining_troops = 2;</code>
        * @param value The remainingTroops to set.
        * @return This builder for chaining.
@@ -12094,6 +15424,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 战斗结算后的剩余兵力。
+       * </pre>
+       *
        * <code>int32 remaining_troops = 2;</code>
        * @return This builder for chaining.
        */
@@ -12172,60 +15506,104 @@ public final class Scene {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * BattleServer 生成并持久化的全局结果 ID。
+     * </pre>
+     *
      * <code>int64 battle_result_id = 1;</code>
      * @return The battleResultId.
      */
     long getBattleResultId();
 
     /**
+     * <pre>
+     * 本结果对应的集结 ID。
+     * </pre>
+     *
      * <code>int64 rally_id = 2;</code>
      * @return The rallyId.
      */
     long getRallyId();
 
     /**
+     * <pre>
+     * 战斗目标对象 ID。
+     * </pre>
+     *
      * <code>int64 target_id = 3;</code>
      * @return The targetId.
      */
     long getTargetId();
 
     /**
+     * <pre>
+     * BattleServer 结算时使用的目标状态版本。
+     * </pre>
+     *
      * <code>int64 target_version = 4;</code>
      * @return The targetVersion.
      */
     long getTargetVersion();
 
     /**
+     * <pre>
+     * 进攻方是否胜利。
+     * </pre>
+     *
      * <code>bool victory = 5;</code>
      * @return The victory.
      */
     boolean getVictory();
 
     /**
+     * <pre>
+     * 本次战斗对目标造成的耐久损失。
+     * </pre>
+     *
      * <code>int32 target_durability_loss = 6;</code>
      * @return The targetDurabilityLoss.
      */
     int getTargetDurabilityLoss();
 
     /**
+     * <pre>
+     * 各集结成员的战后结果。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
      */
     java.util.List<ly.proto.Scene.SceneRallyMemberBattleResult> 
         getMemberResultsList();
     /**
+     * <pre>
+     * 各集结成员的战后结果。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
      */
     ly.proto.Scene.SceneRallyMemberBattleResult getMemberResults(int index);
     /**
+     * <pre>
+     * 各集结成员的战后结果。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
      */
     int getMemberResultsCount();
     /**
+     * <pre>
+     * 各集结成员的战后结果。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
      */
     java.util.List<? extends ly.proto.Scene.SceneRallyMemberBattleResultOrBuilder> 
         getMemberResultsOrBuilderList();
     /**
+     * <pre>
+     * 各集结成员的战后结果。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
      */
     ly.proto.Scene.SceneRallyMemberBattleResultOrBuilder getMemberResultsOrBuilder(
@@ -12274,6 +15652,10 @@ public final class Scene {
     public static final int BATTLE_RESULT_ID_FIELD_NUMBER = 1;
     private long battleResultId_ = 0L;
     /**
+     * <pre>
+     * BattleServer 生成并持久化的全局结果 ID。
+     * </pre>
+     *
      * <code>int64 battle_result_id = 1;</code>
      * @return The battleResultId.
      */
@@ -12285,6 +15667,10 @@ public final class Scene {
     public static final int RALLY_ID_FIELD_NUMBER = 2;
     private long rallyId_ = 0L;
     /**
+     * <pre>
+     * 本结果对应的集结 ID。
+     * </pre>
+     *
      * <code>int64 rally_id = 2;</code>
      * @return The rallyId.
      */
@@ -12296,6 +15682,10 @@ public final class Scene {
     public static final int TARGET_ID_FIELD_NUMBER = 3;
     private long targetId_ = 0L;
     /**
+     * <pre>
+     * 战斗目标对象 ID。
+     * </pre>
+     *
      * <code>int64 target_id = 3;</code>
      * @return The targetId.
      */
@@ -12307,6 +15697,10 @@ public final class Scene {
     public static final int TARGET_VERSION_FIELD_NUMBER = 4;
     private long targetVersion_ = 0L;
     /**
+     * <pre>
+     * BattleServer 结算时使用的目标状态版本。
+     * </pre>
+     *
      * <code>int64 target_version = 4;</code>
      * @return The targetVersion.
      */
@@ -12318,6 +15712,10 @@ public final class Scene {
     public static final int VICTORY_FIELD_NUMBER = 5;
     private boolean victory_ = false;
     /**
+     * <pre>
+     * 进攻方是否胜利。
+     * </pre>
+     *
      * <code>bool victory = 5;</code>
      * @return The victory.
      */
@@ -12329,6 +15727,10 @@ public final class Scene {
     public static final int TARGET_DURABILITY_LOSS_FIELD_NUMBER = 6;
     private int targetDurabilityLoss_ = 0;
     /**
+     * <pre>
+     * 本次战斗对目标造成的耐久损失。
+     * </pre>
+     *
      * <code>int32 target_durability_loss = 6;</code>
      * @return The targetDurabilityLoss.
      */
@@ -12341,6 +15743,10 @@ public final class Scene {
     @SuppressWarnings("serial")
     private java.util.List<ly.proto.Scene.SceneRallyMemberBattleResult> memberResults_;
     /**
+     * <pre>
+     * 各集结成员的战后结果。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
      */
     @java.lang.Override
@@ -12348,6 +15754,10 @@ public final class Scene {
       return memberResults_;
     }
     /**
+     * <pre>
+     * 各集结成员的战后结果。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
      */
     @java.lang.Override
@@ -12356,6 +15766,10 @@ public final class Scene {
       return memberResults_;
     }
     /**
+     * <pre>
+     * 各集结成员的战后结果。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
      */
     @java.lang.Override
@@ -12363,6 +15777,10 @@ public final class Scene {
       return memberResults_.size();
     }
     /**
+     * <pre>
+     * 各集结成员的战后结果。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
      */
     @java.lang.Override
@@ -12370,6 +15788,10 @@ public final class Scene {
       return memberResults_.get(index);
     }
     /**
+     * <pre>
+     * 各集结成员的战后结果。
+     * </pre>
+     *
      * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
      */
     @java.lang.Override
@@ -12901,6 +16323,10 @@ public final class Scene {
 
       private long battleResultId_ ;
       /**
+       * <pre>
+       * BattleServer 生成并持久化的全局结果 ID。
+       * </pre>
+       *
        * <code>int64 battle_result_id = 1;</code>
        * @return The battleResultId.
        */
@@ -12909,6 +16335,10 @@ public final class Scene {
         return battleResultId_;
       }
       /**
+       * <pre>
+       * BattleServer 生成并持久化的全局结果 ID。
+       * </pre>
+       *
        * <code>int64 battle_result_id = 1;</code>
        * @param value The battleResultId to set.
        * @return This builder for chaining.
@@ -12921,6 +16351,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * BattleServer 生成并持久化的全局结果 ID。
+       * </pre>
+       *
        * <code>int64 battle_result_id = 1;</code>
        * @return This builder for chaining.
        */
@@ -12933,6 +16367,10 @@ public final class Scene {
 
       private long rallyId_ ;
       /**
+       * <pre>
+       * 本结果对应的集结 ID。
+       * </pre>
+       *
        * <code>int64 rally_id = 2;</code>
        * @return The rallyId.
        */
@@ -12941,6 +16379,10 @@ public final class Scene {
         return rallyId_;
       }
       /**
+       * <pre>
+       * 本结果对应的集结 ID。
+       * </pre>
+       *
        * <code>int64 rally_id = 2;</code>
        * @param value The rallyId to set.
        * @return This builder for chaining.
@@ -12953,6 +16395,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 本结果对应的集结 ID。
+       * </pre>
+       *
        * <code>int64 rally_id = 2;</code>
        * @return This builder for chaining.
        */
@@ -12965,6 +16411,10 @@ public final class Scene {
 
       private long targetId_ ;
       /**
+       * <pre>
+       * 战斗目标对象 ID。
+       * </pre>
+       *
        * <code>int64 target_id = 3;</code>
        * @return The targetId.
        */
@@ -12973,6 +16423,10 @@ public final class Scene {
         return targetId_;
       }
       /**
+       * <pre>
+       * 战斗目标对象 ID。
+       * </pre>
+       *
        * <code>int64 target_id = 3;</code>
        * @param value The targetId to set.
        * @return This builder for chaining.
@@ -12985,6 +16439,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 战斗目标对象 ID。
+       * </pre>
+       *
        * <code>int64 target_id = 3;</code>
        * @return This builder for chaining.
        */
@@ -12997,6 +16455,10 @@ public final class Scene {
 
       private long targetVersion_ ;
       /**
+       * <pre>
+       * BattleServer 结算时使用的目标状态版本。
+       * </pre>
+       *
        * <code>int64 target_version = 4;</code>
        * @return The targetVersion.
        */
@@ -13005,6 +16467,10 @@ public final class Scene {
         return targetVersion_;
       }
       /**
+       * <pre>
+       * BattleServer 结算时使用的目标状态版本。
+       * </pre>
+       *
        * <code>int64 target_version = 4;</code>
        * @param value The targetVersion to set.
        * @return This builder for chaining.
@@ -13017,6 +16483,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * BattleServer 结算时使用的目标状态版本。
+       * </pre>
+       *
        * <code>int64 target_version = 4;</code>
        * @return This builder for chaining.
        */
@@ -13029,6 +16499,10 @@ public final class Scene {
 
       private boolean victory_ ;
       /**
+       * <pre>
+       * 进攻方是否胜利。
+       * </pre>
+       *
        * <code>bool victory = 5;</code>
        * @return The victory.
        */
@@ -13037,6 +16511,10 @@ public final class Scene {
         return victory_;
       }
       /**
+       * <pre>
+       * 进攻方是否胜利。
+       * </pre>
+       *
        * <code>bool victory = 5;</code>
        * @param value The victory to set.
        * @return This builder for chaining.
@@ -13049,6 +16527,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 进攻方是否胜利。
+       * </pre>
+       *
        * <code>bool victory = 5;</code>
        * @return This builder for chaining.
        */
@@ -13061,6 +16543,10 @@ public final class Scene {
 
       private int targetDurabilityLoss_ ;
       /**
+       * <pre>
+       * 本次战斗对目标造成的耐久损失。
+       * </pre>
+       *
        * <code>int32 target_durability_loss = 6;</code>
        * @return The targetDurabilityLoss.
        */
@@ -13069,6 +16555,10 @@ public final class Scene {
         return targetDurabilityLoss_;
       }
       /**
+       * <pre>
+       * 本次战斗对目标造成的耐久损失。
+       * </pre>
+       *
        * <code>int32 target_durability_loss = 6;</code>
        * @param value The targetDurabilityLoss to set.
        * @return This builder for chaining.
@@ -13081,6 +16571,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 本次战斗对目标造成的耐久损失。
+       * </pre>
+       *
        * <code>int32 target_durability_loss = 6;</code>
        * @return This builder for chaining.
        */
@@ -13104,6 +16598,10 @@ public final class Scene {
           ly.proto.Scene.SceneRallyMemberBattleResult, ly.proto.Scene.SceneRallyMemberBattleResult.Builder, ly.proto.Scene.SceneRallyMemberBattleResultOrBuilder> memberResultsBuilder_;
 
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public java.util.List<ly.proto.Scene.SceneRallyMemberBattleResult> getMemberResultsList() {
@@ -13114,6 +16612,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public int getMemberResultsCount() {
@@ -13124,6 +16626,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public ly.proto.Scene.SceneRallyMemberBattleResult getMemberResults(int index) {
@@ -13134,6 +16640,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public Builder setMemberResults(
@@ -13151,6 +16661,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public Builder setMemberResults(
@@ -13165,6 +16679,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public Builder addMemberResults(ly.proto.Scene.SceneRallyMemberBattleResult value) {
@@ -13181,6 +16699,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public Builder addMemberResults(
@@ -13198,6 +16720,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public Builder addMemberResults(
@@ -13212,6 +16738,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public Builder addMemberResults(
@@ -13226,6 +16756,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public Builder addAllMemberResults(
@@ -13241,6 +16775,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public Builder clearMemberResults() {
@@ -13254,6 +16792,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public Builder removeMemberResults(int index) {
@@ -13267,6 +16809,10 @@ public final class Scene {
         return this;
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public ly.proto.Scene.SceneRallyMemberBattleResult.Builder getMemberResultsBuilder(
@@ -13274,6 +16820,10 @@ public final class Scene {
         return getMemberResultsFieldBuilder().getBuilder(index);
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public ly.proto.Scene.SceneRallyMemberBattleResultOrBuilder getMemberResultsOrBuilder(
@@ -13284,6 +16834,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public java.util.List<? extends ly.proto.Scene.SceneRallyMemberBattleResultOrBuilder> 
@@ -13295,6 +16849,10 @@ public final class Scene {
         }
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public ly.proto.Scene.SceneRallyMemberBattleResult.Builder addMemberResultsBuilder() {
@@ -13302,6 +16860,10 @@ public final class Scene {
             ly.proto.Scene.SceneRallyMemberBattleResult.getDefaultInstance());
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public ly.proto.Scene.SceneRallyMemberBattleResult.Builder addMemberResultsBuilder(
@@ -13310,6 +16872,10 @@ public final class Scene {
             index, ly.proto.Scene.SceneRallyMemberBattleResult.getDefaultInstance());
       }
       /**
+       * <pre>
+       * 各集结成员的战后结果。
+       * </pre>
+       *
        * <code>repeated .SceneRallyMemberBattleResult member_results = 7;</code>
        */
       public java.util.List<ly.proto.Scene.SceneRallyMemberBattleResult.Builder> 
@@ -14618,6 +18184,10 @@ public final class Scene {
     int getRadius();
   }
   /**
+   * <pre>
+   * 查询指定坐标附近场景信息的请求；主要用于点选地图格和轻量服务间查询。
+   * </pre>
+   *
    * Protobuf type {@code csSceneQuery}
    */
   public static final class csSceneQuery extends
@@ -14975,6 +18545,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 查询指定坐标附近场景信息的请求；主要用于点选地图格和轻量服务间查询。
+     * </pre>
+     *
      * Protobuf type {@code csSceneQuery}
      */
     public static final class Builder extends
@@ -15754,6 +19328,10 @@ public final class Scene {
         int index);
   }
   /**
+   * <pre>
+   * 指定坐标附近场景信息的查询结果。
+   * </pre>
+   *
    * Protobuf type {@code scSceneQuery}
    */
   public static final class scSceneQuery extends
@@ -16209,6 +19787,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 指定坐标附近场景信息的查询结果。
+     * </pre>
+     *
      * Protobuf type {@code scSceneQuery}
      */
     public static final class Builder extends
@@ -17304,6 +20886,10 @@ public final class Scene {
     long getRequestId();
   }
   /**
+   * <pre>
+   * 玩家进入本服或跨服场景的请求。
+   * </pre>
+   *
    * Protobuf type {@code csSceneEnter}
    */
   public static final class csSceneEnter extends
@@ -17689,6 +21275,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 玩家进入本服或跨服场景的请求。
+     * </pre>
+     *
      * Protobuf type {@code csSceneEnter}
      */
     public static final class Builder extends
@@ -18487,6 +22077,10 @@ public final class Scene {
     long getRequestId();
   }
   /**
+   * <pre>
+   * 玩家进入场景后的权威位置和所属分片。
+   * </pre>
+   *
    * Protobuf type {@code scSceneEnter}
    */
   public static final class scSceneEnter extends
@@ -18871,6 +22465,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 玩家进入场景后的权威位置和所属分片。
+     * </pre>
+     *
      * Protobuf type {@code scSceneEnter}
      */
     public static final class Builder extends
@@ -19669,6 +23267,10 @@ public final class Scene {
     long getRequestId();
   }
   /**
+   * <pre>
+   * 请求把玩家场景实体移动到目标坐标；服务端仍会校验地形、迷雾和分片边界。
+   * </pre>
+   *
    * Protobuf type {@code csSceneMove}
    */
   public static final class csSceneMove extends
@@ -20054,6 +23656,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 请求把玩家场景实体移动到目标坐标；服务端仍会校验地形、迷雾和分片边界。
+     * </pre>
+     *
      * Protobuf type {@code csSceneMove}
      */
     public static final class Builder extends
@@ -20852,6 +24458,10 @@ public final class Scene {
     long getRequestId();
   }
   /**
+   * <pre>
+   * 玩家移动请求的处理结果和服务端权威坐标。
+   * </pre>
+   *
    * Protobuf type {@code scSceneMove}
    */
   public static final class scSceneMove extends
@@ -21236,6 +24846,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 玩家移动请求的处理结果和服务端权威坐标。
+     * </pre>
+     *
      * Protobuf type {@code scSceneMove}
      */
     public static final class Builder extends
@@ -21987,6 +25601,10 @@ public final class Scene {
     ly.proto.Scene.SceneScope getScope();
   }
   /**
+   * <pre>
+   * 查询指定场景基础容量和运行指标的请求。
+   * </pre>
+   *
    * Protobuf type {@code csSceneMetrics}
    */
   public static final class csSceneMetrics extends
@@ -22263,6 +25881,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 查询指定场景基础容量和运行指标的请求。
+     * </pre>
+     *
      * Protobuf type {@code csSceneMetrics}
      */
     public static final class Builder extends
@@ -22786,6 +26408,10 @@ public final class Scene {
     int getOnlineTarget();
   }
   /**
+   * <pre>
+   * 指定场景的地图规模、逻辑分片、Tick 和动态对象指标。
+   * </pre>
+   *
    * Protobuf type {@code scSceneMetrics}
    */
   public static final class scSceneMetrics extends
@@ -23246,6 +26872,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 指定场景的地图规模、逻辑分片、Tick 和动态对象指标。
+     * </pre>
+     *
      * Protobuf type {@code scSceneMetrics}
      */
     public static final class Builder extends
@@ -24111,6 +27741,10 @@ public final class Scene {
     long getRequestId();
   }
   /**
+   * <pre>
+   * 玩家主动离开、切换或退出当前场景的请求。
+   * </pre>
+   *
    * Protobuf type {@code csSceneLeave}
    */
   public static final class csSceneLeave extends
@@ -24441,6 +28075,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 玩家主动离开、切换或退出当前场景的请求。
+     * </pre>
+     *
      * Protobuf type {@code csSceneLeave}
      */
     public static final class Builder extends
@@ -25026,6 +28664,10 @@ public final class Scene {
     long getRequestId();
   }
   /**
+   * <pre>
+   * 玩家离开场景后的确认响应。
+   * </pre>
+   *
    * Protobuf type {@code scSceneLeave}
    */
   public static final class scSceneLeave extends
@@ -25356,6 +28998,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 玩家离开场景后的确认响应。
+     * </pre>
+     *
      * Protobuf type {@code scSceneLeave}
      */
     public static final class Builder extends
@@ -26007,6 +29653,10 @@ public final class Scene {
     long getRequestId();
   }
   /**
+   * <pre>
+   * 更新玩家相机视野、AOI 订阅块和缩放数据层级的请求。
+   * </pre>
+   *
    * Protobuf type {@code csSceneView}
    */
   public static final class csSceneView extends
@@ -26482,6 +30132,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 更新玩家相机视野、AOI 订阅块和缩放数据层级的请求。
+     * </pre>
+     *
      * Protobuf type {@code csSceneView}
      */
     public static final class Builder extends
@@ -27623,6 +31277,10 @@ public final class Scene {
     long getRequestId();
   }
   /**
+   * <pre>
+   * 按玩家独立战争迷雾和缩放层级裁剪后的 AOI 视野快照。
+   * </pre>
+   *
    * Protobuf type {@code scSceneView}
    */
   public static final class scSceneView extends
@@ -28293,6 +31951,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 按玩家独立战争迷雾和缩放层级裁剪后的 AOI 视野快照。
+     * </pre>
+     *
      * Protobuf type {@code scSceneView}
      */
     public static final class Builder extends
@@ -30172,6 +33834,10 @@ public final class Scene {
     long getRequestId();
   }
   /**
+   * <pre>
+   * 提交异步 A* 寻路任务的请求；计算在线程池完成，结果回投所属 SceneShard。
+   * </pre>
+   *
    * Protobuf type {@code csScenePathFind}
    */
   public static final class csScenePathFind extends
@@ -30674,6 +34340,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * 提交异步 A* 寻路任务的请求；计算在线程池完成，结果回投所属 SceneShard。
+     * </pre>
+     *
      * Protobuf type {@code csScenePathFind}
      */
     public static final class Builder extends
@@ -31829,6 +35499,10 @@ public final class Scene {
     long getCompletedTick();
   }
   /**
+   * <pre>
+   * A* 寻路结果，包含权威路径、计算成本和回投 Tick。
+   * </pre>
+   *
    * Protobuf type {@code scScenePathFind}
    */
   public static final class scScenePathFind extends
@@ -32286,6 +35960,10 @@ public final class Scene {
       return builder;
     }
     /**
+     * <pre>
+     * A* 寻路结果，包含权威路径、计算成本和回投 Tick。
+     * </pre>
+     *
      * Protobuf type {@code scScenePathFind}
      */
     public static final class Builder extends
@@ -33296,6 +36974,11 @@ public final class Scene {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ScenePoint_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ScenePersistentObjectState_descriptor;
+  private static final
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_ScenePersistentObjectState_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_SceneObjectSnapshot_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -33420,161 +37103,167 @@ public final class Scene {
   static {
     java.lang.String[] descriptorData = {
       "\n\013Scene.proto\032\016ErrorMsg.proto\"\"\n\nScenePo" +
-      "int\022\t\n\001x\030\001 \001(\005\022\t\n\001y\030\002 \001(\005\"\354\001\n\023SceneObjec" +
-      "tSnapshot\022\021\n\tobject_id\030\001 \001(\003\022\036\n\004kind\030\002 \001" +
-      "(\0162\020.SceneObjectKind\022\020\n\010owner_id\030\003 \001(\003\022\032" +
-      "\n\005point\030\004 \001(\0132\013.ScenePoint\022\025\n\rstate_vers" +
-      "ion\030\005 \001(\005\022\025\n\rdata_tag_mask\030\006 \001(\004\022\"\n\005marc" +
-      "h\030\007 \001(\0132\023.SceneMarchSnapshot\022\"\n\005rally\030\010 " +
-      "\001(\0132\023.SceneRallySnapshot\"\213\001\n\020SceneMarchT" +
-      "arget\022\021\n\ttarget_id\030\001 \001(\003\022\036\n\004type\030\002 \001(\0162\020" +
-      ".SceneTargetType\022\032\n\005point\030\003 \001(\0132\013.SceneP" +
-      "oint\022\020\n\010tag_mask\030\004 \001(\004\022\026\n\016target_version" +
-      "\030\005 \001(\003\"\246\003\n\022SceneMarchSnapshot\022\020\n\010march_i" +
-      "d\030\001 \001(\003\022\027\n\017owner_player_id\030\002 \001(\003\022\023\n\013alli" +
-      "ance_id\030\003 \001(\003\022\035\n\004type\030\004 \001(\0162\017.SceneMarch" +
-      "Type\022\020\n\010tag_mask\030\005 \001(\004\022!\n\006status\030\006 \001(\0162\021" +
-      ".SceneMarchStatus\022\033\n\006origin\030\007 \001(\0132\013.Scen" +
-      "ePoint\022!\n\006target\030\010 \001(\0132\021.SceneMarchTarge" +
-      "t\022\031\n\004path\030\t \003(\0132\013.ScenePoint\022\022\n\npath_ind" +
-      "ex\030\n \001(\005\022\023\n\013troop_count\030\013 \001(\005\022\r\n\005power\030\014" +
-      " \001(\003\022\035\n\025army_snapshot_version\030\r \001(\003\022\030\n\020d" +
-      "epart_at_millis\030\016 \001(\003\022\031\n\021arrival_at_mill" +
-      "is\030\017 \001(\003\022\025\n\rstate_version\030\020 \001(\005\"\305\001\n\030Scen" +
-      "eRallyMemberSnapshot\022\021\n\tplayer_id\030\001 \001(\003\022" +
-      "\020\n\010march_id\030\002 \001(\003\022\023\n\013troop_count\030\003 \001(\005\022\r" +
-      "\n\005power\030\004 \001(\003\022\035\n\025army_snapshot_version\030\005" +
-      " \001(\003\022\'\n\006status\030\006 \001(\0162\027.SceneRallyMemberS" +
-      "tatus\022\030\n\020remaining_troops\030\007 \001(\005\"\373\002\n\022Scen" +
-      "eRallySnapshot\022\020\n\010rally_id\030\001 \001(\003\022\030\n\020lead" +
-      "er_player_id\030\002 \001(\003\022\023\n\013alliance_id\030\003 \001(\003\022" +
-      "#\n\016assembly_point\030\004 \001(\0132\013.ScenePoint\022!\n\006" +
-      "target\030\005 \001(\0132\021.SceneMarchTarget\022\020\n\010capac" +
-      "ity\030\006 \001(\005\022\027\n\017minimum_members\030\007 \001(\005\022\030\n\020la" +
-      "unch_at_millis\030\010 \001(\003\022!\n\006status\030\t \001(\0162\021.S" +
-      "ceneRallyStatus\022*\n\007members\030\n \003(\0132\031.Scene" +
-      "RallyMemberSnapshot\022 \n\030applied_battle_re" +
-      "sult_id\030\013 \001(\003\022\017\n\007victory\030\014 \001(\010\022\025\n\rstate_" +
-      "version\030\r \001(\005\"\255\002\n\030SceneRallyLaunchSnapsh" +
-      "ot\022\020\n\010rally_id\030\001 \001(\003\022\030\n\020leader_player_id" +
-      "\030\002 \001(\003\022\023\n\013alliance_id\030\003 \001(\003\022#\n\016assembly_" +
-      "point\030\004 \001(\0132\013.ScenePoint\022!\n\006target\030\005 \001(\013" +
-      "2\021.SceneMarchTarget\022*\n\007members\030\006 \003(\0132\031.S" +
-      "ceneRallyMemberSnapshot\022\024\n\014total_troops\030" +
-      "\007 \001(\005\022\023\n\013total_power\030\010 \001(\003\022\032\n\022launched_a" +
-      "t_millis\030\t \001(\003\022\025\n\rrally_version\030\n \001(\005\"K\n" +
-      "\034SceneRallyMemberBattleResult\022\021\n\tplayer_" +
-      "id\030\001 \001(\003\022\030\n\020remaining_troops\030\002 \001(\005\"\327\001\n\026S" +
-      "ceneRallyBattleResult\022\030\n\020battle_result_i" +
-      "d\030\001 \001(\003\022\020\n\010rally_id\030\002 \001(\003\022\021\n\ttarget_id\030\003" +
-      " \001(\003\022\026\n\016target_version\030\004 \001(\003\022\017\n\007victory\030" +
-      "\005 \001(\010\022\036\n\026target_durability_loss\030\006 \001(\005\0225\n" +
-      "\016member_results\030\007 \003(\0132\035.SceneRallyMember" +
-      "BattleResult\"\235\001\n\022SceneBlockSnapshot\022\023\n\013b" +
-      "lock_index\030\001 \001(\005\022 \n\013block_point\030\002 \001(\0132\013." +
-      "ScenePoint\022\017\n\007visible\030\003 \001(\010\022\022\n\ndiscovere" +
-      "d\030\004 \001(\010\022\024\n\014object_count\030\005 \001(\005\022\025\n\rdata_ta" +
-      "g_mask\030\006 \001(\004\"h\n\014csSceneQuery\022\020\n\010scene_id" +
-      "\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.SceneScope\022\032\n\005po" +
-      "int\030\003 \001(\0132\013.ScenePoint\022\016\n\006radius\030\004 \001(\005\"\255" +
-      "\001\n\014scSceneQuery\022\032\n\006result\030\001 \001(\0162\n.ErrorC" +
-      "ode\022\020\n\010scene_id\030\002 \001(\t\022\017\n\007terrain\030\003 \001(\005\022\021" +
-      "\n\tconfig_id\030\004 \001(\005\022\r\n\005flags\030\005 \001(\005\022\025\n\rspaw" +
-      "n_rule_id\030\006 \001(\005\022%\n\007objects\030\007 \003(\0132\024.Scene" +
-      "ObjectSnapshot\"\177\n\014csSceneEnter\022\020\n\010scene_" +
-      "id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.SceneScope\022\021\n\t" +
-      "player_id\030\003 \001(\003\022\032\n\005point\030\004 \001(\0132\013.ScenePo" +
-      "int\022\022\n\nrequest_id\030\005 \001(\003\"\211\001\n\014scSceneEnter" +
-      "\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene_id" +
-      "\030\002 \001(\t\022\023\n\013shard_index\030\003 \001(\005\022\"\n\rcurrent_p" +
-      "oint\030\004 \001(\0132\013.ScenePoint\022\022\n\nrequest_id\030\005 " +
-      "\001(\003\"\205\001\n\013csSceneMove\022\020\n\010scene_id\030\001 \001(\t\022\032\n" +
-      "\005scope\030\002 \001(\0162\013.SceneScope\022\021\n\tplayer_id\030\003" +
-      " \001(\003\022!\n\014target_point\030\004 \001(\0132\013.ScenePoint\022" +
-      "\022\n\nrequest_id\030\005 \001(\003\"\210\001\n\013scSceneMove\022\032\n\006r" +
+      "int\022\t\n\001x\030\001 \001(\005\022\t\n\001y\030\002 \001(\005\"\347\001\n\032ScenePersi" +
+      "stentObjectState\022\024\n\014data_version\030\001 \001(\005\022\021" +
+      "\n\tconfig_id\030\002 \001(\005\022\017\n\007rule_id\030\003 \001(\005\022\r\n\005le" +
+      "vel\030\004 \001(\005\022\016\n\006amount\030\005 \001(\003\022\016\n\006health\030\006 \001(" +
+      "\003\022\031\n\021refresh_at_millis\030\007 \001(\003\022\030\n\020expire_a" +
+      "t_millis\030\010 \001(\003\022\023\n\013state_flags\030\t \001(\004\022\026\n\016e" +
+      "xtension_data\030\n \001(\014\"\354\001\n\023SceneObjectSnaps" +
+      "hot\022\021\n\tobject_id\030\001 \001(\003\022\036\n\004kind\030\002 \001(\0162\020.S" +
+      "ceneObjectKind\022\020\n\010owner_id\030\003 \001(\003\022\032\n\005poin" +
+      "t\030\004 \001(\0132\013.ScenePoint\022\025\n\rstate_version\030\005 " +
+      "\001(\005\022\025\n\rdata_tag_mask\030\006 \001(\004\022\"\n\005march\030\007 \001(" +
+      "\0132\023.SceneMarchSnapshot\022\"\n\005rally\030\010 \001(\0132\023." +
+      "SceneRallySnapshot\"\213\001\n\020SceneMarchTarget\022" +
+      "\021\n\ttarget_id\030\001 \001(\003\022\036\n\004type\030\002 \001(\0162\020.Scene" +
+      "TargetType\022\032\n\005point\030\003 \001(\0132\013.ScenePoint\022\020" +
+      "\n\010tag_mask\030\004 \001(\004\022\026\n\016target_version\030\005 \001(\003" +
+      "\"\246\003\n\022SceneMarchSnapshot\022\020\n\010march_id\030\001 \001(" +
+      "\003\022\027\n\017owner_player_id\030\002 \001(\003\022\023\n\013alliance_i" +
+      "d\030\003 \001(\003\022\035\n\004type\030\004 \001(\0162\017.SceneMarchType\022\020" +
+      "\n\010tag_mask\030\005 \001(\004\022!\n\006status\030\006 \001(\0162\021.Scene" +
+      "MarchStatus\022\033\n\006origin\030\007 \001(\0132\013.ScenePoint" +
+      "\022!\n\006target\030\010 \001(\0132\021.SceneMarchTarget\022\031\n\004p" +
+      "ath\030\t \003(\0132\013.ScenePoint\022\022\n\npath_index\030\n \001" +
+      "(\005\022\023\n\013troop_count\030\013 \001(\005\022\r\n\005power\030\014 \001(\003\022\035" +
+      "\n\025army_snapshot_version\030\r \001(\003\022\030\n\020depart_" +
+      "at_millis\030\016 \001(\003\022\031\n\021arrival_at_millis\030\017 \001" +
+      "(\003\022\025\n\rstate_version\030\020 \001(\005\"\305\001\n\030SceneRally" +
+      "MemberSnapshot\022\021\n\tplayer_id\030\001 \001(\003\022\020\n\010mar" +
+      "ch_id\030\002 \001(\003\022\023\n\013troop_count\030\003 \001(\005\022\r\n\005powe" +
+      "r\030\004 \001(\003\022\035\n\025army_snapshot_version\030\005 \001(\003\022\'" +
+      "\n\006status\030\006 \001(\0162\027.SceneRallyMemberStatus\022" +
+      "\030\n\020remaining_troops\030\007 \001(\005\"\373\002\n\022SceneRally" +
+      "Snapshot\022\020\n\010rally_id\030\001 \001(\003\022\030\n\020leader_pla" +
+      "yer_id\030\002 \001(\003\022\023\n\013alliance_id\030\003 \001(\003\022#\n\016ass" +
+      "embly_point\030\004 \001(\0132\013.ScenePoint\022!\n\006target" +
+      "\030\005 \001(\0132\021.SceneMarchTarget\022\020\n\010capacity\030\006 " +
+      "\001(\005\022\027\n\017minimum_members\030\007 \001(\005\022\030\n\020launch_a" +
+      "t_millis\030\010 \001(\003\022!\n\006status\030\t \001(\0162\021.SceneRa" +
+      "llyStatus\022*\n\007members\030\n \003(\0132\031.SceneRallyM" +
+      "emberSnapshot\022 \n\030applied_battle_result_i" +
+      "d\030\013 \001(\003\022\017\n\007victory\030\014 \001(\010\022\025\n\rstate_versio" +
+      "n\030\r \001(\005\"\255\002\n\030SceneRallyLaunchSnapshot\022\020\n\010" +
+      "rally_id\030\001 \001(\003\022\030\n\020leader_player_id\030\002 \001(\003" +
+      "\022\023\n\013alliance_id\030\003 \001(\003\022#\n\016assembly_point\030" +
+      "\004 \001(\0132\013.ScenePoint\022!\n\006target\030\005 \001(\0132\021.Sce" +
+      "neMarchTarget\022*\n\007members\030\006 \003(\0132\031.SceneRa" +
+      "llyMemberSnapshot\022\024\n\014total_troops\030\007 \001(\005\022" +
+      "\023\n\013total_power\030\010 \001(\003\022\032\n\022launched_at_mill" +
+      "is\030\t \001(\003\022\025\n\rrally_version\030\n \001(\005\"K\n\034Scene" +
+      "RallyMemberBattleResult\022\021\n\tplayer_id\030\001 \001" +
+      "(\003\022\030\n\020remaining_troops\030\002 \001(\005\"\327\001\n\026SceneRa" +
+      "llyBattleResult\022\030\n\020battle_result_id\030\001 \001(" +
+      "\003\022\020\n\010rally_id\030\002 \001(\003\022\021\n\ttarget_id\030\003 \001(\003\022\026" +
+      "\n\016target_version\030\004 \001(\003\022\017\n\007victory\030\005 \001(\010\022" +
+      "\036\n\026target_durability_loss\030\006 \001(\005\0225\n\016membe" +
+      "r_results\030\007 \003(\0132\035.SceneRallyMemberBattle" +
+      "Result\"\235\001\n\022SceneBlockSnapshot\022\023\n\013block_i" +
+      "ndex\030\001 \001(\005\022 \n\013block_point\030\002 \001(\0132\013.SceneP" +
+      "oint\022\017\n\007visible\030\003 \001(\010\022\022\n\ndiscovered\030\004 \001(" +
+      "\010\022\024\n\014object_count\030\005 \001(\005\022\025\n\rdata_tag_mask" +
+      "\030\006 \001(\004\"h\n\014csSceneQuery\022\020\n\010scene_id\030\001 \001(\t" +
+      "\022\032\n\005scope\030\002 \001(\0162\013.SceneScope\022\032\n\005point\030\003 " +
+      "\001(\0132\013.ScenePoint\022\016\n\006radius\030\004 \001(\005\"\255\001\n\014scS" +
+      "ceneQuery\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\020\n" +
+      "\010scene_id\030\002 \001(\t\022\017\n\007terrain\030\003 \001(\005\022\021\n\tconf" +
+      "ig_id\030\004 \001(\005\022\r\n\005flags\030\005 \001(\005\022\025\n\rspawn_rule" +
+      "_id\030\006 \001(\005\022%\n\007objects\030\007 \003(\0132\024.SceneObject" +
+      "Snapshot\"\177\n\014csSceneEnter\022\020\n\010scene_id\030\001 \001" +
+      "(\t\022\032\n\005scope\030\002 \001(\0162\013.SceneScope\022\021\n\tplayer" +
+      "_id\030\003 \001(\003\022\032\n\005point\030\004 \001(\0132\013.ScenePoint\022\022\n" +
+      "\nrequest_id\030\005 \001(\003\"\211\001\n\014scSceneEnter\022\032\n\006re" +
+      "sult\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene_id\030\002 \001(\t" +
+      "\022\023\n\013shard_index\030\003 \001(\005\022\"\n\rcurrent_point\030\004" +
+      " \001(\0132\013.ScenePoint\022\022\n\nrequest_id\030\005 \001(\003\"\205\001" +
+      "\n\013csSceneMove\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope" +
+      "\030\002 \001(\0162\013.SceneScope\022\021\n\tplayer_id\030\003 \001(\003\022!" +
+      "\n\014target_point\030\004 \001(\0132\013.ScenePoint\022\022\n\nreq" +
+      "uest_id\030\005 \001(\003\"\210\001\n\013scSceneMove\022\032\n\006result\030" +
+      "\001 \001(\0162\n.ErrorCode\022\020\n\010scene_id\030\002 \001(\t\022\023\n\013s" +
+      "hard_index\030\003 \001(\005\022\"\n\rcurrent_point\030\004 \001(\0132" +
+      "\013.ScenePoint\022\022\n\nrequest_id\030\005 \001(\003\">\n\016csSc" +
+      "eneMetrics\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope\030\002 " +
+      "\001(\0162\013.SceneScope\"\316\001\n\016scSceneMetrics\022\032\n\006r" +
       "esult\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene_id\030\002 \001(" +
-      "\t\022\023\n\013shard_index\030\003 \001(\005\022\"\n\rcurrent_point\030" +
-      "\004 \001(\0132\013.ScenePoint\022\022\n\nrequest_id\030\005 \001(\003\">" +
-      "\n\016csSceneMetrics\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005sc" +
-      "ope\030\002 \001(\0162\013.SceneScope\"\316\001\n\016scSceneMetric" +
-      "s\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene_i" +
-      "d\030\002 \001(\t\022\r\n\005width\030\003 \001(\005\022\016\n\006height\030\004 \001(\005\022\023" +
-      "\n\013shard_count\030\005 \001(\005\022\023\n\013tick_number\030\006 \001(\003" +
-      "\022\030\n\020last_tick_millis\030\007 \001(\003\022\024\n\014object_cou" +
-      "nt\030\010 \001(\005\022\025\n\ronline_target\030\t \001(\005\"c\n\014csSce" +
-      "neLeave\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\016" +
-      "2\013.SceneScope\022\021\n\tplayer_id\030\003 \001(\003\022\022\n\nrequ" +
-      "est_id\030\004 \001(\003\"c\n\014scSceneLeave\022\032\n\006result\030\001" +
-      " \001(\0162\n.ErrorCode\022\020\n\010scene_id\030\002 \001(\t\022\021\n\tpl" +
-      "ayer_id\030\003 \001(\003\022\022\n\nrequest_id\030\004 \001(\003\"\335\001\n\013cs" +
-      "SceneView\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope\030\002 \001" +
-      "(\0162\013.SceneScope\022\021\n\tplayer_id\030\003 \001(\003\022!\n\014ce" +
-      "nter_point\030\004 \001(\0132\013.ScenePoint\022\025\n\rradius_" +
-      "blocks\030\005 \001(\005\022#\n\nview_level\030\006 \001(\0162\017.Scene" +
-      "ViewLevel\022\032\n\022requested_tag_mask\030\007 \001(\004\022\022\n" +
-      "\nrequest_id\030\010 \001(\003\"\255\002\n\013scSceneView\022\032\n\006res" +
-      "ult\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene_id\030\002 \001(\t\022" +
-      "\021\n\tplayer_id\030\003 \001(\003\022!\n\014center_block\030\004 \001(\013" +
-      "2\013.ScenePoint\022#\n\nview_level\030\005 \001(\0162\017.Scen" +
-      "eViewLevel\022\023\n\013tick_number\030\006 \001(\003\022%\n\007objec" +
-      "ts\030\007 \003(\0132\024.SceneObjectSnapshot\022#\n\006blocks" +
-      "\030\010 \003(\0132\023.SceneBlockSnapshot\022 \n\030discovere" +
-      "d_block_indices\030\t \003(\005\022\022\n\nrequest_id\030\n \001(" +
-      "\003\"\353\001\n\017csScenePathFind\022\020\n\010scene_id\030\001 \001(\t\022" +
-      "\032\n\005scope\030\002 \001(\0162\013.SceneScope\022\021\n\tplayer_id" +
-      "\030\003 \001(\003\022 \n\013start_point\030\004 \001(\0132\013.ScenePoint" +
-      "\022!\n\014target_point\030\005 \001(\0132\013.ScenePoint\022#\n\nf" +
-      "og_policy\030\006 \001(\0162\017.SceneFogPolicy\022\031\n\021max_" +
-      "visited_nodes\030\007 \001(\005\022\022\n\nrequest_id\030\010 \001(\003\"" +
-      "\263\001\n\017scScenePathFind\022\032\n\006result\030\001 \001(\0162\n.Er" +
-      "rorCode\022\020\n\010scene_id\030\002 \001(\t\022\022\n\nrequest_id\030" +
-      "\003 \001(\003\022\033\n\006points\030\004 \003(\0132\013.ScenePoint\022\022\n\nto" +
-      "tal_cost\030\005 \001(\005\022\025\n\rvisited_nodes\030\006 \001(\005\022\026\n" +
-      "\016completed_tick\030\007 \001(\003*:\n\nSceneScope\022\025\n\021S" +
-      "CENE_SCOPE_LOCAL\020\000\022\025\n\021SCENE_SCOPE_CROSS\020" +
-      "\001*\365\001\n\017SceneObjectKind\022\027\n\023SCENE_OBJECT_PL" +
-      "AYER\020\000\022\031\n\025SCENE_OBJECT_RESOURCE\020\001\022\030\n\024SCE" +
-      "NE_OBJECT_MONSTER\020\002\022\025\n\021SCENE_OBJECT_FARM" +
-      "\020\003\022\025\n\021SCENE_OBJECT_DROP\020\004\022\031\n\025SCENE_OBJEC" +
-      "T_BUILDING\020\005\022\033\n\027SCENE_OBJECT_DECORATION\020" +
-      "\006\022\026\n\022SCENE_OBJECT_MARCH\020\007\022\026\n\022SCENE_OBJEC" +
-      "T_RALLY\020\010*\371\001\n\016SceneMarchType\022\026\n\022SCENE_MA" +
-      "RCH_ATTACK\020\000\022\034\n\030SCENE_MARCH_RALLY_MEMBER" +
-      "\020\001\022\032\n\026SCENE_MARCH_RALLY_ARMY\020\002\022\031\n\025SCENE_" +
-      "MARCH_REINFORCE\020\003\022\030\n\024SCENE_MARCH_GARRISO" +
-      "N\020\004\022\026\n\022SCENE_MARCH_GATHER\020\005\022\025\n\021SCENE_MAR" +
-      "CH_SCOUT\020\006\022\031\n\025SCENE_MARCH_TRANSPORT\020\007\022\026\n" +
-      "\022SCENE_MARCH_RETURN\020\010*\355\001\n\020SceneMarchStat" +
-      "us\022\031\n\025SCENE_MARCH_PREPARING\020\000\022\026\n\022SCENE_M" +
-      "ARCH_MOVING\020\001\022\035\n\031SCENE_MARCH_WAITING_RAL" +
-      "LY\020\002\022\027\n\023SCENE_MARCH_ARRIVED\020\003\022\036\n\032SCENE_M" +
-      "ARCH_BATTLE_PENDING\020\004\022\031\n\025SCENE_MARCH_RET" +
-      "URNING\020\005\022\030\n\024SCENE_MARCH_FINISHED\020\006\022\031\n\025SC" +
-      "ENE_MARCH_CANCELLED\020\007*\233\002\n\017SceneTargetTyp" +
-      "e\022\026\n\022SCENE_TARGET_POINT\020\000\022\034\n\030SCENE_TARGE" +
-      "T_PLAYER_CITY\020\001\022\036\n\032SCENE_TARGET_ALLIANCE" +
-      "_CITY\020\002\022\"\n\036SCENE_TARGET_ALLIANCE_BUILDIN" +
-      "G\020\003\022\031\n\025SCENE_TARGET_RESOURCE\020\004\022\030\n\024SCENE_" +
-      "TARGET_MONSTER\020\005\022\033\n\027SCENE_TARGET_RALLY_C" +
-      "AMP\020\006\022\026\n\022SCENE_TARGET_TROOP\020\007\022$\n SCENE_T" +
-      "ARGET_CROSS_SERVER_OBJECT\020\010*\266\001\n\020SceneRal" +
-      "lyStatus\022\032\n\026SCENE_RALLY_RECRUITING\020\000\022\026\n\022" +
-      "SCENE_RALLY_MOVING\020\001\022\036\n\032SCENE_RALLY_BATT" +
-      "LE_PENDING\020\002\022\031\n\025SCENE_RALLY_RETURNING\020\003\022" +
-      "\030\n\024SCENE_RALLY_FINISHED\020\004\022\031\n\025SCENE_RALLY" +
-      "_CANCELLED\020\005*\235\002\n\026SceneRallyMemberStatus\022" +
-      "\036\n\032SCENE_RALLY_MEMBER_JOINING\020\000\022\034\n\030SCENE" +
-      "_RALLY_MEMBER_READY\020\001\022\035\n\031SCENE_RALLY_MEM" +
-      "BER_MOVING\020\002\022%\n!SCENE_RALLY_MEMBER_BATTL" +
-      "E_PENDING\020\003\022 \n\034SCENE_RALLY_MEMBER_RETURN" +
-      "ING\020\004\022\037\n\033SCENE_RALLY_MEMBER_FINISHED\020\005\022\033" +
-      "\n\027SCENE_RALLY_MEMBER_LEFT\020\006\022\037\n\033SCENE_RAL" +
-      "LY_MEMBER_EXCLUDED\020\007*T\n\016SceneViewLevel\022\025" +
-      "\n\021SCENE_VIEW_DETAIL\020\000\022\025\n\021SCENE_VIEW_REGI" +
-      "ON\020\001\022\024\n\020SCENE_VIEW_WORLD\020\002*a\n\016SceneFogPo" +
-      "licy\022\024\n\020SCENE_FOG_IGNORE\020\000\022\035\n\031SCENE_FOG_" +
-      "DISCOVERED_ONLY\020\001\022\032\n\026SCENE_FOG_VISIBLE_O" +
-      "NLY\020\002B\n\n\010ly.protob\006proto3"
+      "\t\022\r\n\005width\030\003 \001(\005\022\016\n\006height\030\004 \001(\005\022\023\n\013shar" +
+      "d_count\030\005 \001(\005\022\023\n\013tick_number\030\006 \001(\003\022\030\n\020la" +
+      "st_tick_millis\030\007 \001(\003\022\024\n\014object_count\030\010 \001" +
+      "(\005\022\025\n\ronline_target\030\t \001(\005\"c\n\014csSceneLeav" +
+      "e\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.Sce" +
+      "neScope\022\021\n\tplayer_id\030\003 \001(\003\022\022\n\nrequest_id" +
+      "\030\004 \001(\003\"c\n\014scSceneLeave\022\032\n\006result\030\001 \001(\0162\n" +
+      ".ErrorCode\022\020\n\010scene_id\030\002 \001(\t\022\021\n\tplayer_i" +
+      "d\030\003 \001(\003\022\022\n\nrequest_id\030\004 \001(\003\"\335\001\n\013csSceneV" +
+      "iew\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.S" +
+      "ceneScope\022\021\n\tplayer_id\030\003 \001(\003\022!\n\014center_p" +
+      "oint\030\004 \001(\0132\013.ScenePoint\022\025\n\rradius_blocks" +
+      "\030\005 \001(\005\022#\n\nview_level\030\006 \001(\0162\017.SceneViewLe" +
+      "vel\022\032\n\022requested_tag_mask\030\007 \001(\004\022\022\n\nreque" +
+      "st_id\030\010 \001(\003\"\255\002\n\013scSceneView\022\032\n\006result\030\001 " +
+      "\001(\0162\n.ErrorCode\022\020\n\010scene_id\030\002 \001(\t\022\021\n\tpla" +
+      "yer_id\030\003 \001(\003\022!\n\014center_block\030\004 \001(\0132\013.Sce" +
+      "nePoint\022#\n\nview_level\030\005 \001(\0162\017.SceneViewL" +
+      "evel\022\023\n\013tick_number\030\006 \001(\003\022%\n\007objects\030\007 \003" +
+      "(\0132\024.SceneObjectSnapshot\022#\n\006blocks\030\010 \003(\013" +
+      "2\023.SceneBlockSnapshot\022 \n\030discovered_bloc" +
+      "k_indices\030\t \003(\005\022\022\n\nrequest_id\030\n \001(\003\"\353\001\n\017" +
+      "csScenePathFind\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005sco" +
+      "pe\030\002 \001(\0162\013.SceneScope\022\021\n\tplayer_id\030\003 \001(\003" +
+      "\022 \n\013start_point\030\004 \001(\0132\013.ScenePoint\022!\n\014ta" +
+      "rget_point\030\005 \001(\0132\013.ScenePoint\022#\n\nfog_pol" +
+      "icy\030\006 \001(\0162\017.SceneFogPolicy\022\031\n\021max_visite" +
+      "d_nodes\030\007 \001(\005\022\022\n\nrequest_id\030\010 \001(\003\"\263\001\n\017sc" +
+      "ScenePathFind\022\032\n\006result\030\001 \001(\0162\n.ErrorCod" +
+      "e\022\020\n\010scene_id\030\002 \001(\t\022\022\n\nrequest_id\030\003 \001(\003\022" +
+      "\033\n\006points\030\004 \003(\0132\013.ScenePoint\022\022\n\ntotal_co" +
+      "st\030\005 \001(\005\022\025\n\rvisited_nodes\030\006 \001(\005\022\026\n\016compl" +
+      "eted_tick\030\007 \001(\003*:\n\nSceneScope\022\025\n\021SCENE_S" +
+      "COPE_LOCAL\020\000\022\025\n\021SCENE_SCOPE_CROSS\020\001*\365\001\n\017" +
+      "SceneObjectKind\022\027\n\023SCENE_OBJECT_PLAYER\020\000" +
+      "\022\031\n\025SCENE_OBJECT_RESOURCE\020\001\022\030\n\024SCENE_OBJ" +
+      "ECT_MONSTER\020\002\022\025\n\021SCENE_OBJECT_FARM\020\003\022\025\n\021" +
+      "SCENE_OBJECT_DROP\020\004\022\031\n\025SCENE_OBJECT_BUIL" +
+      "DING\020\005\022\033\n\027SCENE_OBJECT_DECORATION\020\006\022\026\n\022S" +
+      "CENE_OBJECT_MARCH\020\007\022\026\n\022SCENE_OBJECT_RALL" +
+      "Y\020\010*\371\001\n\016SceneMarchType\022\026\n\022SCENE_MARCH_AT" +
+      "TACK\020\000\022\034\n\030SCENE_MARCH_RALLY_MEMBER\020\001\022\032\n\026" +
+      "SCENE_MARCH_RALLY_ARMY\020\002\022\031\n\025SCENE_MARCH_" +
+      "REINFORCE\020\003\022\030\n\024SCENE_MARCH_GARRISON\020\004\022\026\n" +
+      "\022SCENE_MARCH_GATHER\020\005\022\025\n\021SCENE_MARCH_SCO" +
+      "UT\020\006\022\031\n\025SCENE_MARCH_TRANSPORT\020\007\022\026\n\022SCENE" +
+      "_MARCH_RETURN\020\010*\355\001\n\020SceneMarchStatus\022\031\n\025" +
+      "SCENE_MARCH_PREPARING\020\000\022\026\n\022SCENE_MARCH_M" +
+      "OVING\020\001\022\035\n\031SCENE_MARCH_WAITING_RALLY\020\002\022\027" +
+      "\n\023SCENE_MARCH_ARRIVED\020\003\022\036\n\032SCENE_MARCH_B" +
+      "ATTLE_PENDING\020\004\022\031\n\025SCENE_MARCH_RETURNING" +
+      "\020\005\022\030\n\024SCENE_MARCH_FINISHED\020\006\022\031\n\025SCENE_MA" +
+      "RCH_CANCELLED\020\007*\233\002\n\017SceneTargetType\022\026\n\022S" +
+      "CENE_TARGET_POINT\020\000\022\034\n\030SCENE_TARGET_PLAY" +
+      "ER_CITY\020\001\022\036\n\032SCENE_TARGET_ALLIANCE_CITY\020" +
+      "\002\022\"\n\036SCENE_TARGET_ALLIANCE_BUILDING\020\003\022\031\n" +
+      "\025SCENE_TARGET_RESOURCE\020\004\022\030\n\024SCENE_TARGET" +
+      "_MONSTER\020\005\022\033\n\027SCENE_TARGET_RALLY_CAMP\020\006\022" +
+      "\026\n\022SCENE_TARGET_TROOP\020\007\022$\n SCENE_TARGET_" +
+      "CROSS_SERVER_OBJECT\020\010*\266\001\n\020SceneRallyStat" +
+      "us\022\032\n\026SCENE_RALLY_RECRUITING\020\000\022\026\n\022SCENE_" +
+      "RALLY_MOVING\020\001\022\036\n\032SCENE_RALLY_BATTLE_PEN" +
+      "DING\020\002\022\031\n\025SCENE_RALLY_RETURNING\020\003\022\030\n\024SCE" +
+      "NE_RALLY_FINISHED\020\004\022\031\n\025SCENE_RALLY_CANCE" +
+      "LLED\020\005*\235\002\n\026SceneRallyMemberStatus\022\036\n\032SCE" +
+      "NE_RALLY_MEMBER_JOINING\020\000\022\034\n\030SCENE_RALLY" +
+      "_MEMBER_READY\020\001\022\035\n\031SCENE_RALLY_MEMBER_MO" +
+      "VING\020\002\022%\n!SCENE_RALLY_MEMBER_BATTLE_PEND" +
+      "ING\020\003\022 \n\034SCENE_RALLY_MEMBER_RETURNING\020\004\022" +
+      "\037\n\033SCENE_RALLY_MEMBER_FINISHED\020\005\022\033\n\027SCEN" +
+      "E_RALLY_MEMBER_LEFT\020\006\022\037\n\033SCENE_RALLY_MEM" +
+      "BER_EXCLUDED\020\007*T\n\016SceneViewLevel\022\025\n\021SCEN" +
+      "E_VIEW_DETAIL\020\000\022\025\n\021SCENE_VIEW_REGION\020\001\022\024" +
+      "\n\020SCENE_VIEW_WORLD\020\002*a\n\016SceneFogPolicy\022\024" +
+      "\n\020SCENE_FOG_IGNORE\020\000\022\035\n\031SCENE_FOG_DISCOV" +
+      "ERED_ONLY\020\001\022\032\n\026SCENE_FOG_VISIBLE_ONLY\020\002B" +
+      "\n\n\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -33587,140 +37276,146 @@ public final class Scene {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ScenePoint_descriptor,
         new java.lang.String[] { "X", "Y", });
-    internal_static_SceneObjectSnapshot_descriptor =
+    internal_static_ScenePersistentObjectState_descriptor =
       getDescriptor().getMessageTypes().get(1);
+    internal_static_ScenePersistentObjectState_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_ScenePersistentObjectState_descriptor,
+        new java.lang.String[] { "DataVersion", "ConfigId", "RuleId", "Level", "Amount", "Health", "RefreshAtMillis", "ExpireAtMillis", "StateFlags", "ExtensionData", });
+    internal_static_SceneObjectSnapshot_descriptor =
+      getDescriptor().getMessageTypes().get(2);
     internal_static_SceneObjectSnapshot_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SceneObjectSnapshot_descriptor,
         new java.lang.String[] { "ObjectId", "Kind", "OwnerId", "Point", "StateVersion", "DataTagMask", "March", "Rally", });
     internal_static_SceneMarchTarget_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_SceneMarchTarget_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SceneMarchTarget_descriptor,
         new java.lang.String[] { "TargetId", "Type", "Point", "TagMask", "TargetVersion", });
     internal_static_SceneMarchSnapshot_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_SceneMarchSnapshot_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SceneMarchSnapshot_descriptor,
         new java.lang.String[] { "MarchId", "OwnerPlayerId", "AllianceId", "Type", "TagMask", "Status", "Origin", "Target", "Path", "PathIndex", "TroopCount", "Power", "ArmySnapshotVersion", "DepartAtMillis", "ArrivalAtMillis", "StateVersion", });
     internal_static_SceneRallyMemberSnapshot_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_SceneRallyMemberSnapshot_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SceneRallyMemberSnapshot_descriptor,
         new java.lang.String[] { "PlayerId", "MarchId", "TroopCount", "Power", "ArmySnapshotVersion", "Status", "RemainingTroops", });
     internal_static_SceneRallySnapshot_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_SceneRallySnapshot_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SceneRallySnapshot_descriptor,
         new java.lang.String[] { "RallyId", "LeaderPlayerId", "AllianceId", "AssemblyPoint", "Target", "Capacity", "MinimumMembers", "LaunchAtMillis", "Status", "Members", "AppliedBattleResultId", "Victory", "StateVersion", });
     internal_static_SceneRallyLaunchSnapshot_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_SceneRallyLaunchSnapshot_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SceneRallyLaunchSnapshot_descriptor,
         new java.lang.String[] { "RallyId", "LeaderPlayerId", "AllianceId", "AssemblyPoint", "Target", "Members", "TotalTroops", "TotalPower", "LaunchedAtMillis", "RallyVersion", });
     internal_static_SceneRallyMemberBattleResult_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_SceneRallyMemberBattleResult_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SceneRallyMemberBattleResult_descriptor,
         new java.lang.String[] { "PlayerId", "RemainingTroops", });
     internal_static_SceneRallyBattleResult_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_SceneRallyBattleResult_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SceneRallyBattleResult_descriptor,
         new java.lang.String[] { "BattleResultId", "RallyId", "TargetId", "TargetVersion", "Victory", "TargetDurabilityLoss", "MemberResults", });
     internal_static_SceneBlockSnapshot_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_SceneBlockSnapshot_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SceneBlockSnapshot_descriptor,
         new java.lang.String[] { "BlockIndex", "BlockPoint", "Visible", "Discovered", "ObjectCount", "DataTagMask", });
     internal_static_csSceneQuery_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_csSceneQuery_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csSceneQuery_descriptor,
         new java.lang.String[] { "SceneId", "Scope", "Point", "Radius", });
     internal_static_scSceneQuery_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_scSceneQuery_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scSceneQuery_descriptor,
         new java.lang.String[] { "Result", "SceneId", "Terrain", "ConfigId", "Flags", "SpawnRuleId", "Objects", });
     internal_static_csSceneEnter_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_csSceneEnter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csSceneEnter_descriptor,
         new java.lang.String[] { "SceneId", "Scope", "PlayerId", "Point", "RequestId", });
     internal_static_scSceneEnter_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_scSceneEnter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scSceneEnter_descriptor,
         new java.lang.String[] { "Result", "SceneId", "ShardIndex", "CurrentPoint", "RequestId", });
     internal_static_csSceneMove_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_csSceneMove_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csSceneMove_descriptor,
         new java.lang.String[] { "SceneId", "Scope", "PlayerId", "TargetPoint", "RequestId", });
     internal_static_scSceneMove_descriptor =
-      getDescriptor().getMessageTypes().get(15);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_scSceneMove_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scSceneMove_descriptor,
         new java.lang.String[] { "Result", "SceneId", "ShardIndex", "CurrentPoint", "RequestId", });
     internal_static_csSceneMetrics_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_csSceneMetrics_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csSceneMetrics_descriptor,
         new java.lang.String[] { "SceneId", "Scope", });
     internal_static_scSceneMetrics_descriptor =
-      getDescriptor().getMessageTypes().get(17);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_scSceneMetrics_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scSceneMetrics_descriptor,
         new java.lang.String[] { "Result", "SceneId", "Width", "Height", "ShardCount", "TickNumber", "LastTickMillis", "ObjectCount", "OnlineTarget", });
     internal_static_csSceneLeave_descriptor =
-      getDescriptor().getMessageTypes().get(18);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_csSceneLeave_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csSceneLeave_descriptor,
         new java.lang.String[] { "SceneId", "Scope", "PlayerId", "RequestId", });
     internal_static_scSceneLeave_descriptor =
-      getDescriptor().getMessageTypes().get(19);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_scSceneLeave_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scSceneLeave_descriptor,
         new java.lang.String[] { "Result", "SceneId", "PlayerId", "RequestId", });
     internal_static_csSceneView_descriptor =
-      getDescriptor().getMessageTypes().get(20);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_csSceneView_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csSceneView_descriptor,
         new java.lang.String[] { "SceneId", "Scope", "PlayerId", "CenterPoint", "RadiusBlocks", "ViewLevel", "RequestedTagMask", "RequestId", });
     internal_static_scSceneView_descriptor =
-      getDescriptor().getMessageTypes().get(21);
+      getDescriptor().getMessageTypes().get(22);
     internal_static_scSceneView_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scSceneView_descriptor,
         new java.lang.String[] { "Result", "SceneId", "PlayerId", "CenterBlock", "ViewLevel", "TickNumber", "Objects", "Blocks", "DiscoveredBlockIndices", "RequestId", });
     internal_static_csScenePathFind_descriptor =
-      getDescriptor().getMessageTypes().get(22);
+      getDescriptor().getMessageTypes().get(23);
     internal_static_csScenePathFind_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csScenePathFind_descriptor,
         new java.lang.String[] { "SceneId", "Scope", "PlayerId", "StartPoint", "TargetPoint", "FogPolicy", "MaxVisitedNodes", "RequestId", });
     internal_static_scScenePathFind_descriptor =
-      getDescriptor().getMessageTypes().get(23);
+      getDescriptor().getMessageTypes().get(24);
     internal_static_scScenePathFind_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scScenePathFind_descriptor,

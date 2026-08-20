@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -251,12 +252,16 @@ public class MysqlConnector {
     }
   }
 
-  private static void addSqlParams(Object[] params, PreparedStatement st) throws Exception {
+  static void addSqlParams(Object[] params, PreparedStatement st) throws Exception {
     if (params != null && params.length > 0) {
       for (int i = 0; i < params.length; i++) {
         Object param = params[i];
         if (param == null) {
-          throw new RuntimeException("SQL param can not be null, please provide a default value");
+          // null 是数据库实体的合法状态，例如旧 modules 大字段迁移到 player_module 后，
+          // 必须把 player.modules 清成 SQL NULL。这里应交给 JDBC 绑定 NULL，不能要求
+          // 业务层伪造空字符串或空字节数组，否则会改变数据库语义并导致迁移反复执行。
+          st.setNull(i + 1, Types.NULL);
+          continue;
         }
         st.setObject(i + 1, param);
       }
