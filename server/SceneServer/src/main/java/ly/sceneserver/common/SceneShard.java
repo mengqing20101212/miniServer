@@ -591,7 +591,7 @@ public final class SceneShard {
                 lastThreadName);
     }
 
-    /** 由 SceneRuntime 的调度线程调用；所有场景业务更新都从这里开始。 */
+    /** 由本分片独占的 SceneShard 虚拟线程调用；所有场景业务更新都从这里开始。 */
     void tick() {
         long startedNanos = System.nanoTime();
         int processedCommands = 0;
@@ -609,7 +609,7 @@ public final class SceneShard {
                 tickListener.onTick(this, tickNumber, lastTickMillis);
             }
         } catch (Throwable error) {
-            // 兜住整个 Tick，避免 ScheduledExecutorService 因一次异常永久取消周期任务。
+            // 兜住整个 Tick，避免一次业务异常结束当前分片的常驻虚拟线程循环。
             failedTickCount++;
             ly.LoggerDef.SystemLogger.error(
                     "SceneShard tick failed, sceneId={}, shardIndex={}, tickNumber={}",

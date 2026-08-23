@@ -1,9 +1,12 @@
 package ly.sceneserver.common;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
@@ -15,6 +18,40 @@ import org.junit.Test;
  * 实际入口/出口，以及节点上限是否真正限制 CPU 搜索规模。
  */
 public class ScenePathfinderTest {
+
+    @Test
+    public void pathCapacityIsReservedBeforeCreatingTheVirtualFlow() {
+        String oldParallelism = System.getProperty("slg.scene.path.parallelism");
+        String oldMaxPending = System.getProperty("slg.scene.path.max-pending");
+        System.setProperty("slg.scene.path.parallelism", "1");
+        System.setProperty("slg.scene.path.max-pending", "1");
+
+        ScenePathService service = null;
+        try {
+            service = new ScenePathService();
+            ScenePathService testedService = service;
+            SceneStaticMap map = walkableMap(8, 8);
+            service.prepareMap(map, 4);
+
+            // 第一条完整寻路流程已经取得唯一名额，但尚未创建任何虚拟线程或开始 A*。
+            try (ScenePathService.PathReservation ignored = service.reserve(map, 4)) {
+                ScenePathLoadSnapshot occupied = service.loadSnapshotAndResetPeak();
+                assertEquals(1, occupied.pendingTasks());
+                assertEquals(0, occupied.liveVirtualThreads());
+
+                // 第二条请求必须在调用线程立即拒绝，不能先创建虚拟线程再进入等待队列。
+                assertThrows(RejectedExecutionException.class, () -> testedService.reserve(map, 4));
+                assertEquals(1L, service.loadSnapshotAndResetPeak().rejectedTasks());
+            }
+            assertEquals(0, service.loadSnapshotAndResetPeak().pendingTasks());
+        } finally {
+            if (service != null) {
+                service.close();
+            }
+            restoreProperty("slg.scene.path.parallelism", oldParallelism);
+            restoreProperty("slg.scene.path.max-pending", oldMaxPending);
+        }
+    }
 
     @Test
     public void pathfinderSupportsMillionCellStaticMap() {
@@ -203,6 +240,7 @@ public class ScenePathfinderTest {
             runtime.start();
 
             AtomicReference<String> callbackThread = new AtomicReference<>();
+            AtomicBoolean callbackVirtual = new AtomicBoolean();
             ScenePathResult success = scene.findPathAsync(new ScenePathRequest(
                             1,
                             new ScenePoint(0, 0),
@@ -211,12 +249,15 @@ public class ScenePathfinderTest {
                             10_000))
                     .thenApply(result -> {
                         callbackThread.set(Thread.currentThread().getName());
+                        callbackVirtual.set(Thread.currentThread().isVirtual());
                         return result;
                     })
                     .get(1, TimeUnit.SECONDS);
             assertEquals(ScenePathStatus.OK, success.status());
             assertTrue(success.completedTick() > 0);
             assertTrue(callbackThread.get().startsWith("SceneShard-Tick-"));
+            assertTrue("path result must return through the SceneShard virtual tick thread",
+                    callbackVirtual.get());
 
             ScenePathResult limited = scene.findPathAsync(new ScenePathRequest(
                             1,
@@ -257,5 +298,13 @@ public class ScenePathfinderTest {
     private static SceneVisibilitySnapshot unrestrictedVisibility(int regionSize, int blockColumns) {
         return new SceneVisibilitySnapshot(
                 regionSize, blockColumns, new java.util.BitSet(), new java.util.BitSet());
+    }
+
+    private static void restoreProperty(String key, String value) {
+        if (value == null) {
+            System.clearProperty(key);
+        } else {
+            System.setProperty(key, value);
+        }
     }
 }

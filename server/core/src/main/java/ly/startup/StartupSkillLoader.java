@@ -85,6 +85,8 @@ public final class StartupSkillLoader {
         setDefaultPositiveProperty("slg.scene.load-log-seconds", scene.loadLogSeconds);
         setDefaultPositiveProperty("slg.scene.slow-tick-millis", scene.slowTickMillis);
         setDefaultPositiveProperty("slg.scene.path.region-padding", scene.pathRegionPadding);
+        setDefaultPositiveProperty("slg.scene.path.parallelism", scene.pathParallelism);
+        setDefaultPositiveProperty("slg.scene.path.max-pending", scene.pathMaxPending);
         setDefaultPositiveProperty(
                 "slg.scene.region-migration.queue-capacity",
                 scene.regionMigrationQueueCapacity);
@@ -219,6 +221,14 @@ public final class StartupSkillLoader {
                 "startup.scene.pathRegionPadding",
                 skillPath);
         validateOptionalPositive(
+                skill.startup.scene.pathParallelism,
+                "startup.scene.pathParallelism",
+                skillPath);
+        validateOptionalPositive(
+                skill.startup.scene.pathMaxPending,
+                "startup.scene.pathMaxPending",
+                skillPath);
+        validateOptionalPositive(
                 skill.startup.scene.regionMigrationQueueCapacity,
                 "startup.scene.regionMigrationQueueCapacity",
                 skillPath);
@@ -250,7 +260,7 @@ public final class StartupSkillLoader {
             }
         }
         if (validation != null && validation.startupOrder != null && !validation.startupOrder.isEmpty()) {
-            List<String> expectedOrder = List.of("login", "game", "gate", "bot");
+            List<String> expectedOrder = List.of("login", "game", "scene", "gate", "bot");
             if (!validation.startupOrder.equals(expectedOrder)) {
                 throw new IllegalStateException("startup.validation.startupOrder 必须是 " + expectedOrder);
             }
@@ -424,6 +434,10 @@ public final class StartupSkillLoader {
         public Integer slowTickMillis;
         /** Region 粗路径两侧扩展搜索块数。 */
         public Integer pathRegionPadding;
+        /** 同时执行 A* 的 CPU 工作区数量；虚拟线程超过此值时会挂起等待。 */
+        public Integer pathParallelism;
+        /** 从迷雾快照到结果回投的完整寻路流程上限，防止虚拟线程无界积压。 */
+        public Integer pathMaxPending;
         /** 热点 Region 单线程迁移队列容量。 */
         public Integer regionMigrationQueueCapacity;
         /** SceneServer 启动恢复的实体分页大小。 */

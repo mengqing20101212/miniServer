@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
 
 import org.junit.Test;
@@ -12,10 +13,14 @@ public class SceneLoadMetricsTest {
     @Test
     public void shardPublishesQueueTickAndOwnershipLoadWithoutReadingMapsOffThread() throws Exception {
         SceneRuntime runtime = new SceneRuntime(0L, 1, 100);
+        AtomicBoolean tickUsesVirtualThread = new AtomicBoolean();
         try {
             runtime.addScene(
                     new SceneConfig("load-test", 32, 32, 1, 8, 5),
-                    (shard, tick, now) -> LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(2)));
+                    (shard, tick, now) -> {
+                        tickUsesVirtualThread.set(Thread.currentThread().isVirtual());
+                        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(2));
+                    });
             runtime.start();
             SceneRuntime.SceneInstance scene = runtime.scene("load-test");
             scene.submit(2, 3, shard -> shard.addObject(new SceneObject(
@@ -37,6 +42,8 @@ public class SceneLoadMetricsTest {
             assertTrue(snapshot.slowTickCount() >= 1L);
             assertTrue(snapshot.totalTickNanos() > 0L);
             assertTrue(snapshot.lastThreadName().startsWith("SceneShard-Tick-"));
+            assertTrue("SceneShard tick must run on its dedicated Java 25 virtual thread",
+                    tickUsesVirtualThread.get());
             assertEquals(1, snapshot.objectCount());
             runtime.logLoadNow();
         } finally {

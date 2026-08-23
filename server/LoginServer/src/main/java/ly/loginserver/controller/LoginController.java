@@ -80,11 +80,20 @@ public class LoginController {
      * @return 新账号信息，包含账号 id、token、渠道和网关
      */
     @GetMapping("register")
-    public LoginResult<Map<String, Object>> register(String account, String channel, HttpServletRequest request) {
+    public LoginResult<Map<String, Object>> register(
+            String account,
+            String channel,
+            String gameServerId,
+            HttpServletRequest request) {
         if (!StringUtils.hasText(account)) {
             return new LoginResult<>(ErrorCode.PARAM_ERROR);
         }
         if (!StringUtils.hasText(channel)) {
+            return new LoginResult<>(ErrorCode.PARAM_ERROR);
+        }
+        // 固定分区服只允许在首次注册时明确选择一个当前可用 GameServer；后续登录始终读取
+        // login.assigned_game_server_id，Bot 和普通客户端都不能在长连接登录时临时漂移节点。
+        if (StringUtils.hasText(gameServerId) && !loginService.isAvailableGameServer(gameServerId)) {
             return new LoginResult<>(ErrorCode.PARAM_ERROR);
         }
         if (isBlocked(account, request)) {
@@ -93,7 +102,7 @@ public class LoginController {
         if (RedisUtils.exists(RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account))) {
             return new LoginResult<>(ErrorCode.ACCOUNT_HAS_EXISTS);
         }
-        LoginEntry newAccount = loginService.createNewAccount(account, channel);
+        LoginEntry newAccount = loginService.createNewAccount(account, channel, gameServerId);
         Map<String, Object> accountInfo = new HashMap<>();
         if (newAccount != null) {
             accountInfo.put("account", account);

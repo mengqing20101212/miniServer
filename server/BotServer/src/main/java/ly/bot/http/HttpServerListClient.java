@@ -94,12 +94,24 @@ public class HttpServerListClient {
     }
 
     public ServerListResult register(String account, String channel) {
+        return register(account, channel, null);
+    }
+
+    /**
+     * 通过 LoginServer 的正式注册接口创建固定分区账号。
+     * gameServerId 只在新账号创建时生效，已有账号不能借此改变所属节点。
+     */
+    public ServerListResult register(String account, String channel, String gameServerId) {
+        String assignment = gameServerId == null || gameServerId.isBlank()
+                ? ""
+                : "&gameServerId=" + URLEncoder.encode(gameServerId, StandardCharsets.UTF_8);
         return requestServerResult(
                 String.format(
-                        "%s/register?account=%s&channel=%s",
+                        "%s/register?account=%s&channel=%s%s",
                         baseUrl,
                         URLEncoder.encode(account, StandardCharsets.UTF_8),
-                        URLEncoder.encode(channel, StandardCharsets.UTF_8)));
+                        URLEncoder.encode(channel, StandardCharsets.UTF_8),
+                        assignment));
     }
 
     private ServerListResult requestServerResult(String urlString) {

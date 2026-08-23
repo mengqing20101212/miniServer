@@ -17,14 +17,12 @@ import java.util.concurrent.TimeUnit;
 import ly.LoggerDef;
 
 /**
- * 周期输出 SceneShard、寻路线程池和实际平台线程负载，供线上观察热点与积压。
+ * 周期输出 SceneShard、A* 虚拟线程/工作区和迁移平台线程负载，供线上观察热点与积压。
  *
- * <p>SceneShard 任务会在调度池的平台线程之间迁移，所以同时记录“逻辑分片忙碌率”和
- * “实际线程 CPU 百分比”；只观察其中一层都无法准确定位热点场景。
+ * <p>SceneShard 与 A* 已使用虚拟线程，ThreadMXBean 不保证枚举虚拟线程，因此两者通过
+ * 业务计时、队列和并发计数观测；仍使用平台线程的 Region 迁移任务继续采集线程 CPU。</p>
  */
 public final class SceneLoadLogger implements AutoCloseable {
-    private static final String TICK_THREAD_PREFIX = "SceneShard-Tick-";
-    private static final String PATH_THREAD_PREFIX = "ScenePath-CPU-";
     private static final String MIGRATION_THREAD_PREFIX = "SceneRegion-Migration-";
 
     private final SceneRuntime runtime;
@@ -164,9 +162,10 @@ public final class SceneLoadLogger implements AutoCloseable {
         previousPath = current;
         if (previous == null) {
             LoggerDef.SystemLogger.info(
-                    "ScenePath pool load baseline, configuredThreads={}, poolSize={}, activeThreads={}, largestPoolSize={}, queue={}, submitted={}, finished={}, failed={}, rejected={}, maxTaskMicros={}",
-                    current.configuredThreads(), current.poolSize(), current.activeThreads(),
-                    current.largestPoolSize(), current.queuedTasks(), current.submittedTasks(),
+                    "ScenePath virtual load baseline, maxParallelism={}, pending={}, liveVirtualThreads={}, activeSearches={}, peakActiveSearches={}, waitingWorkspace={}, maxPending={}, submitted={}, finished={}, failed={}, rejected={}, maxTaskMicros={}",
+                    current.maxParallelism(), current.pendingTasks(), current.liveVirtualThreads(), current.activeSearches(),
+                    current.intervalPeakActiveSearches(), current.waitingTasks(), current.maxPendingTasks(),
+                    current.submittedTasks(),
                     current.finishedTasks(), current.failedTasks(), current.rejectedTasks(),
                     current.intervalMaxTaskNanos() / 1_000L);
             return;
@@ -179,23 +178,25 @@ public final class SceneLoadLogger implements AutoCloseable {
         long averageTaskMicros = finishedDelta == 0L ? 0L : taskNanosDelta / finishedDelta / 1_000L;
         double busyPercent = percent(
                 taskNanosDelta,
-                elapsedNanos * Math.max(1L, current.configuredThreads()));
+                elapsedNanos * Math.max(1L, current.maxParallelism()));
         boolean warning = failedDelta > 0L
                 || rejectedDelta > 0L
-                || current.queuedTasks() >= queueWarnThreshold;
+                || current.pendingTasks() >= queueWarnThreshold;
         if (warning) {
             LoggerDef.SystemLogger.warn(
-                    "ScenePath pool load warning, busyPercent={}, configuredThreads={}, poolSize={}, activeThreads={}, largestPoolSize={}, queue={}, submittedDelta={}, finishedDelta={}, failedDelta={}, rejectedDelta={}, avgTaskMicros={}, maxTaskMicros={}",
-                    busyPercent, current.configuredThreads(), current.poolSize(), current.activeThreads(),
-                    current.largestPoolSize(), current.queuedTasks(),
+                    "ScenePath virtual load warning, busyPercent={}, maxParallelism={}, pending={}, liveVirtualThreads={}, activeSearches={}, peakActiveSearches={}, waitingWorkspace={}, maxPending={}, submittedDelta={}, finishedDelta={}, failedDelta={}, rejectedDelta={}, avgTaskMicros={}, maxTaskMicros={}",
+                    busyPercent, current.maxParallelism(), current.pendingTasks(), current.liveVirtualThreads(),
+                    current.activeSearches(), current.intervalPeakActiveSearches(),
+                    current.waitingTasks(), current.maxPendingTasks(),
                     Math.max(0L, current.submittedTasks() - previous.submittedTasks()), finishedDelta,
                     failedDelta, rejectedDelta, averageTaskMicros,
                     current.intervalMaxTaskNanos() / 1_000L);
         } else {
             LoggerDef.SystemLogger.info(
-                    "ScenePath pool load, busyPercent={}, configuredThreads={}, poolSize={}, activeThreads={}, largestPoolSize={}, queue={}, submittedDelta={}, finishedDelta={}, failedDelta={}, rejectedDelta={}, avgTaskMicros={}, maxTaskMicros={}",
-                    busyPercent, current.configuredThreads(), current.poolSize(), current.activeThreads(),
-                    current.largestPoolSize(), current.queuedTasks(),
+                    "ScenePath virtual load, busyPercent={}, maxParallelism={}, pending={}, liveVirtualThreads={}, activeSearches={}, peakActiveSearches={}, waitingWorkspace={}, maxPending={}, submittedDelta={}, finishedDelta={}, failedDelta={}, rejectedDelta={}, avgTaskMicros={}, maxTaskMicros={}",
+                    busyPercent, current.maxParallelism(), current.pendingTasks(), current.liveVirtualThreads(),
+                    current.activeSearches(), current.intervalPeakActiveSearches(),
+                    current.waitingTasks(), current.maxPendingTasks(),
                     Math.max(0L, current.submittedTasks() - previous.submittedTasks()), finishedDelta,
                     failedDelta, rejectedDelta, averageTaskMicros,
                     current.intervalMaxTaskNanos() / 1_000L);
@@ -315,9 +316,7 @@ public final class SceneLoadLogger implements AutoCloseable {
     }
 
     private static boolean isManagedThread(String threadName) {
-        return threadName.startsWith(TICK_THREAD_PREFIX)
-                || threadName.startsWith(PATH_THREAD_PREFIX)
-                || threadName.startsWith(MIGRATION_THREAD_PREFIX);
+        return threadName.startsWith(MIGRATION_THREAD_PREFIX);
     }
 
     private static String shardKey(SceneShardLoadSnapshot snapshot) {

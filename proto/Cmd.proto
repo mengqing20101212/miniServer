@@ -47,21 +47,22 @@ enum CMD{
   CS_GmRuntimeScriptExecute = 10011;                                                // GM 推送一次性运行时脚本
   SC_GmRuntimeScriptExecute = 10012;                                                // 一次性运行时脚本执行结果
 
-  // SceneServer 通用地图 RPC 12000-12099
-  CS_SceneQuery = 12001;                                                            // 查询地图对象和静态格信息
-  SC_SceneQuery = 12002;
-  CS_SceneEnter = 12003;                                                            // 实体进入场景
-  SC_SceneEnter = 12004;
-  CS_SceneMove = 12005;                                                             // 实体移动
-  SC_SceneMove = 12006;
-  CS_SceneMetrics = 12007;                                                          // 查询场景运行指标
-  SC_SceneMetrics = 12008;
-  CS_SceneLeave = 12009;                                                            // 实体离开场景
-  SC_SceneLeave = 12010;
-  CS_SceneView = 12011;                                                             // 移动 AOI 视野或切换缩放层
-  SC_SceneView = 12012;
-  CS_ScenePathFind = 12013;                                                         // 异步地形和战争迷雾 A* 寻路
-  SC_ScenePathFind = 12014;
+  // Scene 地图客户端协议 2000-2099。客户端经 Gate -> Game 发送；Game 再使用
+  // CS_Server2Server 外壳把同一业务消息转给 SceneServer，不能放在服务器内部号段。
+  CS_SceneQuery = 2001;                                                             // 查询地图对象和静态格信息
+  SC_SceneQuery = 2002;
+  CS_SceneEnter = 2003;                                                             // 实体进入场景
+  SC_SceneEnter = 2004;
+  CS_SceneMove = 2005;                                                              // 实体移动
+  SC_SceneMove = 2006;
+  CS_SceneMetrics = 2007;                                                           // 查询场景运行指标（仅内部运维调用）
+  SC_SceneMetrics = 2008;
+  CS_SceneLeave = 2009;                                                             // 实体离开场景
+  SC_SceneLeave = 2010;
+  CS_SceneView = 2011;                                                              // 移动 AOI 视野或切换缩放层
+  SC_SceneView = 2012;
+  CS_ScenePathFind = 2013;                                                          // 异步地形和战争迷雾 A* 寻路
+  SC_ScenePathFind = 2014;
   MaxServeMsgId = 20000;                                                         //maxServeMsgId 服务器之间通信消息号最大值
 
   ///////////////////////////////msgId 10000 -- 20000 之间的是server之间的消息号，客户端不占用////////////////////////////////////////

@@ -132,6 +132,16 @@ public class LoginService {
     }
 
     public LoginEntry createNewAccount(String account, String channel) {
+        return createNewAccount(account, channel, null);
+    }
+
+    /**
+     * 创建账号并可选地完成首次固定分区分配。
+     *
+     * <p>分区只在 INSERT 时写入，已有账号不会通过注册接口改变归属。这样 BotServer 可以
+     * 通过真实注册流程准备压测账号，同时仍遵守“节点不漂移”的固定分区约束。</p>
+     */
+    public LoginEntry createNewAccount(String account, String channel, String gameServerId) {
         // 参数验证
         if (account == null || account.trim().isEmpty() || channel == null || channel.trim().isEmpty()) {
             logger.error("Invalid account or channel parameters");
@@ -170,6 +180,9 @@ public class LoginService {
             entry.setToken(createToken(account));
             entry.setCreateTime(now);
             entry.setLastLoginTime(now);
+            if (gameServerId != null && !gameServerId.isBlank()) {
+                entry.setAssignedGameServerId(gameServerId.trim());
+            }
             boolean saveSuccess = LoginEntryHelper.save(entry);
             if (!saveSuccess) {
                 logger.error("Failed to persist account to DB, account: {}", account);
@@ -198,6 +211,16 @@ public class LoginService {
                 }
             }
         }
+    }
+
+    /** 注册阶段只接受 Nacos 中当前可用的 GameServer，避免写入拼错或已下线的节点 ID。 */
+    public boolean isAvailableGameServer(String gameServerId) {
+        if (gameServerId == null || gameServerId.isBlank()) {
+            return false;
+        }
+        String expected = gameServerId.trim();
+        return NacosService.getInstance().getNodeList(ServerTypeEnum.GAME).stream()
+                .anyMatch(node -> node.canUse() && expected.equals(node.getServerId()));
     }
 
 

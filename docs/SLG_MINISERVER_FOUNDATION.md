@@ -15,12 +15,12 @@
 - 使用 `region-size` 把地图划成 AOI 块，同时维护“块 -> 对象”和“块 -> 观察者”倒排索引；玩家移动视野时只注册相交块，不做全图广播。
 - 支持 DETAIL、REGION、WORLD 三种缩放数据层：近景返回对象明细，中景/世界视图逐步收敛为重要对象和块级聚合。
 - 每个玩家、每个场景独立保存“当前可见块”和“历史已探索块”两个 BitSet；不同玩家之间绝不共用永久探索记录。
-- 支持独立 CPU 线程池执行 Region/Portal 粗路径和四方向格子加权 A*，根据道路、平原、森林、山地、不可通行 flags 与个人迷雾计算每块入口、出口和块内路径。
+- 支持在受控虚拟线程中执行 Region/Portal 粗路径和四方向格子加权 A*；复用有界原生数组工作区限制真正并行的 CPU 搜索数量，根据道路、平原、森林、山地、不可通行 flags 与个人迷雾计算每块入口、出口和块内路径。
 - 已建立攻击、集结成员、集结主车、增援、驻军、采集、侦察、运输和返程等行军类型，以及行军标签、目标类型和目标能力标签。
 - 已建立联盟集结的招募、成员赴集结点、到时冻结发车名单、主车攻城、幂等应用 BattleServer 结果、成员返程和结束状态机。
 - 已建立 `player_scene`、`scene_object`、`scene_march`、`scene_rally` 实体及分页恢复流程；玩家与场景聚合分别通过固定分区 FIFO 异步入库，业务层不拼 SQL。
 - 已实现同一 SceneServer JVM 内的热点 Region 单线程迁移，迁移对象、格子/AOI 索引、观察者订阅和每个玩家独立的战争迷雾。
-- 已增加 SceneShard、寻路池、Region 迁移线程和实际平台线程的周期负载日志，可观察慢 Tick、队列积压和线程 CPU。
+- 已增加 SceneShard 虚拟线程、寻路虚拟线程及有界工作区、Region 迁移线程的周期负载日志，可观察慢 Tick、任务积压、搜索并发和可采样的平台线程 CPU。
 - 动态对象只能由所属 SceneShard 的逻辑线程修改。
 - 按坐标的跨线程业务操作通过 `SceneInstance.submit(x, y, ...)` 投递；业务代码不能先取出 SceneShard 再绕过动态 Region 路由。
 - SceneShard 按固定 tick 执行队列，第一阶段默认 100ms。
@@ -30,24 +30,26 @@
 
 ### SceneShard 逻辑线程
 
+- 每个 SceneShard 独占一个长期运行的 Java 25 虚拟线程 `SceneShard-Tick-*`；虚拟线程只改变承载方式，不改变“一个 Shard 只有一个权威写线程”的规则。
 - 处理场景内动态对象创建、移动、删除。
 - 处理资源点刷新、怪物刷新、农田状态推进等确定性 tick 逻辑。
 - 处理同一 SceneShard 内的碰撞、占格和场景状态变更。
 - 不执行同步 MySQL、Redis、HTTP 或慢 RPC。
 
-### 异步线程
+### 异步执行
 
 - 数据库落库、批量快照、Outbox 投递。
 - RPC、文件、配置加载和地图文件解析。
 - 日志、指标和战报写入。
-- `ScenePath-CPU-*` 专用平台线程执行 A*；默认最多 4 个线程，可通过 JVM 参数调整。
+- 每个寻路请求启动一个短生命周期虚拟线程，采用普通顺序代码完成“取得个人迷雾快照 -> A* -> 回投 Tick”，不在 RPC 条带线程上阻塞，也不使用多层 callback/Future 链拼接业务流程。
+- 虚拟线程不等于无限 CPU 并行。`ScenePathService` 在创建寻路流程之前先取得容量名额，再通过有界 `Workspace` 池限制搜索；默认最多 4 个 A* 同时占用 CPU，最多接纳 10000 个处于“迷雾快照 -> A* -> 回投 Tick”任一阶段的请求。
 - `SceneRegion-Migration-*` 单平台线程串行编排热点 Region 迁移；对象导出和安装仍回投源、目标 SceneShard Tick。
 
 异步操作完成后必须通过 `SceneShard.submit(...)` 把结果投递回场景线程，不能从异步线程直接修改 `SceneObject`。
 
 按地图坐标回投时必须优先使用 `SceneInstance.submit(x, y, ...)`。`SceneShard.submit(...)` 只适用于已经明确持有固定 Shard 的内部流程；热点 Region 迁移期间，只有前者会自动暂存命令并在所有权切换后投递给新 Shard。
 
-寻路线程只读取场景启动后只读的 `terrain[]` 和 `flags[]`，战争迷雾由 SceneShard 在 Tick 中复制为不可变块快照。A* 完成后必须回投起点所属 SceneShard，再恢复通用 RPC 的 `callId` 并发送结果。
+寻路虚拟线程只读取场景启动后只读的 `terrain[]` 和 `flags[]`，战争迷雾由 SceneShard 在 Tick 中复制为不可变块快照。A* 完成后必须回投起点所属 SceneShard；成功 Future 也由该 Tick 完成，响应虚拟线程再恢复通用 RPC 的 `callId` 并发送结果，异步线程不能直接修改地图对象。
 
 ### GameServer 玩家队列
 
@@ -77,6 +79,8 @@ Scene.scSceneEnter response = (Scene.scSceneEnter) sceneConnector
         .syncSendProtoMessage(playerId, Cmd.CMD.CS_SceneEnter_VALUE, request, 2_000,
                 RpcFailSavePolicy.SEND_FAILED_OR_TIMEOUT);
 ```
+
+客户端可发送的 Scene 协议号使用 `2001-2014`，低于 `10000`，因此 Gate 会把它们按客户端业务包转发给 GameServer。GameServer 校验登录会话后，不信任包体中的 `playerId`，统一改用连接绑定的权威玩家 ID，再把原始 Scene cmd 和 Protobuf body 包进 `CS_Server2Server` 通用 RPC 外壳发往 SceneServer；外层服务器 RPC 协议号仍保留在服务器内部区间。这样客户端不会绕过 Gate/Game 的身份和顺序边界，SceneServer 也不需要维护第二套通信协议。
 
 查询类请求可使用 `RpcFailSavePolicy.NONE`；进入、移动、离开等改变场景状态的命令必须带幂等 `requestId` 或业务版本，再根据业务选择失败保存和补发策略。SceneServer Handler 不直接操作调用方的玩家对象，响应成功后由 GameServer 玩家队列应用玩家侧状态。
 
@@ -113,7 +117,7 @@ Scene.scSceneEnter response = (Scene.scSceneEnter) sceneConnector
 - `SCENE_FOG_DISCOVERED_ONLY`：路径只能经过历史探索块。
 - `SCENE_FOG_VISIBLE_ONLY`：路径只能经过当前可见块。
 
-A* 使用曼哈顿启发、原生 `int[]` 工作区和无对象最小堆；线程工作区重复使用，不会为每个节点创建 Java 对象。`maxVisitedNodes` 默认 100000、硬上限 500000，达到限制返回 `SCENE_PATH_LIMIT_EXCEEDED`，避免热点请求无限占用 CPU。
+A* 使用曼哈顿启发、原生 `int[]` 工作区和无对象最小堆；工作区从有界池中借用并重复使用，不会为每个节点或每个虚拟线程创建百万格数组。`maxVisitedNodes` 默认 100000、硬上限 500000，达到限制返回 `SCENE_PATH_LIMIT_EXCEEDED`，避免热点请求无限占用 CPU。
 
 ### Region 粗路径、Portal 和块内细路径
 
@@ -308,11 +312,11 @@ Nacos/Config/MySQL 初始化并完成自动建表
 默认每 60 秒输出三类指标：
 
 - `SceneShard load`：场景/分片、最近执行线程、逻辑忙碌率、Tick 频率、平均/最大/最近 Tick 耗时、慢 Tick 和失败数、命令增量、当前/峰值队列、对象数、活跃观察者、迷雾玩家数和 Tick 延迟。
-- `ScenePath pool load`：线程数、活跃线程、队列、任务增量、失败/拒绝数、平均/最大寻路耗时和线程池忙碌率。
+- `ScenePath virtual load`：最大 CPU 并行度、存活寻路虚拟线程、正在搜索数、峰值搜索数、等待工作区数、最大待处理数、任务增量、失败/拒绝数以及平均/最大寻路耗时。
 - `SceneRegion migration load`：单线程池活跃数、迁移积压、成功/失败/拒绝增量、平均/最大迁移耗时。
-- `Scene platform thread load`：每个 `SceneShard-Tick-*`、`ScenePath-CPU-*`、`SceneRegion-Migration-*` 平台线程的 JVM CPU 百分比、状态、阻塞次数增量和等待次数增量。
+- `Scene platform thread load`：JVM `ThreadMXBean` 可靠采样 `SceneRegion-Migration-*` 平台线程的 CPU 百分比、状态、阻塞和等待变化；SceneShard/A* 虚拟线程改用上面的逻辑耗时、积压和并发指标观察。
 
-多个 SceneShard 会复用调度线程，因此逻辑分片忙碌率和实际线程 CPU 必须同时看。超过慢 Tick、队列积压、寻路失败/拒绝或 Tick 长时间未完成时会输出 WARN；也可通过 `SceneRuntime.logLoadNow()` 立即打印。
+每个 SceneShard 使用独立虚拟线程，但仍会由 JVM 调度到有限的平台载体线程上，因此容量判断应以 Shard 逻辑忙碌率、Tick 延迟和命令积压为主，不能把虚拟线程数量当成 CPU 容量。超过慢 Tick、队列积压、寻路失败/拒绝或 Tick 长时间未完成时会输出 WARN；也可通过 `SceneRuntime.logLoadNow()` 立即打印。
 
 ## 启动参数
 
@@ -327,7 +331,8 @@ Nacos/Config/MySQL 初始化并完成自动建表
 -Dslg.scene.rpc-queue-capacity=4096
 -Dslg.scene.region-size=32
 -Dslg.scene.tick-millis=100
--Dslg.scene.path.threads=4
+-Dslg.scene.path.parallelism=4
+-Dslg.scene.path.max-pending=10000
 -Dslg.scene.path.region-padding=1
 -Dslg.scene.region-migration.queue-capacity=128
 -Dslg.scene.load-log-seconds=60
@@ -361,7 +366,7 @@ Nacos/Config/MySQL 初始化并完成自动建表
 | 在线玩家 | 10,000 | 假数据联调和容量基线，不等于最终压测结论 |
 | 动态对象 | 稀疏 Map | 仅为有实体的格子创建对象 |
 | AOI | 32 x 32 格/块 | 维护块对象和块观察者索引，不做全图明细下发 |
-| 寻路线程 | 默认 1-4 个平台线程 | 与 Tick 隔离，数量可配置 |
+| 寻路执行 | 每请求一个虚拟线程，默认最多 4 个 CPU 工作区 | 顺序写法与 Tick 隔离；有界工作区和最大待处理数提供背压 |
 | Region 寻路 | 32 x 32 格/块，约 1024 块 | 启动时扫描 Portal，先粗路径再格子细路径 |
 | A* 搜索上限 | 默认 100000 节点 | 硬上限 500000 节点 |
 | RPC | 通用 Server2Server | 业务 cmd 放在统一 RPC 外壳内 |
@@ -371,7 +376,7 @@ Nacos/Config/MySQL 初始化并完成自动建表
 | 玩家投影恢复 | 1000 条/页 | 静态地图后恢复主城和每玩家独立迷雾，失败则不 ready |
 | 投影入库 | 4 个玩家哈希分区 | 同玩家 FIFO、版本 UPSERT、失败原位重试 |
 | 场景聚合入库 | 4 个场景+聚合 ID 哈希分区 | 对象/行军/集结共用 FIFO 队列，实体 revision UPSERT |
-| 负载日志 | 60 秒 | 同时输出分片忙碌率、线程池和平台线程 CPU |
+| 负载日志 | 60 秒 | 同时输出分片忙碌率、虚拟线程寻路并发/积压和可采样的平台线程 CPU |
 
 假数据启动示例：
 
@@ -384,7 +389,7 @@ Nacos/Config/MySQL 初始化并完成自动建表
 
 启动日志至少应能看到：地图场景 id、假在线玩家数量、世界对象数量、SceneShard 数量和首个 tick 指标。
 
-BotServer 提供两类真实 TCP 回归命令。功能回归覆盖本服/跨服路由、参数和越界错误、
+BotServer 提供直接组件回归和正式客户端链路回归。直接功能回归覆盖本服/跨服路由、参数和越界错误、
 进入/查询/移动/离开、九宫格 AOI、缩放数据分层、每玩家独立迷雾、异步两级 A*、
 跨分片拒绝语义以及断线后的重新查询和重新订阅：
 
@@ -397,10 +402,14 @@ java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
 java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
   --test-scene-rpc 127.0.0.1 9101 true
 
-# 32 条真实 TCP 连接批量模拟 10000 个 playerId，每连接使用 128 个请求的有界流水线。
-# 该命令验证 SceneServer 地图状态容量，不等价于 10000 条客户端 WebSocket 连接压测。
-java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
-  --test-scene-load 127.0.0.1 9101 10000 128
+# 正式链路：每个账号创建一个真实 RobotSession，经 Login -> Gate -> Game -> Scene 完成
+# 登录、进入、九宫格 AOI、个人迷雾、寻路、移动和离开。batchSize 仅限制并发启动批次。
+java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT.jar \
+  --test-scene-load 127.0.0.1 8889 10000 32 game1001 scene_e2e
+
+# 仅测试 SceneServer 地图/RPC 组件容量，显式使用 direct 名称，不能替代正式链路验收。
+java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT.jar \
+  --test-scene-direct-load 127.0.0.1 9101 10000 128
 ```
 
 ### 验收指标
@@ -417,13 +426,14 @@ java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
 - 寻路不占用 Tick 线程，结果必须在 `SceneShard-Tick-*` 回调并携带 `completedTick`。
 - 不可通行地形、搜索上限、当前可见和历史探索约束必须返回明确错误码。
 - 场景 RPC 响应必须携带通用 RPC 的 callId，由 core 负责匹配和可靠补发。
+- Scene 客户端业务协议号必须低于 `10000`，并由 Gate 转发到 Game；Game 必须使用登录会话中的权威玩家 ID 后再调用 Scene，机器人正式验收不得直连 SceneServer。
 - 行军类型必须与目标能力标签匹配，目标版本过期不能继续应用异步结果。
 - 集结发车只冻结已到达成员，BattleServer 同一结果重放不得重复扣兵或重复发奖。
 - 数据库加载失败不能启动空地图；恢复完成前 RPC 必须返回 `SCENE_NOT_READY`。
 - 两个玩家的主城和迷雾可从 `player_scene` 分页恢复，恢复后的迷雾仍互相隔离。
 - 同一玩家投影的失败版本必须先重试成功，后续 revision 才能入库；旧 revision 重放不得覆盖新数据。
 - 同一场景聚合的失败版本必须原位重试；对象、行军、集结只能通过对应 Entry/Helper 更新，业务层不得出现 SQL。
-- 周期日志必须能定位具体 scene/shard 的慢 Tick 和积压，并显示寻路线程池及平台线程 CPU。
+- 周期日志必须能定位具体 scene/shard 的慢 Tick 和积压，并显示寻路虚拟线程、工作区等待/并发及可采样的平台线程 CPU。
 
 ## 后续接入顺序
 

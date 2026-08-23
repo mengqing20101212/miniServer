@@ -2,6 +2,8 @@ package ly.startup;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import ly.config.ServerConfig;
 import ly.config.ServerTypeEnum;
 import org.junit.Test;
@@ -16,9 +18,14 @@ public class StartupSkillLoaderTest {
         assertEquals(Integer.valueOf(60), scene.loadLogSeconds);
         assertEquals(Integer.valueOf(200), scene.slowTickMillis);
         assertEquals(Integer.valueOf(1), scene.pathRegionPadding);
+        assertEquals(Integer.valueOf(4), scene.pathParallelism);
+        assertEquals(Integer.valueOf(10_000), scene.pathMaxPending);
         assertEquals(Integer.valueOf(128), scene.regionMigrationQueueCapacity);
         assertEquals(Integer.valueOf(1_000), scene.restorePageSize);
         assertEquals(Integer.valueOf(4), scene.persistencePartitions);
+        assertEquals(
+                List.of("login", "game", "scene", "gate", "bot"),
+                StartupSkillLoader.loadRequired().startup.validation.startupOrder);
     }
 
     @Test

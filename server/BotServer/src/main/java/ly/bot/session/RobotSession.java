@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -32,6 +33,7 @@ import ly.bot.observer.impl.LoggingObserver;
 import ly.bot.state.RobotContext;
 import ly.bot.state.impl.LoggedInState;
 import ly.bot.stats.PacketLatencyStats;
+import ly.bot.scenario.RobotScenario;
 import ly.net.NetClient;
 import ly.net.NetService;
 import ly.net.packet.MessagePacket;
@@ -58,6 +60,12 @@ public class RobotSession {
 
     private final String loginServerHost;
     private final int loginServerPort;
+    /** 新账号首次注册时请求的固定 GameServer；已有账号仍以服务端持久化分配为准。 */
+    private final String requestedGameServerId;
+    /** 专项测试场景；为 null 时执行普通 Bot 模块轮询。 */
+    private final RobotScenario scenario;
+    /** 供容量编排器等待真实登录完成，不能用固定 sleep 猜测状态。 */
+    private final CompletableFuture<RobotSession> loginFuture = new CompletableFuture<>();
     private NetClient gateClient;
     private static ly.bot.http.HttpServerListClient globalHttpClient;
 
@@ -93,12 +101,31 @@ public class RobotSession {
     private static final int LOGIN_WAIT_TIMEOUT_MS = 15_000;
 
     public RobotSession(int botId, String loginServerHost, int loginServerPort) {
+        this(botId, loginServerHost, loginServerPort, "robot_user_" + botId, null, null);
+    }
+
+    /**
+     * 创建一个可执行确定性场景的真实机器人会话。
+     *
+     * @param account 机器人账号；容量测试应使用本次运行唯一前缀，避免旧账号分区污染
+     * @param requestedGameServerId 新账号首次注册时固定分配的 GameServer
+     * @param scenario 登录成功后执行的业务场景；null 表示普通随机机器人
+     */
+    public RobotSession(
+            int botId,
+            String loginServerHost,
+            int loginServerPort,
+            String account,
+            String requestedGameServerId,
+            RobotScenario scenario) {
         this.botId = botId;
-        this.account = "robot_user_" + botId;
+        this.account = account == null || account.isBlank() ? "robot_user_" + botId : account.trim();
         this.token = "robot_token_" + botId;
         this.accountId = 1000000L + botId;
         this.loginServerHost = loginServerHost;
         this.loginServerPort = loginServerPort;
+        this.requestedGameServerId = requestedGameServerId;
+        this.scenario = scenario;
 
         // 初始化全局HTTP客户端
         if (globalHttpClient == null) {
@@ -149,7 +176,7 @@ public class RobotSession {
             if (serverListResult != null
                     && (serverListResult.getAccountId() <= 0 || serverListResult.getToken() == null)) {
                 logger.info("机器人 #{} 账号不存在，先执行注册流程", botId);
-                serverListResult = globalHttpClient.register(account, "bot");
+                serverListResult = globalHttpClient.register(account, "bot", requestedGameServerId);
                 ly.bot.http.HttpServerListClient.ServerListResult refreshedServerList = globalHttpClient
                         .getServerList(account);
                 if (refreshedServerList != null && refreshedServerList.getFirstGameServerId() != null) {
@@ -168,6 +195,10 @@ public class RobotSession {
                 if (gameServerId == null) {
                     gameServerId = serverListResult.getFirstGameServerId();
                 }
+                if (gameServerId == null || gameServerId.isBlank()) {
+                    failLogin("账号没有固定分配 GameServer: " + account);
+                    return;
+                }
 
                 // 获取GateServer信息
                 ly.bot.http.HttpServerListClient.ServerNode gateServer = serverListResult.getGate();
@@ -180,12 +211,15 @@ public class RobotSession {
                             returnedToken, gameServerId, returnedPlayerId);
                 } else {
                     logger.error("机器人 #{} 未获取到GateServer信息", botId);
+                    failLogin("未获取到 GateServer");
                 }
             } else {
                 logger.error("机器人 #{} 获取服务器列表失败", botId);
+                failLogin("获取服务器列表失败");
             }
         } catch (Exception e) {
             logger.error("机器人 #{} 获取服务器列表失败", botId, e);
+            failLogin("获取服务器列表异常", e);
         }
     }
 
@@ -248,9 +282,11 @@ public class RobotSession {
                 sendLoginToGateServer(accountId, token, gameServerId, playerId);
             } else {
                 logger.error("机器人 #{} 连接GateServer超时", botId);
+                failLogin("连接 GateServer 超时");
             }
         } catch (Exception e) {
             logger.error("机器人 #{} 连接GateServer失败", botId, e);
+            failLogin("连接 GateServer 失败", e);
         }
     }
 
@@ -293,6 +329,7 @@ public class RobotSession {
             RobotActionResult result = loginAction.execute(new RobotActionContext(gateClient, this));
             if (!result.isSuccess()) {
                 logger.error("机器人 #{} 登录 Action 执行失败: {}", botId, result.getMessage());
+                failLogin("登录 Action 执行失败: " + result.getMessage());
                 return;
             }
 
@@ -360,6 +397,7 @@ public class RobotSession {
 
             if (!isLoginSuccess) {
                 logger.warn("机器人 #{} 登录超时", botId);
+                failLogin("等待 GameServer 登录响应超时");
             }
         });
     }
@@ -385,11 +423,18 @@ public class RobotSession {
             logger.info("机器人 #{} 登录成功", botId);
             notifyLoginSuccess(robotContext);
 
+            loginFuture.complete(this);
+
             // 启动延迟统计报告线程
             startLatencyStatsReporter();
 
-            // 登录成功后，可以开始执行其他游戏行为
-            startGameActions();
+            if (scenario != null) {
+                // 场景自己启动虚拟线程，不能阻塞负责收包和 Action 回调的 ResponseHandler。
+                scenario.onLogin(this);
+            } else {
+                // 普通机器人继续按原模块执行随机/轮询行为。
+                startGameActions();
+            }
         }
     }
 
@@ -570,15 +615,25 @@ public class RobotSession {
      */
     public boolean sendActionPacket(RobotAction action, AbstractMessage message) {
         MessagePacket packet = createPacket(action.requestCmd(), message);
+        // 先登记再发包，避免本地环境中响应先于 PendingRequest 入队。
+        actionRegistry.registerPending(action, packet);
         if (!gateClient.send(packet)) {
+            actionRegistry.cancelPending(action, packet);
             return false;
         }
-        actionRegistry.registerPending(action, packet);
         return true;
     }
 
     public int getBotId() {
         return botId;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public CompletableFuture<RobotSession> loginFuture() {
+        return loginFuture;
     }
 
     /**
@@ -683,9 +738,23 @@ public class RobotSession {
 
     public void shutdown() {
         running.set(false);
+        if (!loginFuture.isDone()) {
+            failLogin("机器人会话在登录完成前关闭");
+        }
         // loginClient不再使用，因为LoginServer通过HTTP访问
         if (gateClient != null) {
             gateClient.stop();
         }
+    }
+
+    private void failLogin(String message) {
+        failLogin(message, null);
+    }
+
+    private void failLogin(String message, Throwable cause) {
+        IllegalStateException failure = cause == null
+                ? new IllegalStateException(message)
+                : new IllegalStateException(message, cause);
+        loginFuture.completeExceptionally(failure);
     }
 }

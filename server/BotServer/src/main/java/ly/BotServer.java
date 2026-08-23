@@ -3,6 +3,7 @@ package ly;
 import ly.bot.RobotManager;
 import ly.bot.module.impl.CoroutinePlayerCallTestModule;
 import ly.bot.module.impl.RpcSeqSidTestModule;
+import ly.bot.module.impl.SceneEndToEndLoadTestModule;
 import ly.bot.module.impl.SceneRpcLoadTestModule;
 import ly.bot.module.impl.SceneRpcSmokeTestModule;
 import ly.bot.util.ProtocolTester;
@@ -15,7 +16,7 @@ public class BotServer {
 
     public static void main(String[] args) {
         System.out.println("BotServer - 机器人压测服务器启动");
-        System.out.println("支持完整的登录流程：LoginServer -> GateServer");
+        System.out.println("支持完整链路：LoginServer -> GateServer -> GameServer -> SceneServer");
 
         if (args != null && args.length > 0 && "--test-rpc-seq-sid".equals(args[0])) {
             String loginHost = args.length >= 2 ? args[1] : "127.0.0.1";
@@ -63,14 +64,30 @@ public class BotServer {
             System.exit(success ? 0 : 1);
         }
         if (args != null && args.length > 0 && "--test-scene-load".equals(args[0])) {
-            String sceneHost = args.length >= 2 ? args[1] : "127.0.0.1";
-            int scenePort = args.length >= 3 ? Integer.parseInt(args[2]) : 9101;
+            String loginHost = args.length >= 2 ? args[1] : "127.0.0.1";
+            int loginHttpPort = args.length >= 3 ? Integer.parseInt(args[2]) : 8889;
             int players = args.length >= 4
                     ? Integer.parseInt(args[3])
-                    : SceneRpcLoadTestModule.defaultPlayers();
+                    : SceneEndToEndLoadTestModule.defaultPlayers();
+            int batchSize = args.length >= 5
+                    ? Integer.parseInt(args[4])
+                    : SceneEndToEndLoadTestModule.defaultBatchSize();
+            String gameServerId = args.length >= 6 ? args[5] : "game1001";
+            String accountPrefix = args.length >= 7
+                    ? args[6]
+                    : SceneEndToEndLoadTestModule.defaultAccountPrefix();
+            boolean success = SceneEndToEndLoadTestModule.runStandalone(
+                    loginHost, loginHttpPort, players, batchSize, gameServerId, accountPrefix);
+            System.exit(success ? 0 : 1);
+        }
+        if (args != null && args.length > 0 && "--test-scene-direct-load".equals(args[0])) {
+            String sceneHost = args.length >= 2 ? args[1] : "127.0.0.1";
+            int scenePort = args.length >= 3 ? Integer.parseInt(args[2]) : 9101;
+            int players = args.length >= 4 ? Integer.parseInt(args[3]) : SceneRpcLoadTestModule.defaultPlayers();
             int batchSize = args.length >= 5
                     ? Integer.parseInt(args[4])
                     : SceneRpcLoadTestModule.defaultBatchSize();
+            // 仅用于隔离 SceneShard 容量问题；正式万人链路必须使用 --test-scene-load。
             boolean success = SceneRpcLoadTestModule.runStandalone(sceneHost, scenePort, players, batchSize);
             System.exit(success ? 0 : 1);
         }
@@ -120,7 +137,7 @@ public class BotServer {
 
             default:
                 System.out.println("未知命令: " + command);
-                System.out.println("可用命令: --test-protocol, --run-bots, --test-rpc-seq-sid, --test-rpc-reliable-replay, --test-coroutine-player-call, --test-scene-rpc, --test-scene-load");
+                System.out.println("可用命令: --test-protocol, --run-bots, --test-rpc-seq-sid, --test-rpc-reliable-replay, --test-coroutine-player-call, --test-scene-rpc, --test-scene-load, --test-scene-direct-load");
                 break;
         }
     }

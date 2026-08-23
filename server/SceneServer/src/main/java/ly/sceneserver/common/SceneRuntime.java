@@ -6,15 +6,15 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.LockSupport;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -31,9 +31,9 @@ public final class SceneRuntime implements AutoCloseable {
     private static final long DEFAULT_LOAD_LOG_SECONDS = 60L;
     private static final int DEFAULT_SLOW_TICK_MILLIS = 200;
     private static final int DEFAULT_QUEUE_WARN_THRESHOLD = 1_000;
+    private static final long THREAD_CLOSE_WAIT_SECONDS = 10L;
 
     private final Map<String, SceneInstance> scenes = new ConcurrentHashMap<>();
-    private final ScheduledExecutorService tickExecutor;
     private final ScenePathService pathService;
     /** 所有逻辑场景共用一个迁移线程，避免多个大 Region 同时争抢内存带宽。 */
     private final SceneRegionMigrationService regionMigrationService;
@@ -52,12 +52,6 @@ public final class SceneRuntime implements AutoCloseable {
         if (loadLogIntervalMillis < 0L || slowTickMillis <= 0 || queueWarnThreshold <= 0) {
             throw new IllegalArgumentException("invalid SceneRuntime load monitor parameters");
         }
-        ThreadFactory threadFactory = Thread.ofPlatform()
-                .daemon(true)
-                .name("SceneShard-Tick-", 0)
-                .factory();
-        this.tickExecutor = Executors.newScheduledThreadPool(
-                Math.max(1, Runtime.getRuntime().availableProcessors()), threadFactory);
         this.pathService = new ScenePathService();
         this.regionMigrationService = new SceneRegionMigrationService();
         this.slowTickMillis = slowTickMillis;
@@ -125,20 +119,25 @@ public final class SceneRuntime implements AutoCloseable {
     @Override
     public void close() {
         loadLogger.close();
-        // 迁移线程可能正在等待源/目标 Tick 完成导出或安装，必须在关闭 Tick 池之前优雅停止。
+        // 迁移线程可能正在等待源/目标 Tick 完成导出或安装，必须在关闭 Shard 前优雅停止。
         regionMigrationService.close();
         if (!started) {
-            tickExecutor.shutdownNow();
             pathService.close();
             return;
         }
         started = false;
-        tickExecutor.shutdownNow();
+        // 先停止新的/正在等待的寻路流程，此时 Shard Tick 仍运行，可完成已经入队的收尾命令。
         pathService.close();
+        for (SceneInstance scene : scenes.values()) {
+            scene.stopPathTasks();
+        }
+        for (SceneInstance scene : scenes.values()) {
+            scene.stopShardLoops();
+        }
         LoggerDef.SystemLogger.info("SceneRuntime stopped");
     }
 
-    /** 立即输出 SceneShard、寻路线程池和实际平台线程负载，供 GM/线上诊断调用。 */
+    /** 立即输出 SceneShard、A* 虚拟线程/工作区和迁移平台线程负载，供 GM/线上诊断调用。 */
     public void logLoadNow() {
         loadLogger.logNow();
     }
@@ -163,12 +162,19 @@ public final class SceneRuntime implements AutoCloseable {
         private final SceneStaticMap staticMap;
         private final SceneRegionDirectory regionDirectory;
         private final SceneShard[] shards;
+        /** 每个 SceneShard 独占一个虚拟线程，保持动态地图严格单写。 */
+        private final Thread[] shardThreads;
+        /** 完整寻路协程：迷雾快照 -> 受控 A* -> 结果回投 Tick。 */
+        private final Set<Thread> pathTasks = ConcurrentHashMap.newKeySet();
+        private final Object pathTaskLifecycle = new Object();
+        private volatile boolean shardLoopsRunning;
 
         private SceneInstance(SceneConfig config, SceneTickListener tickListener) {
             this.config = config;
             this.staticMap = new SceneStaticMap(config.width(), config.height());
             this.regionDirectory = new SceneRegionDirectory(config);
             this.shards = new SceneShard[config.shardCount()];
+            this.shardThreads = new Thread[config.shardCount()];
             for (int i = 0; i < shards.length; i++) {
                 int minX = config.width() * i / shards.length;
                 int maxX = config.width() * (i + 1) / shards.length;
@@ -185,12 +191,94 @@ public final class SceneRuntime implements AutoCloseable {
         }
 
         private void start() {
-            for (SceneShard shard : shards) {
-                tickExecutor.scheduleAtFixedRate(
-                        shard::tick,
-                        config.tickMillis(),
-                        config.tickMillis(),
-                        TimeUnit.MILLISECONDS);
+            shardLoopsRunning = true;
+            for (int index = 0; index < shards.length; index++) {
+                SceneShard shard = shards[index];
+                Thread thread = Thread.ofVirtual()
+                        .name("SceneShard-Tick-" + config.sceneId() + '-' + index)
+                        .unstarted(() -> runShardLoop(shard));
+                shardThreads[index] = thread;
+                thread.start();
+            }
+        }
+
+        /**
+         * SceneShard 的常驻虚拟线程循环。
+         *
+         * <p>一个 Shard 始终只有这个协程调用 tick()，因此对象、AOI、迷雾和行军状态仍严格
+         * 串行。Tick 超时后从当前时间重新计算下一截止点，不连续补跑过期 Tick 形成雪崩。</p>
+         */
+        private void runShardLoop(SceneShard shard) {
+            long tickNanos = TimeUnit.MILLISECONDS.toNanos(config.tickMillis());
+            long nextTickNanos = System.nanoTime() + tickNanos;
+            while (shardLoopsRunning && !Thread.currentThread().isInterrupted()) {
+                long waitNanos = nextTickNanos - System.nanoTime();
+                if (waitNanos > 0L) {
+                    LockSupport.parkNanos(waitNanos);
+                }
+                if (!shardLoopsRunning || Thread.currentThread().isInterrupted()) {
+                    return;
+                }
+
+                shard.tick();
+                nextTickNanos += tickNanos;
+                long nowNanos = System.nanoTime();
+                if (nextTickNanos <= nowNanos) {
+                    // 当前 Tick 已经超过一个周期：记录耗时即可，不立即追赶执行多个历史 Tick。
+                    nextTickNanos = nowNanos + tickNanos;
+                }
+            }
+        }
+
+        /** 中断完整寻路协程；Future.get 和 Workspace 等待都会立即响应中断。 */
+        private void stopPathTasks() {
+            synchronized (pathTaskLifecycle) {
+                for (Thread thread : pathTasks) {
+                    thread.interrupt();
+                }
+            }
+            awaitThreads(pathTasks, "scene path");
+        }
+
+        /** 停止并等待每个 SceneShard 的常驻虚拟线程退出。 */
+        private void stopShardLoops() {
+            shardLoopsRunning = false;
+            for (Thread thread : shardThreads) {
+                if (thread != null) {
+                    thread.interrupt();
+                }
+            }
+            long deadlineNanos = System.nanoTime()
+                    + TimeUnit.SECONDS.toNanos(THREAD_CLOSE_WAIT_SECONDS);
+            for (Thread thread : shardThreads) {
+                if (thread == null) {
+                    continue;
+                }
+                joinUntil(thread, deadlineNanos, "SceneShard");
+            }
+        }
+
+        private void awaitThreads(Set<Thread> threads, String taskName) {
+            long deadlineNanos = System.nanoTime()
+                    + TimeUnit.SECONDS.toNanos(THREAD_CLOSE_WAIT_SECONDS);
+            while (!threads.isEmpty() && System.nanoTime() < deadlineNanos) {
+                Thread thread = threads.iterator().next();
+                joinUntil(thread, deadlineNanos, taskName);
+            }
+        }
+
+        private void joinUntil(Thread thread, long deadlineNanos, String taskName) {
+            long remainingNanos = deadlineNanos - System.nanoTime();
+            if (remainingNanos <= 0L) {
+                LoggerDef.SystemLogger.warn(
+                        "{} virtual thread did not stop before timeout, sceneId={}, thread={}",
+                        taskName, config.sceneId(), thread.getName());
+                return;
+            }
+            try {
+                thread.join(Math.max(1L, TimeUnit.NANOSECONDS.toMillis(remainingNanos)));
+            } catch (InterruptedException error) {
+                Thread.currentThread().interrupt();
             }
         }
 
@@ -372,40 +460,76 @@ public final class SceneRuntime implements AutoCloseable {
         }
 
         /**
-         * 异步执行 A*，并把完成结果投递回起点所属 SceneShard 的下一个 Tick。
+         * 使用一条 Java 25 虚拟线程顺序执行完整寻路流程，并把结果投递回起点所属 Shard。
          *
-         * <p>返回 Future 的监听器会在 Tick 线程中被触发；RPC Handler 可在该监听器中恢复
-         * callId 后发送响应，寻路线程绝不直接修改场景对象或响应网络连接。
+         * <p>CompletableFuture 只保留为跨线程边界的结果句柄。协程内部直接等待个人迷雾快照、
+         * 有界 A* 工作区和 SceneShard Tick，不再用 thenCompose/whenComplete 拼接业务流程。</p>
          */
         public CompletableFuture<ScenePathResult> findPathAsync(ScenePathRequest request) {
-            CompletableFuture<SceneVisibilitySnapshot> visibilityFuture;
-            if (request.fogPolicy() == SceneFogPolicy.IGNORE) {
-                visibilityFuture = CompletableFuture.completedFuture(new SceneVisibilitySnapshot(
-                        config.regionSize(), blockColumns(), new BitSet(), new BitSet()));
-            } else {
-                visibilityFuture = visibilitySnapshotAsync(request.playerId());
+            CompletableFuture<ScenePathResult> returnedOnTick = new CompletableFuture<>();
+            if (!started) {
+                return CompletableFuture.failedFuture(
+                        new IllegalStateException("SceneRuntime is not started"));
             }
 
-            CompletableFuture<ScenePathResult> workerFuture = visibilityFuture.thenCompose(visibility ->
-                    pathService.findPathAsync(staticMap, request, visibility));
-            CompletableFuture<ScenePathResult> returnedOnTick = new CompletableFuture<>();
-            workerFuture.whenComplete((pathResult, error) -> {
-                try {
-                    submit(request.start().x(), request.start().y(), shard -> {
-                        if (error == null) {
-                            // inbox 在 tickNumber 自增前 drain，因此当前正在执行的是下一个 tick。
+            ScenePathService.PathReservation reservation;
+            try {
+                // 必须在创建虚拟线程之前无阻塞抢占容量；达到上限立即失败并交给 RPC 返回错误。
+                reservation = pathService.reserve(staticMap, config.regionSize());
+            } catch (RuntimeException error) {
+                return CompletableFuture.failedFuture(error);
+            }
+
+            Thread pathTask;
+            try {
+                pathTask = Thread.ofVirtual()
+                        .name("ScenePath-Flow-" + config.sceneId() + '-' + request.playerId())
+                        .unstarted(() -> {
+                    try (reservation) {
+                        SceneVisibilitySnapshot visibility = request.fogPolicy() == SceneFogPolicy.IGNORE
+                                ? new SceneVisibilitySnapshot(
+                                        config.regionSize(), blockColumns(), new BitSet(), new BitSet())
+                                : visibilitySnapshotAsync(request.playerId()).get();
+                        ScenePathResult pathResult = pathService.findPathReserved(
+                                staticMap, request, visibility);
+
+                        // submit 的 action 在目标 Shard Tick 内执行，所以成功 Future 仍由 Tick 线程完成。
+                        submit(request.start().x(), request.start().y(), shard -> {
+                            // inbox 在 tickNumber 自增前 drain，因此本轮完成后对应 tickNumber + 1。
                             returnedOnTick.complete(pathResult.completedOn(shard.tickNumber() + 1));
-                        } else {
-                            returnedOnTick.completeExceptionally(error);
-                        }
-                    }).exceptionally(dispatchError -> {
-                        returnedOnTick.completeExceptionally(dispatchError);
-                        return null;
-                    });
-                } catch (Throwable dispatchError) {
-                    returnedOnTick.completeExceptionally(dispatchError);
+                        }).get();
+                    } catch (InterruptedException error) {
+                        Thread.currentThread().interrupt();
+                        returnedOnTick.completeExceptionally(error);
+                    } catch (ExecutionException error) {
+                        returnedOnTick.completeExceptionally(
+                                error.getCause() == null ? error : error.getCause());
+                    } catch (Throwable error) {
+                        returnedOnTick.completeExceptionally(error);
+                    } finally {
+                        pathTasks.remove(Thread.currentThread());
+                    }
+                });
+            } catch (RuntimeException | Error error) {
+                reservation.close();
+                return CompletableFuture.failedFuture(error);
+            }
+            synchronized (pathTaskLifecycle) {
+                // 与 close() 竞争时不允许在 started=false 后漏启动一条无人管理的寻路协程。
+                if (!started) {
+                    reservation.close();
+                    return CompletableFuture.failedFuture(
+                            new IllegalStateException("SceneRuntime is stopping"));
                 }
-            });
+                pathTasks.add(pathTask);
+                try {
+                    pathTask.start();
+                } catch (RuntimeException | Error error) {
+                    pathTasks.remove(pathTask);
+                    reservation.close();
+                    return CompletableFuture.failedFuture(error);
+                }
+            }
             return returnedOnTick;
         }
 

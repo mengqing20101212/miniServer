@@ -133,10 +133,13 @@ public class GateClient {
         }
 
         int rpcSeq = rpcNodeConnector.getClient().getSendSeq();
+        // 登录后只能使用 Gate 已绑定的 playerId。不能相信客户端包里的 guid，否则客户端可以
+        // 伪造其他在线玩家 ID，让 GameServer 把请求投递到错误的玩家队列。
+        long authoritativeGuid = getSessionGuid();
         Server.csGate2GameRpcGameCall req = Server.csGate2GameRpcGameCall.newBuilder()
                 .setClientCmd(csPacket.getCmd())
                 .setClientSid(csPacket.getSid())
-                .setGuid(csPacket.getGuid())
+                .setGuid(authoritativeGuid)
                 .setClientReqSeq(csPacket.getSeq())
                 .setData(ByteString.copyFrom(csPacket.getData()))
                 .setCallId(callId)
@@ -199,7 +202,7 @@ public class GateClient {
             request = Server.csGate2GameRpcGameCall.newBuilder()
                     .setClientCmd(csPacket.getCmd())
                     .setClientSid(csPacket.getSid())
-                    .setGuid(csPacket.getGuid())
+                    .setGuid(getSessionGuid())
                     .setClientReqSeq(csPacket.getSeq())
                     .setData(ByteString.copyFrom(csPacket.getData()))
                     .build();

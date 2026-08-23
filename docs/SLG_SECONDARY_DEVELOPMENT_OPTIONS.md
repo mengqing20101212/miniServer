@@ -978,12 +978,12 @@ SceneShard EventLoop
   # AOI 订阅和增量广播决策
   └── AOI State
 
-# 可以放到异步线程，但结果必须回投 SceneShard 校验版本
-Async Executors
+# 可以放到异步执行边界，但结果必须回投 SceneShard 校验版本
+Async Execution
   # 数据库、Redis 和快照写入
   ├── DB/Redis IO
-  # 复杂路径搜索或大规模计算
-  ├── Pathfinding Pool
+  # Java 25：每个寻路流程使用一个短生命周期虚拟线程；有界 Workspace 限制 CPU 并行和内存
+  ├── Pathfinding Virtual Threads + Bounded Workspace
   # 热点 Region 迁移编排；数据导出/安装仍在 SceneShard Tick
   ├── Region Migration Thread
   # BattleServer 返回的战斗结果处理
@@ -1046,6 +1046,8 @@ PlayerSceneFog
   ├── discoveredBlocks         # 历史已探索区域，离线后仍保留
   └── fogVersion               # 防止异步旧快照覆盖新探索结果
 ```
+
+这里不把“换成虚拟线程”理解成取消并发控制。SceneShard 仍是单写者，只是每个 Shard 的固定 Tick EventLoop 由一个长期虚拟线程承载；寻路则在创建虚拟线程前先取得容量名额，再用顺序代码完成“迷雾快照 -> A* -> 回投 Tick”。A* 的百万格原生数组不能随虚拟线程创建，必须从默认 4 个的有界工作区池复用，并以最大待处理数对完整寻路生命周期提供背压。`Future` 只作为跨边界结果载体，业务流程不依赖层层 `whenComplete` callback；成功结果必须在对应 SceneShard Tick 上完成后才可应用。
 
 - 相机移动只更新 `visibleBlocks` 和 AOI 块注册，同时将新块 OR 到该玩家自己的 `discoveredBlocks`。
 - 玩家离线只释放 `visibleBlocks`，不能删除 `discoveredBlocks`；永久探索异步落库成功后才能回收内存。
@@ -1127,7 +1129,7 @@ Handler、SceneShard 和 Store 禁止直接拼 SQL。普通动态对象使用 `S
 Future 成功后才能清除内存脏标记；永久失败时停止对应持久化分区并报警。数据库加载失败、
 Protobuf 损坏、坏坐标和重复对象 ID 必须中断 SceneServer 启动，禁止降级成空地图。
 
-线上默认周期输出：每个 SceneShard 的忙碌率、Tick 平均/最大耗时、慢 Tick、命令队列、对象/观察者数量；寻路线程池活跃数、积压和耗时；Region 迁移线程的队列、成功/失败/拒绝数和平均/最大耗时；`SceneShard-Tick-*`、`ScenePath-CPU-*`、`SceneRegion-Migration-*` 平台线程 CPU、阻塞与等待变化。逻辑分片指标和实际线程 CPU 必须同时观察。
+线上默认周期输出：每个 SceneShard 的忙碌率、Tick 平均/最大耗时、慢 Tick、命令队列、对象/观察者数量；寻路最大并行度、存活虚拟线程、正在搜索数、峰值、工作区等待数、任务积压和耗时；Region 迁移线程的队列、成功/失败/拒绝数和平均/最大耗时。`ThreadMXBean` 只可靠采样 `SceneRegion-Migration-*` 等平台线程；`SceneShard-Tick-*` 和寻路虚拟线程使用逻辑耗时、积压与并发指标观察。
 
 ### 11.2 自研 TCP 统一通信方案
 
@@ -1318,6 +1320,8 @@ SceneShard 内存修改
   -> 成功后清理 dirty 标记
 ```
 
+Scene 的客户端业务 cmd 当前收敛到 `2001-2014`，必须低于 Gate 判定服务器内部包的 `10000` 边界。客户端包先由 Gate 按连接路由到 GameServer，GameServer 用登录会话绑定的玩家 ID 覆盖客户端传入身份，再把原始 Scene cmd/body 封装进 `CS_Server2Server` 调用 SceneServer；外层通用 RPC cmd 仍属于服务器内部区间。测试机器人也必须走同一条 Login -> Gate -> Game -> Scene 链路，不能用直连 Scene 的方式冒充客户端容量结论。
+
 当前 MiniServer 的具体映射为：
 
 ```text
@@ -1478,12 +1482,18 @@ java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
 java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
   --test-scene-rpc 127.0.0.1 9101 true
 
-# 地图状态容量回归：32 条真实 TCP 连接、10000 个 playerId、每连接 128 个在途请求。
-java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT-shaded.jar \
-  --test-scene-load 127.0.0.1 9101 10000 128
+# 正式客户端链路容量回归：10000 个账号分别创建真实 RobotSession，分 32 个并发启动批次，
+# 经 Login -> Gate -> Game -> Scene 完成登录、进入、九宫格 AOI、寻路、移动和离开。
+java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT.jar \
+  --test-scene-load 127.0.0.1 8889 10000 32 game1001 scene_e2e
+
+# SceneServer 组件容量回归；该入口显式标记 direct，不能替代正式客户端链路。
+java -jar server/BotServer/target/BotServer-1.0-SNAPSHOT.jar \
+  --test-scene-direct-load 127.0.0.1 9101 10000 128
 ```
 
-容量命令验证的是 1 万个玩家对象、AOI/迷雾状态、SceneShard 命令队列、RPC 背压和完整
-离场清理，不代表 1 万条微信 WebSocket 连接；客户端连接容量仍需由 GateServer 的机器人压测验证。
+`--test-scene-load` 验证的是当前项目 TCP 客户端的真实服务链路和每账号独立会话；微信 WebSocket
+与阿里云负载均衡的连接容量仍需专门的 WebSocket 压测。`--test-scene-direct-load` 只验证 1 万个
+玩家对象、AOI/迷雾状态、SceneShard 命令队列、Scene RPC 背压和完整离场清理，不能当成客户端链路结论。
 SceneServer RPC 分发按 playerId/aggregateId 哈希到固定条带，同一聚合严格保序，不同玩家可并行
 等待对应 SceneShard Tick，禁止恢复成所有连接共享一个同步 Dispatcher 的全局串行模型。

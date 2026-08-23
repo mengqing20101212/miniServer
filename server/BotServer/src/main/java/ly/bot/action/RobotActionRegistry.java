@@ -48,6 +48,26 @@ public class RobotActionRegistry {
                 .offer(new PendingRequest(action, request.getSeq(), System.currentTimeMillis()));
     }
 
+    /**
+     * 发包失败时撤销刚登记的 PendingRequest。
+     *
+     * <p>Pending 必须在 NetClient.send 之前登记，否则本机低延迟回包可能先于登记到达，
+     * ResponseHandler 会把它当成未知响应。发送失败后再按 Action 和请求 seq 精确删除。</p>
+     */
+    public void cancelPending(RobotAction action, MessagePacket request) {
+        if (action == null || request == null || action.responseCmd() <= 0) {
+            return;
+        }
+        Queue<PendingRequest> queue = pendingRequests.get(action.responseCmd());
+        if (queue == null) {
+            return;
+        }
+        queue.removeIf(pending -> pending.action() == action && pending.requestSeq() == request.getSeq());
+        if (queue.isEmpty()) {
+            pendingRequests.remove(action.responseCmd(), queue);
+        }
+    }
+
     public boolean dispatch(MessagePacket response, RobotActionContext context) {
         RobotAction action = pollPendingAction(response);
         if (action == null) {

@@ -65,8 +65,23 @@ public final class ScenePathfinder {
             SceneStaticMap map,
             ScenePathRequest request,
             SceneVisibilitySnapshot visibility) {
+        return find(map, request, visibility, workspaces.get());
+    }
+
+    /**
+     * 使用调用方提供的可复用工作区执行一次寻路。
+     *
+     * <p>普通同步调用继续使用上面的 ThreadLocal 入口；ScenePathService 的虚拟线程模式则从
+     * 有界工作区池借用 Workspace。否则每个短生命周期虚拟线程都会重新分配四组百万长度
+     * int[]，1 万个并发请求会把“轻量虚拟线程”错误放大成巨量堆内存。</p>
+     */
+    ScenePathResult find(
+            SceneStaticMap map,
+            ScenePathRequest request,
+            SceneVisibilitySnapshot visibility,
+            Workspace workspace) {
         // 1. 先做常量时间校验。越界、起终点受迷雾限制或落在不可行走格时，不进入任何 A*。
-        if (map == null || request == null || visibility == null) {
+        if (map == null || request == null || visibility == null || workspace == null) {
             return ScenePathResult.failure(ScenePathStatus.INVALID_ARGUMENT, 0);
         }
         if (!inBounds(map, request.start()) || !inBounds(map, request.target())) {
@@ -100,7 +115,7 @@ public final class ScenePathfinder {
         int maxVisitedNodes = request.effectiveMaxVisitedNodes();
         if (regionSize <= 1) {
             // regionSize=1 常用于单元测试或极小地图，此时粗图和格子图完全等价，直接走细路径。
-            return findCells(map, request, visibility, null, maxVisitedNodes, 0);
+            return findCells(map, request, visibility, null, maxVisitedNodes, 0, workspace);
         }
 
         // 2. 在约 1024 个 Region 上寻找粗路径。粗图只选择候选走廊，不直接作为最终行军路径。
@@ -115,18 +130,19 @@ public final class ScenePathfinder {
                     visibility,
                     graph,
                     List.of(startRegion),
-                    maxVisitedNodes);
+                    maxVisitedNodes,
+                    workspace);
         }
 
         List<Integer> regionRoute = findRegionRoute(
-                graph, startRegion, targetRegion, request.fogPolicy(), visibility);
+                graph, startRegion, targetRegion, request.fogPolicy(), visibility, workspace);
         if (regionRoute.isEmpty()) {
             // Region 边由真实 Portal 生成并同时经过本玩家迷雾过滤；当前地图约束和迷雾策略下无粗路径。
             return ScenePathResult.failure(ScenePathStatus.PATH_NOT_FOUND, 0);
         }
 
         return findWithCorridorFallback(
-                map, request, visibility, graph, regionRoute, maxVisitedNodes);
+                map, request, visibility, graph, regionRoute, maxVisitedNodes, workspace);
     }
 
     private ScenePathResult findWithCorridorFallback(
@@ -135,13 +151,14 @@ public final class ScenePathfinder {
             SceneVisibilitySnapshot visibility,
             SceneRegionGraph graph,
             List<Integer> regionRoute,
-            int maxVisitedNodes) {
+            int maxVisitedNodes,
+            Workspace workspace) {
         // 3. 将 Region 序列展开为 BitSet 走廊。格子 A* 用一次位测试即可判断候选格是否在走廊内。
         BitSet corridorRegions = graph.corridor(regionRoute, regionPadding);
         RegionCorridor corridor = new RegionCorridor(
                 graph.regionSize(), graph.columns(), corridorRegions);
         ScenePathResult corridorResult = findCells(
-                map, request, visibility, corridor, maxVisitedNodes, 0);
+                map, request, visibility, corridor, maxVisitedNodes, 0, workspace);
         if (corridorResult.status() != ScenePathStatus.PATH_NOT_FOUND) {
             // OK 直接返回；LIMIT_EXCEEDED 也必须直接返回，禁止突破调用方给出的 CPU 预算。
             return corridorResult;
@@ -163,7 +180,8 @@ public final class ScenePathfinder {
                 visibility,
                 null,
                 remainingBudget,
-                corridorResult.visitedNodes());
+                corridorResult.visitedNodes(),
+                workspace);
     }
 
     private ScenePathResult findCells(
@@ -172,13 +190,13 @@ public final class ScenePathfinder {
             SceneVisibilitySnapshot visibility,
             RegionCorridor corridor,
             int maxVisitedNodes,
-            int visitedOffset) {
+            int visitedOffset,
+            Workspace workspace) {
         // 细路径搜索的输出才是权威行军路径。它逐格检查地形、flags、个人迷雾和可选 Region 走廊。
         int width = map.width();
         int startIndex = request.start().y() * width + request.start().x();
         int targetIndex = request.target().y() * width + request.target().x();
         // beginCells 通过 epoch 复用旧数组，不需要每次 Arrays.fill 一百万个位置。
-        Workspace workspace = workspaces.get();
         workspace.beginCells(map.cellCount(), maxVisitedNodes);
         int epoch = workspace.cellEpoch;
         workspace.seenEpoch[startIndex] = epoch;
@@ -188,6 +206,9 @@ public final class ScenePathfinder {
 
         int visited = 0;
         while (!workspace.cellHeap.isEmpty()) {
+            if ((visited & 1_023) == 0 && Thread.currentThread().isInterrupted()) {
+                throw new java.util.concurrent.CancellationException("scene path task interrupted");
+            }
             int current = workspace.cellHeap.pop();
             int currentG = workspace.cellHeap.poppedG;
             if (workspace.closedEpoch[current] == epoch
@@ -283,9 +304,9 @@ public final class ScenePathfinder {
             int startRegion,
             int targetRegion,
             SceneFogPolicy fogPolicy,
-            SceneVisibilitySnapshot visibility) {
+            SceneVisibilitySnapshot visibility,
+            Workspace workspace) {
         // Region A* 使用独立的小工作区。1000 x 1000 / 32 的标准地图仅有 1024 个节点。
-        Workspace workspace = workspaces.get();
         workspace.beginRegions(graph.regionCount());
         int epoch = workspace.regionEpoch;
         workspace.regionSeenEpoch[startRegion] = epoch;
@@ -295,6 +316,9 @@ public final class ScenePathfinder {
                 startRegion, 0, graph.heuristic(startRegion, targetRegion));
 
         while (!workspace.regionHeap.isEmpty()) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new java.util.concurrent.CancellationException("scene region path task interrupted");
+            }
             int current = workspace.regionHeap.pop();
             int currentG = workspace.regionHeap.poppedG;
             if (workspace.regionClosedEpoch[current] == epoch
@@ -416,7 +440,7 @@ public final class ScenePathfinder {
         }
     }
 
-    private static final class Workspace {
+    static final class Workspace {
         // 格子级数组按地图 cellIndex 访问。epoch 数组用于区分本次搜索和历史搜索。
         private int[] seenEpoch = new int[0];
         private int[] closedEpoch = new int[0];

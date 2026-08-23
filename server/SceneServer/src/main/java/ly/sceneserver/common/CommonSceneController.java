@@ -1,6 +1,7 @@
 package ly.sceneserver.common;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -306,13 +307,29 @@ public final class CommonSceneController implements IController {
                     new ScenePoint(request.getTargetPoint().getX(), request.getTargetPoint().getY()),
                     fromProtoFogPolicy(request.getFogPolicy()),
                     request.getMaxVisitedNodes());
-            scene.findPathAsync(pathRequest).whenComplete((pathResult, error) -> {
-                if (error != null) {
-                    LoggerDef.NetLogger.warn("scene path find failed, playerId={}", request.getPlayerId(), error);
+            // 先在 RPC stripe 上无阻塞取得全流程容量名额；达到上限时 findPathAsync 立即失败，
+            // 不会先创建并堆积等待迷雾快照的寻路虚拟线程。
+            var pathFuture = scene.findPathAsync(pathRequest);
+            // 寻路可能等待个人迷雾快照、CPU 工作区和下一个 SceneShard Tick。单独使用虚拟线程
+            // 顺序等待后发送响应，既不阻塞同条 RPC stripe，也不再用 whenComplete 拆散业务流程。
+            Thread.ofVirtual()
+                    .name("ScenePath-Response-" + request.getPlayerId())
+                    .start(() -> {
+                try {
+                    ScenePathResult pathResult = pathFuture.get();
+                    sendPathResponse(context.session(), callId, request, scene.config().sceneId(), pathResult);
+                } catch (InterruptedException error) {
+                    Thread.currentThread().interrupt();
+                    LoggerDef.NetLogger.warn(
+                            "scene path response interrupted, playerId={}", request.getPlayerId(), error);
                     sendPathError(context.session(), callId, request, scene.config().sceneId(),
                             ErrorMsg.ErrorCode.SYSTEM_ERROR);
-                } else {
-                    sendPathResponse(context.session(), callId, request, scene.config().sceneId(), pathResult);
+                } catch (ExecutionException error) {
+                    Throwable cause = error.getCause() == null ? error : error.getCause();
+                    LoggerDef.NetLogger.warn(
+                            "scene path find failed, playerId={}", request.getPlayerId(), cause);
+                    sendPathError(context.session(), callId, request, scene.config().sceneId(),
+                            ErrorMsg.ErrorCode.SYSTEM_ERROR);
                 }
             });
         } catch (IllegalArgumentException error) {

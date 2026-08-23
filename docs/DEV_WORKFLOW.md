@@ -161,7 +161,7 @@ cmd.exe /c "cd /d D:\WORK\me\miniServer\server && mvnw.cmd clean install -pl Gam
 
 ## 启动与运行流程
 
-启动顺序：`LoginServer → GateServer → GameServer → BotServer`
+启动顺序：`LoginServer → GameServer → SceneServer → GateServer → BotServer`
 
 使用 Windows JDK/mvn：
 

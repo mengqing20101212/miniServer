@@ -1,6 +1,6 @@
 ---
 name: mini-server-startup
-description: Canonical local startup parameters, validation rules, and startup order for LoginServer, GameServer, GateServer, and BotServer.
+description: Canonical local startup parameters, validation rules, and startup order for LoginServer, GameServer, SceneServer, GateServer, and BotServer.
 startup:
   nacos:
     url: "118.25.76.117:8848"
@@ -24,6 +24,8 @@ startup:
     loadLogSeconds: 60
     slowTickMillis: 200
     pathRegionPadding: 1
+    pathParallelism: 4
+    pathMaxPending: 10000
     regionMigrationQueueCapacity: 128
     restorePageSize: 1000
     persistencePartitions: 4
@@ -49,6 +51,7 @@ startup:
     startupOrder:
       - login
       - game
+      - scene
       - gate
       - bot
 ---
@@ -62,7 +65,7 @@ startup:
 - LoginServer: `serverId=login`, NetServer `8888`, Spring HTTP `8889`
 - GameServer: `serverId=game1001`, NetServer `9002`
 - SceneServer: `serverId=scene1001`, NetServer `9101`
-- SceneServer load/persistence baseline: load log `60s`, slow Tick `200ms`, Region migration queue `128`, restore page `1000`, persistence partitions `4`.
+- SceneServer load/persistence baseline: load log `60s`, slow Tick `200ms`, A* CPU parallelism `4`, A* pending limit `10000`, Region migration queue `128`, restore page `1000`, persistence partitions `4`.
 - GateServer: `serverId=gate1001`, NetServer `9001`
 - BotServer: `--run-bots 127.0.0.1 8889 1`
 
@@ -70,10 +73,11 @@ startup:
 
 1. `LoginServer`
 2. `GameServer`
-3. `GateServer`
-4. `BotServer`
+3. `SceneServer`
+4. `GateServer`
+5. `BotServer`
 
-Do not start BotServer until Login/Game/Gate are actually listening on `8888`, `8889`, `9002`, and `9001`.
+Do not start BotServer until Login/Game/Scene/Gate are actually listening on `8888`, `8889`, `9002`, `9101`, and `9001`.
 
 ## Validation Rules
 
@@ -87,11 +91,11 @@ Do not start BotServer until Login/Game/Gate are actually listening on `8888`, `
 
 ## Clean Restart Procedure
 
-- Stop stale Java processes for `LoginServerApplication`, `ly.GameServer`, `ly.GateServer`, and `ly.BotServer`.
-- Confirm ports `8888`, `8889`, `9001`, and `9002` are free before startup.
+- Stop stale Java processes for `LoginServerApplication`, `ly.GameServer`, `ly.SceneServer`, `ly.GateServer`, and `ly.BotServer`.
+- Confirm ports `8888`, `8889`, `9001`, `9002`, and `9101` are free before startup.
 - Build from `server` with `mvnw.cmd -DskipTests install` on Windows or
   `./mvnw -DskipTests install` on macOS/Linux.
-- Generate `cp.txt` for `LoginServer`, `GameServer`, `GateServer`, and `BotServer`.
+- Generate `cp.txt` for `LoginServer`, `GameServer`, `SceneServer`, `GateServer`, and `BotServer`.
 - Prefer a fixed JDK path such as `D:\Soft\env\Java\jdk-25\bin\java.exe`, not mixed `javapath` and direct JDK launches.
 - Use fresh log names such as `login-clean.out.log`, `game-clean.out.log`, `gate-clean.out.log`, and `bot-clean.out.log`.
 - Check only the current clean logs; historical logs in `runlogs` may contain old failed attempts.
@@ -100,6 +104,7 @@ Do not start BotServer until Login/Game/Gate are actually listening on `8888`, `
 
 - LoginServer listens on `8888` and `8889`.
 - GameServer listens on `9002`.
+- SceneServer listens on `9101` and has completed map recovery before BotServer starts.
 - GateServer listens on `9001`.
 - BotServer logs show total robot count `1`, connected Gate count `1`, and login success count `1`.
 - LoginServer `/actuator` responds on `http://127.0.0.1:8889/actuator`.

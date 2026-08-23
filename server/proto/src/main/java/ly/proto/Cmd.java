@@ -302,88 +302,89 @@ public final class Cmd {
     SC_GmRuntimeScriptExecute(10012),
     /**
      * <pre>
-     * SceneServer 通用地图 RPC 12000-12099
+     * Scene 地图客户端协议 2000-2099。客户端经 Gate -&gt; Game 发送；Game 再使用
+     * CS_Server2Server 外壳把同一业务消息转给 SceneServer，不能放在服务器内部号段。
      * </pre>
      *
-     * <code>CS_SceneQuery = 12001;</code>
+     * <code>CS_SceneQuery = 2001;</code>
      */
-    CS_SceneQuery(12001),
+    CS_SceneQuery(2001),
     /**
-     * <code>SC_SceneQuery = 12002;</code>
+     * <code>SC_SceneQuery = 2002;</code>
      */
-    SC_SceneQuery(12002),
+    SC_SceneQuery(2002),
     /**
      * <pre>
      * 实体进入场景
      * </pre>
      *
-     * <code>CS_SceneEnter = 12003;</code>
+     * <code>CS_SceneEnter = 2003;</code>
      */
-    CS_SceneEnter(12003),
+    CS_SceneEnter(2003),
     /**
-     * <code>SC_SceneEnter = 12004;</code>
+     * <code>SC_SceneEnter = 2004;</code>
      */
-    SC_SceneEnter(12004),
+    SC_SceneEnter(2004),
     /**
      * <pre>
      * 实体移动
      * </pre>
      *
-     * <code>CS_SceneMove = 12005;</code>
+     * <code>CS_SceneMove = 2005;</code>
      */
-    CS_SceneMove(12005),
+    CS_SceneMove(2005),
     /**
-     * <code>SC_SceneMove = 12006;</code>
+     * <code>SC_SceneMove = 2006;</code>
      */
-    SC_SceneMove(12006),
+    SC_SceneMove(2006),
     /**
      * <pre>
-     * 查询场景运行指标
+     * 查询场景运行指标（仅内部运维调用）
      * </pre>
      *
-     * <code>CS_SceneMetrics = 12007;</code>
+     * <code>CS_SceneMetrics = 2007;</code>
      */
-    CS_SceneMetrics(12007),
+    CS_SceneMetrics(2007),
     /**
-     * <code>SC_SceneMetrics = 12008;</code>
+     * <code>SC_SceneMetrics = 2008;</code>
      */
-    SC_SceneMetrics(12008),
+    SC_SceneMetrics(2008),
     /**
      * <pre>
      * 实体离开场景
      * </pre>
      *
-     * <code>CS_SceneLeave = 12009;</code>
+     * <code>CS_SceneLeave = 2009;</code>
      */
-    CS_SceneLeave(12009),
+    CS_SceneLeave(2009),
     /**
-     * <code>SC_SceneLeave = 12010;</code>
+     * <code>SC_SceneLeave = 2010;</code>
      */
-    SC_SceneLeave(12010),
+    SC_SceneLeave(2010),
     /**
      * <pre>
      * 移动 AOI 视野或切换缩放层
      * </pre>
      *
-     * <code>CS_SceneView = 12011;</code>
+     * <code>CS_SceneView = 2011;</code>
      */
-    CS_SceneView(12011),
+    CS_SceneView(2011),
     /**
-     * <code>SC_SceneView = 12012;</code>
+     * <code>SC_SceneView = 2012;</code>
      */
-    SC_SceneView(12012),
+    SC_SceneView(2012),
     /**
      * <pre>
      * 异步地形和战争迷雾 A* 寻路
      * </pre>
      *
-     * <code>CS_ScenePathFind = 12013;</code>
+     * <code>CS_ScenePathFind = 2013;</code>
      */
-    CS_ScenePathFind(12013),
+    CS_ScenePathFind(2013),
     /**
-     * <code>SC_ScenePathFind = 12014;</code>
+     * <code>SC_ScenePathFind = 2014;</code>
      */
-    SC_ScenePathFind(12014),
+    SC_ScenePathFind(2014),
     /**
      * <pre>
      *maxServeMsgId 服务器之间通信消息号最大值
@@ -673,88 +674,89 @@ public final class Cmd {
     public static final int SC_GmRuntimeScriptExecute_VALUE = 10012;
     /**
      * <pre>
-     * SceneServer 通用地图 RPC 12000-12099
+     * Scene 地图客户端协议 2000-2099。客户端经 Gate -&gt; Game 发送；Game 再使用
+     * CS_Server2Server 外壳把同一业务消息转给 SceneServer，不能放在服务器内部号段。
      * </pre>
      *
-     * <code>CS_SceneQuery = 12001;</code>
+     * <code>CS_SceneQuery = 2001;</code>
      */
-    public static final int CS_SceneQuery_VALUE = 12001;
+    public static final int CS_SceneQuery_VALUE = 2001;
     /**
-     * <code>SC_SceneQuery = 12002;</code>
+     * <code>SC_SceneQuery = 2002;</code>
      */
-    public static final int SC_SceneQuery_VALUE = 12002;
+    public static final int SC_SceneQuery_VALUE = 2002;
     /**
      * <pre>
      * 实体进入场景
      * </pre>
      *
-     * <code>CS_SceneEnter = 12003;</code>
+     * <code>CS_SceneEnter = 2003;</code>
      */
-    public static final int CS_SceneEnter_VALUE = 12003;
+    public static final int CS_SceneEnter_VALUE = 2003;
     /**
-     * <code>SC_SceneEnter = 12004;</code>
+     * <code>SC_SceneEnter = 2004;</code>
      */
-    public static final int SC_SceneEnter_VALUE = 12004;
+    public static final int SC_SceneEnter_VALUE = 2004;
     /**
      * <pre>
      * 实体移动
      * </pre>
      *
-     * <code>CS_SceneMove = 12005;</code>
+     * <code>CS_SceneMove = 2005;</code>
      */
-    public static final int CS_SceneMove_VALUE = 12005;
+    public static final int CS_SceneMove_VALUE = 2005;
     /**
-     * <code>SC_SceneMove = 12006;</code>
+     * <code>SC_SceneMove = 2006;</code>
      */
-    public static final int SC_SceneMove_VALUE = 12006;
+    public static final int SC_SceneMove_VALUE = 2006;
     /**
      * <pre>
-     * 查询场景运行指标
+     * 查询场景运行指标（仅内部运维调用）
      * </pre>
      *
-     * <code>CS_SceneMetrics = 12007;</code>
+     * <code>CS_SceneMetrics = 2007;</code>
      */
-    public static final int CS_SceneMetrics_VALUE = 12007;
+    public static final int CS_SceneMetrics_VALUE = 2007;
     /**
-     * <code>SC_SceneMetrics = 12008;</code>
+     * <code>SC_SceneMetrics = 2008;</code>
      */
-    public static final int SC_SceneMetrics_VALUE = 12008;
+    public static final int SC_SceneMetrics_VALUE = 2008;
     /**
      * <pre>
      * 实体离开场景
      * </pre>
      *
-     * <code>CS_SceneLeave = 12009;</code>
+     * <code>CS_SceneLeave = 2009;</code>
      */
-    public static final int CS_SceneLeave_VALUE = 12009;
+    public static final int CS_SceneLeave_VALUE = 2009;
     /**
-     * <code>SC_SceneLeave = 12010;</code>
+     * <code>SC_SceneLeave = 2010;</code>
      */
-    public static final int SC_SceneLeave_VALUE = 12010;
+    public static final int SC_SceneLeave_VALUE = 2010;
     /**
      * <pre>
      * 移动 AOI 视野或切换缩放层
      * </pre>
      *
-     * <code>CS_SceneView = 12011;</code>
+     * <code>CS_SceneView = 2011;</code>
      */
-    public static final int CS_SceneView_VALUE = 12011;
+    public static final int CS_SceneView_VALUE = 2011;
     /**
-     * <code>SC_SceneView = 12012;</code>
+     * <code>SC_SceneView = 2012;</code>
      */
-    public static final int SC_SceneView_VALUE = 12012;
+    public static final int SC_SceneView_VALUE = 2012;
     /**
      * <pre>
      * 异步地形和战争迷雾 A* 寻路
      * </pre>
      *
-     * <code>CS_ScenePathFind = 12013;</code>
+     * <code>CS_ScenePathFind = 2013;</code>
      */
-    public static final int CS_ScenePathFind_VALUE = 12013;
+    public static final int CS_ScenePathFind_VALUE = 2013;
     /**
-     * <code>SC_ScenePathFind = 12014;</code>
+     * <code>SC_ScenePathFind = 2014;</code>
      */
-    public static final int SC_ScenePathFind_VALUE = 12014;
+    public static final int SC_ScenePathFind_VALUE = 2014;
     /**
      * <pre>
      *maxServeMsgId 服务器之间通信消息号最大值
@@ -824,20 +826,20 @@ public final class Cmd {
         case 10010: return SC_GmUpdatePlayerModule;
         case 10011: return CS_GmRuntimeScriptExecute;
         case 10012: return SC_GmRuntimeScriptExecute;
-        case 12001: return CS_SceneQuery;
-        case 12002: return SC_SceneQuery;
-        case 12003: return CS_SceneEnter;
-        case 12004: return SC_SceneEnter;
-        case 12005: return CS_SceneMove;
-        case 12006: return SC_SceneMove;
-        case 12007: return CS_SceneMetrics;
-        case 12008: return SC_SceneMetrics;
-        case 12009: return CS_SceneLeave;
-        case 12010: return SC_SceneLeave;
-        case 12011: return CS_SceneView;
-        case 12012: return SC_SceneView;
-        case 12013: return CS_ScenePathFind;
-        case 12014: return SC_ScenePathFind;
+        case 2001: return CS_SceneQuery;
+        case 2002: return SC_SceneQuery;
+        case 2003: return CS_SceneEnter;
+        case 2004: return SC_SceneEnter;
+        case 2005: return CS_SceneMove;
+        case 2006: return SC_SceneMove;
+        case 2007: return CS_SceneMetrics;
+        case 2008: return SC_SceneMetrics;
+        case 2009: return CS_SceneLeave;
+        case 2010: return SC_SceneLeave;
+        case 2011: return CS_SceneView;
+        case 2012: return SC_SceneView;
+        case 2013: return CS_ScenePathFind;
+        case 2014: return SC_ScenePathFind;
         case 20000: return MaxServeMsgId;
         default: return null;
       }
@@ -923,14 +925,14 @@ public final class Cmd {
       "CS_GmUpdatePlayerModule\020\231N\022\034\n\027SC_GmUpdat" +
       "ePlayerModule\020\232N\022\036\n\031CS_GmRuntimeScriptEx" +
       "ecute\020\233N\022\036\n\031SC_GmRuntimeScriptExecute\020\234N" +
-      "\022\022\n\rCS_SceneQuery\020\341]\022\022\n\rSC_SceneQuery\020\342]" +
-      "\022\022\n\rCS_SceneEnter\020\343]\022\022\n\rSC_SceneEnter\020\344]" +
-      "\022\021\n\014CS_SceneMove\020\345]\022\021\n\014SC_SceneMove\020\346]\022\024" +
-      "\n\017CS_SceneMetrics\020\347]\022\024\n\017SC_SceneMetrics\020" +
-      "\350]\022\022\n\rCS_SceneLeave\020\351]\022\022\n\rSC_SceneLeave\020" +
-      "\352]\022\021\n\014CS_SceneView\020\353]\022\021\n\014SC_SceneView\020\354]" +
-      "\022\025\n\020CS_ScenePathFind\020\355]\022\025\n\020SC_ScenePathF" +
-      "ind\020\356]\022\023\n\rMaxServeMsgId\020\240\234\001B\n\n\010ly.protob" +
+      "\022\022\n\rCS_SceneQuery\020\321\017\022\022\n\rSC_SceneQuery\020\322\017" +
+      "\022\022\n\rCS_SceneEnter\020\323\017\022\022\n\rSC_SceneEnter\020\324\017" +
+      "\022\021\n\014CS_SceneMove\020\325\017\022\021\n\014SC_SceneMove\020\326\017\022\024" +
+      "\n\017CS_SceneMetrics\020\327\017\022\024\n\017SC_SceneMetrics\020" +
+      "\330\017\022\022\n\rCS_SceneLeave\020\331\017\022\022\n\rSC_SceneLeave\020" +
+      "\332\017\022\021\n\014CS_SceneView\020\333\017\022\021\n\014SC_SceneView\020\334\017" +
+      "\022\025\n\020CS_ScenePathFind\020\335\017\022\025\n\020SC_ScenePathF" +
+      "ind\020\336\017\022\023\n\rMaxServeMsgId\020\240\234\001B\n\n\010ly.protob" +
       "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
