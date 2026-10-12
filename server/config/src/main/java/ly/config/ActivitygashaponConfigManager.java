@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: ActivitygashaponConfigManager
  */
 public class ActivitygashaponConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final ActivitygashaponConfigManager instance = new ActivitygashaponConfigManager();
-  private static final ActivitygashaponConfigManagerImpl instanceImplA = new ActivitygashaponConfigManagerImpl();
-  private static final ActivitygashaponConfigManagerImpl instanceImplB = new ActivitygashaponConfigManagerImpl();
-
   public static ActivitygashaponConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static ActivitygashaponConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(ActivitygashaponConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new ActivitygashaponConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    ActivitygashaponConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "activitygashapon.txt"; }
 
   public static class ActivitygashaponConfigManagerImpl extends AbstractConfigManger {
     private List<ActivitygashaponConfig> configList = List.of();
@@ -140,7 +114,6 @@ public class ActivitygashaponConfigManager implements InterfaceConfigManagerProx
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

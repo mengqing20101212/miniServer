@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: ManualActiveConfigManager
  */
 public class ManualActiveConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final ManualActiveConfigManager instance = new ManualActiveConfigManager();
-  private static final ManualActiveConfigManagerImpl instanceImplA = new ManualActiveConfigManagerImpl();
-  private static final ManualActiveConfigManagerImpl instanceImplB = new ManualActiveConfigManagerImpl();
-
   public static ManualActiveConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static ManualActiveConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(ManualActiveConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new ManualActiveConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    ManualActiveConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "manualActive.txt"; }
 
   public static class ManualActiveConfigManagerImpl extends AbstractConfigManger {
     private List<ManualActiveConfig> configList = List.of();
@@ -122,7 +96,6 @@ public class ManualActiveConfigManager implements InterfaceConfigManagerProxy {
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

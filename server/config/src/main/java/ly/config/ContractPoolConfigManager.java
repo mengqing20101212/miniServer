@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: ContractPoolConfigManager
  */
 public class ContractPoolConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final ContractPoolConfigManager instance = new ContractPoolConfigManager();
-  private static final ContractPoolConfigManagerImpl instanceImplA = new ContractPoolConfigManagerImpl();
-  private static final ContractPoolConfigManagerImpl instanceImplB = new ContractPoolConfigManagerImpl();
-
   public static ContractPoolConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static ContractPoolConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(ContractPoolConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new ContractPoolConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    ContractPoolConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "contractPool.txt"; }
 
   public static class ContractPoolConfigManagerImpl extends AbstractConfigManger {
     private List<ContractPoolConfig> configList = List.of();
@@ -134,7 +108,6 @@ public class ContractPoolConfigManager implements InterfaceConfigManagerProxy {
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: BossDamageStatisticsInfoConfigManager
  */
 public class BossDamageStatisticsInfoConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final BossDamageStatisticsInfoConfigManager instance = new BossDamageStatisticsInfoConfigManager();
-  private static final BossDamageStatisticsInfoConfigManagerImpl instanceImplA = new BossDamageStatisticsInfoConfigManagerImpl();
-  private static final BossDamageStatisticsInfoConfigManagerImpl instanceImplB = new BossDamageStatisticsInfoConfigManagerImpl();
-
   public static BossDamageStatisticsInfoConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static BossDamageStatisticsInfoConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(BossDamageStatisticsInfoConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new BossDamageStatisticsInfoConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    BossDamageStatisticsInfoConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "bossDamageStatisticsInfo.txt"; }
 
   public static class BossDamageStatisticsInfoConfigManagerImpl extends AbstractConfigManger {
     private List<BossDamageStatisticsInfoConfig> configList = List.of();
@@ -128,7 +102,6 @@ public class BossDamageStatisticsInfoConfigManager implements InterfaceConfigMan
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

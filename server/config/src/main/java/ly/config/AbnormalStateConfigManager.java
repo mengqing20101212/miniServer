@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: AbnormalStateConfigManager
  */
 public class AbnormalStateConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final AbnormalStateConfigManager instance = new AbnormalStateConfigManager();
-  private static final AbnormalStateConfigManagerImpl instanceImplA = new AbnormalStateConfigManagerImpl();
-  private static final AbnormalStateConfigManagerImpl instanceImplB = new AbnormalStateConfigManagerImpl();
-
   public static AbnormalStateConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static AbnormalStateConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(AbnormalStateConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new AbnormalStateConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    AbnormalStateConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "abnormalState.txt"; }
 
   public static class AbnormalStateConfigManagerImpl extends AbstractConfigManger {
     private List<AbnormalStateConfig> configList = List.of();
@@ -242,7 +216,6 @@ public class AbnormalStateConfigManager implements InterfaceConfigManagerProxy {
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

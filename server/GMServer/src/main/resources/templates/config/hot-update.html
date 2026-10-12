@@ -29,6 +29,7 @@
         </div>
         <div class="col-lg-7">
             <div class="border rounded p-3">
+                <div class="mb-3"><label class="form-label">本次热更目标节点</label><input id="targetServerIds" class="form-control" placeholder="填写相关服务器 ID，以英文逗号分隔"></div>
                 <div class="row g-2 align-items-end mb-3">
                     <div class="col-md-4">
                         <label class="form-label">发布版本</label>
@@ -114,10 +115,12 @@ function uploadFiles() {
 function prepareVersion() {
   var version = document.getElementById('publishVersion').value.trim();
   var switchAt = document.getElementById('switchAt').value;
+  var targetServerIds = document.getElementById('targetServerIds').value.trim();
+  if (!targetServerIds) { alert('请填写本次热更目标节点'); return; }
   if (!version || !switchAt) { alert('请选择版本和切换时间'); return; }
   var millis = new Date(switchAt).getTime();
   if (!confirm('将下发版本 ' + version + ' 的准备指令，各服务器校验成功后显示 READY。确认继续？')) return;
-  postForm('/api/config-hot-update/prepare', {version: version, switchAtMillis: millis}, document.getElementById('prepareBtn'));
+  postForm('/api/config-hot-update/prepare', {version: version, switchAtMillis: millis, targetServerIds: targetServerIds}, document.getElementById('prepareBtn'));
 }
 function commitVersion() {
   var version = document.getElementById('publishVersion').value.trim();

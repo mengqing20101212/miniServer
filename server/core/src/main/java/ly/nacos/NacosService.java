@@ -1,22 +1,5 @@
 package ly.nacos;
 
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.slf4j.Logger;
-
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.config.ConfigService;
@@ -36,11 +19,27 @@ import ly.rpc.RpcService;
 import ly.startup.StartupSkillLoader;
 import ly.utils.CommonUtils;
 
+import org.slf4j.Logger;
+
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Nacos 服务发现组件，负责节点注册、监听、配置订阅和本节点元数据管理。
- * <p>
- * 本项目把 Nacos 同时用于两件事：通过配置中心读取当前 serverId 的
- * {@link ServerConfig}，通过注册中心维护所有可 RPC 的服务器节点列表。
+ *
+ * <p>本项目把 Nacos 同时用于两件事：通过配置中心读取当前 serverId 的 {@link ServerConfig}，通过注册中心维护所有可 RPC 的服务器节点列表。
  */
 public class NacosService {
     Logger logger = LoggerDef.SystemLogger;
@@ -56,15 +55,12 @@ public class NacosService {
     /*** nacos 请求操作最大超时时间戳 */
     static final long MAX_TIME_OUT = 5000;
 
-    /**
-     * 存活的服务器节点信息
-     */
+    /** 存活的服务器节点信息 */
     private Map<String, NacosServerNode> nodeMap = new ConcurrentHashMap<>();
 
     private static NacosServerNode currentNode;
 
-    private NacosService() {
-    }
+    private NacosService() {}
 
     public static NacosService getInstance() {
         return instance;
@@ -72,11 +68,10 @@ public class NacosService {
 
     /**
      * 启动 Nacos 客户端。
-     * <p>
-     * 会先读取当前节点配置，再订阅同 namespace 下的节点变化。
-     * 读取配置成功后会写入 {@link ServerContext#serverConfig}，供后续服务初始化使用。
-     * 当前节点要等端口真正绑定后由 {@link #registerCurrentServerNode()} 注册，避免发现列表
-     * 暴露尚未就绪或校验失败的节点。
+     *
+     * <p>会先读取当前节点配置，再订阅同 namespace 下的节点变化。 读取配置成功后会写入 {@link
+     * ServerContext#serverConfig}，供后续服务初始化使用。 当前节点要等端口真正绑定后由 {@link #registerCurrentServerNode()}
+     * 注册，避免发现列表 暴露尚未就绪或校验失败的节点。
      */
     public void startUp(String nacosUrl, ServerTypeEnum serverType, String serverId, String env) {
         logger.info("开始启动 Nacos ");
@@ -108,45 +103,43 @@ public class NacosService {
 
     /**
      * 订阅 RPC 节点列表变化。
-     * <p>
-     * Nacos 的 InstanceId 用于删除事件，ServerId 用于本地 nodeMap 查询；新增和修改事件会
-     * 转换为 {@link NacosServerNode} 后写入本地缓存。
+     *
+     * <p>Nacos 的 InstanceId 用于删除事件，ServerId 用于本地 nodeMap 查询；新增和修改事件会 转换为 {@link NacosServerNode}
+     * 后写入本地缓存。
      */
     private void subscribeServerNode(NamingService namingService) throws NacosException {
-        EventListener serviceListener = new AbstractNamingChangeListener() {
-            @Override
-            public void onChange(NamingChangeEvent event) {
-                if (event.isAdded()) {
-                    event
-                            .getAddedInstances()
-                            .forEach(
-                                    data -> {
-                                        addNewNode(data);
-                                    });
-                }
-                if (event.isRemoved()) {
-                    event
-                            .getRemovedInstances()
-                            .forEach(
-                                    data -> {
-                                        delNode(data.getInstanceId());
-                                    });
-                }
-                if (event.isModified()) {
-                    event
-                            .getModifiedInstances()
-                            .forEach(
-                                    data -> {
-                                        updateNode(data);
-                                    });
-                }
-            }
+        EventListener serviceListener =
+                new AbstractNamingChangeListener() {
+                    @Override
+                    public void onChange(NamingChangeEvent event) {
+                        if (event.isAdded()) {
+                            event.getAddedInstances()
+                                    .forEach(
+                                            data -> {
+                                                addNewNode(data);
+                                            });
+                        }
+                        if (event.isRemoved()) {
+                            event.getRemovedInstances()
+                                    .forEach(
+                                            data -> {
+                                                delNode(data.getInstanceId());
+                                            });
+                        }
+                        if (event.isModified()) {
+                            event.getModifiedInstances()
+                                    .forEach(
+                                            data -> {
+                                                updateNode(data);
+                                            });
+                        }
+                    }
 
-            @Override
-            public Executor getExecutor() {
-                return executorService;
-            }
-        };
+                    @Override
+                    public Executor getExecutor() {
+                        return executorService;
+                    }
+                };
 
         namingService.subscribe(RPC_NODE_LIST_SERVICE, ServerContext.ENV, serviceListener);
     }
@@ -154,11 +147,14 @@ public class NacosService {
     private void updateNode(Instance instance) {
         NacosServerNode node = nodeMap.get(instance.getInstanceId());
         if (node == null) {
-            logger.info(String.format("updateNode 当前节点数量:%d 该节点不存在，直接添加: %s ", nodeMap.size(), instance));
+            logger.info(
+                    String.format(
+                            "updateNode 当前节点数量:%d 该节点不存在，直接添加: %s ", nodeMap.size(), instance));
             addNewNode(instance);
         } else {
             node.update(instance);
-            logger.info(String.format("updateNode 当前节点数量:%d, 更新服务器节点: %s", nodeMap.size(), instance));
+            logger.info(
+                    String.format("updateNode 当前节点数量:%d, 更新服务器节点: %s", nodeMap.size(), instance));
             if (node.canUse()) {
                 RpcService.getInstance().onNodeAvailable(node.getServerId());
             }
@@ -192,8 +188,7 @@ public class NacosService {
     /**
      * 在本服网络端口绑定成功后注册当前节点。
      *
-     * <p>该入口刻意与 Nacos 配置加载分开：如果端口校验、数据库初始化或 Netty 绑定失败，
-     * 注册中心不会出现一个实际不可用的节点。</p>
+     * <p>该入口刻意与 Nacos 配置加载分开：如果端口校验、数据库初始化或 Netty 绑定失败， 注册中心不会出现一个实际不可用的节点。
      */
     public void registerCurrentServerNode() {
         if (namingService == null) {
@@ -209,24 +204,31 @@ public class NacosService {
 
     /**
      * 注册当前服务器节点。
-     * <p>
-     * 服务名固定为 {@code rpc_node_list_service}，group 使用当前 ENV。注册失败会有限重试，
-     * 让本地 Nacos 刚启动或网络短暂抖动时不至于直接退出。
+     *
+     * <p>服务名固定为 {@code rpc_node_list_service}，group 使用当前 ENV。注册失败会有限重试， 让本地 Nacos
+     * 刚启动或网络短暂抖动时不至于直接退出。
      */
     private void registerServerNode(NamingService namingService) throws NacosException {
-        NacosServerNode curNode = NacosServerNode.createNacosServerNode(
-                ServerContext.getServerId(),
-                ServerContext.serverType,
-                ServerContext.serverConfig.serverIp,
-                ServerContext.serverConfig.getServerPort(),
-                new HashMap<>());
+        NacosServerNode curNode =
+                NacosServerNode.createNacosServerNode(
+                        ServerContext.getServerId(),
+                        ServerContext.serverType,
+                        ServerContext.serverConfig.serverIp,
+                        ServerContext.serverConfig.getServerPort(),
+                        new HashMap<>());
+        curNode.getInstance()
+                .getMetadata()
+                .put("configBootId", ly.config.hotupdate.ConfigHotUpdateRuntime.BOOT_ID);
         curNode.setLoadNum(0);
         NacosException lastException = null;
         for (int i = 0; i < 10; i++) {
             try {
                 namingService.registerInstance(
                         RPC_NODE_LIST_SERVICE, ServerContext.ENV, curNode.getInstance());
-                logger.info("registerServerNode success, serverId={}, attempt={}", ServerContext.getServerId(), i + 1);
+                logger.info(
+                        "registerServerNode success, serverId={}, attempt={}",
+                        ServerContext.getServerId(),
+                        i + 1);
                 return;
             } catch (NacosException e) {
                 lastException = e;
@@ -256,7 +258,8 @@ public class NacosService {
     /** 当前服务全部启动成功后再监听配表热更，避免端口未绑定时提前切换或回包失败。 */
     public void startConfigHotUpdateListener() throws NacosException {
         if (nacosConfigService == null) {
-            throw new NacosException(NacosException.CLIENT_INVALID_PARAM, "Nacos ConfigService 未初始化");
+            throw new NacosException(
+                    NacosException.CLIENT_INVALID_PARAM, "Nacos ConfigService 未初始化");
         }
         nacosConfigService.addListener(
                 "config-hot-update",
@@ -272,13 +275,29 @@ public class NacosService {
                         ly.config.hotupdate.ConfigHotUpdateRuntime.handle(content);
                     }
                 });
+        ly.config.hotupdate.ConfigHotUpdateRuntime.startRecovery(
+                () -> readConfigPublication(true), () -> readConfigPublication(false));
         logger.info("配置热更监听启动成功, dataId=config-hot-update, group={}", ServerContext.ENV);
+    }
+
+    public String readConfigPublication(boolean committed) {
+        try {
+            return nacosConfigService.getConfig(
+                    committed ? "config-active" : "config-hot-update", ServerContext.ENV, 5000);
+        } catch (Exception error) {
+            throw new IllegalStateException("读取配置发布状态失败", error);
+        }
+    }
+
+    public boolean publishActiveConfig(String content) throws NacosException {
+        return nacosConfigService.publishConfig("config-active", ServerContext.ENV, content);
     }
 
     /** GM 发布热更指令到 Nacos，业务服监听后下载指定版本配表。 */
     public boolean publishConfigHotUpdate(String content) throws NacosException {
         if (nacosConfigService == null) {
-            throw new NacosException(NacosException.CLIENT_INVALID_PARAM, "Nacos ConfigService 未初始化");
+            throw new NacosException(
+                    NacosException.CLIENT_INVALID_PARAM, "Nacos ConfigService 未初始化");
         }
         return nacosConfigService.publishConfig("config-hot-update", ServerContext.ENV, content);
     }
@@ -294,13 +313,13 @@ public class NacosService {
 
     /**
      * 从 Nacos 配置中心拉取当前节点配置并监听后续变更。
-     * <p>
-     * dataId 使用 serverId，group 使用服务器类型。Nacos SDK 偶发空返回时会降级到 HTTP
-     * 接口；仍失败时使用 gate1001/GATE 作为共享运行参数兜底。兜底配置中的节点身份和端口
-     * 不能复用，会按 STARTUP.SKILL.md 中当前服务器的基线覆盖。
+     *
+     * <p>dataId 使用 serverId，group 使用服务器类型。Nacos SDK 偶发空返回时会降级到 HTTP 接口；仍失败时使用 gate1001/GATE
+     * 作为共享运行参数兜底。兜底配置中的节点身份和端口 不能复用，会按 STARTUP.SKILL.md 中当前服务器的基线覆盖。
      */
     private void getServerConfig(
-            ConfigService configService, ServerTypeEnum serverType, String serverId) throws Exception {
+            ConfigService configService, ServerTypeEnum serverType, String serverId)
+            throws Exception {
         if (configService == null) {
             throw new RuntimeException("ConfigService 不能为 null");
         }
@@ -327,13 +346,17 @@ public class NacosService {
                 parserServerConfig(configStr);
                 StartupSkillLoader.applyFallbackNodeConfig(serverType, ServerContext.serverConfig);
                 logger.warn(
-                        "未找到独立 Nacos 配置，使用 gate1001/GATE 的共享参数并覆盖节点身份，serverId={}, serverType={}, serverPort={}",
+                        "未找到独立 Nacos 配置，使用 gate1001/GATE 的共享参数并覆盖节点身份，serverId={}, serverType={},"
+                            + " serverPort={}",
                         serverId,
                         serverType.getType(),
                         ServerContext.serverConfig.serverPort);
             } else {
                 throw new RuntimeException(
-                        "获取nacos 配置失败，serverId=" + serverId + ", serverType=" + serverType.getType());
+                        "获取nacos 配置失败，serverId="
+                                + serverId
+                                + ", serverType="
+                                + serverType.getType());
             }
         }
 
@@ -370,31 +393,36 @@ public class NacosService {
 
     /**
      * 使用 Nacos OpenAPI 兜底拉取配置。
-     * <p>
-     * 该方法只在 SDK 拉取为空时使用，主要解决本地或容器环境中 SDK 首次读配置不稳定的问题。
+     *
+     * <p>该方法只在 SDK 拉取为空时使用，主要解决本地或容器环境中 SDK 首次读配置不稳定的问题。
      */
     private String fetchConfigByHttp(String dataId, String group) {
         if (currentNacosUrl == null || dataId == null || group == null) {
             return null;
         }
         try {
-            String baseUrl = currentNacosUrl.startsWith("http://") || currentNacosUrl.startsWith("https://")
-                    ? currentNacosUrl
-                    : "http://" + currentNacosUrl;
+            String baseUrl =
+                    currentNacosUrl.startsWith("http://") || currentNacosUrl.startsWith("https://")
+                            ? currentNacosUrl
+                            : "http://" + currentNacosUrl;
             if (baseUrl.endsWith("/")) {
                 baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
             }
-            String url = String.format(
-                    "%s/nacos/v1/cs/configs?dataId=%s&group=%s&tenant=%s",
-                    baseUrl,
-                    URLEncoder.encode(dataId, StandardCharsets.UTF_8),
-                    URLEncoder.encode(group, StandardCharsets.UTF_8),
-                    URLEncoder.encode(
-                            currentNamespace == null ? "" : currentNamespace,
-                            StandardCharsets.UTF_8));
+            String url =
+                    String.format(
+                            "%s/nacos/v1/cs/configs?dataId=%s&group=%s&tenant=%s",
+                            baseUrl,
+                            URLEncoder.encode(dataId, StandardCharsets.UTF_8),
+                            URLEncoder.encode(group, StandardCharsets.UTF_8),
+                            URLEncoder.encode(
+                                    currentNamespace == null ? "" : currentNamespace,
+                                    StandardCharsets.UTF_8));
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
-            HttpResponse<String> response = HttpClient.newHttpClient()
-                    .send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            HttpResponse<String> response =
+                    HttpClient.newHttpClient()
+                            .send(
+                                    request,
+                                    HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             if (response.statusCode() == 200
                     && response.body() != null
                     && !response.body().isBlank()) {

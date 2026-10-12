@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: Battle_typeConfigManager
  */
 public class Battle_typeConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final Battle_typeConfigManager instance = new Battle_typeConfigManager();
-  private static final Battle_typeConfigManagerImpl instanceImplA = new Battle_typeConfigManagerImpl();
-  private static final Battle_typeConfigManagerImpl instanceImplB = new Battle_typeConfigManagerImpl();
-
   public static Battle_typeConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static Battle_typeConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(Battle_typeConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new Battle_typeConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    Battle_typeConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "battle_type.txt"; }
 
   public static class Battle_typeConfigManagerImpl extends AbstractConfigManger {
     private List<Battle_typeConfig> configList = List.of();
@@ -147,7 +121,6 @@ public class Battle_typeConfigManager implements InterfaceConfigManagerProxy {
         }
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

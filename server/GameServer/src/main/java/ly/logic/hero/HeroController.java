@@ -1,8 +1,5 @@
 package ly.logic.hero;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ly.config.HeroAwakenConfig;
 import ly.config.HeroAwakenConfigManager;
 import ly.config.HeroExpConfig;
@@ -13,6 +10,8 @@ import ly.config.HeroStarConfig;
 import ly.config.HeroStarConfigManager;
 import ly.config.ResourceType;
 import ly.db.entry.PlayerHeroEntry;
+import ly.logic.asset.ChangeReason;
+import ly.logic.asset.Consume;
 import ly.logic.hero.module.HeroModule;
 import ly.logic.player.ModuleEnum;
 import ly.logic.player.Player;
@@ -22,12 +21,12 @@ import ly.net.IGameController;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 import ly.proto.Hero;
-import ly.utils.ExcelKVParser;
 import ly.utils.KV;
 
-/**
- * 英雄消息控制器
- */
+import java.util.ArrayList;
+import java.util.List;
+
+/** 英雄消息控制器 */
 public class HeroController implements IGameController {
 
     @Override
@@ -39,12 +38,11 @@ public class HeroController implements IGameController {
         gameHandlerRegister(Cmd.CMD.CS_HeroAdd, this::handleHeroAdd);
     }
 
-    /**
-     * 处理获取英雄列表
-     */
+    /** 处理获取英雄列表 */
     public void handleHeroList(GameHandlerContext context, Hero.CS_HeroList request) {
         Player player = context.player();
-        HeroModule heroModule = (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
+        HeroModule heroModule =
+                (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
         List<PlayerHeroEntry> heroList = heroModule.getHeroList();
 
         Hero.SC_HeroList.Builder builder = Hero.SC_HeroList.newBuilder();
@@ -56,13 +54,13 @@ public class HeroController implements IGameController {
         player.sendMsg(Cmd.CMD.SC_HeroList, builder.build());
     }
 
-    /**
-     * 处理英雄升级
-     */
+    /** 处理英雄升级 */
     public void handleHeroLevelUp(GameHandlerContext context, Hero.CS_HeroLevelUp request) {
         Player player = context.player();
-        HeroModule heroModule = (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
-        ResourceModule resourceModule = (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
+        HeroModule heroModule =
+                (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
+        ResourceModule resourceModule =
+                (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
 
         // 验证英雄存在
         PlayerHeroEntry hero = heroModule.getHero(request.getHeroUid());
@@ -72,14 +70,17 @@ public class HeroController implements IGameController {
         }
 
         // 获取英雄配置
-        HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(hero.getHeroId());
+        HeroInfoConfig heroConfig =
+                HeroInfoConfigManager.getInstance().getConfigMap().get(hero.getHeroId());
         if (heroConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroLevelUp, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
         }
 
         // 获取升级经验配置
-        HeroExpConfig expConfig = HeroExpConfigManager.getInstance().getByModelIdAndLevel(heroConfig.expModelId, hero.getLevel() + 1);
+        HeroExpConfig expConfig =
+                HeroExpConfigManager.getInstance()
+                        .getByModelIdAndLevel(heroConfig.expModelId, hero.getLevel() + 1);
         if (expConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroLevelUp, ErrorMsg.ErrorCode.LEVEL_MAX);
             return;
@@ -91,27 +92,19 @@ public class HeroController implements IGameController {
             return;
         }
 
-        if (resourceModule.getResource(ResourceType.EXP_ITEM) < expItemCount) {
+        long nextExp = Math.addExact(hero.getExp(), expItemCount);
+        Consume consume = upgradeCost(expConfig).addThing(ResourceType.EXP_ITEM, expItemCount);
+        if (!consume.isEnoughAndCost(player, ChangeReason.HERO_LEVEL_UP)) {
             player.sendErrorCode(Cmd.CMD.CS_HeroLevelUp, ErrorMsg.ErrorCode.RESOURCE_NOT_ENOUGH);
             return;
         }
-
-        // 扣除经验道具
-        resourceModule.deductResource(ResourceType.EXP_ITEM, expItemCount);
-
-        // 扣除升级所需的额外消费
-        if (!canAffordUpgrade(resourceModule, expConfig)) {
-            player.sendErrorCode(Cmd.CMD.CS_HeroLevelUp, ErrorMsg.ErrorCode.RESOURCE_NOT_ENOUGH);
-            return;
-        }
-        deductUpgradeCost(resourceModule, expConfig);
-
-        // 更新英雄经验
-        hero.setExp(hero.getExp() + expItemCount);
+        hero.setExp(nextExp);
 
         // 升级逻辑
         while (true) {
-            HeroExpConfig nextLevelConfig = HeroExpConfigManager.getInstance().getByModelIdAndLevel(heroConfig.expModelId, hero.getLevel() + 1);
+            HeroExpConfig nextLevelConfig =
+                    HeroExpConfigManager.getInstance()
+                            .getByModelIdAndLevel(heroConfig.expModelId, hero.getLevel() + 1);
             if (nextLevelConfig == null) {
                 break; // 已达最高等级
             }
@@ -129,13 +122,13 @@ public class HeroController implements IGameController {
         player.sendMsg(Cmd.CMD.SC_HeroLevelUp, builder.build());
     }
 
-    /**
-     * 处理英雄升星
-     */
+    /** 处理英雄升星 */
     public void handleHeroStarUp(GameHandlerContext context, Hero.CS_HeroStarUp request) {
         Player player = context.player();
-        HeroModule heroModule = (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
-        ResourceModule resourceModule = (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
+        HeroModule heroModule =
+                (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
+        ResourceModule resourceModule =
+                (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
 
         // 验证英雄存在
         PlayerHeroEntry hero = heroModule.getHero(request.getHeroUid());
@@ -145,29 +138,28 @@ public class HeroController implements IGameController {
         }
 
         // 获取英雄配置
-        HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(hero.getHeroId());
+        HeroInfoConfig heroConfig =
+                HeroInfoConfigManager.getInstance().getConfigMap().get(hero.getHeroId());
         if (heroConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroStarUp, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
         }
 
         // 获取升星配置
-        HeroStarConfig starConfig = HeroStarConfigManager.getInstance().getByModelIdAndStar(heroConfig.starModelId, hero.getStar() + 1);
+        HeroStarConfig starConfig =
+                HeroStarConfigManager.getInstance()
+                        .getByModelIdAndStar(heroConfig.starModelId, hero.getStar() + 1);
         if (starConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroStarUp, ErrorMsg.ErrorCode.STAR_MAX);
             return;
         }
 
-        // 检查货币是否充足（currencyNum 格式：slotLevel,cost|...）
         long starCost = parseStarCurrencyCost(starConfig.currencyNum);
-        if (starConfig.currencyType > 0 && resourceModule.getResource(starConfig.currencyType) < starCost) {
+        Consume consume = Consume.create();
+        if (starConfig.currencyType > 0) consume.addThing(starConfig.currencyType, starCost);
+        if (!consume.isEnoughAndCost(player, ChangeReason.HERO_STAR_UP)) {
             player.sendErrorCode(Cmd.CMD.CS_HeroStarUp, ErrorMsg.ErrorCode.RESOURCE_NOT_ENOUGH);
             return;
-        }
-
-        // 扣除资源
-        if (starCost > 0 && starConfig.currencyType > 0) {
-            resourceModule.deductResource(starConfig.currencyType, starCost);
         }
 
         // 更新星级
@@ -180,13 +172,13 @@ public class HeroController implements IGameController {
         player.sendMsg(Cmd.CMD.SC_HeroStarUp, builder.build());
     }
 
-    /**
-     * 处理英雄觉醒
-     */
+    /** 处理英雄觉醒 */
     public void handleHeroAwaken(GameHandlerContext context, Hero.CS_HeroAwaken request) {
         Player player = context.player();
-        HeroModule heroModule = (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
-        ResourceModule resourceModule = (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
+        HeroModule heroModule =
+                (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
+        ResourceModule resourceModule =
+                (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
 
         // 验证英雄存在
         PlayerHeroEntry hero = heroModule.getHero(request.getHeroUid());
@@ -196,29 +188,35 @@ public class HeroController implements IGameController {
         }
 
         // 获取英雄配置
-        HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(hero.getHeroId());
+        HeroInfoConfig heroConfig =
+                HeroInfoConfigManager.getInstance().getConfigMap().get(hero.getHeroId());
         if (heroConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroAwaken, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
         }
 
         // 获取觉醒配置
-        HeroAwakenConfig awakenConfig = HeroAwakenConfigManager.getInstance().getByHeroAwakenDataAndLevel(heroConfig.heroAwakenData, hero.getAwaken() + 1);
+        HeroAwakenConfig awakenConfig =
+                HeroAwakenConfigManager.getInstance()
+                        .getByHeroAwakenDataAndLevel(
+                                heroConfig.heroAwakenData, hero.getAwaken() + 1);
         if (awakenConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroAwaken, ErrorMsg.ErrorCode.AWAKEN_MAX);
             return;
         }
 
-        // 检查觉醒条件——新配置表中无星级要求字段，跳过星级检查
-        // 原 heroStar 字段在重新生成后不再存在，觉醒条件由 awakenItem/awakenCurrency 约束
-
-        // 检查觉醒材料是否充足
-        if (!canAffordAwaken(resourceModule, awakenConfig)) {
+        Consume consume = Consume.create();
+        if (awakenConfig.awakenCurrencyType > 0)
+            consume.addThing(awakenConfig.awakenCurrencyType, awakenConfig.awakenCurrencyNum);
+        if (awakenConfig.awakenItem != null && !awakenConfig.awakenItem.isBlank()) {
+            String[] item = awakenConfig.awakenItem.split(",", -1);
+            if (item.length != 2) throw new IllegalArgumentException("觉醒消耗配置格式错误");
+            consume.addThing(Integer.parseInt(item[0].trim()), Long.parseLong(item[1].trim()));
+        }
+        if (!consume.isEnoughAndCost(player, ChangeReason.HERO_AWAKEN)) {
             player.sendErrorCode(Cmd.CMD.CS_HeroAwaken, ErrorMsg.ErrorCode.RESOURCE_NOT_ENOUGH);
             return;
         }
-
-        deductAwakenCost(resourceModule, awakenConfig);
 
         // 更新觉醒等级
         hero.setAwaken(hero.getAwaken() + 1);
@@ -230,20 +228,25 @@ public class HeroController implements IGameController {
         player.sendMsg(Cmd.CMD.SC_HeroAwaken, builder.build());
     }
 
-    /**
-     * 处理添加英雄（GM命令等）
-     */
+    /** 处理添加英雄（GM命令等） */
     public void handleHeroAdd(GameHandlerContext context, Hero.CS_HeroAdd request) {
         Player player = context.player();
-        HeroModule heroModule = (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
+        HeroModule heroModule =
+                (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
 
         Hero.SC_HeroAdd.Builder builder = Hero.SC_HeroAdd.newBuilder();
 
-        if (heroModule.getHero(player.getPlayerId() * 1000000L + request.getHeroId()) != null) {
+        if (heroModule.hasHero(request.getHeroId())) {
             player.sendErrorCode(Cmd.CMD.CS_HeroAdd, ErrorMsg.ErrorCode.HERO_ALREADY_EXISTS);
             return;
         }
 
+        // 当前规则每种英雄只能拥有一份，拒绝批量请求，避免部分添加后才报错。
+        if (request.getCount() != 1
+                || !heroModule.canAddHeroes(java.util.List.of(request.getHeroId()))) {
+            player.sendErrorCode(Cmd.CMD.CS_HeroAdd, ErrorMsg.ErrorCode.HERO_SLOT_FULL);
+            return;
+        }
         for (int i = 0; i < request.getCount(); i++) {
             PlayerHeroEntry hero = heroModule.addHero(request.getHeroId());
             if (hero == null) {
@@ -257,9 +260,7 @@ public class HeroController implements IGameController {
         player.sendMsg(Cmd.CMD.SC_HeroAdd, builder.build());
     }
 
-    /**
-     * 构建英雄信息
-     */
+    /** 构建英雄信息 */
     private Hero.HeroInfo buildHeroInfo(PlayerHeroEntry entry) {
         Hero.HeroInfo.Builder builder = Hero.HeroInfo.newBuilder();
         builder.setHeroUid(entry.getId());
@@ -276,79 +277,16 @@ public class HeroController implements IGameController {
         return builder.build();
     }
 
-    private boolean canAffordUpgrade(ResourceModule resourceModule, HeroExpConfig expConfig) {
-        if (expConfig.currencyType > 0) {
-            long currencyAmount = parseStarCurrencyCost(expConfig.currencyNum);
-            if (currencyAmount > 0 && resourceModule.getResource(expConfig.currencyType) < currencyAmount) {
-                return false;
-            }
-        }
-        for (KV<Integer, Integer> item : parseCostItems(expConfig.item)) {
-            if (resourceModule.getResource(item.getKey()) < item.getValue()) {
-                return false;
-            }
-        }
-        return true;
+    private Consume upgradeCost(HeroExpConfig config) {
+        Consume consume = Consume.create();
+        if (config.currencyType > 0)
+            consume.addThing(config.currencyType, parseStarCurrencyCost(config.currencyNum));
+        for (KV<Integer, Integer> item : parseCostItems(config.item))
+            consume.addThing(item.getKey(), item.getValue());
+        return consume;
     }
 
-    private void deductUpgradeCost(ResourceModule resourceModule, HeroExpConfig expConfig) {
-        if (expConfig.currencyType > 0) {
-            long currencyAmount = parseStarCurrencyCost(expConfig.currencyNum);
-            if (currencyAmount > 0) {
-                resourceModule.deductResource(expConfig.currencyType, currencyAmount);
-            }
-        }
-        for (KV<Integer, Integer> item : parseCostItems(expConfig.item)) {
-            resourceModule.deductResource(item.getKey(), item.getValue());
-        }
-    }
-
-    private boolean canAffordAwaken(ResourceModule resourceModule, HeroAwakenConfig awakenConfig) {
-        // 检查觉醒货币（awakenCurrencyType/awakenCurrencyNum）
-        if (awakenConfig.awakenCurrencyType > 0 && awakenConfig.awakenCurrencyNum > 0) {
-            if (resourceModule.getResource(awakenConfig.awakenCurrencyType) < awakenConfig.awakenCurrencyNum) {
-                return false;
-            }
-        }
-        // 检查觉醒材料（awakenItem 格式：itemId,count）
-        if (awakenConfig.awakenItem != null && !awakenConfig.awakenItem.trim().isEmpty()) {
-            String[] parts = awakenConfig.awakenItem.split(",");
-            if (parts.length >= 2) {
-                try {
-                    int itemId = Integer.parseInt(parts[0].trim());
-                    int count = Integer.parseInt(parts[1].trim());
-                    if (itemId > 0 && count > 0 && resourceModule.getResource(itemId) < count) {
-                        return false;
-                    }
-                } catch (NumberFormatException ignored) {}
-            }
-        }
-        return true;
-    }
-
-    private void deductAwakenCost(ResourceModule resourceModule, HeroAwakenConfig awakenConfig) {
-        // 扣除觉醒货币
-        if (awakenConfig.awakenCurrencyType > 0 && awakenConfig.awakenCurrencyNum > 0) {
-            resourceModule.deductResource(awakenConfig.awakenCurrencyType, awakenConfig.awakenCurrencyNum);
-        }
-        // 扣除觉醒材料
-        if (awakenConfig.awakenItem != null && !awakenConfig.awakenItem.trim().isEmpty()) {
-            String[] parts = awakenConfig.awakenItem.split(",");
-            if (parts.length >= 2) {
-                try {
-                    int itemId = Integer.parseInt(parts[0].trim());
-                    int count = Integer.parseInt(parts[1].trim());
-                    if (itemId > 0 && count > 0) {
-                        resourceModule.deductResource(itemId, count);
-                    }
-                } catch (NumberFormatException ignored) {}
-            }
-        }
-    }
-
-    /**
-     * 解析升星消耗（currencyNum 格式：slotLevel,cost|slotLevel,cost|...）
-     */
+    /** 解析升星消耗（currencyNum 格式：slotLevel,cost|slotLevel,cost|...） */
     private long parseStarCurrencyCost(String currencyNum) {
         if (currencyNum == null || currencyNum.trim().isEmpty()) {
             return 0;
@@ -361,50 +299,38 @@ public class HeroController implements IGameController {
                     return Long.parseLong(kv[1].trim());
                 }
             }
-        } catch (NumberFormatException ignored) {}
-        return 0;
-    }
-
-    private long parseLong(String value) {
-        if (value == null || value.trim().isEmpty()) {
-            return 0;
+        } catch (NumberFormatException error) {
+            throw new IllegalArgumentException("消耗数量配置错误", error);
         }
-        try {
-            return Long.parseLong(value.trim());
-        } catch (NumberFormatException e) {
-            return 0;
-        }
+        throw new IllegalArgumentException("消耗配置格式错误: " + currencyNum);
     }
 
     private List<KV<Integer, Integer>> parseCostItems(String costText) {
         List<KV<Integer, Integer>> result = new ArrayList<>();
-        if (costText == null || costText.trim().isEmpty()) {
-            return result;
-        }
-        List<KV<String, String>> parsed = ExcelKVParser.parseSimpleKV(costText);
-        for (KV<String, String> kv : parsed) {
-            try {
-                int resourceType = Integer.parseInt(kv.getKey().trim());
-                int amount = Integer.parseInt(kv.getValue().trim());
-                if (resourceType > 0 && amount > 0) {
-                    result.add(new KV<>(resourceType, amount));
-                }
-            } catch (NumberFormatException ignored) {
-            }
+        if (costText == null || costText.isBlank() || costText.trim().equals("0")) return result;
+        boolean colonFormat = costText.contains(":");
+        for (String item : costText.split(colonFormat ? "," : "\\|", -1)) {
+            String[] pair = item.split(colonFormat ? ":" : ",", -1);
+            if (pair.length != 2) throw new IllegalArgumentException("消耗道具配置格式错误: " + costText);
+            int id = Integer.parseInt(pair[0].trim());
+            int amount = Integer.parseInt(pair[1].trim());
+            if (id == 0 && amount == 0) continue;
+            if (id <= 0 || amount < 0) throw new IllegalArgumentException("无效消耗道具 ID 或数量");
+            result.add(new KV<>(id, amount));
         }
         return result;
     }
 
-    /**
-     * 计算升级所需经验
-     */
+    /** 计算升级所需经验 */
     private long calcMaxExp(int heroId, int level) {
         HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(heroId);
         if (heroConfig == null) {
             return 0;
         }
 
-        HeroExpConfig expConfig = HeroExpConfigManager.getInstance().getByModelIdAndLevel(heroConfig.expModelId, level + 1);
+        HeroExpConfig expConfig =
+                HeroExpConfigManager.getInstance()
+                        .getByModelIdAndLevel(heroConfig.expModelId, level + 1);
         if (expConfig == null) {
             return 0; // 已达最高等级
         }

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: TrialawardConfigManager
  */
 public class TrialawardConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final TrialawardConfigManager instance = new TrialawardConfigManager();
-  private static final TrialawardConfigManagerImpl instanceImplA = new TrialawardConfigManagerImpl();
-  private static final TrialawardConfigManagerImpl instanceImplB = new TrialawardConfigManagerImpl();
-
   public static TrialawardConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static TrialawardConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(TrialawardConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new TrialawardConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    TrialawardConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "trialaward.txt"; }
 
   public static class TrialawardConfigManagerImpl extends AbstractConfigManger {
     private List<TrialawardConfig> configList = List.of();
@@ -123,7 +97,6 @@ public class TrialawardConfigManager implements InterfaceConfigManagerProxy {
         }
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

@@ -37,6 +37,7 @@ public class PlayerData {
         }
         this.playerEntry = entry;
         this.persistenceStore = persistenceStore;
+        entry.bindPersistenceChangeListener(() -> changed(entry));
     }
 
     Map<ModuleEnum, PlayerModuleEntry> loadModuleEntries() {
@@ -144,21 +145,22 @@ public class PlayerData {
     }
 
     private void persistPendingChanges() {
+        java.util.List<AbstractEntry> saves = new java.util.ArrayList<>(dirtyEntities);
+        java.util.List<AbstractEntry> deletes = new java.util.ArrayList<>(deletedEntities);
+        java.util.List<AbstractModule> blobs = new java.util.ArrayList<>();
         for (AbstractModule module : modules.values()) {
-            module.persistDirtyModuleBlob(persistenceStore);
-        }
-        for (AbstractEntry entry : dirtyEntities.toArray(new AbstractEntry[0])) {
-            if (!persistenceStore.acceptEntitySnapshot(entry)) {
-                throw new IllegalStateException("player entity persistence rejected");
+            PlayerModuleEntry entry = module.prepareDirtyModuleBlob();
+            if (entry != null) {
+                saves.add(entry);
+                blobs.add(module);
             }
-            entry.markPersisted();
-            dirtyEntities.remove(entry);
         }
-        for (AbstractEntry entry : deletedEntities.toArray(new AbstractEntry[0])) {
-            if (!persistenceStore.acceptEntityDeletion(entry)) {
-                throw new IllegalStateException("player entity delete rejected");
-            }
-            deletedEntities.remove(entry);
-        }
+        if (saves.isEmpty() && deletes.isEmpty()) return;
+        if (!persistenceStore.acceptBatch(saves, deletes))
+            throw new IllegalStateException("玩家保存批次未被持久化层接收");
+        for (AbstractEntry entry : saves) entry.markPersisted();
+        for (AbstractModule module : blobs) module.acceptPreparedModuleBlob();
+        dirtyEntities.removeAll(saves);
+        deletedEntities.removeAll(deletes);
     }
 }

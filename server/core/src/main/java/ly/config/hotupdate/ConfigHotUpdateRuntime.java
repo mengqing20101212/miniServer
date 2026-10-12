@@ -2,219 +2,277 @@ package ly.config.hotupdate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import ly.*;
+
 import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
+import java.net.http.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import ly.ConfigLoadException;
-import ly.ConfigService;
-import ly.LoggerDef;
-import ly.ServerContext;
+import java.nio.file.*;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.*;
 
-/** 业务服收到 GM 配置热更指令后的本地执行器。 */
-public class ConfigHotUpdateRuntime {
-  private static final ObjectMapper MAPPER = new ObjectMapper();
-  private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
-  private static final String CHANGE_MANIFEST = "__changed_files.manifest";
+/** 节点热更状态机。提交决定落盘后只向前恢复，不清理业务持有的旧快照。 */
+public final class ConfigHotUpdateRuntime {
+    public static final String BOOT_ID = UUID.randomUUID().toString();
+    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final HttpClient HTTP =
+            HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+    private static final ScheduledExecutorService RECOVERY =
+            Executors.newSingleThreadScheduledExecutor(
+                    Thread.ofVirtual().name("config-recovery-").factory());
+    private static ConfigHotUpdateCommand prepared;
+    private static ConfigHotUpdateCommand committed;
+    private static long appliedSequence;
+    private static String lastStatus = "";
+    private static boolean recoveryStarted;
 
-  private static volatile boolean running;
-  private static volatile ConfigHotUpdateCommand preparedCommand;
-  private static volatile Path preparedDir;
+    private ConfigHotUpdateRuntime() {}
 
-  public static synchronized void handle(String content) {
-    if (content == null || content.isBlank()) {
-      return;
+    private static Path root() {
+        String configured = System.getProperty("miniserver.config.statePath");
+        return configured == null
+                ? Path.of(ServerContext.serverConfig.configPath)
+                        .resolveSibling(".config-versions")
+                        .resolve(ServerContext.ENV)
+                        .resolve(ServerContext.getServerId())
+                : Path.of(configured);
     }
-    if (running) {
-      LoggerDef.SystemLogger.error("已有配置热更任务正在执行，本次指令忽略: {}", content);
-      return;
-    }
-    running = true;
-    try {
-      ConfigHotUpdateCommand command = MAPPER.readValue(content, ConfigHotUpdateCommand.class);
-      String type = command.commandType == null ? "PREPARE" : command.commandType;
-      if ("PREPARE".equalsIgnoreCase(type)) {
-        prepare(command);
-      } else if ("COMMIT".equalsIgnoreCase(type)) {
-        commit(command);
-      } else if ("CANCEL".equalsIgnoreCase(type)) {
-        cancel(command);
-      }
-    } catch (Exception e) {
-      LoggerDef.SystemLogger.error("配置热更执行失败, content={}", content, e);
-    } finally {
-      running = false;
-    }
-  }
 
-  private static void prepare(ConfigHotUpdateCommand command) throws Exception {
-    try {
-      validate(command);
-      report(command, "RECEIVED", "");
-      Path configDir = Path.of(ServerContext.serverConfig.configPath.replace('\\', '/'));
-      Path stagingDir =
-          configDir
-              .resolveSibling(".config-hot-update-staging")
-              .resolve(command.version)
-              .resolve(ServerContext.getServerId());
-      resetDirectory(stagingDir);
-      // 热更版本只需要包含本次变更的表，服务端用当前线上配置做基线，再用 GM 上传文件覆盖。
-      copyCurrentConfigAsBaseline(configDir, stagingDir);
-      JsonNode files = downloadFiles(command.downloadUrl).path("data");
-      if (!files.isArray()) {
-        throw new ConfigLoadException("配置热更下载结果格式错误");
-      }
-      List<String> changedFiles = new ArrayList<>();
-      for (JsonNode file : files) {
-        String fileName = file.path("fileName").asText();
-        Files.writeString(stagingDir.resolve(fileName), file.path("content").asText(), StandardCharsets.UTF_8);
-        changedFiles.add(fileName);
-      }
-      Files.write(stagingDir.resolve(CHANGE_MANIFEST), changedFiles, StandardCharsets.UTF_8);
-      report(command, "DOWNLOADED", "");
-      ConfigService.getInstance()
-          .loadAllConfigToStandby(LoggerDef.SystemLogger, stagingDir.toString(), command.version);
-      preparedCommand = command;
-      preparedDir = stagingDir;
-      report(command, "READY", "");
-    } catch (Exception e) {
-      report(command, "FAILED", e.getMessage());
-      throw e;
+    private static Path versionDirectory(ConfigHotUpdateCommand command) {
+        return root().resolve(command.version);
     }
-  }
 
-  private static void resetDirectory(Path dir) throws Exception {
-    if (Files.exists(dir)) {
-      try (var stream = Files.walk(dir)) {
-        for (Path path : stream.sorted(Comparator.reverseOrder()).toList()) {
-          Files.delete(path);
+    public static synchronized void handle(String content) {
+        if (content == null || content.isBlank()) return;
+        try {
+            apply(JSON.readValue(content, ConfigHotUpdateCommand.class), false);
+        } catch (Exception error) {
+            LoggerDef.SystemLogger.error("配置发布处理失败，保留原状态并等待恢复", error);
         }
-      }
     }
-    Files.createDirectories(dir);
-  }
 
-  private static void copyCurrentConfigAsBaseline(Path configDir, Path stagingDir) throws Exception {
-    if (!Files.isDirectory(configDir)) {
-      throw new ConfigLoadException("当前配置目录不存在，不能执行配置热更:" + configDir);
+    private static void validate(ConfigHotUpdateCommand command) {
+        if (command.version == null
+                || !command.version.matches("[A-Za-z0-9_-]+")
+                || command.sequence <= 0
+                || command.publishId == null
+                || command.digest == null) throw new ConfigLoadException("无效的发布版本、序号或摘要");
     }
-    try (var stream = Files.list(configDir)) {
-      for (Path file : stream.toList()) {
-        if (Files.isRegularFile(file) && file.getFileName().toString().endsWith(".txt")) {
-          Files.copy(file, stagingDir.resolve(file.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+
+    private static synchronized void apply(ConfigHotUpdateCommand command, boolean recovery)
+            throws Exception {
+        validate(command);
+        if (!Set.of("PREPARE", "COMMIT", "CANCEL").contains(command.commandType))
+            throw new ConfigLoadException("未知发布指令");
+        if (command.sequence < appliedSequence
+                || (committed != null && command.sequence < committed.sequence)) return;
+        boolean commit = "COMMIT".equals(command.commandType);
+        if (!command.targets.containsKey(ServerContext.getServerId())) return;
+        if (command.sequence == appliedSequence) {
+            if (commit) report(command, "ACTIVE", "");
+            return;
         }
-      }
-    }
-  }
-
-  private static void commit(ConfigHotUpdateCommand command) throws Exception {
-    try {
-      if (preparedCommand == null
-          || preparedDir == null
-          || !preparedCommand.version.equals(command.version)
-          || !preparedCommand.publishId.equals(command.publishId)) {
-        throw new ConfigLoadException("当前服务器没有该版本的 READY 配置:" + command.version);
-      }
-      Path configDir = Path.of(ServerContext.serverConfig.configPath.replace('\\', '/'));
-      Files.createDirectories(configDir);
-      copyChangedFilesToConfigDir(configDir, preparedDir);
-      ConfigService.getInstance()
-          .schedulePreparedSwitch(LoggerDef.SystemLogger, command.version, command.switchAtMillis, 60_000L);
-      report(command, "SWITCH_SCHEDULED", "");
-    } catch (Exception e) {
-      report(command, "FAILED", e.getMessage());
-      throw e;
-    }
-  }
-
-  private static void copyChangedFilesToConfigDir(Path configDir, Path preparedDir) throws Exception {
-    Path manifest = preparedDir.resolve(CHANGE_MANIFEST);
-    if (!Files.exists(manifest)) {
-      throw new ConfigLoadException("配置热更缺少变更文件清单:" + manifest);
-    }
-    List<String> changedFiles = Files.readAllLines(manifest, StandardCharsets.UTF_8);
-    Path lockFile = configDir.resolve(".config-hot-update.lock");
-    // 本地开发时多个服务可能共用同一个 configDir，文件锁用于串行化覆盖动作，避免 Windows 文件占用冲突。
-    try (FileChannel channel =
-            FileChannel.open(lockFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-        FileLock ignored = channel.lock()) {
-      for (String fileName : changedFiles) {
-        if (fileName == null || fileName.isBlank()) {
-          continue;
+        if (committed != null && command.sequence == committed.sequence) {
+            if (!Objects.equals(command.digest, committed.digest))
+                throw new ConfigLoadException("同一发布序号内容冲突");
+            if (ConfigService.getInstance().getActiveVersion().equals(command.version)) {
+                appliedSequence = command.sequence;
+                report(command, "ACTIVE", "");
+                return;
+            }
+            if (lastStatus.equals("SWITCH_SCHEDULED")) {
+                report(command, lastStatus, "");
+                return;
+            }
         }
-        Path src = preparedDir.resolve(fileName);
-        if (!Files.isRegularFile(src)) {
-          throw new ConfigLoadException("配置热更变更文件不存在:" + src);
+        if (!commit && committed != null && committed.sequence > appliedSequence)
+            throw new ConfigLoadException("上一提交尚未生效，不能准备下一版本");
+        if ("CANCEL".equals(command.commandType)) {
+            if (committed != null && committed.sequence == command.sequence)
+                throw new ConfigLoadException("提交后不可取消");
+            ConfigService.getInstance().cancelPrepared(command.version);
+            prepared = null;
+            report(command, "CANCELLED", "");
+            return;
         }
-        Files.copy(src, configDir.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
-      }
+        try {
+            if (commit) {
+                // 必须先保存决定；下载失败或进程崩溃仍能在重启后恢复。
+                DurableConfigFile.write(root().resolve("committed.json"), command);
+                committed = command;
+            }
+            if (prepared == null || prepared.sequence != command.sequence) prepare(command);
+            if (!commit) {
+                report(command, "READY", "");
+                return;
+            }
+            long delay = command.switchAtMillis - System.currentTimeMillis();
+            if (delay < 0 && !recovery) {
+                ConfigService.getInstance().suspend("配置提交迟到，恢复完成前暂停业务");
+            }
+            ConfigService.getInstance()
+                    .schedulePreparedSwitch(
+                            command.version,
+                            command.switchAtMillis,
+                            () -> {
+                                synchronized (ConfigHotUpdateRuntime.class) {
+                                    appliedSequence = command.sequence;
+                                    prepared = null;
+                                    ConfigService.getInstance().resume();
+                                    lastStatus = "ACTIVE";
+                                    report(command, "ACTIVE", "");
+                                }
+                            });
+            lastStatus = "SWITCH_SCHEDULED";
+            report(command, lastStatus, "");
+        } catch (Exception error) {
+            if (commit) ConfigService.getInstance().suspend("配置提交恢复失败: " + command.version);
+            lastStatus = "FAILED";
+            report(command, "FAILED", error.getMessage());
+            throw error;
+        }
     }
-  }
 
-  private static void cancel(ConfigHotUpdateCommand command) {
-    preparedCommand = null;
-    preparedDir = null;
-    report(command, "CANCELLED", "");
-  }
+    private static void prepare(ConfigHotUpdateCommand command) throws Exception {
+        Path directory = versionDirectory(command);
+        Map<String, String> files =
+                Files.isDirectory(directory) ? ConfigBundle.read(directory) : Map.of();
+        if (!ConfigBundle.digest(files).equals(command.digest))
+            files = download(command.downloadUrl);
+        if (!ConfigBundle.digest(files).equals(command.digest))
+            throw new ConfigLoadException("完整配置摘要不匹配");
+        if (!files.keySet().equals(ConfigService.getInstance().getExpectedConfigFileNames()))
+            throw new ConfigLoadException("完整配置包表集合与当前程序不一致");
+        Files.createDirectories(directory);
+        for (var file : files.entrySet()) {
+            ConfigBundle.validateName(file.getKey());
+            Files.writeString(
+                    directory.resolve(file.getKey()), file.getValue(), StandardCharsets.UTF_8);
+        }
+        ConfigService.getInstance()
+                .loadAllConfigToStandby(
+                        LoggerDef.SystemLogger, directory.toString(), command.version);
+        prepared = command;
+    }
 
-  private static void validate(ConfigHotUpdateCommand command) throws ConfigLoadException {
-    if (command.publishId == null || command.publishId.isBlank()) {
-      throw new ConfigLoadException("配置热更发布ID为空");
+    /** 在监听端口和注册节点之前调用；已提交配置加载失败则启动失败。 */
+    public static void recoverBeforeServing(String authoritativeContent) throws Exception {
+        Path journal = root().resolve("committed.json");
+        ConfigHotUpdateCommand command =
+                Files.exists(journal)
+                        ? DurableConfigFile.read(journal, ConfigHotUpdateCommand.class)
+                        : null;
+        if (authoritativeContent != null && !authoritativeContent.isBlank()) {
+            ConfigHotUpdateCommand remote =
+                    JSON.readValue(authoritativeContent, ConfigHotUpdateCommand.class);
+            if (remote.targets.containsKey(ServerContext.getServerId())
+                    && (command == null || remote.sequence >= command.sequence)) command = remote;
+        }
+        if (command != null && command.targets.containsKey(ServerContext.getServerId())) {
+            apply(command, true);
+            // 不在持有状态锁时等待回调。启动直接完成整套替换，等待未来生效点。
+            ConfigService.getInstance()
+                    .awaitVersion(
+                            command.version,
+                            Math.max(
+                                    30_000,
+                                    command.switchAtMillis - System.currentTimeMillis() + 30_000));
+        }
     }
-    if (command.version == null || command.version.isBlank()) {
-      throw new ConfigLoadException("配置热更版本号为空");
-    }
-    if (command.downloadUrl == null || command.downloadUrl.isBlank()) {
-      throw new ConfigLoadException("配置热更下载地址为空");
-    }
-  }
 
-  private static JsonNode downloadFiles(String url) throws Exception {
-    HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
-    HttpResponse<String> response =
-        HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-    if (response.statusCode() != 200) {
-      throw new ConfigLoadException("配置热更下载失败, status=" + response.statusCode());
+    public static synchronized void startRecovery(
+            java.util.function.Supplier<String> committedContent,
+            java.util.function.Supplier<String> pendingContent) {
+        if (recoveryStarted) return;
+        recoveryStarted = true;
+        RECOVERY.scheduleWithFixedDelay(
+                () -> {
+                    try {
+                        String active = committedContent.get();
+                        if (active != null && !active.isBlank()) handle(active);
+                        ConfigHotUpdateCommand local;
+                        synchronized (ConfigHotUpdateRuntime.class) {
+                            local = committed;
+                        }
+                        if (local != null) {
+                            synchronized (ConfigHotUpdateRuntime.class) {
+                                apply(local, true);
+                            }
+                        }
+                        String pending = pendingContent.get();
+                        if (pending != null && !pending.isBlank()) handle(pending);
+                    } catch (Exception error) {
+                        LoggerDef.SystemLogger.error("配置发布恢复查询失败", error);
+                    }
+                },
+                5,
+                5,
+                TimeUnit.SECONDS);
     }
-    return MAPPER.readTree(response.body());
-  }
 
-  private static void report(ConfigHotUpdateCommand command, String status, String errorMsg) {
-    if (command == null || command.reportUrl == null || command.reportUrl.isBlank()) {
-      return;
+    private static Map<String, String> download(String url) throws Exception {
+        HttpResponse<String> response =
+                HTTP.send(
+                        HttpRequest.newBuilder(URI.create(url))
+                                .timeout(Duration.ofSeconds(30))
+                                .GET()
+                                .build(),
+                        HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        if (response.statusCode() != 200)
+            throw new ConfigLoadException("下载配置失败: " + response.statusCode());
+        JsonNode data = JSON.readTree(response.body()).path("data");
+        if (!data.isArray()) throw new ConfigLoadException("配置下载格式错误");
+        Map<String, String> files = new TreeMap<>();
+        for (JsonNode file : data) {
+            String name = file.path("fileName").asText();
+            ConfigBundle.validateName(name);
+            if (files.put(name, file.path("content").asText()) != null)
+                throw new ConfigLoadException("重复配置文件: " + name);
+        }
+        return files;
     }
-    try {
-      String body =
-          "publishId=" + enc(command.publishId)
-              + "&version=" + enc(command.version)
-              + "&serverId=" + enc(ServerContext.getServerId())
-              + "&serverType=" + enc(ServerContext.serverType.getType())
-              + "&status=" + enc(status)
-              + "&errorMsg=" + enc(errorMsg == null ? "" : errorMsg);
-      HttpRequest request =
-          HttpRequest.newBuilder()
-              .uri(URI.create(command.reportUrl))
-              .header("Content-Type", "application/x-www-form-urlencoded")
-              .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
-              .build();
-      HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
-    } catch (Exception e) {
-      LoggerDef.SystemLogger.error("上报配置热更状态失败, status={}", status, e);
-    }
-  }
 
-  private static String enc(String value) {
-    return URLEncoder.encode(value == null ? "" : value, StandardCharsets.UTF_8);
-  }
+    private static void report(ConfigHotUpdateCommand command, String status, String error) {
+        if (command.reportUrl == null) return;
+        try {
+            String body =
+                    "publishId="
+                            + enc(command.publishId)
+                            + "&version="
+                            + enc(command.version)
+                            + "&serverId="
+                            + enc(ServerContext.getServerId())
+                            + "&serverType="
+                            + enc(ServerContext.serverType.getType())
+                            + "&status="
+                            + status
+                            + "&errorMsg="
+                            + enc(error == null ? "" : error)
+                            + "&bootId="
+                            + enc(BOOT_ID)
+                            + "&digest="
+                            + enc(command.digest)
+                            + "&nodeTimeMillis="
+                            + System.currentTimeMillis();
+            HttpResponse<Void> response =
+                    HTTP.send(
+                            HttpRequest.newBuilder(URI.create(command.reportUrl))
+                                    .timeout(Duration.ofSeconds(5))
+                                    .header("Content-Type", "application/x-www-form-urlencoded")
+                                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                                    .build(),
+                            HttpResponse.BodyHandlers.discarding());
+            if (response.statusCode() != 200)
+                throw new IllegalStateException("HTTP " + response.statusCode());
+        } catch (Exception failure) {
+            LoggerDef.SystemLogger.warn("热更状态上报失败，恢复扫描会重报: {}", status, failure);
+        }
+    }
+
+    private static String enc(String text) {
+        return URLEncoder.encode(text, StandardCharsets.UTF_8);
+    }
 }

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: NpcCircuitModelConfigManager
  */
 public class NpcCircuitModelConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final NpcCircuitModelConfigManager instance = new NpcCircuitModelConfigManager();
-  private static final NpcCircuitModelConfigManagerImpl instanceImplA = new NpcCircuitModelConfigManagerImpl();
-  private static final NpcCircuitModelConfigManagerImpl instanceImplB = new NpcCircuitModelConfigManagerImpl();
-
   public static NpcCircuitModelConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static NpcCircuitModelConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(NpcCircuitModelConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new NpcCircuitModelConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    NpcCircuitModelConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "npcCircuitModel.txt"; }
 
   public static class NpcCircuitModelConfigManagerImpl extends AbstractConfigManger {
     private List<NpcCircuitModelConfig> configList = List.of();
@@ -164,7 +138,6 @@ public class NpcCircuitModelConfigManager implements InterfaceConfigManagerProxy
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

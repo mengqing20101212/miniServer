@@ -1,5 +1,10 @@
 package ly.sceneserver.common;
 
+import ly.sceneserver.common.march.SceneMarchSnapshot;
+import ly.sceneserver.common.march.SceneMarchState;
+import ly.sceneserver.common.march.SceneRallySnapshot;
+import ly.sceneserver.common.march.SceneRallyState;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Comparator;
@@ -16,47 +21,51 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import ly.sceneserver.common.march.SceneMarchSnapshot;
-import ly.sceneserver.common.march.SceneMarchState;
-import ly.sceneserver.common.march.SceneRallySnapshot;
-import ly.sceneserver.common.march.SceneRallyState;
-
 /**
  * 同一 SceneServer JVM 内的一块逻辑分片。
  *
- * <p>X 轴条带只用于启动时分配 Region；运行期由 SceneRegionDirectory 维护每个 Region 的
- * 唯一所有者。一个 SceneShard 只修改自己拥有 Region 内的动态对象，跨分片操作必须通过
- * SceneRuntime.SceneInstance.submit 投递，不能直接跨线程读写对象。
+ * <p>X 轴条带只用于启动时分配 Region；运行期由 SceneRegionDirectory 维护每个 Region 的 唯一所有者。一个 SceneShard 只修改自己拥有
+ * Region 内的动态对象，跨分片操作必须通过 SceneRuntime.SceneInstance.submit 投递，不能直接跨线程读写对象。
  */
 public final class SceneShard {
     private final SceneConfig config;
     private final SceneStaticMap staticMap;
+
     /** 动态 Region 所有权的唯一事实来源；热点迁移后 owns() 会立即反映新所有者。 */
     private final SceneRegionDirectory regionDirectory;
+
     private final int shardIndex;
+
     /** 仅用于描述启动时的初始 X 条带，不再作为运行期 owns() 的判断依据。 */
     private final int minX;
+
     private final int maxXExclusive;
     private final Queue<Runnable> inbox = new ConcurrentLinkedQueue<>();
     private final Map<Long, SceneObject> objects = new HashMap<>();
     private final Map<Integer, LinkedHashSet<Long>> occupants = new HashMap<>();
+
     /** AOI 块到本 SceneShard 动态对象 ID 的倒排索引。 */
     private final Map<Integer, LinkedHashSet<Long>> objectsByBlock = new HashMap<>();
+
     /** AOI 块到当前观察该块的玩家 ID，用于后续按脏块做增量广播。 */
     private final Map<Integer, LinkedHashSet<Long>> viewersByBlock = new HashMap<>();
+
     /** 当前在线玩家的相机视野订阅；玩家离开时该状态必须释放。 */
     private final Map<Long, ViewerState> viewers = new HashMap<>();
+
     /**
      * 每个玩家独立的历史探索块。
      *
-     * <p>该状态不能和在线 ViewerState 共用生命周期：玩家断线只取消订阅，已探索迷雾仍需保留，
-     * 并最终通过异步快照持久化后在重启时恢复。
+     * <p>该状态不能和在线 ViewerState 共用生命周期：玩家断线只取消订阅，已探索迷雾仍需保留， 并最终通过异步快照持久化后在重启时恢复。
      */
     private final Map<Long, BitSet> discoveredBlocksByPlayer = new HashMap<>();
+
     private final SceneTickListener tickListener;
     private final int slowTickMillis;
+
     /** 不调用 ConcurrentLinkedQueue.size()，避免积压时为了监控再做一次 O(n) 遍历。 */
     private final AtomicInteger queuedCommands = new AtomicInteger();
+
     private final AtomicInteger intervalPeakQueuedCommands = new AtomicInteger();
     private final AtomicLong intervalMaxTickNanos = new AtomicLong();
     private volatile long tickNumber;
@@ -134,16 +143,20 @@ public final class SceneShard {
     public CompletableFuture<Void> submit(Consumer<SceneShard> action) {
         Objects.requireNonNull(action, "action");
         CompletableFuture<Void> future = new CompletableFuture<>();
-        enqueue(() -> {
-            try {
-                try (ly.db.PersistenceScope persistence = ly.db.PersistenceScope.open()) {
-                    action.accept(this);
-                }
-                future.complete(null);
-            } catch (Throwable error) {
-                future.completeExceptionally(error);
-            }
-        });
+        ly.ConfigSnapshot snapshot = ly.ConfigScope.capture();
+        enqueue(
+                () -> {
+                    try {
+                        try (ly.ConfigScope config = ly.ConfigScope.use(snapshot);
+                                ly.db.PersistenceScope persistence =
+                                        ly.db.PersistenceScope.open()) {
+                            action.accept(this);
+                        }
+                        future.complete(null);
+                    } catch (Throwable error) {
+                        future.completeExceptionally(error);
+                    }
+                });
         return future;
     }
 
@@ -151,17 +164,21 @@ public final class SceneShard {
     public <T> CompletableFuture<T> query(Function<SceneShard, T> action) {
         Objects.requireNonNull(action, "action");
         CompletableFuture<T> future = new CompletableFuture<>();
-        enqueue(() -> {
-            try {
-                T result;
-                try (ly.db.PersistenceScope persistence = ly.db.PersistenceScope.open()) {
-                    result = action.apply(this);
-                }
-                future.complete(result);
-            } catch (Throwable error) {
-                future.completeExceptionally(error);
-            }
-        });
+        ly.ConfigSnapshot snapshot = ly.ConfigScope.capture();
+        enqueue(
+                () -> {
+                    try {
+                        T result;
+                        try (ly.ConfigScope config = ly.ConfigScope.use(snapshot);
+                                ly.db.PersistenceScope persistence =
+                                        ly.db.PersistenceScope.open()) {
+                            result = action.apply(this);
+                        }
+                        future.complete(result);
+                    } catch (Throwable error) {
+                        future.completeExceptionally(error);
+                    }
+                });
         return future;
     }
 
@@ -172,9 +189,13 @@ public final class SceneShard {
             throw new IllegalStateException("scene object already exists: " + object.objectId());
         }
         objects.put(object.objectId(), object);
-        occupants.computeIfAbsent(cellIndex(object.x(), object.y()), ignored -> new LinkedHashSet<>())
+        occupants
+                .computeIfAbsent(
+                        cellIndex(object.x(), object.y()), ignored -> new LinkedHashSet<>())
                 .add(object.objectId());
-        objectsByBlock.computeIfAbsent(blockIndex(object.x(), object.y()), ignored -> new LinkedHashSet<>())
+        objectsByBlock
+                .computeIfAbsent(
+                        blockIndex(object.x(), object.y()), ignored -> new LinkedHashSet<>())
                 .add(object.objectId());
     }
 
@@ -186,7 +207,9 @@ public final class SceneShard {
         removeBlockObject(object.x(), object.y(), objectId);
         object.moveTo(x, y);
         occupants.computeIfAbsent(cellIndex(x, y), ignored -> new LinkedHashSet<>()).add(objectId);
-        objectsByBlock.computeIfAbsent(blockIndex(x, y), ignored -> new LinkedHashSet<>()).add(objectId);
+        objectsByBlock
+                .computeIfAbsent(blockIndex(x, y), ignored -> new LinkedHashSet<>())
+                .add(objectId);
     }
 
     /** 在所属逻辑线程删除动态对象。 */
@@ -202,8 +225,7 @@ public final class SceneShard {
      * 在源 SceneShard Tick 中冻结并导出一个 Region 的全部运行时状态。
      *
      * <p>RegionDirectory 在调用本方法前已经停止向该 Region 投递新命令；FIFO 中更早到达的
-     * 命令会先执行，因此这里导出的就是明确的切换点状态。对象会同时从主表、格子索引和 AOI
-     * 块索引删除；在线观察者和个人迷雾也按玩家一起搬走，不能只迁移 SceneObject。
+     * 命令会先执行，因此这里导出的就是明确的切换点状态。对象会同时从主表、格子索引和 AOI 块索引删除；在线观察者和个人迷雾也按玩家一起搬走，不能只迁移 SceneObject。
      */
     SceneRegionTransfer exportRegion(SceneRegionMigrationTicket ticket) {
         if (!regionDirectory.matches(ticket) || ticket.sourceShardIndex() != shardIndex) {
@@ -215,31 +237,38 @@ public final class SceneShard {
         }
 
         LinkedHashSet<Long> indexedObjectIds = objectsByBlock.get(regionIndex);
-        ArrayList<SceneObject> regionObjects = new ArrayList<>(
-                indexedObjectIds == null ? 0 : indexedObjectIds.size());
+        ArrayList<SceneObject> regionObjects =
+                new ArrayList<>(indexedObjectIds == null ? 0 : indexedObjectIds.size());
         if (indexedObjectIds != null) {
             for (Long objectId : indexedObjectIds) {
                 SceneObject object = objects.get(objectId);
                 if (object == null || blockIndex(object.x(), object.y()) != regionIndex) {
                     throw new IllegalStateException(
-                            "region object index is inconsistent, region=" + regionIndex
-                                    + ", objectId=" + objectId);
+                            "region object index is inconsistent, region="
+                                    + regionIndex
+                                    + ", objectId="
+                                    + objectId);
                 }
                 LinkedHashSet<Long> cellObjects = occupants.get(cellIndex(object.x(), object.y()));
                 if (cellObjects == null || !cellObjects.contains(objectId)) {
                     throw new IllegalStateException(
-                            "region occupant index is inconsistent, region=" + regionIndex
-                                    + ", objectId=" + objectId);
+                            "region occupant index is inconsistent, region="
+                                    + regionIndex
+                                    + ", objectId="
+                                    + objectId);
                 }
                 regionObjects.add(object);
             }
         }
         for (SceneObject object : objects.values()) {
             if (blockIndex(object.x(), object.y()) == regionIndex
-                    && (indexedObjectIds == null || !indexedObjectIds.contains(object.objectId()))) {
+                    && (indexedObjectIds == null
+                            || !indexedObjectIds.contains(object.objectId()))) {
                 throw new IllegalStateException(
-                        "object is missing from region index, region=" + regionIndex
-                                + ", objectId=" + object.objectId());
+                        "object is missing from region index, region="
+                                + regionIndex
+                                + ", objectId="
+                                + object.objectId());
             }
         }
 
@@ -263,19 +292,21 @@ public final class SceneShard {
         }
         ArrayList<Long> sortedPlayerIds = new ArrayList<>(playerIds);
         sortedPlayerIds.sort(Long::compareTo);
-        ArrayList<SceneRegionPlayerTransfer> playerTransfers = new ArrayList<>(sortedPlayerIds.size());
+        ArrayList<SceneRegionPlayerTransfer> playerTransfers =
+                new ArrayList<>(sortedPlayerIds.size());
         for (Long playerId : sortedPlayerIds) {
             ViewerState viewer = viewers.get(playerId);
             boolean visible = viewer != null && viewer.visibleBlocks.get(regionIndex);
             BitSet discoveredBlocks = discoveredBlocksByPlayer.get(playerId);
             boolean discovered = discoveredBlocks != null && discoveredBlocks.get(regionIndex);
-            playerTransfers.add(new SceneRegionPlayerTransfer(
-                    playerId,
-                    visible,
-                    discovered,
-                    visible ? viewer.centerBlock : null,
-                    visible ? viewer.viewLevel : null,
-                    visible ? viewer.requestedTagMask : 0L));
+            playerTransfers.add(
+                    new SceneRegionPlayerTransfer(
+                            playerId,
+                            visible,
+                            discovered,
+                            visible ? viewer.centerBlock : null,
+                            visible ? viewer.viewLevel : null,
+                            visible ? viewer.requestedTagMask : 0L));
         }
 
         // 所有一致性检查完成后才真正拆除源端状态，避免校验异常留下半导出 Region。
@@ -307,14 +338,13 @@ public final class SceneShard {
     /**
      * 在目标 SceneShard Tick 中安装迁移数据，或在失败回滚时重新安装到源 Shard。
      *
-     * <p>先完整校验对象 ID、坐标和玩家元数据，再修改任何集合。安装过程只重建本 Shard 的
-     * 内存索引，不做数据库 IO；持久化仍遵循场景异步投影方案。
+     * <p>先完整校验对象 ID、坐标和玩家元数据，再修改任何集合。安装过程只重建本 Shard 的 内存索引，不做数据库 IO；持久化仍遵循场景异步投影方案。
      */
     void installRegion(SceneRegionTransfer transfer) {
         SceneRegionMigrationTicket ticket = transfer.ticket();
         if (!regionDirectory.matches(ticket)
                 || (shardIndex != ticket.sourceShardIndex()
-                && shardIndex != ticket.targetShardIndex())) {
+                        && shardIndex != ticket.targetShardIndex())) {
             throw new IllegalStateException("invalid destination migration ticket: " + ticket);
         }
         int regionIndex = ticket.regionIndex();
@@ -354,21 +384,24 @@ public final class SceneShard {
 
         for (SceneObject object : transfer.objects()) {
             objects.put(object.objectId(), object);
-            occupants.computeIfAbsent(
+            occupants
+                    .computeIfAbsent(
                             cellIndex(object.x(), object.y()), ignored -> new LinkedHashSet<>())
                     .add(object.objectId());
-            objectsByBlock.computeIfAbsent(regionIndex, ignored -> new LinkedHashSet<>())
+            objectsByBlock
+                    .computeIfAbsent(regionIndex, ignored -> new LinkedHashSet<>())
                     .add(object.objectId());
         }
         for (SceneRegionPlayerTransfer player : transfer.players()) {
             if (player.visible()) {
-                ViewerState viewer = viewers.computeIfAbsent(
-                        player.playerId(), ignored -> new ViewerState());
+                ViewerState viewer =
+                        viewers.computeIfAbsent(player.playerId(), ignored -> new ViewerState());
                 viewer.visibleBlocks.set(regionIndex);
                 viewer.centerBlock = player.centerBlock();
                 viewer.viewLevel = player.viewLevel();
                 viewer.requestedTagMask = player.requestedTagMask();
-                viewersByBlock.computeIfAbsent(regionIndex, ignored -> new LinkedHashSet<>())
+                viewersByBlock
+                        .computeIfAbsent(regionIndex, ignored -> new LinkedHashSet<>())
                         .add(player.playerId());
             }
             if (player.discovered()) {
@@ -386,25 +419,27 @@ public final class SceneShard {
     /** 把已经冻结部队数据并完成目标校验的行军注册成地图动态对象。 */
     public void addMarch(SceneMarchState march) {
         SceneMarchSnapshot snapshot = march.snapshot();
-        addObject(new SceneObject(
-                snapshot.marchId(),
-                SceneObjectType.MARCH,
-                snapshot.ownerPlayerId(),
-                snapshot.origin().x(),
-                snapshot.origin().y(),
-                march));
+        addObject(
+                new SceneObject(
+                        snapshot.marchId(),
+                        SceneObjectType.MARCH,
+                        snapshot.ownerPlayerId(),
+                        snapshot.origin().x(),
+                        snapshot.origin().y(),
+                        march));
     }
 
     /** 把集结点注册成战略动态对象，AOI 世界层也会同步其摘要。 */
     public void addRally(SceneRallyState rally) {
         SceneRallySnapshot snapshot = rally.snapshot();
-        addObject(new SceneObject(
-                snapshot.rallyId(),
-                SceneObjectType.RALLY,
-                snapshot.allianceId(),
-                snapshot.assemblyPoint().x(),
-                snapshot.assemblyPoint().y(),
-                rally));
+        addObject(
+                new SceneObject(
+                        snapshot.rallyId(),
+                        SceneObjectType.RALLY,
+                        snapshot.allianceId(),
+                        snapshot.assemblyPoint().x(),
+                        snapshot.assemblyPoint().y(),
+                        rally));
     }
 
     /** 在 SceneShard Tick 中串行修改行军状态，并同步增加通用对象版本。 */
@@ -430,8 +465,7 @@ public final class SceneShard {
     /**
      * 推进行军到同一 SceneShard 内的新路径点。
      *
-     * <p>跨 SceneShard 点会被拒绝，必须先由 SceneRuntime 协调对象所有权转移，不能直接
-     * 从当前 Tick 修改另一个分片。
+     * <p>跨 SceneShard 点会被拒绝，必须先由 SceneRuntime 协调对象所有权转移，不能直接 从当前 Tick 修改另一个分片。
      */
     public void advanceMarch(long marchId, int newPathIndex) {
         SceneObject object = requireObject(marchId);
@@ -483,8 +517,8 @@ public final class SceneShard {
     /**
      * 更新玩家在本 SceneShard 的块订阅，并在同一个 Tick 中创建分层快照。
      *
-     * <p>visibleBlocks 是全场景块编号；本分片只登记 RegionDirectory 当前分配给自己的块。
-     * 每个块始终只有一个 SceneShard 负责，因此迁移后不会由源、目标重复生成 AOI 数据。
+     * <p>visibleBlocks 是全场景块编号；本分片只登记 RegionDirectory 当前分配给自己的块。 每个块始终只有一个 SceneShard
+     * 负责，因此迁移后不会由源、目标重复生成 AOI 数据。
      */
     public SceneViewSnapshot updateViewer(SceneViewRequest request, BitSet visibleBlocks) {
         BitSet localVisible = localBlocks(visibleBlocks);
@@ -511,9 +545,10 @@ public final class SceneShard {
         discoveredBlocksByPlayer
                 .computeIfAbsent(request.playerId(), ignored -> new BitSet())
                 .or(localVisible);
-        state.centerBlock = new ScenePoint(
-                request.center().x() / config.regionSize(),
-                request.center().y() / config.regionSize());
+        state.centerBlock =
+                new ScenePoint(
+                        request.center().x() / config.regionSize(),
+                        request.center().y() / config.regionSize());
         state.viewLevel = request.viewLevel();
         state.requestedTagMask = request.requestedTagMask();
         return snapshotViewer(request.playerId(), state);
@@ -621,7 +656,10 @@ public final class SceneShard {
             failedTickCount++;
             ly.LoggerDef.SystemLogger.error(
                     "SceneShard tick failed, sceneId={}, shardIndex={}, tickNumber={}",
-                    config.sceneId(), shardIndex, tickNumber, error);
+                    config.sceneId(),
+                    shardIndex,
+                    tickNumber,
+                    error);
         } finally {
             long durationNanos = Math.max(0L, System.nanoTime() - startedNanos);
             lastTickNanos = durationNanos;
@@ -707,7 +745,9 @@ public final class SceneShard {
         for (int blockIndex = added.nextSetBit(0);
                 blockIndex >= 0;
                 blockIndex = added.nextSetBit(blockIndex + 1)) {
-            viewersByBlock.computeIfAbsent(blockIndex, ignored -> new LinkedHashSet<>()).add(playerId);
+            viewersByBlock
+                    .computeIfAbsent(blockIndex, ignored -> new LinkedHashSet<>())
+                    .add(playerId);
         }
     }
 
@@ -737,8 +777,9 @@ public final class SceneShard {
             }
             int blockX = blockIndex % blockColumns();
             int blockY = blockIndex / blockColumns();
-            blockSnapshots.add(new SceneBlockSnapshot(
-                    blockIndex, blockX, blockY, true, true, objectCount, aggregateTags));
+            blockSnapshots.add(
+                    new SceneBlockSnapshot(
+                            blockIndex, blockX, blockY, true, true, objectCount, aggregateTags));
         }
 
         BitSet playerDiscovered = discoveredBlocksByPlayer.getOrDefault(playerId, new BitSet());
@@ -761,12 +802,14 @@ public final class SceneShard {
     }
 
     private SceneObjectSnapshot snapshot(SceneObject object) {
-        SceneMarchSnapshot march = object.state() instanceof SceneMarchState state
-                ? state.snapshot()
-                : object.state() instanceof SceneMarchSnapshot state ? state : null;
-        SceneRallySnapshot rally = object.state() instanceof SceneRallyState state
-                ? state.snapshot()
-                : object.state() instanceof SceneRallySnapshot state ? state : null;
+        SceneMarchSnapshot march =
+                object.state() instanceof SceneMarchState state
+                        ? state.snapshot()
+                        : object.state() instanceof SceneMarchSnapshot state ? state : null;
+        SceneRallySnapshot rally =
+                object.state() instanceof SceneRallyState state
+                        ? state.snapshot()
+                        : object.state() instanceof SceneRallySnapshot state ? state : null;
         return new SceneObjectSnapshot(
                 object.objectId(),
                 object.type(),

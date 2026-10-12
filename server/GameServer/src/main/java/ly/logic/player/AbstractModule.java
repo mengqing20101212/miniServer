@@ -89,10 +89,8 @@ public abstract class AbstractModule implements IModule, IPlayerEvent {
     }
 
     @SuppressWarnings("unchecked")
-    final void persistDirtyModuleBlob(ly.db.player.PlayerPersistenceStore persistenceStore) {
-        if (!moduleDataDirty || !usesBlobPersistence()) {
-            return;
-        }
+    final PlayerModuleEntry prepareDirtyModuleBlob() {
+        if (!moduleDataDirty || !usesBlobPersistence()) return null;
         try {
             Object data = getModuleDataForPersistence();
             byte[] bytes = ProtobufProxy.create((Class<Object>) data.getClass()).encode(data);
@@ -100,14 +98,15 @@ public abstract class AbstractModule implements IModule, IPlayerEvent {
             moduleEntry.setRevision(moduleEntry.getRevision() + 1L);
             moduleEntry.setModuleData(bytes);
             moduleEntry.setUpdateTime(java.time.LocalDateTime.now());
-            if (!persistenceStore.acceptEntitySnapshot(moduleEntry)) {
-                throw new IllegalStateException("module persistence rejected");
-            }
-            moduleEntry.markPersisted();
-            moduleDataDirty = false;
-        } catch (Exception e) {
-            throw new IllegalStateException("save module failed: " + getClass().getName(), e);
+            return moduleEntry;
+        } catch (Exception error) {
+            throw new IllegalStateException("编码模块失败: " + getClass().getName(), error);
         }
+    }
+
+    final void acceptPreparedModuleBlob() {
+        moduleEntry.markPersisted();
+        moduleDataDirty = false;
     }
 
     /** 使用模块声明的持久化类型统一反序列化。 */

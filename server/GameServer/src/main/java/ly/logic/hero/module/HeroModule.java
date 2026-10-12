@@ -71,6 +71,18 @@ public class HeroModule extends AbstractModule {
         return null;
     }
 
+    public boolean hasHero(int heroId) {
+        return heroes.stream().anyMatch(entry -> entry.getHeroId() == heroId);
+    }
+
+    public boolean canAddHeroes(java.util.Collection<Integer> ids) {
+        if (heroes.size() + ids.size() > maxHeroCount) return false;
+        for (int id : ids)
+            if (hasHero(id) || !HeroInfoConfigManager.getInstance().getConfigMap().containsKey(id))
+                return false;
+        return true;
+    }
+
     public PlayerHeroEntry addHero(int heroId) {
         if (heroes.size() >= maxHeroCount
                 || HeroInfoConfigManager.getInstance().getConfigMap().get(heroId) == null) {

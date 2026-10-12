@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: Mail_templateConfigManager
  */
 public class Mail_templateConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final Mail_templateConfigManager instance = new Mail_templateConfigManager();
-  private static final Mail_templateConfigManagerImpl instanceImplA = new Mail_templateConfigManagerImpl();
-  private static final Mail_templateConfigManagerImpl instanceImplB = new Mail_templateConfigManagerImpl();
-
   public static Mail_templateConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static Mail_templateConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(Mail_templateConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new Mail_templateConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    Mail_templateConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "mail_template.txt"; }
 
   public static class Mail_templateConfigManagerImpl extends AbstractConfigManger {
     private List<Mail_templateConfig> configList = List.of();
@@ -159,7 +133,6 @@ public class Mail_templateConfigManager implements InterfaceConfigManagerProxy {
         }
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

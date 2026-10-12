@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: CircuitAttrInfoConfigManager
  */
 public class CircuitAttrInfoConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final CircuitAttrInfoConfigManager instance = new CircuitAttrInfoConfigManager();
-  private static final CircuitAttrInfoConfigManagerImpl instanceImplA = new CircuitAttrInfoConfigManagerImpl();
-  private static final CircuitAttrInfoConfigManagerImpl instanceImplB = new CircuitAttrInfoConfigManagerImpl();
-
   public static CircuitAttrInfoConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static CircuitAttrInfoConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(CircuitAttrInfoConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new CircuitAttrInfoConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    CircuitAttrInfoConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "circuitAttrInfo.txt"; }
 
   public static class CircuitAttrInfoConfigManagerImpl extends AbstractConfigManger {
     private List<CircuitAttrInfoConfig> configList = List.of();
@@ -176,7 +150,6 @@ public class CircuitAttrInfoConfigManager implements InterfaceConfigManagerProxy
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

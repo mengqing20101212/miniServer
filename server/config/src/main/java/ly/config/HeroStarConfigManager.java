@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: HeroStarConfigManager
  */
 public class HeroStarConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final HeroStarConfigManager instance = new HeroStarConfigManager();
-  private static final HeroStarConfigManagerImpl instanceImplA = new HeroStarConfigManagerImpl();
-  private static final HeroStarConfigManagerImpl instanceImplB = new HeroStarConfigManagerImpl();
-
   public static HeroStarConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static HeroStarConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(HeroStarConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new HeroStarConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    HeroStarConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "heroStar.txt"; }
 
   public static class HeroStarConfigManagerImpl extends AbstractConfigManger {
     private List<HeroStarConfig> configList = List.of();
@@ -165,7 +139,6 @@ public class HeroStarConfigManager implements InterfaceConfigManagerProxy {
         }
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

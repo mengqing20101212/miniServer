@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: StrategyRecommendLineupConfigManager
  */
 public class StrategyRecommendLineupConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final StrategyRecommendLineupConfigManager instance = new StrategyRecommendLineupConfigManager();
-  private static final StrategyRecommendLineupConfigManagerImpl instanceImplA = new StrategyRecommendLineupConfigManagerImpl();
-  private static final StrategyRecommendLineupConfigManagerImpl instanceImplB = new StrategyRecommendLineupConfigManagerImpl();
-
   public static StrategyRecommendLineupConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static StrategyRecommendLineupConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(StrategyRecommendLineupConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new StrategyRecommendLineupConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    StrategyRecommendLineupConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "strategyRecommendLineup.txt"; }
 
   public static class StrategyRecommendLineupConfigManagerImpl extends AbstractConfigManger {
     private List<StrategyRecommendLineupConfig> configList = List.of();
@@ -140,7 +114,6 @@ public class StrategyRecommendLineupConfigManager implements InterfaceConfigMana
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: Lua_id_define2ConfigManager
  */
 public class Lua_id_define2ConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final Lua_id_define2ConfigManager instance = new Lua_id_define2ConfigManager();
-  private static final Lua_id_define2ConfigManagerImpl instanceImplA = new Lua_id_define2ConfigManagerImpl();
-  private static final Lua_id_define2ConfigManagerImpl instanceImplB = new Lua_id_define2ConfigManagerImpl();
-
   public static Lua_id_define2ConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static Lua_id_define2ConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(Lua_id_define2ConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new Lua_id_define2ConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    Lua_id_define2ConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "lua_id_define2.txt"; }
 
   public static class Lua_id_define2ConfigManagerImpl extends AbstractConfigManger {
     private List<Lua_id_define2Config> configList = List.of();
@@ -116,7 +90,6 @@ public class Lua_id_define2ConfigManager implements InterfaceConfigManagerProxy 
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

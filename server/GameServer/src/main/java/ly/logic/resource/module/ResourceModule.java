@@ -13,6 +13,9 @@ public class ResourceModule extends AbstractModule {
     private final java.util.Map<Integer, ly.db.entry.PlayerResourceEntry> resources =
             new java.util.HashMap<>();
 
+    private final java.util.Map<Integer, Long> pendingNotifications =
+            new java.util.LinkedHashMap<>();
+
     @Override
     protected boolean usesBlobPersistence() {
         return false;
@@ -55,7 +58,7 @@ public class ResourceModule extends AbstractModule {
         } else {
             entry.setAmount(next);
         }
-        notifyResourceChange(resourceType, amount);
+        recordResourceChange(resourceType, amount);
         return true;
     }
 
@@ -67,7 +70,7 @@ public class ResourceModule extends AbstractModule {
             return false;
         }
         resources.get(resourceType).setAmount(current - amount);
-        notifyResourceChange(resourceType, -amount);
+        recordResourceChange(resourceType, -amount);
         return true;
     }
 
@@ -77,17 +80,23 @@ public class ResourceModule extends AbstractModule {
         return entry == null ? 0L : entry.getAmount();
     }
 
-    /** 通知资源变化 */
-    private void notifyResourceChange(int resourceType, long amount) {
+    private void recordResourceChange(int resourceType, long amount) {
+        pendingNotifications.merge(resourceType, amount, Math::addExact);
+        ly.db.PersistenceScope.afterFlush(this, this::notifyResourceChanges);
+    }
+
+    /** 保存边界接收成功后，一条消息推送本轮合并后的资产变化。 */
+    private void notifyResourceChanges() {
+        java.util.Map<Integer, Long> changes = new java.util.LinkedHashMap<>(pendingNotifications);
+        pendingNotifications.clear();
+        changes.values().removeIf(amount -> amount == 0);
+        if (changes.isEmpty()) return;
         try {
-            // 发送 SC_ResourceChange 消息
-            Resource.SC_ResourceChange.Builder builder = Resource.SC_ResourceChange.newBuilder();
-            builder.putChanges(resourceType, amount);
-            player.sendMsg(ly.proto.Cmd.CMD.SC_ResourceChange, builder.build());
-        } catch (NoClassDefFoundError | Exception e) {
-            // protobuf 版本兼容性兜底：当前运行时 protobuf 版本可能不支持 Map 反射
-            System.err.println(
-                    "WARN: notifyResourceChange failed (protobuf compat): " + e.getMessage());
+            Resource.SC_ResourceChange message =
+                    Resource.SC_ResourceChange.newBuilder().putAllChanges(changes).build();
+            player.sendMsg(ly.proto.Cmd.CMD.SC_ResourceChange, message);
+        } catch (NoClassDefFoundError | Exception error) {
+            ly.LoggerDef.SystemLogger.warn("资源变更通知失败, playerId={}", player.getPlayerId(), error);
         }
     }
 }

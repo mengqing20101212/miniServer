@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: ActivitycashGiftConfigManager
  */
 public class ActivitycashGiftConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final ActivitycashGiftConfigManager instance = new ActivitycashGiftConfigManager();
-  private static final ActivitycashGiftConfigManagerImpl instanceImplA = new ActivitycashGiftConfigManagerImpl();
-  private static final ActivitycashGiftConfigManagerImpl instanceImplB = new ActivitycashGiftConfigManagerImpl();
-
   public static ActivitycashGiftConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static ActivitycashGiftConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(ActivitycashGiftConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new ActivitycashGiftConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    ActivitycashGiftConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "activitycashGift.txt"; }
 
   public static class ActivitycashGiftConfigManagerImpl extends AbstractConfigManger {
     private List<ActivitycashGiftConfig> configList = List.of();
@@ -122,7 +96,6 @@ public class ActivitycashGiftConfigManager implements InterfaceConfigManagerProx
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

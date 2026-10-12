@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: ActivityRedemptionConfigManager
  */
 public class ActivityRedemptionConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final ActivityRedemptionConfigManager instance = new ActivityRedemptionConfigManager();
-  private static final ActivityRedemptionConfigManagerImpl instanceImplA = new ActivityRedemptionConfigManagerImpl();
-  private static final ActivityRedemptionConfigManagerImpl instanceImplB = new ActivityRedemptionConfigManagerImpl();
-
   public static ActivityRedemptionConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static ActivityRedemptionConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(ActivityRedemptionConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new ActivityRedemptionConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    ActivityRedemptionConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "activityRedemption.txt"; }
 
   public static class ActivityRedemptionConfigManagerImpl extends AbstractConfigManger {
     private List<ActivityRedemptionConfig> configList = List.of();
@@ -152,7 +126,6 @@ public class ActivityRedemptionConfigManager implements InterfaceConfigManagerPr
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

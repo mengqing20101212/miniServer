@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: BlockBattleChallengeRewardConfigManager
  */
 public class BlockBattleChallengeRewardConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final BlockBattleChallengeRewardConfigManager instance = new BlockBattleChallengeRewardConfigManager();
-  private static final BlockBattleChallengeRewardConfigManagerImpl instanceImplA = new BlockBattleChallengeRewardConfigManagerImpl();
-  private static final BlockBattleChallengeRewardConfigManagerImpl instanceImplB = new BlockBattleChallengeRewardConfigManagerImpl();
-
   public static BlockBattleChallengeRewardConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static BlockBattleChallengeRewardConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(BlockBattleChallengeRewardConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new BlockBattleChallengeRewardConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    BlockBattleChallengeRewardConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "blockBattleChallengeReward.txt"; }
 
   public static class BlockBattleChallengeRewardConfigManagerImpl extends AbstractConfigManger {
     private List<BlockBattleChallengeRewardConfig> configList = List.of();
@@ -128,7 +102,6 @@ public class BlockBattleChallengeRewardConfigManager implements InterfaceConfigM
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

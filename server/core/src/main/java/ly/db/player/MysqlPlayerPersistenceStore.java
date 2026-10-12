@@ -30,6 +30,10 @@ public final class MysqlPlayerPersistenceStore implements PlayerPersistenceStore
         return MysqlService.getInstance().generateEntityId();
     }
 
+    public boolean acceptBatch(List<AbstractEntry> saves, List<AbstractEntry> deletes) {
+        return MysqlService.getInstance().acceptEntityBatch(saves, deletes);
+    }
+
     public boolean acceptEntitySnapshot(AbstractEntry entry) {
         return MysqlService.getInstance().save(entry);
     }

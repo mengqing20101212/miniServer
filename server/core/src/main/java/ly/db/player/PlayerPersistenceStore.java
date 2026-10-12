@@ -20,4 +20,11 @@ public interface PlayerPersistenceStore {
     boolean acceptEntitySnapshot(AbstractEntry entry);
 
     boolean acceptEntityDeletion(AbstractEntry entry);
+
+    /** 测试存储可覆盖；生产实现必须以单一持久化批次接收全部实体。 */
+    default boolean acceptBatch(List<AbstractEntry> saves, List<AbstractEntry> deletes) {
+        for (AbstractEntry entry : saves) if (!acceptEntitySnapshot(entry)) return false;
+        for (AbstractEntry entry : deletes) if (!acceptEntityDeletion(entry)) return false;
+        return true;
+    }
 }

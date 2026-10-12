@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: ElectronicThreeHeroConfigManager
  */
 public class ElectronicThreeHeroConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final ElectronicThreeHeroConfigManager instance = new ElectronicThreeHeroConfigManager();
-  private static final ElectronicThreeHeroConfigManagerImpl instanceImplA = new ElectronicThreeHeroConfigManagerImpl();
-  private static final ElectronicThreeHeroConfigManagerImpl instanceImplB = new ElectronicThreeHeroConfigManagerImpl();
-
   public static ElectronicThreeHeroConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static ElectronicThreeHeroConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(ElectronicThreeHeroConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new ElectronicThreeHeroConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    ElectronicThreeHeroConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "electronicThreeHero.txt"; }
 
   public static class ElectronicThreeHeroConfigManagerImpl extends AbstractConfigManger {
     private List<ElectronicThreeHeroConfig> configList = List.of();
@@ -260,7 +234,6 @@ public class ElectronicThreeHeroConfigManager implements InterfaceConfigManagerP
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

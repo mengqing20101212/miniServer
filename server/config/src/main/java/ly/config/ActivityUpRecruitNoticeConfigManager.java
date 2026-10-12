@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import ly.AbstractConfigManger;
 import ly.ConfigLoadException;
 import ly.InterfaceConfigManagerProxy;
@@ -20,40 +19,15 @@ import org.slf4j.Logger;
  * File: ActivityUpRecruitNoticeConfigManager
  */
 public class ActivityUpRecruitNoticeConfigManager implements InterfaceConfigManagerProxy {
-  private static final AtomicBoolean switched = new AtomicBoolean(false);
-  private static final ActivityUpRecruitNoticeConfigManager instance = new ActivityUpRecruitNoticeConfigManager();
-  private static final ActivityUpRecruitNoticeConfigManagerImpl instanceImplA = new ActivityUpRecruitNoticeConfigManagerImpl();
-  private static final ActivityUpRecruitNoticeConfigManagerImpl instanceImplB = new ActivityUpRecruitNoticeConfigManagerImpl();
-
   public static ActivityUpRecruitNoticeConfigManagerImpl getInstance() {
-    return switched.get() ? instanceImplA : instanceImplB;
-  }
-
-  private static ActivityUpRecruitNoticeConfigManagerImpl getStandby() {
-    return switched.get() ? instanceImplB : instanceImplA;
+    return ly.ConfigService.getInstance().table(ActivityUpRecruitNoticeConfigManagerImpl.class);
   }
 
   @Override
-  public void loadConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getInstance().reload(logger, configDir);
-  }
+  public AbstractConfigManger createTable() { return new ActivityUpRecruitNoticeConfigManagerImpl(); }
 
   @Override
-  public void loadStandbyConfig(Logger logger, String configDir) throws ConfigLoadException {
-    getStandby().reload(logger, configDir);
-  }
-
-  @Override
-  public AbstractConfigManger switchConfig() {
-    ActivityUpRecruitNoticeConfigManagerImpl oldActive = getInstance();
-    switched.set(!switched.get());
-    return oldActive;
-  }
-
-  @Override
-  public String getConfigFileName() {
-    return getInstance().getConfigFileName();
-  }
+  public String getConfigFileName() { return "activityUpRecruitNotice.txt"; }
 
   public static class ActivityUpRecruitNoticeConfigManagerImpl extends AbstractConfigManger {
     private List<ActivityUpRecruitNoticeConfig> configList = List.of();
@@ -242,7 +216,6 @@ public class ActivityUpRecruitNoticeConfigManager implements InterfaceConfigMana
         checker.checkAfterParse(logger, newList);
         configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-        afterLoad();
       } catch (IOException e) {
         throw new ConfigLoadException("Config file could not be read :" + fileName);
       }

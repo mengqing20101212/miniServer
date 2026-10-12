@@ -1,5 +1,7 @@
 package ly.logic.hero;
 
+import static org.junit.Assert.*;
+
 import ly.config.ResourceType;
 import ly.db.entry.PlayerHeroEntry;
 import ly.logic.hero.module.HeroModule;
@@ -16,23 +18,16 @@ import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 import ly.proto.Hero;
 
-import org.junit.Before;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.junit.Assert.*;
-
-/**
- * HeroController 集成测试
- * 测试英雄模块的消息处理流程，包括升级、升星、觉醒等操作
- */
+/** HeroController 集成测试 测试英雄模块的消息处理流程，包括升级、升星、觉醒等操作 */
 public class HeroControllerTest {
 
     private HeroController heroController;
@@ -73,8 +68,8 @@ public class HeroControllerTest {
         resourceModule.addResource(ResourceType.EXP_ITEM, 5000);
         resourceModule.addResource(ResourceType.HERO_DEBRIS, 1000);
         resourceModule.addResource(ResourceType.AWAKEN_ITEM, 500);
-        resourceModule.addResource(1120001, 50000);  // 觉醒货币
-        resourceModule.addResource(1210001, 100);    // 觉醒材料（1210001,40）
+        resourceModule.addResource(1120001, 50000); // 觉醒货币
+        resourceModule.addResource(1210001, 100); // 觉醒材料（1210001,40）
 
         // 注册模块到玩家
         mockPlayerData.putModule(ModuleEnum.HERO_MODULE, heroModule);
@@ -110,12 +105,10 @@ public class HeroControllerTest {
     }
 
     private static int validHeroId(int index) {
-        List<Integer> heroIds = ly.config.HeroInfoConfigManager.getInstance()
-                .getConfigMap()
-                .keySet()
-                .stream()
-                .sorted()
-                .toList();
+        List<Integer> heroIds =
+                ly.config.HeroInfoConfigManager.getInstance().getConfigMap().keySet().stream()
+                        .sorted()
+                        .toList();
         if (heroIds.isEmpty()) {
             throw new IllegalStateException("heroInfo 配置为空，无法执行 HeroControllerTest");
         }
@@ -129,9 +122,7 @@ public class HeroControllerTest {
         return PlayerDataTestFactory.create(entry);
     }
 
-    /**
-     * 测试获取英雄列表
-     */
+    /** 测试获取英雄列表 */
     @Test
     public void testHandleHeroList() {
         // 先添加几个英雄
@@ -156,9 +147,48 @@ public class HeroControllerTest {
         assertEquals("英雄列表应包含 3 个英雄", 3, response.getHeroListCount());
     }
 
-    /**
-     * 测试英雄升级
-     */
+    /** 测试英雄升级 */
+    @Test
+    public void insufficientAdditionalCostDoesNotConsumeExperienceItems() throws Exception {
+        int heroId = validHeroId(0);
+        PlayerHeroEntry hero = heroModule.addHero(heroId);
+        int model =
+                ly.config.HeroInfoConfigManager.getInstance().getConfigMap().get(heroId).expModelId;
+        Object manager = ly.config.HeroExpConfigManager.getInstance();
+        Field list = manager.getClass().getDeclaredField("configList");
+        list.setAccessible(true);
+        Object previous = list.get(manager);
+        try {
+            list.set(
+                    manager,
+                    List.of(
+                            new ly.config.HeroExpConfig(
+                                    2, model, 100, 0, ResourceType.GOLD, "0,999999999", "")));
+            long before = resourceModule.getResource(ResourceType.EXP_ITEM);
+            Hero.CS_HeroLevelUp request =
+                    Hero.CS_HeroLevelUp.newBuilder()
+                            .setHeroUid(hero.getId())
+                            .addExpItemIds(ResourceType.EXP_ITEM)
+                            .build();
+            try (ly.db.PersistenceScope scope = ly.db.PersistenceScope.open()) {
+                heroController.handleHeroLevelUp(mockContext, request);
+            }
+            assertEquals(before, resourceModule.getResource(ResourceType.EXP_ITEM));
+            assertEquals(Integer.valueOf(1), hero.getLevel());
+        } finally {
+            list.set(manager, previous);
+        }
+    }
+
+    @Test
+    public void addingMultipleCopiesFailsBeforeCreatingAnyHero() {
+        int before = heroModule.getHeroList().size();
+        heroController.handleHeroAdd(
+                mockContext,
+                Hero.CS_HeroAdd.newBuilder().setHeroId(validHeroId(0)).setCount(2).build());
+        assertEquals(before, heroModule.getHeroList().size());
+    }
+
     @Test
     public void testHandleHeroLevelUp() {
         // 添加一个英雄
@@ -166,10 +196,11 @@ public class HeroControllerTest {
         int initialLevel = hero.getLevel();
 
         // 创建升级请求（使用经验道具 ID 列表）
-        Hero.CS_HeroLevelUp request = Hero.CS_HeroLevelUp.newBuilder()
-                .setHeroUid(hero.getId())
-                .addExpItemIds(1) // 添加一个经验道具 ID
-                .build();
+        Hero.CS_HeroLevelUp request =
+                Hero.CS_HeroLevelUp.newBuilder()
+                        .setHeroUid(hero.getId())
+                        .addExpItemIds(1) // 添加一个经验道具 ID
+                        .build();
 
         // 调用处理器
         heroController.handleHeroLevelUp(mockContext, request);
@@ -188,16 +219,12 @@ public class HeroControllerTest {
         assertTrue("英雄等级应提升", response.getHeroInfo().getLevel() >= initialLevel);
     }
 
-    /**
-     * 测试升级不存在的英雄
-     */
+    /** 测试升级不存在的英雄 */
     @Test
     public void testHandleHeroLevelUpNonExistent() {
         // 创建升级请求（使用不存在的 heroUid）
-        Hero.CS_HeroLevelUp request = Hero.CS_HeroLevelUp.newBuilder()
-                .setHeroUid(999999L)
-                .addExpItemIds(1)
-                .build();
+        Hero.CS_HeroLevelUp request =
+                Hero.CS_HeroLevelUp.newBuilder().setHeroUid(999999L).addExpItemIds(1).build();
 
         // 调用处理器
         heroController.handleHeroLevelUp(mockContext, request);
@@ -208,9 +235,7 @@ public class HeroControllerTest {
         assertNotNull("应发送响应", sentMessage);
     }
 
-    /**
-     * 测试升级时经验道具不足
-     */
+    /** 测试升级时经验道具不足 */
     @Test
     public void testHandleHeroLevelUpInsufficientExpItems() {
         // 添加一个英雄
@@ -220,10 +245,8 @@ public class HeroControllerTest {
         resourceModule.deductResource(ResourceType.EXP_ITEM, 5000);
 
         // 创建升级请求
-        Hero.CS_HeroLevelUp request = Hero.CS_HeroLevelUp.newBuilder()
-                .setHeroUid(hero.getId())
-                .addExpItemIds(1)
-                .build();
+        Hero.CS_HeroLevelUp request =
+                Hero.CS_HeroLevelUp.newBuilder().setHeroUid(hero.getId()).addExpItemIds(1).build();
 
         // 调用处理器
         heroController.handleHeroLevelUp(mockContext, request);
@@ -233,18 +256,15 @@ public class HeroControllerTest {
         assertNotNull("应发送响应", sentMessage);
     }
 
-    /**
-     * 测试英雄升星
-     */
+    /** 测试英雄升星 */
     @Test
     public void testHandleHeroStarUp() {
         // 添加一个英雄
         PlayerHeroEntry hero = heroModule.addHero(validHeroId(0));
 
         // 创建升星请求
-        Hero.CS_HeroStarUp request = Hero.CS_HeroStarUp.newBuilder()
-                .setHeroUid(hero.getId())
-                .build();
+        Hero.CS_HeroStarUp request =
+                Hero.CS_HeroStarUp.newBuilder().setHeroUid(hero.getId()).build();
 
         // 调用处理器
         heroController.handleHeroStarUp(mockContext, request);
@@ -255,15 +275,11 @@ public class HeroControllerTest {
         assertEquals("消息 CMD 应为 SC_HeroStarUp", Cmd.CMD.SC_HeroStarUp_VALUE, sentMessage.cmd);
     }
 
-    /**
-     * 测试升星不存在的英雄
-     */
+    /** 测试升星不存在的英雄 */
     @Test
     public void testHandleHeroStarUpNonExistent() {
         // 创建升星请求（使用不存在的 heroUid）
-        Hero.CS_HeroStarUp request = Hero.CS_HeroStarUp.newBuilder()
-                .setHeroUid(999999L)
-                .build();
+        Hero.CS_HeroStarUp request = Hero.CS_HeroStarUp.newBuilder().setHeroUid(999999L).build();
 
         // 调用处理器
         heroController.handleHeroStarUp(mockContext, request);
@@ -273,18 +289,15 @@ public class HeroControllerTest {
         assertNotNull("应发送响应", sentMessage);
     }
 
-    /**
-     * 测试英雄觉醒
-     */
+    /** 测试英雄觉醒 */
     @Test
     public void testHandleHeroAwaken() {
         // 添加一个英雄
         PlayerHeroEntry hero = heroModule.addHero(validHeroId(0));
 
         // 创建觉醒请求
-        Hero.CS_HeroAwaken request = Hero.CS_HeroAwaken.newBuilder()
-                .setHeroUid(hero.getId())
-                .build();
+        Hero.CS_HeroAwaken request =
+                Hero.CS_HeroAwaken.newBuilder().setHeroUid(hero.getId()).build();
 
         // 调用处理器
         heroController.handleHeroAwaken(mockContext, request);
@@ -299,15 +312,11 @@ public class HeroControllerTest {
         assertNotNull("应返回响应", response);
     }
 
-    /**
-     * 测试觉醒不存在的英雄
-     */
+    /** 测试觉醒不存在的英雄 */
     @Test
     public void testHandleHeroAwakenNonExistent() {
         // 创建觉醒请求（使用不存在的 heroUid）
-        Hero.CS_HeroAwaken request = Hero.CS_HeroAwaken.newBuilder()
-                .setHeroUid(999999L)
-                .build();
+        Hero.CS_HeroAwaken request = Hero.CS_HeroAwaken.newBuilder().setHeroUid(999999L).build();
 
         // 调用处理器
         heroController.handleHeroAwaken(mockContext, request);
@@ -317,16 +326,12 @@ public class HeroControllerTest {
         assertNotNull("应发送响应", sentMessage);
     }
 
-    /**
-     * 测试添加英雄
-     */
+    /** 测试添加英雄 */
     @Test
     public void testHandleHeroAdd() {
         // 创建添加英雄请求
-        Hero.CS_HeroAdd request = Hero.CS_HeroAdd.newBuilder()
-                .setHeroId(validHeroId(0))
-                .setCount(1)
-                .build();
+        Hero.CS_HeroAdd request =
+                Hero.CS_HeroAdd.newBuilder().setHeroId(validHeroId(0)).setCount(1).build();
 
         // 调用处理器
         heroController.handleHeroAdd(mockContext, request);
@@ -342,21 +347,21 @@ public class HeroControllerTest {
         assertEquals("应返回 1 个英雄", 1, response.getHeroListCount());
 
         // 验证英雄确实被添加
-        PlayerHeroEntry addedHero = heroModule.getHeroList().stream().filter(h -> h.getHeroId() == validHeroId(0)).findFirst().orElse(null);
+        PlayerHeroEntry addedHero =
+                heroModule.getHeroList().stream()
+                        .filter(h -> h.getHeroId() == validHeroId(0))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull("英雄应被添加", addedHero);
         assertEquals("英雄 ID 应正确", validHeroId(0), addedHero.getHeroId().intValue());
     }
 
-    /**
-     * 测试添加多个英雄
-     */
+    /** 测试添加多个英雄 */
     @Test
     public void testHandleHeroAddMultiple() {
         // 添加多个不同 ID 的英雄（相同 heroId 只能添加一个，因为 heroUid 唯一）
-        Hero.CS_HeroAdd request = Hero.CS_HeroAdd.newBuilder()
-                .setHeroId(validHeroId(1))
-                .setCount(1)
-                .build();
+        Hero.CS_HeroAdd request =
+                Hero.CS_HeroAdd.newBuilder().setHeroId(validHeroId(1)).setCount(1).build();
 
         // 调用处理器
         heroController.handleHeroAdd(mockContext, request);
@@ -372,9 +377,7 @@ public class HeroControllerTest {
         assertEquals("应返回 1 个英雄", 1, response.getHeroListCount());
     }
 
-    /**
-     * 测试添加已存在的英雄
-     */
+    /** 测试添加已存在的英雄 */
     @Test
     public void testHandleHeroAddAlreadyExists() {
         // 先添加一个英雄
@@ -382,10 +385,8 @@ public class HeroControllerTest {
         heroModule.addHero(heroId);
 
         // 再次尝试添加相同 ID 的英雄
-        Hero.CS_HeroAdd request = Hero.CS_HeroAdd.newBuilder()
-                .setHeroId(heroId)
-                .setCount(1)
-                .build();
+        Hero.CS_HeroAdd request =
+                Hero.CS_HeroAdd.newBuilder().setHeroId(heroId).setCount(1).build();
 
         // 调用处理器
         heroController.handleHeroAdd(mockContext, request);
@@ -395,9 +396,7 @@ public class HeroControllerTest {
         assertNotNull("应发送响应", sentMessage);
     }
 
-    /**
-     * 测试添加英雄超过最大数量限制
-     */
+    /** 测试添加英雄超过最大数量限制 */
     @Test
     public void testHandleHeroAddMaxLimit() {
         // 添加大量英雄直到达到限制
@@ -406,10 +405,8 @@ public class HeroControllerTest {
         }
 
         // 尝试再添加一个英雄
-        Hero.CS_HeroAdd request = Hero.CS_HeroAdd.newBuilder()
-                .setHeroId(validHeroId(0))
-                .setCount(1)
-                .build();
+        Hero.CS_HeroAdd request =
+                Hero.CS_HeroAdd.newBuilder().setHeroId(validHeroId(0)).setCount(1).build();
 
         // 调用处理器
         heroController.handleHeroAdd(mockContext, request);
@@ -419,9 +416,7 @@ public class HeroControllerTest {
         assertNotNull("应发送响应", sentMessage);
     }
 
-    /**
-     * 测试资源消耗正确性
-     */
+    /** 测试资源消耗正确性 */
     @Test
     public void testResourceConsumption() {
         // 记录初始资源
@@ -432,10 +427,8 @@ public class HeroControllerTest {
         PlayerHeroEntry hero = heroModule.addHero(validHeroId(0));
 
         // 创建升级请求
-        Hero.CS_HeroLevelUp request = Hero.CS_HeroLevelUp.newBuilder()
-                .setHeroUid(hero.getId())
-                .addExpItemIds(1)
-                .build();
+        Hero.CS_HeroLevelUp request =
+                Hero.CS_HeroLevelUp.newBuilder().setHeroUid(hero.getId()).addExpItemIds(1).build();
 
         // 调用处理器
         heroController.handleHeroLevelUp(mockContext, request);
@@ -445,11 +438,10 @@ public class HeroControllerTest {
         assertTrue("经验道具应被消耗", currentExpItem < initialExpItem);
     }
 
-    /**
-     * 模拟 GamePlayer
-     */
+    /** 模拟 GamePlayer */
     private static class MockGamePlayer extends GamePlayer {
-        private final ConcurrentHashMap<Integer, MockMessagePacket> sentMessages = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<Integer, MockMessagePacket> sentMessages =
+                new ConcurrentHashMap<>();
 
         public MockGamePlayer(long playerId) {
             super(new MockGameConnectSession());
@@ -476,9 +468,7 @@ public class HeroControllerTest {
         }
     }
 
-    /**
-     * 模拟 GameConnectSession
-     */
+    /** 模拟 GameConnectSession */
     private static class MockGameConnectSession extends GameConnectSession {
         private MockGamePlayer testPlayer;
 
@@ -509,9 +499,7 @@ public class HeroControllerTest {
         }
     }
 
-    /**
-     * 模拟 MessagePacket
-     */
+    /** 模拟 MessagePacket */
     private static class MockRequestPacket extends MessagePacket {
         public MockRequestPacket() {
             super();
@@ -523,9 +511,7 @@ public class HeroControllerTest {
         }
     }
 
-    /**
-     * 模拟消息包
-     */
+    /** 模拟消息包 */
     private static class MockMessagePacket {
         public final int cmd;
         public final Object message;
@@ -536,26 +522,18 @@ public class HeroControllerTest {
         }
     }
 
-    /**
-     * 从 MessagePacket 中提取 protobuf 消息对象
-     */
+    /** 从 MessagePacket 中提取 protobuf 消息对象 */
     private static Object extractMessage(MessagePacket packet) {
         try {
             byte[] data = packet.getData();
             int cmd = packet.getCmd();
             // 下行包 cmd 使用 SC_ 枚举值
-            if (cmd == Cmd.CMD.SC_ErrorCode_VALUE)
-                return ErrorMsg.scErrorCode.parseFrom(data);
-            if (cmd == Cmd.CMD.SC_HeroList_VALUE)
-                return Hero.SC_HeroList.parseFrom(data);
-            if (cmd == Cmd.CMD.SC_HeroLevelUp_VALUE)
-                return Hero.SC_HeroLevelUp.parseFrom(data);
-            if (cmd == Cmd.CMD.SC_HeroStarUp_VALUE)
-                return Hero.SC_HeroStarUp.parseFrom(data);
-            if (cmd == Cmd.CMD.SC_HeroAwaken_VALUE)
-                return Hero.SC_HeroAwaken.parseFrom(data);
-            if (cmd == Cmd.CMD.SC_HeroAdd_VALUE)
-                return Hero.SC_HeroAdd.parseFrom(data);
+            if (cmd == Cmd.CMD.SC_ErrorCode_VALUE) return ErrorMsg.scErrorCode.parseFrom(data);
+            if (cmd == Cmd.CMD.SC_HeroList_VALUE) return Hero.SC_HeroList.parseFrom(data);
+            if (cmd == Cmd.CMD.SC_HeroLevelUp_VALUE) return Hero.SC_HeroLevelUp.parseFrom(data);
+            if (cmd == Cmd.CMD.SC_HeroStarUp_VALUE) return Hero.SC_HeroStarUp.parseFrom(data);
+            if (cmd == Cmd.CMD.SC_HeroAwaken_VALUE) return Hero.SC_HeroAwaken.parseFrom(data);
+            if (cmd == Cmd.CMD.SC_HeroAdd_VALUE) return Hero.SC_HeroAdd.parseFrom(data);
             return packet;
         } catch (Exception e) {
             return packet;
