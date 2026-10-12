@@ -27,9 +27,8 @@ public class RpcService {
 
   /** 获取指定服务器的 RPC 连接器；不存在时从 Nacos 节点表懒加载。 */
   public RpcNodeConnector getRpcNodeConnector(String serverId) {
-    if (rpcNodeConnectorMap.containsKey(serverId)) {
-      return rpcNodeConnectorMap.get(serverId);
-    }
+    RpcNodeConnector existing = rpcNodeConnectorMap.get(serverId);
+    if (existing != null && existing.isConnect()) { return existing; }
     return createRpcNodeConnector(serverId);
   }
 
@@ -77,6 +76,7 @@ public class RpcService {
           "RpcService createRpcNodeConnector NacosServerNode not canUse for serverId={}", serverId);
       return null;
     }
+    if (existing != null) { existing.cleanup(); }
     RpcNodeConnector rpcNodeConnector =
         new RpcNodeConnector(
             serverId, nacosServerNode.getIp(), nacosServerNode.getPort(), connectFailureWarnOnly);
@@ -89,6 +89,7 @@ public class RpcService {
       rpcNodeConnectorMap.put(serverId, rpcNodeConnector);
       return rpcNodeConnector;
     }
+    rpcNodeConnector.cleanup();
     return null;
   }
 
@@ -113,9 +114,7 @@ public class RpcService {
     if (node != null && !isRpcConnectableType(node.getServerType())) {
       return;
     }
-    Thread.ofVirtual()
-        .name("reliable-rpc-replay-" + serverId)
-        .start(() -> ReliableRpcStore.getInstance().replayForTarget(serverId));
+    ReliableRpcStore.getInstance().replayForTarget(serverId);
   }
 
   public Set<String> getConnectedTargetServerIds() {
@@ -137,25 +136,19 @@ public class RpcService {
 
   /** 本服启动后扫描当前可连接目标，避免错过目标服已经在线的补发机会。 */
   public void replayReliableMessagesOnStartup() {
+    ReliableRpcStore.getInstance().initialize();
     startReliableReplayWorker();
-    Thread.ofVirtual()
-        .name("reliable-rpc-replay-startup")
-        .start(
-            () -> {
-              // 先尝试为当前 Nacos 缓存中的节点建立连接，再补发对应 outbox。
-              for (ServerTypeEnum serverType : ServerTypeEnum.values()) {
-                if (isRpcConnectableType(serverType)) {
-                  connectRpcNodesForReplay(serverType);
-                }
-              }
-              ReliableRpcStore.getInstance().replayAllAvailableTargets();
-            });
+    ReliableRpcStore.getInstance().replayAllAvailableTargets();
   }
 
   private void startReliableReplayWorker() {
     if (!reliableReplayWorkerStarted.compareAndSet(false, true)) {
       return;
     }
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      ReliableRpcStore.getInstance().close();
+      for (RpcNodeConnector connector : rpcNodeConnectorMap.values()) { connector.cleanup(); }
+    }, "rpc-shutdown"));
     Thread.ofVirtual()
         .name("reliable-rpc-replay-worker")
         .start(
@@ -174,12 +167,6 @@ public class RpcService {
   }
 
   private void replayKnownTargets() {
-    // Nacos 可能先通知节点上线，目标端口稍后才真正绑定；周期性重建连接可以覆盖这段窗口。
-    for (ServerTypeEnum serverType : ServerTypeEnum.values()) {
-      if (isRpcConnectableType(serverType)) {
-        connectRpcNodesForReplay(serverType);
-      }
-    }
     ReliableRpcStore.getInstance().replayAllAvailableTargets();
   }
 
@@ -202,7 +189,6 @@ public class RpcService {
     for (RpcNodeConnector rpcNodeConnector : rpcNodeConnectorMap.values()) {
       rpcNodeConnector.pingConnect();
     }
-    // 心跳后顺手补发已到重试时间的可靠 RPC，不额外引入新定时器。
-    ReliableRpcStore.getInstance().replayAllAvailableTargets();
+    // Dedicated worker handles replay; a heartbeat tick must not scan disk or await business responses.
   }
 }

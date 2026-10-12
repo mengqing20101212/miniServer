@@ -22,17 +22,23 @@ public class RpcUtils {
         request(serverId, packet, false);
     }
 
-    /** 发送不等待响应的 RPC；saveOnFail 为 true 时发送失败会保存到 Redis 等目标服恢复后补发。 */
+    /** 发送不等待响应的 RPC；saveOnFail 为 true 时发送失败会保存到 RocksDB 等目标服恢复后补发。 */
     public static void request(String serverId, MessagePacket packet, boolean saveOnFail) {
-        RpcNodeConnector rpcNodeConnector = RpcService.getInstance().getRpcNodeConnector(serverId);
-        if (rpcNodeConnector != null) {
-            boolean success = rpcNodeConnector.sendPacket(packet);
-            if (!success && saveOnFail) {
-                ReliableRpcStore.getInstance().save(serverId, packet, "send failed");
-            }
-        } else if (saveOnFail) {
-            ReliableRpcStore.getInstance().save(serverId, packet, "connector unavailable");
+        ly.db.PersistenceScope.flushCurrent();
+        RpcNodeConnector connector = RpcService.getInstance().getRpcNodeConnector(serverId);
+        if (connector == null) {
+            if (saveOnFail) { ReliableRpcStore.getInstance().save(serverId, packet, "connector unavailable"); }
+            return;
         }
+        connector.getClient().sendRpcAsync(packet).whenComplete((ignored, error) -> {
+            if (error != null) {
+                ly.LoggerDef.NetLogger.warn("RPC send failed, target={}, cmd={}", serverId, packet.getCmd(), error);
+                if (saveOnFail) {
+                    Thread.ofVirtual().name("rpc-failure-save").start(
+                            () -> ReliableRpcStore.getInstance().save(serverId, packet, "send failed"));
+                }
+            }
+        });
     }
 
 
@@ -46,6 +52,7 @@ public class RpcUtils {
      * @param <R>  目标服务器返回的protobuf数据类型
      */
     public static <R extends AbstractMessage> R syncRequest(String serverId, long guid, int cmd, AbstractMessage protoData) {
+        checkBlockingAllowed();
         RpcNodeConnector rpcNodeConnector = RpcService.getInstance().getRpcNodeConnector(serverId);
         if (rpcNodeConnector != null) {
             return (R) rpcNodeConnector.syncSendProtoMessage(guid, cmd, protoData);
@@ -75,6 +82,7 @@ public class RpcUtils {
             AbstractMessage protoData,
             int timeout,
             RpcFailSavePolicy failSavePolicy) {
+        checkBlockingAllowed();
         RpcNodeConnector rpcNodeConnector = RpcService.getInstance().getRpcNodeConnector(serverId);
         if (rpcNodeConnector != null) {
             return (R) rpcNodeConnector.syncSendProtoMessage(guid, cmd, protoData, timeout, failSavePolicy);
@@ -83,7 +91,7 @@ public class RpcUtils {
             // 连连接器都创建失败时，说明目标节点当前不可达；保存时也必须使用 S2S RPC 外壳。
             ly.net.packet.MessagePacket packet =
                     RpcNodeConnector.createServer2ServerRpcPacket(
-                            guid, cmd, protoData, 0, 0, System.nanoTime() ^ Thread.currentThread().threadId());
+                            guid, cmd, protoData, 0, 0, RpcCallIds.next());
             ReliableRpcStore.getInstance().save(serverId, packet, "connector unavailable");
         }
         return null;
@@ -91,9 +99,32 @@ public class RpcUtils {
 
 
     public static <R extends AbstractMessage> CompletableFuture<R> asyncRequest(String serverId, long guid, int cmd, AbstractMessage protoData) {
-        CompletableFuture<R> future = new CompletableFuture<>();
-        future.completeAsync(() -> syncRequest(serverId, guid, cmd, protoData));
-        return future;
+        ly.db.PersistenceScope.flushCurrent();
+        CompletableFuture<R> result = new CompletableFuture<>();
+        // Service discovery/initial connection can block; never run it on the common pool or IO thread.
+        Thread.ofVirtual().name("rpc-resolve-" + serverId).start(() -> {
+            try {
+                RpcNodeConnector connector = RpcService.getInstance().getRpcNodeConnector(serverId);
+                if (result.isCancelled()) { return; }
+                if (connector == null) {
+                    result.completeExceptionally(new RpcException(RpcException.Code.TRANSPORT, "RPC target unavailable: " + serverId));
+                    return;
+                }
+                CompletableFuture<AbstractMessage> call = connector.asyncSendProtoMessage(guid, cmd, protoData, 1000, RpcFailSavePolicy.NONE);
+                result.whenComplete((value, error) -> { if (result.isCancelled()) { call.cancel(false); } });
+                call.whenComplete((value, error) -> {
+                    if (error == null) { result.complete((R) value); }
+                    else { result.completeExceptionally(error); }
+                });
+            } catch (Exception error) { result.completeExceptionally(error); }
+        });
+        return result;
+    }
+
+    private static void checkBlockingAllowed() {
+        if (Thread.currentThread() instanceof io.netty.util.concurrent.FastThreadLocalThread) {
+            throw new IllegalStateException("Blocking RPC on Netty IO is forbidden");
+        }
     }
 
     /***

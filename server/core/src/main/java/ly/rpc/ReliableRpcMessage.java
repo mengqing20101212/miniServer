@@ -5,9 +5,9 @@ import java.util.Arrays;
 import ly.net.packet.MessagePacket;
 
 /**
- * 保存到 Redis 的可靠 RPC 消息快照，用于目标服恢复后补发。
+ * 保存到 RocksDB 的可靠 RPC 消息快照，用于目标服恢复后补发。
  *
- * <p>快照只保存协议包必要字段，不保存同步调用栈和响应等待状态；补发是一次新的异步投递。
+ * <p>快照只保存协议包必要字段，不保存同步调用栈和响应等待状态；补发保留原 callId，连接 sid/seq 重新分配。
  */
 public class ReliableRpcMessage implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -79,7 +79,7 @@ public class ReliableRpcMessage implements Serializable {
   }
 
   public void increaseRetryCount(long nextRetryAt) {
-    retryCount++;
+    if (retryCount < Integer.MAX_VALUE - 1) { retryCount++; }
     this.nextRetryAt = nextRetryAt;
   }
 

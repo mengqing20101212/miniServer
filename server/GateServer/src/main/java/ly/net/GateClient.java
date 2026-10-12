@@ -92,7 +92,7 @@ public class GateClient {
 
     public void sendPacketToGameServer(MessagePacket csPacket) {
         // 普通业务包失败后保存到可靠 RPC outbox，等目标 GameServer 恢复后补发。
-        Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket, true);
+        Server.scGate2GameRpcGameCall resp = sendPacketToGameServerSync(csPacket, ly.rpc.RpcFailSavePolicy.SEND_FAILED_ONLY);
         if (resp != null) {
             sendGameResponseToClient(resp);
         }
@@ -125,10 +125,20 @@ public class GateClient {
      */
     public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(
             MessagePacket csPacket, boolean saveOnFailOrTimeout) {
+        return sendPacketToGameServerSync(csPacket, saveOnFailOrTimeout
+                ? ly.rpc.RpcFailSavePolicy.SEND_FAILED_OR_TIMEOUT : ly.rpc.RpcFailSavePolicy.NONE);
+    }
+
+    /** Timeout replay must be explicitly selected only for idempotent business operations. */
+    public Server.scGate2GameRpcGameCall sendPacketToGameServerSync(
+            MessagePacket csPacket, ly.rpc.RpcFailSavePolicy policy) {
+        if (Thread.currentThread() instanceof io.netty.util.concurrent.FastThreadLocalThread) {
+            throw new IllegalStateException("Blocking RPC on Netty IO is forbidden");
+        }
         RpcNodeConnector rpcNodeConnector = RpcService.getInstance().getRpcNodeConnector(gameServerId);
         long callId = newCallId();
         if (rpcNodeConnector == null || rpcNodeConnector.getClient() == null) {
-            saveReliableRpcIfNeeded(csPacket, null, saveOnFailOrTimeout, "connector unavailable");
+            saveReliableRpcIfNeeded(csPacket, null, policy, "connector unavailable");
             return null;
         }
 
@@ -155,45 +165,38 @@ public class GateClient {
                 gameServerId, req.getGuid(), csPacket.getSid(), Cmd.CMD.forNumber(csPacket.getCmd()).name(),
                 csPacket.getSeq(),
                 csPacket.getLength(), rpcPacket.getSid(), rpcSeq));
-        if (!rpcNodeConnector.sendPacket(rpcPacket)) {
-            saveReliableRpcIfNeeded(csPacket, req, saveOnFailOrTimeout, "send failed");
-            return null;
-        }
-
-        long deadline = System.currentTimeMillis() + LOGIN_RPC_TIMEOUT_MS;
-        while (System.currentTimeMillis() < deadline) {
-            MessagePacket response = rpcNodeConnector
-                    .getClient()
-                    .getReceiveMsgByCallId(callId, Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE);
-            if (response != null) {
-                Server.scGate2GameRpcGameCall resp = (Server.scGate2GameRpcGameCall) ProtoMessageFactory
-                        .createProtoMessage(
-                                Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, response.getData());
-                LoggerDef.LogNet(
-                        String.format("<<%s, guid:%d, clientSid:%d, cmd:%s, len:%d sid:%d, seq:%d",
-                                gameServerId, req.getGuid(), csPacket.getSid(),
-                                Cmd.CMD.forNumber(resp.getClientCmd()).name(),
-                                resp.getData().size(), response.getSid(), response.getSeq()));
-                return resp;
-            }
-
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return null;
+        java.util.concurrent.CompletableFuture<MessagePacket> waiting = rpcNodeConnector.requestAsync(
+                rpcPacket, Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, LOGIN_RPC_TIMEOUT_MS);
+        try {
+            MessagePacket response = waiting.get();
+            return (Server.scGate2GameRpcGameCall) ProtoMessageFactory.createProtoMessage(
+                    Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE, response.getData());
+        } catch (InterruptedException error) {
+            waiting.cancel(false);
+            Thread.currentThread().interrupt();
+        } catch (java.util.concurrent.ExecutionException error) {
+            Throwable cause = error.getCause();
+            LoggerDef.NetLogger.warn("Gate RPC failed, target={}, callId={}, cmd={}", gameServerId, callId, csPacket.getCmd(), cause);
+            if (cause instanceof ly.rpc.RpcException failure) {
+                if (failure.code() == ly.rpc.RpcException.Code.TIMEOUT) {
+                    saveReliableRpcIfNeeded(csPacket, req, policy, "response timeout");
+                } else if (failure.code() == ly.rpc.RpcException.Code.TRANSPORT) {
+                    saveReliableRpcIfNeeded(csPacket, req, policy, "send failed");
+                }
             }
         }
-        saveReliableRpcIfNeeded(csPacket, req, saveOnFailOrTimeout, "response timeout");
         return null;
     }
 
     private void saveReliableRpcIfNeeded(
             MessagePacket csPacket,
             Server.csGate2GameRpcGameCall wrappedRequest,
-            boolean saveOnFailOrTimeout,
+            ly.rpc.RpcFailSavePolicy policy,
             String reason) {
-        if (!saveOnFailOrTimeout || csPacket == null || gameServerId == null) {
+        if (policy == null || policy == ly.rpc.RpcFailSavePolicy.NONE || csPacket == null || gameServerId == null) {
+            return;
+        }
+        if (policy == ly.rpc.RpcFailSavePolicy.SEND_FAILED_ONLY && "response timeout".equals(reason)) {
             return;
         }
         Server.csGate2GameRpcGameCall request = wrappedRequest;
@@ -204,6 +207,7 @@ public class GateClient {
                     .setClientSid(csPacket.getSid())
                     .setGuid(getSessionGuid())
                     .setClientReqSeq(csPacket.getSeq())
+                    .setCallId(ly.rpc.RpcCallIds.next())
                     .setData(ByteString.copyFrom(csPacket.getData()))
                     .build();
         }
@@ -238,7 +242,7 @@ public class GateClient {
     }
 
     private long newCallId() {
-        return System.nanoTime() ^ Thread.currentThread().threadId();
+        return ly.rpc.RpcCallIds.next();
     }
 
     public void closeConnection() {

@@ -62,6 +62,14 @@ public class RpcNodeConnector {
         this.port = port;
         // 通过NetClientManager创建新的网络客户端
         this.client = NetClientManager.getInstance().newNetClient(ip, port, connectFailureWarnOnly);
+        this.client.enableRpcMode();
+    }
+
+    RpcNodeConnector(String serverId, NetClient client) {
+        this.serverId = serverId;
+        this.ip = client.getHost();
+        this.port = client.getPort();
+        setClient(client);
     }
 
     /**
@@ -92,6 +100,7 @@ public class RpcNodeConnector {
      */
     public void setClient(NetClient client) {
         this.client = client;
+        if (client != null) { client.enableRpcMode(); }
     }
 
     /**
@@ -133,7 +142,12 @@ public class RpcNodeConnector {
                 .setServerId(ServerContext.getServerId())
                 .build();
         // 发送心跳消息
-        sendProtoMessage(0, Cmd.CMD.CS_RpcPing_VALUE, ping);
+        if (isConnect()) {
+            MessagePacket packet = MessagePacketFactory.createMessagePacket(0, Cmd.CMD.CS_RpcPing_VALUE, ping, client.getSendSeq(), 0);
+            client.sendRpcAsync(packet).whenComplete((ignored, error) -> {
+                if (error != null) { LoggerDef.NetLogger.warn("RPC heartbeat write failed, target={}", serverId, error); }
+            });
+        }
     }
 
     /**
@@ -179,31 +193,15 @@ public class RpcNodeConnector {
      * @return 响应消息包，如果超时或失败则返回null
      */
     public MessagePacket syncSendPacket(MessagePacket packet, int timeout) {
-        final int sendSeq = packet.getSeq();
-        final int responseCmd = packet.getCmd() + 1;
-
-        try {
-            if (sendPacket(packet)) {
-                long startTime = System.currentTimeMillis();
-                long endTime = startTime + timeout;
-
-                // 使用简单的轮询方式等待响应，适合虚拟线程环境
-                while (System.currentTimeMillis() < endTime) {
-                    MessagePacket response = getReceiveMsgByRpcIdentity(packet, responseCmd);
-                    if (response != null) {
-                        return response;
-                    }
-
-                    // 短暂睡眠，让出CPU时间片
-                    Thread.sleep(10);
-                }
-
-                // 超时返回null
-                return null;
-            }
-        } catch (Exception e) {
-            LoggerDef.NetLogger.warn("RPC call failed, serverId={}, seq={}, error={}", serverId, sendSeq,
-                    e.getMessage());
+        checkBlockingAllowed();
+        java.util.concurrent.CompletableFuture<MessagePacket> response = requestAsync(packet, packet.getCmd() + 1, timeout);
+        try { return response.get(); }
+        catch (InterruptedException error) {
+            response.cancel(false);
+            Thread.currentThread().interrupt();
+            LoggerDef.NetLogger.warn("RPC wait interrupted, serverId={}, callId={}", serverId, extractCallId(packet));
+        } catch (java.util.concurrent.ExecutionException error) {
+            LoggerDef.NetLogger.warn("RPC call failed, serverId={}, callId={}", serverId, extractCallId(packet), error.getCause());
         }
         return null;
     }
@@ -248,55 +246,64 @@ public class RpcNodeConnector {
      */
     public AbstractMessage syncSendProtoMessage(
             long guid, int cmd, AbstractMessage protoData, int timeout, RpcFailSavePolicy failSavePolicy) {
-        long callId = newCallId();
-        Server.csServer2Server request = buildServer2ServerRequest(cmd, protoData, callId);
-        MessagePacket packet = MessagePacketFactory.createMessagePacket(
-                guid, Cmd.CMD.CS_Server2Server_VALUE, request, client.getSendSeq(), 0);
-        // 可靠补发包必须脱离当前 TCP 连接上下文，避免旧 sid/seq 在新连接上触发目标服丢包校验。
-        MessagePacket reliablePacket = createServer2ServerRpcPacket(guid, cmd, protoData, 0, 0, callId);
-        if (!sendPacket(packet)) {
-            LoggerDef.NetLogger.warn("send proto message failed, serverId={}, guid={}, cmd={}", serverId, guid, cmd);
-            saveReliableIfNeeded(reliablePacket, failSavePolicy, "send failed");
-            return null;
-        }
-
-        try {
-            long startTime = System.currentTimeMillis();
-            long endTime = startTime + timeout;
-
-            // 使用简单的轮询方式等待响应
-            while (System.currentTimeMillis() < endTime) {
-                MessagePacket response = client.getReceiveMsgByCallId(callId, Cmd.CMD.SC_Server2Server_VALUE);
-                if (response != null) {
-                    return unpackServer2ServerResponse(response, cmd + 1, callId);
-                }
-
-                // 短暂睡眠，让出CPU时间片
-                Thread.sleep(10);
-            }
-
-            // SEND_FAILED_OR_TIMEOUT 会把响应超时也保存下来；调用方仍然立即拿到 null。
-            saveReliableIfNeeded(reliablePacket, failSavePolicy, "response timeout");
-            return null;
-        } catch (Exception e) {
-            LoggerDef.NetLogger.warn("RPC proto call failed, serverId={}, cmd={}, error={}", serverId, cmd,
-                    e.getMessage());
-            saveReliableIfNeeded(reliablePacket, failSavePolicy, "rpc exception");
+        checkBlockingAllowed();
+        java.util.concurrent.CompletableFuture<AbstractMessage> response = asyncSendProtoMessage(guid, cmd, protoData, timeout, failSavePolicy);
+        try { return response.get(); }
+        catch (InterruptedException error) { response.cancel(false); Thread.currentThread().interrupt(); }
+        catch (java.util.concurrent.ExecutionException error) {
+            LoggerDef.NetLogger.warn("RPC failed, serverId={}, cmd={}", serverId, cmd, error.getCause());
         }
         return null;
     }
 
-    private MessagePacket getReceiveMsgByRpcIdentity(MessagePacket requestPacket, int responseCmd) {
-        long callId = extractCallId(requestPacket);
-        if (callId > 0) {
-            return client.getReceiveMsgByCallId(callId, responseCmd);
+    public java.util.concurrent.CompletableFuture<AbstractMessage> asyncSendProtoMessage(
+            long guid, int cmd, AbstractMessage data, int timeout, RpcFailSavePolicy policy) {
+        long callId = RpcCallIds.next();
+        MessagePacket packet = createServer2ServerRpcPacket(guid, cmd, data, client.getSendSeq(), 0, callId);
+        java.util.concurrent.CompletableFuture<MessagePacket> response = requestAsync(packet, Cmd.CMD.SC_Server2Server_VALUE, timeout);
+        java.util.concurrent.CompletableFuture<AbstractMessage> parsed = response.thenApply(received -> {
+            AbstractMessage value = unpackServer2ServerResponse(received, cmd + 1, callId);
+            if (value == null) { throw new RpcException(RpcException.Code.PROTOCOL, "Invalid RPC response"); }
+            return value;
+        });
+        java.util.concurrent.CompletableFuture<AbstractMessage> result = parsed.exceptionallyCompose(error -> {
+            java.util.concurrent.CompletableFuture<AbstractMessage> failed = new java.util.concurrent.CompletableFuture<>();
+            Thread.ofVirtual().name("rpc-failure-" + callId).start(() -> {
+                try {
+                    Throwable cause = error;
+                    while (cause instanceof java.util.concurrent.CompletionException && cause.getCause() != null) {
+                        cause = cause.getCause();
+                    }
+                    if (cause instanceof RpcException failure) {
+                        if (failure.code() == RpcException.Code.TRANSPORT) { saveReliableIfNeeded(packet, policy, "send failed"); }
+                        else if (failure.code() == RpcException.Code.TIMEOUT) { saveReliableIfNeeded(packet, policy, "response timeout"); }
+                    }
+                    failed.completeExceptionally(cause);
+                } catch (Throwable failure) { failed.completeExceptionally(failure); }
+            });
+            return failed;
+        });
+        result.whenComplete((value, error) -> { if (result.isCancelled()) { response.cancel(false); } });
+        return result;
+    }
+
+    /** Register before write; connection-scoped trackers also validate the responding peer. */
+    public java.util.concurrent.CompletableFuture<MessagePacket> requestAsync(MessagePacket packet, int responseCmd, int timeout) {
+        ly.db.PersistenceScope.flushCurrent();
+        java.util.concurrent.CompletableFuture<MessagePacket> response = client.rpcResponses().register(extractCallId(packet), responseCmd, timeout);
+        if (!response.isDone()) {
+            client.sendRpcAsync(packet).whenComplete((ignored, error) -> {
+                if (error != null) { response.completeExceptionally(error); }
+            });
         }
-        LoggerDef.NetLogger.warn(
-                "RPC packet has no callId, serverId={}, cmd={}, responseCmd={}",
-                serverId,
-                requestPacket == null ? null : requestPacket.getCmd(),
-                responseCmd);
-        return null;
+        return response;
+    }
+
+    private void checkBlockingAllowed() {
+        if (Thread.currentThread() instanceof io.netty.util.concurrent.FastThreadLocalThread
+                || (client.getChannel() != null && client.getChannel().eventLoop().inEventLoop())) {
+            throw new IllegalStateException("Blocking RPC on Netty IO is forbidden");
+        }
     }
 
     private long extractCallId(MessagePacket requestPacket) {
@@ -376,12 +383,12 @@ public class RpcNodeConnector {
     }
 
     private long newCallId() {
-        return System.nanoTime() ^ Thread.currentThread().threadId();
+        return RpcCallIds.next();
     }
 
     private void saveReliableIfNeeded(
             MessagePacket packet, RpcFailSavePolicy failSavePolicy, String reason) {
-        // 默认策略不改变旧同步 RPC 行为，只有显式传入策略时才进入 Redis outbox。
+        // 默认策略不改变旧同步 RPC 行为，只有显式传入策略时才进入 RocksDB outbox。
         if (failSavePolicy == null || failSavePolicy == RpcFailSavePolicy.NONE) {
             return;
         }
@@ -434,7 +441,7 @@ public class RpcNodeConnector {
      * 当不再需要此连接时调用此方法释放相关资源
      */
     public void cleanup() {
-        if (isConnect()) {
+        if (client != null) {
             // 通过NetClientManager删除网络客户端
             NetClientManager.getInstance().delNetClient(client);
             LoggerDef.NetLogger.info("cleanup rpc node connector, serverId={}", serverId);

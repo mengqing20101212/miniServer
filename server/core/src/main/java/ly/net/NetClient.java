@@ -29,11 +29,13 @@ public class NetClient {
 
     private final String host;
     private final int port;
-    private Channel channel;
+    private volatile Channel channel;
+    private final ly.rpc.RpcResponseTracker rpcResponses = new ly.rpc.RpcResponseTracker();
+    private volatile boolean rpcMode;
     private EventLoopGroup group;
     private final boolean isMultiplex;
     private final boolean connectFailureWarnOnly;
-    private int sid;
+    private volatile int sid;
     BlockingQueue<MessagePacket> receivePacketQueue = new ArrayBlockingQueue<>(1024);
     AtomicInteger sendSeq = new AtomicInteger(0);
     static AttributeKey<NetClient> SELF_ATTR_KEY = AttributeKey.valueOf("NET_CLIENT");
@@ -81,7 +83,7 @@ public class NetClient {
 
     private void connectOnce() {
         Bootstrap bootstrap = new Bootstrap();
-        setSid(0);
+        sid = 0;
         final NetClient SELF = this;
         bootstrap
                 .group(group)
@@ -159,7 +161,8 @@ public class NetClient {
     }
 
     public void stop() {
-        if (group != null) {
+        rpcResponses.close();
+        if (channel != null && channel.isOpen()) {
             channel.attr(NetService.SELF_CLOSED).set(true);
             channel.close();
         }
@@ -221,8 +224,54 @@ public class NetClient {
         if (packet.getCmd() == MessagePacket.CMD_ACK) {
             setSid(packet.getSid());
         } else {
-            receivePacketQueue.add(packet);
+            if (rpcMode && routeRpcResponse(packet)) { return; }
+            if (!receivePacketQueue.offer(packet)) {
+                logger.warn("receive queue full, host={}, port={}, cmd={}", host, port, packet.getCmd());
+            }
         }
+    }
+
+    public void enableRpcMode() { rpcMode = true; }
+    public ly.rpc.RpcResponseTracker rpcResponses() { return rpcResponses; }
+    public void rpcDisconnected() { rpcResponses.disconnected(); }
+
+    /** RPC sends never reconnect or wait on Netty IO. Transport failures complete exceptionally. */
+    public java.util.concurrent.CompletableFuture<Void> sendRpcAsync(MessagePacket packet) {
+        java.util.concurrent.CompletableFuture<Void> sent = new java.util.concurrent.CompletableFuture<>();
+        Channel current = channel;
+        if (current == null || !current.isActive() || !isReady() || !current.isWritable()) {
+            return java.util.concurrent.CompletableFuture.failedFuture(new ly.rpc.RpcException(
+                    ly.rpc.RpcException.Code.TRANSPORT, "RPC target unavailable or not writable"));
+        }
+        if (packet.getSid() == 0) { packet.setSid(sid); }
+        if (packet.getSeq() == 0) { packet.setSeq(getSendSeq()); }
+        try {
+            current.writeAndFlush(packet).addListener(result -> {
+                if (result.isSuccess()) { sent.complete(null); }
+                else { sent.completeExceptionally(new ly.rpc.RpcException(
+                        ly.rpc.RpcException.Code.TRANSPORT, "RPC write failed; outcome unknown", result.cause())); }
+            });
+        } catch (RuntimeException error) {
+            sent.completeExceptionally(new ly.rpc.RpcException(ly.rpc.RpcException.Code.TRANSPORT, "RPC write failed", error));
+        }
+        return sent;
+    }
+
+    private boolean routeRpcResponse(MessagePacket packet) {
+        int cmd = packet.getCmd();
+        if (cmd == ly.proto.Cmd.CMD.SC_RpcPing_VALUE) { return true; }
+        if (cmd != ly.proto.Cmd.CMD.SC_Server2Server_VALUE
+                && cmd != ly.proto.Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE) { return false; }
+        try {
+            com.google.protobuf.AbstractMessage parsed = ly.ProtoMessageFactory.createProtoMessage(cmd, packet.getData());
+            long callId = parsed instanceof ly.proto.Server.scServer2Server response
+                    ? response.getCallId() : ((ly.proto.Server.scGate2GameRpcGameCall) parsed).getCallId();
+            // Late/unmatched RPC responses do not accumulate in the ordinary receive queue.
+            rpcResponses.receive(callId, packet);
+        } catch (RuntimeException error) {
+            logger.warn("malformed RPC response, host={}, port={}, cmd={}", host, port, cmd, error);
+        }
+        return true;
     }
 
     public Channel getChannel() {
@@ -276,7 +325,10 @@ public class NetClient {
      */
     public void putBackPacket(MessagePacket packet) {
         if (packet != null) {
-            receivePacketQueue.add(packet);
+            if (rpcMode && routeRpcResponse(packet)) { return; }
+            if (!receivePacketQueue.offer(packet)) {
+                logger.warn("receive queue full, host={}, port={}, cmd={}", host, port, packet.getCmd());
+            }
         }
     }
 

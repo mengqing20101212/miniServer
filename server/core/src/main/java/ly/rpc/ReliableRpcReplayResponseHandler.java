@@ -14,7 +14,7 @@ public interface ReliableRpcReplayResponseHandler {
   /**
    * 处理一次可靠 RPC 重放收到的回包。
    *
-   * @param message Redis outbox 中保存的可靠 RPC 消息
+   * @param message RocksDB outbox 中保存的可靠 RPC 消息
    * @param response 目标服务器返回的 RPC 回包
    * @return true 表示业务方已经消费该回包，可以删除 outbox 消息
    */

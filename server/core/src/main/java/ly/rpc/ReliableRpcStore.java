@@ -1,356 +1,205 @@
 package ly.rpc;
 
-import java.util.List;
+import java.nio.file.Path;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import ly.LoggerDef;
-import ly.ProtoMessageFactory;
 import ly.ServerContext;
 import ly.net.packet.MessagePacket;
 import ly.proto.Cmd;
 import ly.proto.Server;
-import ly.redis.RedisUtils;
 
-/**
- * RPC 可靠消息 Redis outbox。
- *
- * <p>这里只保存“当前服务器发往目标服务器”的待补发消息。目标服恢复后仍然通过正常 TCP RPC
- * 通道补发，不直接在目标服本地执行，避免绕过连接、session 和现有路由校验。
- */
-public class ReliableRpcStore {
+/** Failure-only RocksDB outbox. Normal successful calls never touch this store. */
+public class ReliableRpcStore implements AutoCloseable {
   private static final ReliableRpcStore INSTANCE = new ReliableRpcStore();
-  private static final int MAX_RETRY_COUNT = 20;
-  private static final long INITIAL_RETRY_DELAY_MILLIS = 5_000L;
-  // 目标服故障可能持续很久，最大退避放到 8 小时，避免长故障期间每几分钟持续冲击目标服。
   private static final long MAX_RETRY_DELAY_MILLIS = TimeUnit.HOURS.toMillis(8);
-  // 补发成功路径也要限频，防止目标服刚恢复时被历史积压 RPC 打满。
-  private static final long REPLAY_INTERVAL_MILLIS = 100L;
-  private static final long MESSAGE_EXPIRE_MILLIS = TimeUnit.HOURS.toMillis(72);
+  private final Set<String> replaying = ConcurrentHashMap.newKeySet();
+  private final Semaphore replaySlots = new Semaphore(8);
+  private volatile RocksRpcOutbox outbox;
+  private final java.util.function.Function<String, RpcNodeConnector> connectors;
 
-  private ReliableRpcStore() {}
+  private volatile boolean closed;
+  private int replayCursor;
+  private ReliableRpcStore() { connectors = target -> RpcService.getInstance().getRpcNodeConnector(target); }
+  ReliableRpcStore(Path directory, java.util.function.Function<String, RpcNodeConnector> connectors) {
+    this.connectors = connectors;
+    initialize(directory);
+  }
+  int pendingCount(String target) { return outbox.snapshot(target).size(); }
 
-  public static ReliableRpcStore getInstance() {
-    return INSTANCE;
+  public static ReliableRpcStore getInstance() { return INSTANCE; }
+
+  public synchronized void initialize(Path directory) {
+    if (closed) { throw new IllegalStateException("RPC outbox closed"); }
+    if (outbox != null) { return; }
+    try { outbox = new RocksRpcOutbox(directory); }
+    catch (Exception error) { throw new IllegalStateException("Cannot open RPC outbox: " + directory, error); }
   }
 
-  public boolean save(String targetServerId, MessagePacket packet, String reason) {
-    if (RedisUtils.redissonClient == null) {
-      LoggerDef.NetLogger.error("save reliable rpc failed, redis not initialized, target={}", targetServerId);
-      return false;
-    }
-    if (targetServerId == null || targetServerId.isBlank() || packet == null) {
-      LoggerDef.NetLogger.error("save reliable rpc failed, param invalid, target={}", targetServerId);
-      return false;
-    }
-
-    String sourceServerId = currentServerId();
-    // Redis list 作为发送方 outbox：同一个 source -> target 的消息保存在同一条队列里。
-    ReliableRpcMessage message =
-        ReliableRpcMessage.from(
-            nextMsgId(sourceServerId, targetServerId),
-            sourceServerId,
-            targetServerId,
-            packet,
-            reason);
-    RedisUtils.listAdd(queueKey(sourceServerId, targetServerId), message);
-    LoggerDef.NetLogger.warn(
-        "saved reliable rpc, msgId={}, target={}, cmd={}, reason={}",
-        message.getMsgId(),
-        targetServerId,
-        message.getCmd(),
-        reason);
-    return true;
+  public void initialize() {
+    ly.config.DbConfig config = ServerContext.serverConfig == null
+        ? new ly.config.DbConfig() : ServerContext.serverConfig.db;
+    Path directory = Path.of(System.getProperty("miniserver.rpc.rocksPath",
+        System.getProperty("miniserver.rocksPath", config.rocksPath)))
+        .resolve(safeSegment(ServerContext.ENV, "local"))
+        .resolve(safeSegment(ServerContext.getServerId(), "server")).resolve("rpc-outbox");
+    initialize(directory);
   }
 
-  public void replayForTarget(String targetServerId) {
-    replayForTarget(currentServerId(), targetServerId);
-  }
-
-  void replayForTarget(String sourceServerId, String targetServerId) {
-    if (RedisUtils.redissonClient == null || targetServerId == null || targetServerId.isBlank()) {
-      return;
+  /** Explicit upgrade operation only; normal RPC/replay does not access Redis. */
+  public synchronized int importLegacyRedis(String target) {
+    if (closed || outbox == null || target == null || target.isBlank()) {
+      throw new IllegalStateException("Initialize the RPC outbox and provide a target before importing");
     }
-    String key = queueKey(sourceServerId, targetServerId);
-    List<ReliableRpcMessage> messages = RedisUtils.listGetAll(key);
-    if (messages.isEmpty()) {
-      return;
-    }
-
-    RpcNodeConnector connector = RpcService.getInstance().getRpcNodeConnector(targetServerId);
-    if (connector == null || !connector.isConnect()) {
-      return;
-    }
-
-    // listGetAll 只是快照；成功补发后按 msgId 删除，失败则更新重试信息后放回队列。
-    long lastReplayAt = 0L;
-    long now = System.currentTimeMillis();
+    if (!replaying.isEmpty()) { throw new IllegalStateException("Stop replay before importing legacy messages"); }
+    String key = "rpc:reliable:" + safeSegment(ServerContext.ENV, "unknown-env") + ":"
+        + safeSegment(ServerContext.getServerId(), "unknown-source") + ":" + safeSegment(target, "unknown-target");
+    int count = 0;
+    if (ly.redis.RedisUtils.redissonClient == null) { throw new IllegalStateException("Initialize legacy Redis before importing"); }
+    org.redisson.api.RList<ReliableRpcMessage> legacy = ly.redis.RedisUtils.redissonClient.getList(key);
+    java.util.List<ReliableRpcMessage> messages = legacy.readAll();
     for (ReliableRpcMessage message : messages) {
-      if (message == null) {
-        continue;
-      }
-      if (message.getNextRetryAt() > now) {
-        continue;
-      }
-      // 超过保留时间或重试次数后不再补发，避免永远占用 Redis 队列。
-      if (now - message.getCreatedAt() > MESSAGE_EXPIRE_MILLIS
-          || message.getRetryCount() >= MAX_RETRY_COUNT) {
-        RedisUtils.listRemove(key, message);
-        LoggerDef.NetLogger.error(
-            "reliable rpc expired, msgId={}, target={}, cmd={}, retryCount={}",
-            message.getMsgId(),
-            targetServerId,
-            message.getCmd(),
-            message.getRetryCount());
-        continue;
-      }
-
-      sleepForReplayRateLimit(lastReplayAt);
-      lastReplayAt = System.currentTimeMillis();
-      // 为补发包生成唯一 callId，用于匹配回包
-      long callId = System.nanoTime() ^ Thread.currentThread().threadId();
-      MessagePacket replayPacket = buildReplayPacket(message, callId);
-      if (replayPacket == null) {
-        LoggerDef.NetLogger.error("build replay packet failed, msgId={}", message.getMsgId());
-        continue;
-      }
-      if (connector.sendPacket(replayPacket)) {
-        if (requiresReplayResponse(message) && !waitAndHandleReplayResponse(connector, message, callId)) {
-          RedisUtils.listRemove(key, message);
-          message.increaseRetryCount(System.currentTimeMillis() + calculateRetryDelayMillis(message.getRetryCount() + 1));
-          RedisUtils.listAdd(key, message);
-          LoggerDef.NetLogger.warn(
-              "replay reliable rpc response timeout, msgId={}, target={}, retryCount={}",
-              message.getMsgId(),
-              targetServerId,
-              message.getRetryCount());
-          return;
-        }
-        RedisUtils.listRemove(key, message);
-        LoggerDef.NetLogger.info(
-            "replayed reliable rpc, msgId={}, target={}, cmd={}",
-            message.getMsgId(),
-            targetServerId,
-            message.getCmd());
-      } else {
-        // 补发失败后放回队列尾部，下一轮按 nextRetryAt 再尝试。
-        RedisUtils.listRemove(key, message);
-        message.increaseRetryCount(System.currentTimeMillis() + calculateRetryDelayMillis(message.getRetryCount() + 1));
-        RedisUtils.listAdd(key, message);
-        LoggerDef.NetLogger.warn(
-            "replay reliable rpc failed, msgId={}, target={}, retryCount={}",
-            message.getMsgId(),
-            targetServerId,
-            message.getRetryCount());
-        return;
-      }
-    }
-  }
-
-  private boolean requiresReplayResponse(ReliableRpcMessage message) {
-    return message.getCmd() == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE
-        || message.getCmd() == Cmd.CMD.CS_Server2Server_VALUE;
-  }
-
-  private boolean waitAndHandleReplayResponse(RpcNodeConnector connector, ReliableRpcMessage message, long callId) {
-    int expectedCmd = getReplayResponseCmd(message.getCmd());
-    if (expectedCmd <= 0) {
-      return true;
-    }
-    LoggerDef.NetLogger.info(
-        "[ReplayWait] waiting for response, msgId={}, callId={}, cmd={}, queueSize={}",
-        message.getMsgId(), callId, expectedCmd, connector.getClient().getReceivePacketQueueSize());
-
-    long deadline = System.currentTimeMillis() + 10_000L;
-    while (System.currentTimeMillis() < deadline) {
-      MessagePacket response =
-          connector.getClient().getReceiveMsgByCallId(callId, expectedCmd);
-      if (response != null) {
-        if (message.getCmd() == Cmd.CMD.CS_Server2Server_VALUE) {
-          return handleServer2ServerReplayResponse(response, callId);
-        }
-        // 校验 callId
-        Server.scGate2GameRpcGameCall resp =
-            (Server.scGate2GameRpcGameCall)
-                ProtoMessageFactory.createProtoMessage(expectedCmd, response.getData());
-        if (resp == null || resp.getCallId() != callId) {
-          // callId 不匹配，放回队列继续等
-          LoggerDef.NetLogger.warn(
-              "[ReplayWait] callId mismatch, expected={}, got={}, put back",
-              callId, resp != null ? resp.getCallId() : "null");
-          connector.getClient().putBackPacket(response);
-          continue;
-        }
-        // 校验内层 cmd
-        int innerCmd = resp.getClientCmd();
-        if (innerCmd == Cmd.CMD.SC_ErrorCode_VALUE) {
-          // 错误码回包，Game 已处理，算送达成功
-          LoggerDef.NetLogger.info(
-              "[ReplayWait] received SC_ErrorCode via SC_Gate2GameRpcGameCall, callId={}, treating as delivered",
-              callId);
-        } else {
-          // 正常业务回包
-          LoggerDef.NetLogger.info(
-              "[ReplayWait] received normal response, callId={}, innerCmd={}, treating as delivered",
-              callId, innerCmd);
-        }
-        // 重放等待会从 RPC 连接队列里消费回包，这里必须交给业务处理器继续转发。
-        return RpcService.getInstance().handleReliableReplayResponse(message, response);
-      }
+      if (!target.equals(message.getTargetServerId())) { throw new IllegalStateException("Legacy target mismatch"); }
       try {
-        Thread.sleep(10L);
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        return false;
+        outbox.put(message);
+        if (!legacy.remove(message)) { throw new IllegalStateException("Legacy message concurrently changed"); }
+        count++;
+      } catch (Exception error) {
+        throw new IllegalStateException("Legacy RPC import stopped; original remaining messages retained", error);
       }
     }
-    LoggerDef.NetLogger.warn("[ReplayWait] response TIMEOUT after 10s, msgId={}, callId={}", message.getMsgId(), callId);
-    return false;
+    return count;
   }
 
-  private int getReplayResponseCmd(int requestCmd) {
-    if (requestCmd == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) {
-      return Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE;
+  public boolean save(String target, MessagePacket packet, String reason) {
+    if (target == null || target.isBlank() || packet == null) {
+      LoggerDef.NetLogger.error("RPC failure not persisted: invalid target or packet, target={}", target);
+      return false;
     }
-    if (requestCmd == Cmd.CMD.CS_Server2Server_VALUE) {
-      return Cmd.CMD.SC_Server2Server_VALUE;
+    long callId = callId(packet);
+    String id = target + ":" + packet.getCmd() + ":" + (callId > 0 ? callId : UUID.randomUUID());
+    // Log first: the deliberately accepted crash window ends after the synchronous WAL write.
+    LoggerDef.NetLogger.warn("RPC failed; persisting for replay, requestId={}, target={}, cmd={}, reason={}",
+        id, target, packet.getCmd(), reason);
+    try {
+      if (outbox == null) { initialize(); }
+      ReliableRpcMessage message = ReliableRpcMessage.from(id, ServerContext.getServerId(), target, packet, reason);
+      outbox.put(message);
+      return true;
+    } catch (Exception error) {
+      LoggerDef.NetLogger.error("RPC FAILURE NOT PERSISTED, requestId={}, target={}, cmd={}, reason={}",
+          id, target, packet.getCmd(), reason, error);
+      return false;
     }
+  }
+
+  /** All trigger sources share one lease per target; disk and network work never block a tick. */
+  public synchronized void replayForTarget(String target) {
+    RocksRpcOutbox current = outbox;
+    if (closed || current == null || target == null || !replaying.add(target)) { return; }
+    if (!replaySlots.tryAcquire()) { replaying.remove(target); return; }
+    Thread.ofVirtual().name("rpc-outbox-" + target).start(() -> {
+      try { replay(current, target); }
+      catch (Exception error) { LoggerDef.NetLogger.error("RPC replay failed; records retained, target={}", target, error); }
+      finally { replaying.remove(target); replaySlots.release(); }
+    });
+  }
+
+  private void replay(RocksRpcOutbox current, String target) throws Exception {
+    for (ReliableRpcMessage message : current.snapshot(target)) {
+      if (closed) { return; }
+      if (message.getNextRetryAt() > System.currentTimeMillis()) { continue; }
+      MessagePacket packet = message.toPacket();
+      int responseCmd = responseCmd(packet.getCmd());
+      // An unacknowledged one-way packet cannot safely be marked delivered or auto-retried.
+      if (responseCmd == 0 || callId(packet) <= 0) {
+        LoggerDef.NetLogger.error("RPC retained for manual handling: no replay acknowledgement, requestId={}, target={}, cmd={}",
+            message.getMsgId(), target, packet.getCmd());
+        postpone(current, message);
+        continue;
+      }
+      RpcNodeConnector connector = connectors.apply(target);
+      if (connector == null || !connector.isConnect()) { postpone(current, message); return; }
+      MessagePacket response;
+      try { response = connector.requestAsync(packet, responseCmd, 10_000).get(); }
+      catch (java.util.concurrent.ExecutionException error) {
+        LoggerDef.NetLogger.warn("RPC replay unconfirmed; retained, requestId={}, target={}", message.getMsgId(), target, error.getCause());
+        postpone(current, message); continue;
+      }
+      boolean confirmed = validateResponse(message, response);
+      // Forwarding a confirmed Gate response is local notification. Its failure must not re-execute business.
+      if (confirmed && message.getCmd() == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) {
+        try {
+          if (!RpcService.getInstance().handleReliableReplayResponse(message, response)) {
+            LoggerDef.NetLogger.warn("RPC completed but local response forwarding failed, requestId={}", message.getMsgId());
+          }
+        } catch (Exception error) { LoggerDef.NetLogger.warn("RPC completed but local notification failed, requestId={}", message.getMsgId(), error); }
+      }
+      if (confirmed) { current.remove(message.getMsgId()); }
+      else { postpone(current, message); }
+      Thread.sleep(100); // Bounded replay rate, outside logic and IO threads.
+    }
+  }
+
+  private void postpone(RocksRpcOutbox current, ReliableRpcMessage message) throws Exception {
+    message.increaseRetryCount(System.currentTimeMillis() + calculateRetryDelayMillis(message.getRetryCount() + 1));
+    current.put(message); // Atomic replacement: never delete before updating retry state.
+  }
+
+  static boolean validateResponse(ReliableRpcMessage message, MessagePacket response) {
+    try {
+      if (message.getCmd() == Cmd.CMD.CS_Server2Server_VALUE) {
+        Server.csServer2Server request = Server.csServer2Server.parseFrom(message.toPacket().getData());
+        Server.scServer2Server result = Server.scServer2Server.parseFrom(response.getData());
+        return response.getCmd() == Cmd.CMD.SC_Server2Server_VALUE && result.getCallId() == request.getCallId()
+            && (result.getCmd() == request.getCmd() + 1 || result.getCmd() == Cmd.CMD.SC_ErrorCode_VALUE);
+      }
+      Server.csGate2GameRpcGameCall request = Server.csGate2GameRpcGameCall.parseFrom(message.toPacket().getData());
+      Server.scGate2GameRpcGameCall result = Server.scGate2GameRpcGameCall.parseFrom(response.getData());
+      return response.getCmd() == Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE && result.getCallId() == request.getCallId()
+          && (result.getClientCmd() == request.getClientCmd() + 1 || result.getClientCmd() == Cmd.CMD.SC_ErrorCode_VALUE);
+    } catch (Exception error) { return false; }
+  }
+
+  public static long callId(MessagePacket packet) {
+    try {
+      if (packet.getCmd() == Cmd.CMD.CS_Server2Server_VALUE) { return Server.csServer2Server.parseFrom(packet.getData()).getCallId(); }
+      if (packet.getCmd() == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) { return Server.csGate2GameRpcGameCall.parseFrom(packet.getData()).getCallId(); }
+    } catch (Exception error) { LoggerDef.NetLogger.warn("Cannot decode RPC request identity, cmd={}", packet.getCmd(), error); }
     return 0;
   }
-
-  private boolean handleServer2ServerReplayResponse(MessagePacket response, long callId) {
-    Server.scServer2Server resp =
-        (Server.scServer2Server)
-            ProtoMessageFactory.createProtoMessage(Cmd.CMD.SC_Server2Server_VALUE, response.getData());
-    if (resp == null || resp.getCallId() != callId) {
-      LoggerDef.NetLogger.warn(
-          "[ReplayWait] S2S callId mismatch, expected={}, got={}",
-          callId,
-          resp != null ? resp.getCallId() : "null");
-      return false;
-    }
-    LoggerDef.NetLogger.info(
-        "[ReplayWait] received S2S response, callId={}, innerCmd={}, treating as delivered",
-        callId,
-        resp.getCmd());
-    return true;
+  static int responseCmd(int cmd) {
+    if (cmd == Cmd.CMD.CS_Server2Server_VALUE) { return Cmd.CMD.SC_Server2Server_VALUE; }
+    if (cmd == Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) { return Cmd.CMD.SC_Gate2GameRpcGameCall_VALUE; }
+    return 0;
   }
-
-  /**
-   * 构建补发包：从原始消息重建 RPC 外壳，写入本轮补发使用的 callId。
-   */
-  private MessagePacket buildReplayPacket(ReliableRpcMessage message, long callId) {
-    if (message.getCmd() == Cmd.CMD.CS_Server2Server_VALUE) {
-      return buildServer2ServerReplayPacket(message, callId);
-    }
-    if (message.getCmd() != Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE) {
-      return message.toPacket();
-    }
-    try {
-      Server.csGate2GameRpcGameCall original =
-          (Server.csGate2GameRpcGameCall)
-              ProtoMessageFactory.createProtoMessage(Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE, message.toPacket().getData());
-      if (original == null) {
-        return message.toPacket();
-      }
-      Server.csGate2GameRpcGameCall withCallId =
-          Server.csGate2GameRpcGameCall.newBuilder(original)
-              .setCallId(callId)
-              .build();
-      MessagePacket packet =
-          new MessagePacket(
-              message.toPacket().getGuid(),
-              Cmd.CMD.CS_Gate2GameRpcGameCall_VALUE,
-              0, 0,
-              withCallId.toByteArray());
-      return packet;
-    } catch (Exception e) {
-      LoggerDef.NetLogger.error("buildReplayPacket failed, msgId={}", message.getMsgId(), e);
-      return message.toPacket();
-    }
+  public synchronized void replayAllAvailableTargets() {
+    RocksRpcOutbox current = outbox;
+    if (closed || current == null) { return; }
+    java.util.List<String> targets = new java.util.ArrayList<>(current.targets());
+    targets.sort(String::compareTo);
+    if (targets.isEmpty()) { return; }
+    int start = replayCursor % targets.size();
+    // Rotate the starting target so a few long outages cannot monopolize all replay slots.
+    replayCursor = (start + Math.min(8, targets.size())) % targets.size();
+    for (int i = 0; i < targets.size(); i++) { replayForTarget(targets.get((start + i) % targets.size())); }
   }
-
-  private MessagePacket buildServer2ServerReplayPacket(ReliableRpcMessage message, long callId) {
-    try {
-      Server.csServer2Server original =
-          (Server.csServer2Server)
-              ProtoMessageFactory.createProtoMessage(Cmd.CMD.CS_Server2Server_VALUE, message.toPacket().getData());
-      if (original == null) {
-        return message.toPacket();
-      }
-      Server.csServer2Server withCallId =
-          Server.csServer2Server.newBuilder(original)
-              .setCallId(callId)
-              .build();
-      return new MessagePacket(
-          message.toPacket().getGuid(),
-          Cmd.CMD.CS_Server2Server_VALUE,
-          0,
-          0,
-          withCallId.toByteArray());
-    } catch (Exception e) {
-      LoggerDef.NetLogger.error("buildServer2ServerReplayPacket failed, msgId={}", message.getMsgId(), e);
-      return message.toPacket();
-    }
-  }
-
-  public void replayAllAvailableTargets() {
-    RpcService.getInstance()
-        .getConnectedTargetServerIds()
-        .forEach(this::replayForTarget);
-  }
-
   long calculateRetryDelayMillis(int retryCount) {
-    // 指数退避：5s、10s、20s... 最大 8 小时。
-    long delay = INITIAL_RETRY_DELAY_MILLIS;
+    long delay = 5000;
     for (int i = 1; i < retryCount; i++) {
-      if (delay >= MAX_RETRY_DELAY_MILLIS / 2) {
-        return MAX_RETRY_DELAY_MILLIS;
-      }
+      if (delay >= MAX_RETRY_DELAY_MILLIS / 2) { return MAX_RETRY_DELAY_MILLIS; }
       delay *= 2;
     }
     return Math.min(delay, MAX_RETRY_DELAY_MILLIS);
   }
-
-  String queueKey(String sourceServerId, String targetServerId) {
-    // 按环境、发送方、目标方隔离队列，避免不同服务器互相消费可靠 RPC。
-    return "rpc:reliable:"
-        + safeSegment(ServerContext.ENV, "unknown-env")
-        + ":"
-        + safeSegment(sourceServerId, "unknown-source")
-        + ":"
-        + safeSegment(targetServerId, "unknown-target");
+  private static String safeSegment(String value, String fallback) {
+    return value == null || value.isBlank() ? fallback : value.replaceAll("[^a-zA-Z0-9._-]", "_");
   }
-
-  private String nextMsgId(String sourceServerId, String targetServerId) {
-    long seq = RedisUtils.incr("rpc:reliable:id:" + safeSegment(sourceServerId, "unknown-source"));
-    return safeSegment(sourceServerId, "unknown-source")
-        + "-"
-        + safeSegment(targetServerId, "unknown-target")
-        + "-"
-        + System.currentTimeMillis()
-        + "-"
-        + seq;
-  }
-
-  private String currentServerId() {
-    return ServerContext.getServerId() == null ? "unknown-source" : ServerContext.getServerId();
-  }
-
-  private static String safeSegment(String value, String defaultValue) {
-    if (value == null || value.isBlank()) {
-      return defaultValue;
-    }
-    return value.replaceAll("[^a-zA-Z0-9._-]", "_");
-  }
-
-  private void sleepForReplayRateLimit(long lastReplayAt) {
-    long waitMillis = REPLAY_INTERVAL_MILLIS - (System.currentTimeMillis() - lastReplayAt);
-    if (waitMillis <= 0) {
-      return;
-    }
-    try {
-      Thread.sleep(waitMillis);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+  @Override public synchronized void close() {
+    closed = true;
+    if (outbox != null) { outbox.close(); }
   }
 }

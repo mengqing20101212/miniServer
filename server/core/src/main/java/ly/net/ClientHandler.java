@@ -37,6 +37,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<MessagePacket> {
         logger.error("客户端发生异常 sid: {}, remote:{}", ctx.channel().id().asLongText(), ctx.channel().remoteAddress(),
                 cause);
         NetClient netClient = ctx.channel().attr(NetClient.SELF_ATTR_KEY).get();
+        if (netClient != null) { netClient.rpcDisconnected(); }
         NetClientManager.getInstance().delNetClient(netClient);
     }
 
@@ -54,6 +55,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<MessagePacket> {
                         "连接断开 :[%s], sid:%s,  原因: %s",
                         ctx.channel().remoteAddress(), ctx.channel().id(), closeStr));
         NetClient netClient = ctx.channel().attr(NetClient.SELF_ATTR_KEY).get();
+        if (netClient != null) { netClient.rpcDisconnected(); }
         NetClientManager.getInstance().delNetClient(netClient);
     }
 

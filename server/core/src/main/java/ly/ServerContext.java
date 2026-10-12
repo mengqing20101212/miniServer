@@ -105,6 +105,8 @@ public class ServerContext {
         String configPath = resolveConfigPath(serverConfig.configPath);
         serverConfig.configPath = configPath;
         initCoreDependencies(configPath);
+        // Open the durable failed-RPC outbox before publishing this node.
+        ly.rpc.ReliableRpcStore.getInstance().initialize();
         
         // 启动自动建表服务
         AutoTableService.getInstance().startAutoTableService();
