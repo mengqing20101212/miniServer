@@ -19,10 +19,11 @@ public class NacosConnectionTest
     @Test
     public void testNacosConnection()
     {
+        org.junit.Assume.assumeTrue("External integration environment not configured: MINISERVER_TEST_NACOS_URL", System.getenv("MINISERVER_TEST_NACOS_URL") != null);
         try {
             // Configure Nacos connection
             Properties properties = new Properties();
-            properties.put(PropertyKeyConst.SERVER_ADDR, "localhost:8848");
+            properties.put(PropertyKeyConst.SERVER_ADDR, System.getenv("MINISERVER_TEST_NACOS_URL"));
             properties.setProperty(PropertyKeyConst.NAMESPACE, "prod");
             properties.setProperty(PropertyKeyConst.USERNAME, "nacos");
             properties.setProperty(PropertyKeyConst.PASSWORD, "nacos");

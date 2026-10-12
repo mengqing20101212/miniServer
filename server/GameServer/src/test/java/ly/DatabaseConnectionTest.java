@@ -19,9 +19,10 @@ public class DatabaseConnectionTest
     @Test
     public void testDatabaseConnection()
     {
-        String url = "jdbc:mysql://118.25.76.117:3306/pick_money";
-        String username = "root";
-        String password = "Ly@2026Root!8899";
+        org.junit.Assume.assumeTrue("External integration environment not configured: MINISERVER_TEST_MYSQL_URL", System.getenv("MINISERVER_TEST_MYSQL_URL") != null);
+        String url = System.getenv("MINISERVER_TEST_MYSQL_URL");
+        String username = System.getenv("MINISERVER_TEST_MYSQL_USER");
+        String password = System.getenv("MINISERVER_TEST_MYSQL_PASSWORD");
 
         try {
             Connection conn = DriverManager.getConnection(url, username, password);

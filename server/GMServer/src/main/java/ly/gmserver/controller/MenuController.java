@@ -24,7 +24,7 @@ public class MenuController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<MenuVO> get(@PathVariable Integer id) {
+    public ApiResponse<MenuVO> get(@PathVariable Long id) {
         MenuVO vo = menuService.getById(id);
         if (vo == null) return ApiResponse.error("菜单不存在");
         return ApiResponse.success(vo);
@@ -34,7 +34,7 @@ public class MenuController {
     public ApiResponse<Void> create(@RequestBody Map<String, Object> body) {
         String name = (String) body.get("name");
         String permission = (String) body.get("permission");
-        Integer parentId = body.get("parentId") != null ? Integer.valueOf(body.get("parentId").toString()) : 0;
+        Long parentId = body.get("parentId") != null ? Long.valueOf(body.get("parentId").toString()) : 0L;
         String path = (String) body.get("path");
         String icon = (String) body.get("icon");
         Integer sortOrder = body.get("sortOrder") != null ? Integer.valueOf(body.get("sortOrder").toString()) : 0;
@@ -44,10 +44,10 @@ public class MenuController {
 
     @PostMapping("/update")
     public ApiResponse<Void> update(@RequestBody Map<String, Object> body) {
-        Integer id = Integer.valueOf(body.get("id").toString());
+        Long id = Long.valueOf(body.get("id").toString());
         String name = (String) body.get("name");
         String permission = (String) body.get("permission");
-        Integer parentId = body.get("parentId") != null ? Integer.valueOf(body.get("parentId").toString()) : null;
+        Long parentId = body.get("parentId") != null ? Long.valueOf(body.get("parentId").toString()) : null;
         String path = (String) body.get("path");
         String icon = (String) body.get("icon");
         Integer sortOrder = body.get("sortOrder") != null ? Integer.valueOf(body.get("sortOrder").toString()) : null;
@@ -56,7 +56,7 @@ public class MenuController {
     }
 
     @PostMapping("/delete/{id}")
-    public ApiResponse<Void> delete(@PathVariable Integer id) {
+    public ApiResponse<Void> delete(@PathVariable Long id) {
         boolean ok = menuService.delete(id);
         return ok ? ApiResponse.success() : ApiResponse.error("删除失败（请先删除子菜单）");
     }

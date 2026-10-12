@@ -18,15 +18,15 @@ public class GmRoleMenuEntry extends AbstractEntry {
   /**ID*/
   @DbMeta.DbMasterKey(name="id", autoIncrement=true)
   @DbMeta.DbField(name="id")
-  private Integer id;
+  private Long id;
 
   /**角色ID*/
   @DbMeta.DbField(name="role_id")
-  private Integer role_id;
+  private Long role_id;
 
   /**菜单ID*/
   @DbMeta.DbField(name="menu_id")
-  private Integer menu_id;
+  private Long menu_id;
   public GmRoleMenuEntry() {
     initDirtyState(DIRTY_FIELDS.length);
   }
@@ -56,28 +56,32 @@ public class GmRoleMenuEntry extends AbstractEntry {
     GmRoleMenuEntryHelper.asyncUpdate(this);
   }
 
- public void setId(Integer Id) {
+ public void setId(Long Id) {
+    checkPrimaryKeyChange(this.id, Id);
+    if (java.util.Objects.deepEquals(this.id, Id)) { return; }
     this.id = Id;
     autoAddCurVersion();
     markFieldDirty(0);
   }
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
- public void setRoleId(Integer RoleId) {
+ public void setRoleId(Long RoleId) {
+    if (java.util.Objects.deepEquals(this.role_id, RoleId)) { return; }
     this.role_id = RoleId;
     autoAddCurVersion();
     markFieldDirty(1);
   }
-  public Integer getRoleId() {
+  public Long getRoleId() {
     return role_id;
   }
- public void setMenuId(Integer MenuId) {
+ public void setMenuId(Long MenuId) {
+    if (java.util.Objects.deepEquals(this.menu_id, MenuId)) { return; }
     this.menu_id = MenuId;
     autoAddCurVersion();
     markFieldDirty(2);
   }
-  public Integer getMenuId() {
+  public Long getMenuId() {
     return menu_id;
   }
 

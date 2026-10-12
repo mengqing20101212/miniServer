@@ -15,7 +15,7 @@ public class GmConfigHotUpdateMenuInitializer implements ApplicationRunner {
   @Override
   public void run(ApplicationArguments args) {
     GmMenuEntry configRoot =
-        ensureMenu("配置管理", "config:view", 0, "", "fas fa-cog", 950);
+        ensureMenu("配置管理", "config:view", 0L, "", "fas fa-cog", 950);
     if (configRoot == null || configRoot.getId() == null) {
       LoggerDef.SystemLogger.error("初始化GM配表热更菜单失败，配置管理父菜单不存在");
       return;
@@ -28,7 +28,7 @@ public class GmConfigHotUpdateMenuInitializer implements ApplicationRunner {
   private GmMenuEntry ensureMenu(
       String name,
       String permission,
-      Integer parentId,
+      Long parentId,
       String path,
       String icon,
       Integer sortOrder) {
@@ -82,11 +82,11 @@ public class GmConfigHotUpdateMenuInitializer implements ApplicationRunner {
     if (path != null && !path.isBlank()) {
       return byPermission.stream()
           .filter(menu -> path.equals(menu.getPath()))
-          .min(Comparator.comparingInt(GmMenuEntry::getId))
+          .min(Comparator.comparingLong(GmMenuEntry::getId))
           .orElse(null);
     }
     return byPermission.stream()
-        .min(Comparator.comparingInt(GmMenuEntry::getId))
+        .min(Comparator.comparingLong(GmMenuEntry::getId))
         .orElse(null);
   }
 }

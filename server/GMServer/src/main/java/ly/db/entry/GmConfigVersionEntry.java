@@ -58,6 +58,8 @@ public class GmConfigVersionEntry extends AbstractEntry {
   }
 
   public void setId(Long id) {
+    checkPrimaryKeyChange(this.id, id);
+    if (java.util.Objects.deepEquals(this.id, id)) { return; }
     this.id = id;
     autoAddCurVersion();
     markFieldDirty(0);
@@ -68,6 +70,7 @@ public class GmConfigVersionEntry extends AbstractEntry {
   }
 
   public void setVersion(String version) {
+    if (java.util.Objects.deepEquals(this.version, version)) { return; }
     this.version = version;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -78,6 +81,7 @@ public class GmConfigVersionEntry extends AbstractEntry {
   }
 
   public void setStatus(String status) {
+    if (java.util.Objects.deepEquals(this.status, status)) { return; }
     this.status = status;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -88,6 +92,7 @@ public class GmConfigVersionEntry extends AbstractEntry {
   }
 
   public void setSwitchAtMillis(Long switchAtMillis) {
+    if (java.util.Objects.deepEquals(this.switch_at_millis, switchAtMillis)) { return; }
     this.switch_at_millis = switchAtMillis;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -98,6 +103,7 @@ public class GmConfigVersionEntry extends AbstractEntry {
   }
 
   public void setOperator(String operator) {
+    if (java.util.Objects.deepEquals(this.operator, operator)) { return; }
     this.operator = operator;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -108,6 +114,7 @@ public class GmConfigVersionEntry extends AbstractEntry {
   }
 
   public void setRemark(String remark) {
+    if (java.util.Objects.deepEquals(this.remark, remark)) { return; }
     this.remark = remark;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -118,6 +125,7 @@ public class GmConfigVersionEntry extends AbstractEntry {
   }
 
   public void setCreateTime(LocalDateTime createTime) {
+    if (java.util.Objects.deepEquals(this.create_time, createTime)) { return; }
     this.create_time = createTime;
     autoAddCurVersion();
     markFieldDirty(6);
@@ -128,6 +136,7 @@ public class GmConfigVersionEntry extends AbstractEntry {
   }
 
   public void setUpdateTime(LocalDateTime updateTime) {
+    if (java.util.Objects.deepEquals(this.update_time, updateTime)) { return; }
     this.update_time = updateTime;
     autoAddCurVersion();
     markFieldDirty(7);

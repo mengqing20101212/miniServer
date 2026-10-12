@@ -99,7 +99,9 @@ public final class SceneRallyEntry extends AbstractEntry {
   }
 
   public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
+  public void setId(Long id) {
+    checkPrimaryKeyChange(this.id, id); if (java.util.Objects.deepEquals(this.id, id)) { return; }
+    this.id = id; }
   public String getSceneId() { return sceneId; }
   public void setSceneId(String value) { sceneId = value; changed(0); }
   public Long getRallyId() { return rallyId; }

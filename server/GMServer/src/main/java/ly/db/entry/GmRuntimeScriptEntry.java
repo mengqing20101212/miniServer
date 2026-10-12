@@ -81,7 +81,8 @@ public class GmRuntimeScriptEntry extends AbstractEntry {
   }
 
   public Long getId() { return id; }
-  public void setId(Long value) { id = value; mark(0); }
+  public void setId(Long value) {
+    checkPrimaryKeyChange(this.id, value); id = value; mark(0); }
   public String getExecutionId() { return execution_id; }
   public void setExecutionId(String value) { execution_id = value; mark(1); }
   public String getTargetServerId() { return target_server_id; }

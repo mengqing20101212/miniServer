@@ -8,7 +8,7 @@ import ly.db.MysqlService;
  * 自动生成的代码, 如需改动需要在 @@@@@自定义区修改@@@@@
  */
 public class GmRolePermissionEntryHelper {
-  public static GmRolePermissionEntry getGmRolePermissionEntryById(Integer id) {
+  public static GmRolePermissionEntry getGmRolePermissionEntryById(Long id) {
     return MysqlService.getInstance()
         .selectOnce(GmRolePermissionEntry.class, new String[] {"id"}, id);
   }

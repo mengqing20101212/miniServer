@@ -343,6 +343,8 @@ public class ParserDbEntry {
                     + " "
                     + filedName
                     + ") {\n"
+                    + (field == table.key ? "    checkPrimaryKeyChange(this." + field.name + ", " + filedName + ");\n" : "")
+                    + "    if (java.util.Objects.deepEquals(this." + field.name + ", " + filedName + ")) { return; }\n"
                     + "    this."
                     + field.name
                     + " = "
@@ -502,6 +504,10 @@ public class ParserDbEntry {
       fieldInfo.javaType = mapSqlTypeToJavaType(sqlType, typeName, columnSize);
       fieldInfo.desc = columns.getString("REMARKS");
       fieldInfo.autoIncrement = isAutoIncrement != null && isAutoIncrement.equals("YES");
+      if (fieldInfo.autoIncrement && "Integer".equals(String.valueOf(fieldInfo.javaType))) {
+        throw new IllegalStateException("Migrate AUTO_INCREMENT INT column to BIGINT before generation: "
+            + tableName + "." + columnName);
+      }
       tableInfo.addField(fieldInfo);
       System.out.println(
           "  字段: "

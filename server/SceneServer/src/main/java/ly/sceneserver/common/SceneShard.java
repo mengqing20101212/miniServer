@@ -136,7 +136,9 @@ public final class SceneShard {
         CompletableFuture<Void> future = new CompletableFuture<>();
         enqueue(() -> {
             try {
-                action.accept(this);
+                try (ly.db.PersistenceScope persistence = ly.db.PersistenceScope.open()) {
+                    action.accept(this);
+                }
                 future.complete(null);
             } catch (Throwable error) {
                 future.completeExceptionally(error);
@@ -151,7 +153,11 @@ public final class SceneShard {
         CompletableFuture<T> future = new CompletableFuture<>();
         enqueue(() -> {
             try {
-                future.complete(action.apply(this));
+                T result;
+                try (ly.db.PersistenceScope persistence = ly.db.PersistenceScope.open()) {
+                    result = action.apply(this);
+                }
+                future.complete(result);
             } catch (Throwable error) {
                 future.completeExceptionally(error);
             }
@@ -600,7 +606,9 @@ public final class SceneShard {
             Runnable command;
             while ((command = inbox.poll()) != null) {
                 queuedCommands.decrementAndGet();
-                command.run();
+                try (ly.db.PersistenceScope persistence = ly.db.PersistenceScope.open()) {
+                    command.run();
+                }
                 processedCommands++;
             }
             tickNumber++;

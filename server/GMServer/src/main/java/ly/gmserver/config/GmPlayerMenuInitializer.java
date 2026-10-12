@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class GmPlayerMenuInitializer implements ApplicationRunner {
   @Override
   public void run(ApplicationArguments args) {
-    GmMenuEntry root = ensureMenu("玩家管理", "player:view", 0, "", "fas fa-gamepad", 800);
+    GmMenuEntry root = ensureMenu("玩家管理", "player:view", 0L, "", "fas fa-gamepad", 800);
     if (root == null || root.getId() == null) {
       LoggerDef.SystemLogger.error("初始化 GM 玩家管理菜单失败，父菜单不存在");
       return;
@@ -25,7 +25,7 @@ public class GmPlayerMenuInitializer implements ApplicationRunner {
   private GmMenuEntry ensureMenu(
       String name,
       String permission,
-      Integer parentId,
+      Long parentId,
       String path,
       String icon,
       Integer sortOrder) {
@@ -79,9 +79,9 @@ public class GmPlayerMenuInitializer implements ApplicationRunner {
     if (path != null && !path.isBlank()) {
       return byPermission.stream()
           .filter(menu -> path.equals(menu.getPath()))
-          .min(Comparator.comparingInt(GmMenuEntry::getId))
+          .min(Comparator.comparingLong(GmMenuEntry::getId))
           .orElse(null);
     }
-    return byPermission.stream().min(Comparator.comparingInt(GmMenuEntry::getId)).orElse(null);
+    return byPermission.stream().min(Comparator.comparingLong(GmMenuEntry::getId)).orElse(null);
   }
 }

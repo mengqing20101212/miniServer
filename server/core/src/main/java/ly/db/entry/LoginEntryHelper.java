@@ -9,7 +9,7 @@ import ly.db.MysqlService;
  * 自动生成的代码, 如需改动需要在 @@@@@自定义区修改@@@@@
  */
 public class LoginEntryHelper {
-  public static LoginEntry getLoginEntryById(Integer id) {
+  public static LoginEntry getLoginEntryById(Long id) {
     return MysqlService.getInstance()
         .selectOnce(LoginEntry.class, new String[] {"id"}, id);
   }

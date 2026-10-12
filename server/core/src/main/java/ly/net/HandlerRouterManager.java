@@ -51,7 +51,9 @@ public class HandlerRouterManager {
         public void execute(ConnectSession session, MessagePacket packet, AbstractMessage request) {
             if (sessionType.isInstance(session) && packetType.isInstance(packet) && requestType.isInstance(request)) {
                 HandlerContext<S, P> context = new HandlerContext<>((S) session, (P) packet);
-                router.execute(context, (R) request);
+                try (ly.db.PersistenceScope persistence = ly.db.PersistenceScope.open()) {
+                    router.execute(context, (R) request);
+                }
             }
         }
     }

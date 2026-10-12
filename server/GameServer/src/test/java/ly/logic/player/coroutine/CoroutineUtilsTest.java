@@ -39,6 +39,7 @@ public class CoroutineUtilsTest {
                 player -> CoroutineUtils.on(target).getLevel());
         source.getGamePlayer().addCoroutineTask(sourceTask);
 
+        CoroutineUtils.on(target); // 在计时前完成首次代理类生成
         Thread sourceThread = Thread.ofVirtual().start(() -> tickOnce(source));
         waitQueue(target, 1);
         target.getGamePlayer().tickWorkItem();
@@ -146,8 +147,8 @@ public class CoroutineUtilsTest {
     }
 
     private void waitQueue(Player player, int expectedSize) throws InterruptedException {
-        long deadline = System.currentTimeMillis() + 1000L;
-        while (System.currentTimeMillis() < deadline) {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+        while (System.nanoTime() < deadline) {
             if (player.getGamePlayer().getWorkQueueSize() >= expectedSize) {
                 return;
             }

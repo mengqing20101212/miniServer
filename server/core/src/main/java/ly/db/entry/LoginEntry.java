@@ -16,7 +16,7 @@ public class LoginEntry extends AbstractEntry {
   /**账号id*/
   @DbMeta.DbMasterKey(name="id")
   @DbMeta.DbField(name="id")
-  private Integer id;
+  private Long id;
 
   /**账号名称 一般为第三方id*/
   @DbMeta.DbField(name="account")
@@ -77,15 +77,18 @@ public class LoginEntry extends AbstractEntry {
     LoginEntryHelper.asyncUpdate(this);
   }
 
- public void setId(Integer Id) {
+ public void setId(Long Id) {
+    checkPrimaryKeyChange(this.id, Id);
+    if (java.util.Objects.deepEquals(this.id, Id)) { return; }
     this.id = Id;
     autoAddCurVersion();
     markFieldDirty(0);
   }
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
  public void setAccount(String Account) {
+    if (java.util.Objects.deepEquals(this.account, Account)) { return; }
     this.account = Account;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -94,6 +97,7 @@ public class LoginEntry extends AbstractEntry {
     return account;
   }
  public void setCreateTime(java.time.LocalDateTime CreateTime) {
+    if (java.util.Objects.deepEquals(this.create_time, CreateTime)) { return; }
     this.create_time = CreateTime;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -102,6 +106,7 @@ public class LoginEntry extends AbstractEntry {
     return create_time;
   }
  public void setLastLoginTime(java.time.LocalDateTime LastLoginTime) {
+    if (java.util.Objects.deepEquals(this.last_login_time, LastLoginTime)) { return; }
     this.last_login_time = LastLoginTime;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -110,6 +115,7 @@ public class LoginEntry extends AbstractEntry {
     return last_login_time;
   }
  public void setLastLogoutTime(java.time.LocalDateTime LastLogoutTime) {
+    if (java.util.Objects.deepEquals(this.last_logout_time, LastLogoutTime)) { return; }
     this.last_logout_time = LastLogoutTime;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -118,6 +124,7 @@ public class LoginEntry extends AbstractEntry {
     return last_logout_time;
   }
  public void setToken(String Token) {
+    if (java.util.Objects.deepEquals(this.token, Token)) { return; }
     this.token = Token;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -126,6 +133,7 @@ public class LoginEntry extends AbstractEntry {
     return token;
   }
  public void setChannel(String Channel) {
+    if (java.util.Objects.deepEquals(this.channel, Channel)) { return; }
     this.channel = Channel;
     autoAddCurVersion();
     markFieldDirty(6);
@@ -134,6 +142,7 @@ public class LoginEntry extends AbstractEntry {
     return channel;
   }
  public void setPlayers(String Players) {
+    if (java.util.Objects.deepEquals(this.players, Players)) { return; }
     this.players = Players;
     autoAddCurVersion();
     markFieldDirty(7);
@@ -142,6 +151,7 @@ public class LoginEntry extends AbstractEntry {
     return players;
   }
  public void setAssignedGameServerId(String AssignedGameServerId) {
+    if (java.util.Objects.deepEquals(this.assigned_game_server_id, AssignedGameServerId)) { return; }
     this.assigned_game_server_id = AssignedGameServerId;
     autoAddCurVersion();
     markFieldDirty(8);

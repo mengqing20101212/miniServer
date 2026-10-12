@@ -4,6 +4,10 @@ package ly.config;
  * 数据库访问组件，封装连接、元数据、实体脏标记和增删改查操作。
  */
 public class DbConfig {
+  /** Globally unique ID-producing JVM number; explicitly configure before startup. */
+  public int idNodeId = -1;
+  public String rocksPath = "runlogs/rocksdb";
+  public long queryBarrierTimeoutMillis = 30000;
   // DB 相关
   public String jdbcUrl = "";
 

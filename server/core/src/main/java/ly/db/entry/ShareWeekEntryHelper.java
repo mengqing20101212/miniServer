@@ -8,7 +8,7 @@ import ly.db.MysqlService;
  * 自动生成的代码, 如需改动需要在 @@@@@自定义区修改@@@@@
  */
 public class ShareWeekEntryHelper {
-  public static ShareWeekEntry getShareWeekEntryById(Integer id) {
+  public static ShareWeekEntry getShareWeekEntryById(Long id) {
     return MysqlService.getInstance()
         .selectOnce(ShareWeekEntry.class, new String[] {"id"}, id);
   }

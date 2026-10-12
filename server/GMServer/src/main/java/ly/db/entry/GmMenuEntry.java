@@ -22,7 +22,7 @@ public class GmMenuEntry extends AbstractEntry {
   /**菜单ID*/
   @DbMeta.DbMasterKey(name="id", autoIncrement=true)
   @DbMeta.DbField(name="id")
-  private Integer id;
+  private Long id;
 
   /**菜单名称*/
   @DbMeta.DbField(name="name")
@@ -34,7 +34,7 @@ public class GmMenuEntry extends AbstractEntry {
 
   /**父菜单ID*/
   @DbMeta.DbField(name="parent_id")
-  private Integer parent_id;
+  private Long parent_id;
 
   /**前端路由路径*/
   @DbMeta.DbField(name="path")
@@ -76,15 +76,18 @@ public class GmMenuEntry extends AbstractEntry {
     GmMenuEntryHelper.asyncUpdate(this);
   }
 
- public void setId(Integer Id) {
+ public void setId(Long Id) {
+    checkPrimaryKeyChange(this.id, Id);
+    if (java.util.Objects.deepEquals(this.id, Id)) { return; }
     this.id = Id;
     autoAddCurVersion();
     markFieldDirty(0);
   }
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
  public void setName(String Name) {
+    if (java.util.Objects.deepEquals(this.name, Name)) { return; }
     this.name = Name;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -93,6 +96,7 @@ public class GmMenuEntry extends AbstractEntry {
     return name;
   }
  public void setPermission(String Permission) {
+    if (java.util.Objects.deepEquals(this.permission, Permission)) { return; }
     this.permission = Permission;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -100,15 +104,17 @@ public class GmMenuEntry extends AbstractEntry {
   public String getPermission() {
     return permission;
   }
- public void setParentId(Integer ParentId) {
+ public void setParentId(Long ParentId) {
+    if (java.util.Objects.deepEquals(this.parent_id, ParentId)) { return; }
     this.parent_id = ParentId;
     autoAddCurVersion();
     markFieldDirty(3);
   }
-  public Integer getParentId() {
+  public Long getParentId() {
     return parent_id;
   }
  public void setPath(String Path) {
+    if (java.util.Objects.deepEquals(this.path, Path)) { return; }
     this.path = Path;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -117,6 +123,7 @@ public class GmMenuEntry extends AbstractEntry {
     return path;
   }
  public void setIcon(String Icon) {
+    if (java.util.Objects.deepEquals(this.icon, Icon)) { return; }
     this.icon = Icon;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -125,6 +132,7 @@ public class GmMenuEntry extends AbstractEntry {
     return icon;
   }
  public void setSortOrder(Integer SortOrder) {
+    if (java.util.Objects.deepEquals(this.sort_order, SortOrder)) { return; }
     this.sort_order = SortOrder;
     autoAddCurVersion();
     markFieldDirty(6);

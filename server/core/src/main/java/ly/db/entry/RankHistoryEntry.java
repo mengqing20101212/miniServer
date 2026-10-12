@@ -54,6 +54,8 @@ public class RankHistoryEntry extends AbstractEntry {
   }
 
   public void setId(Long id) {
+    checkPrimaryKeyChange(this.id, id);
+    if (java.util.Objects.deepEquals(this.id, id)) { return; }
     this.id = id;
     autoAddCurVersion();
     markFieldDirty(0);
@@ -64,6 +66,7 @@ public class RankHistoryEntry extends AbstractEntry {
   }
 
   public void setRankKey(String rankKey) {
+    if (java.util.Objects.deepEquals(this.rank_key, rankKey)) { return; }
     this.rank_key = rankKey;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -74,6 +77,7 @@ public class RankHistoryEntry extends AbstractEntry {
   }
 
   public void setPlayerId(Long playerId) {
+    if (java.util.Objects.deepEquals(this.player_id, playerId)) { return; }
     this.player_id = playerId;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -84,6 +88,7 @@ public class RankHistoryEntry extends AbstractEntry {
   }
 
   public void setScore(Long score) {
+    if (java.util.Objects.deepEquals(this.score, score)) { return; }
     this.score = score;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -94,6 +99,7 @@ public class RankHistoryEntry extends AbstractEntry {
   }
 
   public void setScoreTime(Long scoreTime) {
+    if (java.util.Objects.deepEquals(this.score_time, scoreTime)) { return; }
     this.score_time = scoreTime;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -104,6 +110,7 @@ public class RankHistoryEntry extends AbstractEntry {
   }
 
   public void setRankNo(Integer rankNo) {
+    if (java.util.Objects.deepEquals(this.rank_no, rankNo)) { return; }
     this.rank_no = rankNo;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -114,6 +121,7 @@ public class RankHistoryEntry extends AbstractEntry {
   }
 
   public void setReward(String reward) {
+    if (java.util.Objects.deepEquals(this.reward, reward)) { return; }
     this.reward = reward;
     autoAddCurVersion();
     markFieldDirty(6);
@@ -124,6 +132,7 @@ public class RankHistoryEntry extends AbstractEntry {
   }
 
   public void setSettleTime(Long settleTime) {
+    if (java.util.Objects.deepEquals(this.settle_time, settleTime)) { return; }
     this.settle_time = settleTime;
     autoAddCurVersion();
     markFieldDirty(7);
@@ -134,6 +143,7 @@ public class RankHistoryEntry extends AbstractEntry {
   }
 
   public void setCreateTime(LocalDateTime createTime) {
+    if (java.util.Objects.deepEquals(this.create_time, createTime)) { return; }
     this.create_time = createTime;
     autoAddCurVersion();
     markFieldDirty(8);

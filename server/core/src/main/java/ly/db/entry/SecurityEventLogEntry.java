@@ -100,6 +100,8 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setId(Long id) {
+    checkPrimaryKeyChange(this.id, id);
+    if (java.util.Objects.deepEquals(this.id, id)) { return; }
     this.id = id;
     autoAddCurVersion();
     markFieldDirty(0);
@@ -110,6 +112,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setEventType(Integer eventType) {
+    if (java.util.Objects.deepEquals(this.event_type, eventType)) { return; }
     this.event_type = eventType;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -120,6 +123,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setServerId(String serverId) {
+    if (java.util.Objects.deepEquals(this.server_id, serverId)) { return; }
     this.server_id = serverId;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -130,6 +134,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setIp(String ip) {
+    if (java.util.Objects.deepEquals(this.ip, ip)) { return; }
     this.ip = ip;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -140,6 +145,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setAccount(String account) {
+    if (java.util.Objects.deepEquals(this.account, account)) { return; }
     this.account = account;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -150,6 +156,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setAccountId(Long accountId) {
+    if (java.util.Objects.deepEquals(this.account_id, accountId)) { return; }
     this.account_id = accountId;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -160,6 +167,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setPlayerId(Long playerId) {
+    if (java.util.Objects.deepEquals(this.player_id, playerId)) { return; }
     this.player_id = playerId;
     autoAddCurVersion();
     markFieldDirty(6);
@@ -170,6 +178,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setCmd(Integer cmd) {
+    if (java.util.Objects.deepEquals(this.cmd, cmd)) { return; }
     this.cmd = cmd;
     autoAddCurVersion();
     markFieldDirty(7);
@@ -180,6 +189,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setSid(Integer sid) {
+    if (java.util.Objects.deepEquals(this.sid, sid)) { return; }
     this.sid = sid;
     autoAddCurVersion();
     markFieldDirty(8);
@@ -190,6 +200,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setSeq(Integer seq) {
+    if (java.util.Objects.deepEquals(this.seq, seq)) { return; }
     this.seq = seq;
     autoAddCurVersion();
     markFieldDirty(9);
@@ -200,6 +211,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setReason(String reason) {
+    if (java.util.Objects.deepEquals(this.reason, reason)) { return; }
     this.reason = reason;
     autoAddCurVersion();
     markFieldDirty(10);
@@ -210,6 +222,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setExtra(String extra) {
+    if (java.util.Objects.deepEquals(this.extra, extra)) { return; }
     this.extra = extra;
     autoAddCurVersion();
     markFieldDirty(11);
@@ -220,6 +233,7 @@ public class SecurityEventLogEntry extends AbstractEntry {
   }
 
   public void setCreateTime(java.time.LocalDateTime createTime) {
+    if (java.util.Objects.deepEquals(this.create_time, createTime)) { return; }
     this.create_time = createTime;
     autoAddCurVersion();
     markFieldDirty(12);

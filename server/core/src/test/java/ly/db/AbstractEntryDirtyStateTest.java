@@ -14,7 +14,7 @@ import org.junit.Test;
  */
 public class AbstractEntryDirtyStateTest {
   @Test
-  public void playerEntryShouldTrackDirtyFields() {
+  public void playerEntryShouldTrackSnapshotVersions() {
     PlayerEntry entry = new PlayerEntry();
 
     assertFalse(canSave(entry));
@@ -24,7 +24,11 @@ public class AbstractEntryDirtyStateTest {
     entry.setLevel(10);
 
     assertTrue(canSave(entry));
-    assertArrayEquals(new String[] {"name", "level"}, entry.getDirtyFieldNames());
+    assertTrue(entry.getDirtyFieldNames().length > 2); // full snapshot, not a field delta
+    long snapshotVersion = ((AbstractEntry) entry).changeVersion();
+    entry.setLevel(11);
+    ((AbstractEntry) entry).markAccepted(snapshotVersion);
+    assertTrue(canSave(entry));
 
     entry.markPersisted();
 

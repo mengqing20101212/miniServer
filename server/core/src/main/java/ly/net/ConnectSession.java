@@ -106,6 +106,7 @@ public class ConnectSession {
      * @return 是否添加成功
      */
     public boolean addSendPacket(MessagePacket packet) {
+        ly.db.PersistenceScope.flushCurrent();
         packet = Server2ServerRpcContext.wrapResponseIfNeeded(packet);
         return sendPacketQueue.add(packet);
     }
@@ -117,6 +118,7 @@ public class ConnectSession {
      * @return true 发送成功， false发送失败
      */
     public boolean sendPacket(MessagePacket packet) {
+        ly.db.PersistenceScope.flushCurrent();
         if (connector != null) {
             return connector.write(packet);
         }

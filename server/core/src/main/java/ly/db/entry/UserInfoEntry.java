@@ -82,6 +82,8 @@ public class UserInfoEntry extends AbstractEntry {
   }
 
  public void setId(Long Id) {
+    checkPrimaryKeyChange(this.id, Id);
+    if (java.util.Objects.deepEquals(this.id, Id)) { return; }
     this.id = Id;
     autoAddCurVersion();
     markFieldDirty(0);
@@ -90,6 +92,7 @@ public class UserInfoEntry extends AbstractEntry {
     return id;
   }
  public void setUsername(String Username) {
+    if (java.util.Objects.deepEquals(this.username, Username)) { return; }
     this.username = Username;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -98,6 +101,7 @@ public class UserInfoEntry extends AbstractEntry {
     return username;
   }
  public void setNickname(String Nickname) {
+    if (java.util.Objects.deepEquals(this.nickname, Nickname)) { return; }
     this.nickname = Nickname;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -106,6 +110,7 @@ public class UserInfoEntry extends AbstractEntry {
     return nickname;
   }
  public void setEmail(String Email) {
+    if (java.util.Objects.deepEquals(this.email, Email)) { return; }
     this.email = Email;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -114,6 +119,7 @@ public class UserInfoEntry extends AbstractEntry {
     return email;
   }
  public void setPhone(String Phone) {
+    if (java.util.Objects.deepEquals(this.phone, Phone)) { return; }
     this.phone = Phone;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -122,6 +128,7 @@ public class UserInfoEntry extends AbstractEntry {
     return phone;
   }
  public void setRegistertime(java.time.LocalDateTime Registertime) {
+    if (java.util.Objects.deepEquals(this.registerTime, Registertime)) { return; }
     this.registerTime = Registertime;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -130,6 +137,7 @@ public class UserInfoEntry extends AbstractEntry {
     return registerTime;
   }
  public void setLastlogintime(java.time.LocalDateTime Lastlogintime) {
+    if (java.util.Objects.deepEquals(this.lastLoginTime, Lastlogintime)) { return; }
     this.lastLoginTime = Lastlogintime;
     autoAddCurVersion();
     markFieldDirty(6);
@@ -138,6 +146,7 @@ public class UserInfoEntry extends AbstractEntry {
     return lastLoginTime;
   }
  public void setLevel(Integer Level) {
+    if (java.util.Objects.deepEquals(this.level, Level)) { return; }
     this.level = Level;
     autoAddCurVersion();
     markFieldDirty(7);
@@ -146,6 +155,7 @@ public class UserInfoEntry extends AbstractEntry {
     return level;
   }
  public void setExp(Integer Exp) {
+    if (java.util.Objects.deepEquals(this.exp, Exp)) { return; }
     this.exp = Exp;
     autoAddCurVersion();
     markFieldDirty(8);
@@ -154,6 +164,7 @@ public class UserInfoEntry extends AbstractEntry {
     return exp;
   }
  public void setStatus(Integer Status) {
+    if (java.util.Objects.deepEquals(this.status, Status)) { return; }
     this.status = Status;
     autoAddCurVersion();
     markFieldDirty(9);

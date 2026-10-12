@@ -46,12 +46,103 @@ import ly.db.entry.ShareEnumConfigEntryHelper;
 /**
  * 数据库访问组件，封装连接、元数据、实体脏标记和增删改查操作。
  * <p>
- * 业务层通常通过生成的 EntryHelper 调用这里。同步接口会立即执行 SQL；异步接口先进入
- * {@code dataQueue}，由后台虚拟线程批量消费。
+ * 业务层通过 EntryHelper 调用。运行时所有实体写入先持久化到 RocksDB，
+ * MySQL 由 RocksService 异步提交；查询在 SQL 执行前等待当前数据库提交屏障。
+ * 未初始化 RocksService 的独立测试实例保留旧 SQL 生成路径。
  */
 public class MysqlService {
   Logger logger = LoggerDef.DbLogger;
   private MysqlConnector mysqlConnector;
+  private volatile RocksService rocksService;
+  private GlobalIdGenerator idGenerator;
+
+  public boolean isRocksEnabled() { return rocksService != null; }
+
+  public void beforeQuery() {
+    RocksService service = rocksService;
+    if (service != null) {
+      PersistenceScope.flushCurrent();
+      service.awaitCommitted();
+    }
+  }
+
+  private boolean acceptEntity(AbstractEntry entry, boolean delete, String revisionField) {
+    if (entry == null) { throw new IllegalArgumentException("entry must not be null"); }
+    try {
+      Field keyField = null;
+      for (Field field : entry.getClass().getDeclaredFields()) {
+        if (field.isAnnotationPresent(DbMeta.DbMasterKey.class)) {
+          if (keyField != null) { throw new IllegalArgumentException("Composite primary key not supported yet"); }
+          keyField = field;
+        }
+      }
+      if (keyField == null) { throw new IllegalArgumentException("Missing entity primary key"); }
+      keyField.setAccessible(true);
+      Object key = keyField.get(entry);
+      if (key == null || (key instanceof Number && ((Number) key).longValue() == 0)) {
+        if (delete) { throw new IllegalArgumentException("Cannot delete entity without key"); }
+        if (keyField.getType() != Long.class && keyField.getType() != long.class) {
+          throw new IllegalArgumentException("Generated primary keys require Long/BIGINT: " + entry.getClass().getName());
+        }
+        key = idGenerator.nextId();
+        keyField.set(entry, key);
+      }
+      String table = requireTableName(entry.getClass());
+      if (revisionField == null && !delete) {
+        DbMeta.DbTable metadata = entry.getClass().getAnnotation(DbMeta.DbTable.class);
+        if (metadata.uniqueKeys().length > 0 && getFieldByDbName(entry.getClass(), "revision") != null) {
+          revisionField = "revision";
+        }
+      }
+      List<Object> params = new ArrayList<>();
+      String sql;
+      if (delete) {
+        sql = "DELETE FROM " + quoteIdentifier(table) + " WHERE "
+            + quoteIdentifier(keyField.getAnnotation(DbMeta.DbMasterKey.class).name()) + "=?";
+        params.add(key);
+      } else if (revisionField != null) {
+        sql = getRevisionUpsertSql(entry, revisionField, params);
+      } else {
+        List<String> columns = new ArrayList<>();
+        for (Field field : entry.getClass().getDeclaredFields()) {
+          DbMeta.DbField column = field.getAnnotation(DbMeta.DbField.class);
+          DbMeta.DbMasterKey masterKey = field.getAnnotation(DbMeta.DbMasterKey.class);
+          if (column == null && masterKey == null) { continue; }
+          field.setAccessible(true);
+          String name = column != null ? column.name() : masterKey.name();
+          columns.add(name);
+          params.add(field.get(entry));
+        }
+        StringBuilder builder = new StringBuilder("INSERT INTO " + quoteIdentifier(table) + " (");
+        appendQuotedColumns(builder, columns);
+        builder.append(") VALUES (");
+        for (int i = 0; i < columns.size(); i++) {
+          if (i > 0) { builder.append(','); }
+          builder.append('?');
+        }
+        builder.append(") ON DUPLICATE KEY UPDATE ");
+        boolean first = true;
+        for (String column : columns) {
+          if (column.equals(keyField.getAnnotation(DbMeta.DbMasterKey.class).name())) { continue; }
+          if (!first) { builder.append(','); }
+          first = false;
+          String quoted = quoteIdentifier(column);
+          builder.append(quoted).append("=VALUES(").append(quoted).append(')');
+        }
+        if (first) {
+          String quoted = quoteIdentifier(keyField.getAnnotation(DbMeta.DbMasterKey.class).name());
+          builder.append(quoted).append('=').append(quoted);
+        }
+        sql = builder.toString();
+      }
+      long version = entry.changeVersion();
+      rocksService.accept(RocksService.entityKey(table, key), table, sql, params.toArray());
+      entry.markAccepted(version);
+      if (delete) { entry.markDeleted(); }
+      return true;
+    } catch (IllegalAccessException failure) { throw new IllegalStateException("Cannot snapshot entity", failure); }
+  }
+
   private static final MysqlService instance = new MysqlService();
 
   /** 所有待入库的entry集合 */
@@ -92,10 +183,26 @@ public class MysqlService {
     mysqlConnector = new MysqlConnector(
         jdbcUrl, username, password, maxPoolSize, minIdle, idleTimeout, connectionTimeout);
 
-    replayDeadLettersBeforeStartup();
-
-    // 启动一个保存的协程
-    startAsyncWriteWorkers();
+    ly.config.DbConfig config = ServerContext.serverConfig == null
+        ? new ly.config.DbConfig() : ServerContext.serverConfig.db;
+    int node = Integer.getInteger("miniserver.idNodeId", config.idNodeId);
+    Path directory = Path.of(System.getProperty("miniserver.rocksPath", config.rocksPath))
+        .resolve(safePathSegment(ServerContext.ENV, "local"))
+        .resolve(safePathSegment(ServerContext.getServerId(), "server"))
+        .resolve(RocksService.entityKey("database", jdbcUrl.substring(0, jdbcUrl.indexOf('?') < 0 ? jdbcUrl.length() : jdbcUrl.indexOf('?'))));
+    try {
+      idGenerator = new GlobalIdGenerator(node, directory.resolve("id-reservation"));
+      rocksService = new RocksService(directory.resolve("outbox"), mysqlConnector, config.queryBarrierTimeoutMillis);
+      // Legacy dead letters now enter the durable outbox before being archived.
+      replayDeadLettersBeforeStartup();
+      rocksService.awaitCommitted();
+    } catch (Exception failure) {
+      try { if (rocksService != null) { rocksService.close(); } } catch (Exception closeFailure) { failure.addSuppressed(closeFailure); }
+      rocksService = null;
+      try { if (idGenerator != null) { idGenerator.close(); } } catch (Exception closeFailure) { failure.addSuppressed(closeFailure); }
+      mysqlConnector.shutdown();
+      throw new IllegalStateException("Cannot initialize durable persistence; configure a unique db.idNodeId (0..16383)", failure);
+    }
   }
 
   private void startAsyncWriteWorkers() {
@@ -402,12 +509,13 @@ public class MysqlService {
   }
 
   /**
-   * 立即保存entry，同步阻塞
+   * 保存完整实体；运行时成功表示 RocksDB 已同步持久化，不代表 MySQL 已提交。
    *
    * @param entry
-   * @return true 保存成功， false 保存失败
+   * @return true 已接受；运行时持久化失败抛出异常
    */
   public boolean save(AbstractEntry entry) {
+    if (rocksService != null) { return acceptEntity(entry, false, null); }
     if (entry == null) {
       logger.error("保存数据失败: entry 不能为 null");
       return false;
@@ -445,6 +553,7 @@ public class MysqlService {
    * 标记为已持久化。
    */
   public boolean update(AbstractEntry entry, String... updateFileds) {
+    if (rocksService != null) { return acceptEntity(entry, false, null); }
     if (entry == null) {
       logger.error("更新数据失败: entry 不能为 null");
       return false;
@@ -484,13 +593,15 @@ public class MysqlService {
     return mysqlConnector;
   }
 
-  /** 异步保存，添加到保存队列；真正执行由保存线程完成。 */
+  /** 兼容异步入口：返回前也必须完成 RocksDB 持久化。 */
   public void addSaveEntry(AbstractEntry entry) {
+    if (rocksService != null) { acceptEntity(entry, false, null); return; }
     enqueueAsyncTask(new DbWriteTask(SAVE_TYPE, entry));
   }
 
-  /** 异步更新，字段参数为空时由实体脏字段决定 UPDATE 列。 */
+  /** 兼容异步入口：运行时保存完整快照，fields 不再裁剪列。 */
   public void addUpdateEntry(AbstractEntry entry, String... fileds) {
+    if (rocksService != null) { acceptEntity(entry, false, null); return; }
     enqueueAsyncTask(new DbWriteTask(UPDATE_TYPE, entry, fileds));
   }
 
@@ -500,6 +611,7 @@ public class MysqlService {
    * @param fileds WHERE 条件列名数组，按顺序与 {@code params} 一一对应
    */
   public <T extends AbstractEntry> T selectOnce(Class<T> clazz, String[] fileds, Object... params) {
+    beforeQuery();
     if (clazz == null) {
       logger.error("查询单条记录失败: clazz 不能为 null");
       return null;
@@ -523,6 +635,7 @@ public class MysqlService {
 
   public <T extends AbstractEntry> List<T> selectAll(
       Class<T> clazz, String[] fileds, Object... params) {
+    beforeQuery();
     if (clazz == null) {
       logger.error("查询多条记录失败: clazz 不能为 null");
       return new ArrayList<>();
@@ -626,6 +739,7 @@ public class MysqlService {
    * @return SQL 成功执行时始终返回 true，包括旧版本被数据库忽略的情况
    */
   public boolean upsertIfNewer(AbstractEntry entry, String revisionField) {
+    if (rocksService != null) { return acceptEntity(entry, false, revisionField); }
     if (entry == null) {
       throw new IllegalArgumentException("entry 不能为 null");
     }
@@ -776,7 +890,7 @@ public class MysqlService {
       if (field.isAnnotationPresent(DbMeta.DbMasterKey.class)) {
         DbMeta.DbMasterKey masterKey = field.getAnnotation(DbMeta.DbMasterKey.class);
         masterKeyColumn = masterKey.name();
-        if (masterKey.autoIncrement()) {
+        if (masterKey.autoIncrement() && field.get(entry) == null) {
           continue;
         }
         insertColumns.add(masterKey.name());
@@ -1002,6 +1116,11 @@ public class MysqlService {
   }
 
   public void shutdown() {
+    if (rocksService != null) {
+      try { rocksService.close(); idGenerator.close(); }
+      catch (Exception failure) { throw new IllegalStateException("Cannot close durable persistence", failure); }
+      rocksService = null;
+    }
     long maxSleepTime = 1000;
     while ((!dataQueue.isEmpty() || retryQueueSize.get() > 0) && maxSleepTime > 0) {
       try {
@@ -1025,6 +1144,7 @@ public class MysqlService {
   private static final int UPDATE_TYPE = 2;
 
   public boolean delete(AbstractEntry data) {
+    if (rocksService != null) { return acceptEntity(data, true, null); }
     if (data == null) {
       logger.error("删除数据失败: data 不能为 null");
       return false;
@@ -1474,7 +1594,7 @@ public class MysqlService {
     String password = "Ly@2026Root!8899";
     getInstance().init(jdbcUrl, username, password, 0, 0, 0, 0);
     ShareEnumConfigEntry entry = getInstance().selectOnce(ShareEnumConfigEntry.class, new String[] { "name" }, "1231");
-    ShareEnumConfigEntryHelper.getShareEnumConfigEntryById(1231);
+    ShareEnumConfigEntryHelper.getShareEnumConfigEntryById(1231L);
 
     ShareEnumConfigEntry data = new ShareEnumConfigEntry();
     data.setCode("qqqqq");

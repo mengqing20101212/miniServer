@@ -97,6 +97,8 @@ public final class PlayerModuleEntry extends AbstractEntry {
   }
 
   public void setId(Long id) {
+    checkPrimaryKeyChange(this.id, id);
+    if (java.util.Objects.deepEquals(this.id, id)) { return; }
     this.id = id;
   }
 
@@ -105,6 +107,7 @@ public final class PlayerModuleEntry extends AbstractEntry {
   }
 
   public void setPlayerId(Long playerId) {
+    if (java.util.Objects.deepEquals(this.playerId, playerId)) { return; }
     this.playerId = playerId;
     autoAddCurVersion();
     markFieldDirty(0);
@@ -115,6 +118,7 @@ public final class PlayerModuleEntry extends AbstractEntry {
   }
 
   public void setModuleId(Integer moduleId) {
+    if (java.util.Objects.deepEquals(this.moduleId, moduleId)) { return; }
     this.moduleId = moduleId;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -125,6 +129,7 @@ public final class PlayerModuleEntry extends AbstractEntry {
   }
 
   public void setDataVersion(Integer dataVersion) {
+    if (java.util.Objects.deepEquals(this.dataVersion, dataVersion)) { return; }
     this.dataVersion = dataVersion;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -135,6 +140,7 @@ public final class PlayerModuleEntry extends AbstractEntry {
   }
 
   public void setRevision(Long revision) {
+    if (java.util.Objects.deepEquals(this.revision, revision)) { return; }
     this.revision = revision;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -155,6 +161,7 @@ public final class PlayerModuleEntry extends AbstractEntry {
   }
 
   public void setUpdateTime(LocalDateTime updateTime) {
+    if (java.util.Objects.deepEquals(this.updateTime, updateTime)) { return; }
     this.updateTime = updateTime;
     autoAddCurVersion();
     markFieldDirty(5);

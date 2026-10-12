@@ -60,9 +60,9 @@ public class LoginController {
             loginService.saveToken(account, result.getToken());
             entry.asyncUpdate();
         } else {
-            Integer cachedAccountId = RedisUtils.get(RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account));
-            if (cachedAccountId != null && cachedAccountId > 0) {
-                result.setAccountId(cachedAccountId);
+            Number cachedAccountId = RedisUtils.get(RedisKeys.LOGIN_ACCOUNT_ID_KEY.getKey(account));
+            if (cachedAccountId != null && cachedAccountId.longValue() > 0) {
+                result.setAccountId(cachedAccountId.longValue());
                 result.setToken(loginService.getToken(account));
             }
         }

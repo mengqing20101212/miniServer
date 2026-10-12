@@ -34,7 +34,7 @@ public class GmAdminService {
             AdminVO vo = new AdminVO();
             vo.setId(1L);
             vo.setUsername("admin");
-            vo.setRoleId(1);
+            vo.setRoleId(1L);
             vo.setRoleName("超级管理员");
             vo.setStatus(1);
             return new LoginResponse(token, vo);
@@ -78,18 +78,18 @@ public class GmAdminService {
         return entry != null ? toVO(entry) : null;
     }
 
-    public boolean create(String username, String password, Integer roleId) {
+    public boolean create(String username, String password, Long roleId) {
         List<GmAdminEntry> exist = GmAdminEntryHelper.select(new String[]{"username"}, username);
         if (!exist.isEmpty()) return false;
         GmAdminEntry entry = new GmAdminEntry();
         entry.setUsername(username);
         entry.setPassword(passwordEncoder.encode(password));
-        entry.setRoleId(roleId != null ? roleId : 2);
+        entry.setRoleId(roleId != null ? roleId : 2L);
         entry.setStatus((byte) 1);
         return GmAdminEntryHelper.save(entry);
     }
 
-    public boolean update(Long id, String username, Integer roleId, Byte status) {
+    public boolean update(Long id, String username, Long roleId, Byte status) {
         GmAdminEntry entry = GmAdminEntryHelper.getGmAdminEntryById(id);
         if (entry == null) return false;
         if (username != null && !username.isEmpty()) entry.setUsername(username);

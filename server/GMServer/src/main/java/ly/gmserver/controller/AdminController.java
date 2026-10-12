@@ -57,7 +57,7 @@ public class AdminController {
     public ApiResponse<Void> create(@RequestBody Map<String, Object> body) {
         String username = (String) body.get("username");
         String password = (String) body.get("password");
-        Integer roleId = body.get("roleId") != null ? Integer.valueOf(body.get("roleId").toString()) : null;
+        Long roleId = body.get("roleId") != null ? Long.valueOf(body.get("roleId").toString()) : null;
         boolean ok = adminService.create(username, password, roleId);
         return ok ? ApiResponse.success() : ApiResponse.error("创建失败（用户名可能已存在）");
     }
@@ -66,7 +66,7 @@ public class AdminController {
     public ApiResponse<Void> update(@RequestBody Map<String, Object> body) {
         Long id = Long.valueOf(body.get("id").toString());
         String username = (String) body.get("username");
-        Integer roleId = body.get("roleId") != null ? Integer.valueOf(body.get("roleId").toString()) : null;
+        Long roleId = body.get("roleId") != null ? Long.valueOf(body.get("roleId").toString()) : null;
         Byte status = body.get("status") != null ? Byte.valueOf(body.get("status").toString()) : null;
         boolean ok = adminService.update(id, username, roleId, status);
         return ok ? ApiResponse.success() : ApiResponse.error("更新失败");

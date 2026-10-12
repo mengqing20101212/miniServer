@@ -8,7 +8,7 @@ import ly.db.MysqlService;
  * 自动生成的代码, 如需改动需要在 @@@@@自定义区修改@@@@@
  */
 public class GmRoleMenuEntryHelper {
-  public static GmRoleMenuEntry getGmRoleMenuEntryById(Integer id) {
+  public static GmRoleMenuEntry getGmRoleMenuEntryById(Long id) {
     return MysqlService.getInstance()
         .selectOnce(GmRoleMenuEntry.class, new String[] {"id"}, id);
   }

@@ -21,6 +21,8 @@
         <byte-buddy.version>1.18.7</byte-buddy.version>
         <fastjson2.version>2.0.61</fastjson2.version>
         <protobuf.version>3.25.5</protobuf.version>
+        <fury.version>0.10.3</fury.version>
+        <rocksdb.version>10.10.1.1</rocksdb.version>
         <groovy.version>5.0.2</groovy.version>
     </properties>
 
@@ -39,6 +41,8 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency><groupId>org.apache.fury</groupId><artifactId>fury-core</artifactId><version>${fury.version}</version></dependency>
+            <dependency><groupId>org.rocksdb</groupId><artifactId>rocksdbjni</artifactId><version>${rocksdb.version}</version></dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>

@@ -34,7 +34,7 @@ public class GmAdminEntry extends AbstractEntry {
 
   /**角色ID*/
   @DbMeta.DbField(name="role_id")
-  private Integer role_id;
+  private Long role_id;
 
   /**状态: 1=启用, 0=禁用*/
   @DbMeta.DbField(name="status")
@@ -77,6 +77,8 @@ public class GmAdminEntry extends AbstractEntry {
   }
 
  public void setId(Long Id) {
+    checkPrimaryKeyChange(this.id, Id);
+    if (java.util.Objects.deepEquals(this.id, Id)) { return; }
     this.id = Id;
     autoAddCurVersion();
     markFieldDirty(0);
@@ -85,6 +87,7 @@ public class GmAdminEntry extends AbstractEntry {
     return id;
   }
  public void setUsername(String Username) {
+    if (java.util.Objects.deepEquals(this.username, Username)) { return; }
     this.username = Username;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -93,6 +96,7 @@ public class GmAdminEntry extends AbstractEntry {
     return username;
   }
  public void setPassword(String Password) {
+    if (java.util.Objects.deepEquals(this.password, Password)) { return; }
     this.password = Password;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -100,15 +104,17 @@ public class GmAdminEntry extends AbstractEntry {
   public String getPassword() {
     return password;
   }
- public void setRoleId(Integer RoleId) {
+ public void setRoleId(Long RoleId) {
+    if (java.util.Objects.deepEquals(this.role_id, RoleId)) { return; }
     this.role_id = RoleId;
     autoAddCurVersion();
     markFieldDirty(3);
   }
-  public Integer getRoleId() {
+  public Long getRoleId() {
     return role_id;
   }
  public void setStatus(Byte Status) {
+    if (java.util.Objects.deepEquals(this.status, Status)) { return; }
     this.status = Status;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -117,6 +123,7 @@ public class GmAdminEntry extends AbstractEntry {
     return status;
   }
  public void setCreateTime(java.time.LocalDateTime CreateTime) {
+    if (java.util.Objects.deepEquals(this.create_time, CreateTime)) { return; }
     this.create_time = CreateTime;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -125,6 +132,7 @@ public class GmAdminEntry extends AbstractEntry {
     return create_time;
   }
  public void setUpdateTime(java.time.LocalDateTime UpdateTime) {
+    if (java.util.Objects.deepEquals(this.update_time, UpdateTime)) { return; }
     this.update_time = UpdateTime;
     autoAddCurVersion();
     markFieldDirty(6);

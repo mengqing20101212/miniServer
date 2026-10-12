@@ -20,12 +20,12 @@ public class GmRoleService {
         return roles.stream().map(this::toVO).collect(Collectors.toList());
     }
 
-    public RoleVO getById(Integer id) {
+    public RoleVO getById(Long id) {
         GmRoleEntry entry = GmRoleEntryHelper.getGmRoleEntryById(id);
         return entry != null ? toVO(entry) : null;
     }
 
-    public boolean create(String name, String description, List<String> permissions, List<Integer> menuIds) {
+    public boolean create(String name, String description, List<String> permissions, List<Long> menuIds) {
         List<GmRoleEntry> exist = GmRoleEntryHelper.select(new String[]{"name"}, name);
         if (!exist.isEmpty()) return false;
 
@@ -35,13 +35,13 @@ public class GmRoleService {
         boolean saved = GmRoleEntryHelper.save(entry);
         if (!saved || entry.getId() == null) return false;
 
-        int roleId = entry.getId();
+        long roleId = entry.getId();
         savePermissions(roleId, permissions);
         saveRoleMenus(roleId, menuIds);
         return true;
     }
 
-    public boolean update(Integer id, String name, String description, List<String> permissions, List<Integer> menuIds) {
+    public boolean update(Long id, String name, String description, List<String> permissions, List<Long> menuIds) {
         GmRoleEntry entry = GmRoleEntryHelper.getGmRoleEntryById(id);
         if (entry == null) return false;
 
@@ -62,7 +62,7 @@ public class GmRoleService {
         return true;
     }
 
-    public boolean delete(Integer id) {
+    public boolean delete(Long id) {
         GmRoleEntry entry = GmRoleEntryHelper.getGmRoleEntryById(id);
         if (entry == null) return false;
         // cascade delete permissions and menus
@@ -73,17 +73,17 @@ public class GmRoleService {
         return GmRoleEntryHelper.delete(entry);
     }
 
-    public List<String> getPermissions(Integer roleId) {
+    public List<String> getPermissions(Long roleId) {
         List<GmRolePermissionEntry> perms = GmRolePermissionEntryHelper.select(new String[]{"role_id"}, roleId);
         return perms.stream().map(GmRolePermissionEntry::getPermission).collect(Collectors.toList());
     }
 
-    public List<Integer> getMenuIds(Integer roleId) {
+    public List<Long> getMenuIds(Long roleId) {
         List<GmRoleMenuEntry> menus = GmRoleMenuEntryHelper.select(new String[]{"role_id"}, roleId);
         return menus.stream().map(GmRoleMenuEntry::getMenuId).collect(Collectors.toList());
     }
 
-    private void savePermissions(int roleId, List<String> permissions) {
+    private void savePermissions(long roleId, List<String> permissions) {
         if (permissions == null) return;
         for (String perm : permissions) {
             GmRolePermissionEntry p = new GmRolePermissionEntry();
@@ -93,9 +93,9 @@ public class GmRoleService {
         }
     }
 
-    private void saveRoleMenus(int roleId, List<Integer> menuIds) {
+    private void saveRoleMenus(long roleId, List<Long> menuIds) {
         if (menuIds == null) return;
-        for (Integer menuId : menuIds) {
+        for (Long menuId : menuIds) {
             GmRoleMenuEntry m = new GmRoleMenuEntry();
             m.setRoleId(roleId);
             m.setMenuId(menuId);

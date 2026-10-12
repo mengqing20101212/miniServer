@@ -92,6 +92,8 @@ public class GmOperationLogEntry extends AbstractEntry {
   }
 
  public void setId(Long Id) {
+    checkPrimaryKeyChange(this.id, Id);
+    if (java.util.Objects.deepEquals(this.id, Id)) { return; }
     this.id = Id;
     autoAddCurVersion();
     markFieldDirty(0);
@@ -100,6 +102,7 @@ public class GmOperationLogEntry extends AbstractEntry {
     return id;
   }
  public void setAdminId(Long AdminId) {
+    if (java.util.Objects.deepEquals(this.admin_id, AdminId)) { return; }
     this.admin_id = AdminId;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -108,6 +111,7 @@ public class GmOperationLogEntry extends AbstractEntry {
     return admin_id;
   }
  public void setUsername(String Username) {
+    if (java.util.Objects.deepEquals(this.username, Username)) { return; }
     this.username = Username;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -116,6 +120,7 @@ public class GmOperationLogEntry extends AbstractEntry {
     return username;
   }
  public void setAction(String Action) {
+    if (java.util.Objects.deepEquals(this.action, Action)) { return; }
     this.action = Action;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -124,6 +129,7 @@ public class GmOperationLogEntry extends AbstractEntry {
     return action;
   }
  public void setTargetType(String TargetType) {
+    if (java.util.Objects.deepEquals(this.target_type, TargetType)) { return; }
     this.target_type = TargetType;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -132,6 +138,7 @@ public class GmOperationLogEntry extends AbstractEntry {
     return target_type;
   }
  public void setTargetId(String TargetId) {
+    if (java.util.Objects.deepEquals(this.target_id, TargetId)) { return; }
     this.target_id = TargetId;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -140,6 +147,7 @@ public class GmOperationLogEntry extends AbstractEntry {
     return target_id;
   }
  public void setDetail(String Detail) {
+    if (java.util.Objects.deepEquals(this.detail, Detail)) { return; }
     this.detail = Detail;
     autoAddCurVersion();
     markFieldDirty(6);
@@ -148,6 +156,7 @@ public class GmOperationLogEntry extends AbstractEntry {
     return detail;
   }
  public void setIp(String Ip) {
+    if (java.util.Objects.deepEquals(this.ip, Ip)) { return; }
     this.ip = Ip;
     autoAddCurVersion();
     markFieldDirty(7);
@@ -156,6 +165,7 @@ public class GmOperationLogEntry extends AbstractEntry {
     return ip;
   }
  public void setResult(String Result) {
+    if (java.util.Objects.deepEquals(this.result, Result)) { return; }
     this.result = Result;
     autoAddCurVersion();
     markFieldDirty(8);
@@ -164,6 +174,7 @@ public class GmOperationLogEntry extends AbstractEntry {
     return result;
   }
  public void setCreatedAt(java.time.LocalDateTime CreatedAt) {
+    if (java.util.Objects.deepEquals(this.created_at, CreatedAt)) { return; }
     this.created_at = CreatedAt;
     autoAddCurVersion();
     markFieldDirty(9);

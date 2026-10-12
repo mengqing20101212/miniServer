@@ -8,7 +8,7 @@ import ly.db.MysqlService;
  * 自动生成的代码, 如需改动需要在 @@@@@自定义区修改@@@@@
  */
 public class ShareEnumConfigEntryHelper {
-  public static ShareEnumConfigEntry getShareEnumConfigEntryById(Integer id) {
+  public static ShareEnumConfigEntry getShareEnumConfigEntryById(Long id) {
     return MysqlService.getInstance()
         .selectOnce(ShareEnumConfigEntry.class, new String[] {"id"}, id);
   }

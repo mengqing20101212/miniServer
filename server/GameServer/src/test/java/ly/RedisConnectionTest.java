@@ -17,6 +17,7 @@ public class RedisConnectionTest
     @Test
     public void testRedisConnection()
     {
+        org.junit.Assume.assumeTrue("External integration environment not configured: MINISERVER_TEST_REDIS_HOST", System.getenv("MINISERVER_TEST_REDIS_HOST") != null);
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(128);
         poolConfig.setMaxIdle(128);
@@ -25,7 +26,7 @@ public class RedisConnectionTest
         poolConfig.setTestOnReturn(true);
         poolConfig.setTestWhileIdle(true);
         
-        try (JedisPool jedisPool = new JedisPool(poolConfig, "139.224.80.204", 6379, 2000, "ly.1006897725")) {
+        try (JedisPool jedisPool = new JedisPool(poolConfig, System.getenv("MINISERVER_TEST_REDIS_HOST"), Integer.parseInt(System.getenv().getOrDefault("MINISERVER_TEST_REDIS_PORT", "6379")), 2000, System.getenv("MINISERVER_TEST_REDIS_PASSWORD"))) {
             try (Jedis jedis = jedisPool.getResource()) {
                 // 测试连接
                 String pong = jedis.ping();

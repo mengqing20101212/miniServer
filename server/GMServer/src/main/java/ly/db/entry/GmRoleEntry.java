@@ -18,7 +18,7 @@ public class GmRoleEntry extends AbstractEntry {
   /**角色ID*/
   @DbMeta.DbMasterKey(name="id", autoIncrement=true)
   @DbMeta.DbField(name="id")
-  private Integer id;
+  private Long id;
 
   /**角色名称*/
   @DbMeta.DbField(name="name")
@@ -56,15 +56,18 @@ public class GmRoleEntry extends AbstractEntry {
     GmRoleEntryHelper.asyncUpdate(this);
   }
 
- public void setId(Integer Id) {
+ public void setId(Long Id) {
+    checkPrimaryKeyChange(this.id, Id);
+    if (java.util.Objects.deepEquals(this.id, Id)) { return; }
     this.id = Id;
     autoAddCurVersion();
     markFieldDirty(0);
   }
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
  public void setName(String Name) {
+    if (java.util.Objects.deepEquals(this.name, Name)) { return; }
     this.name = Name;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -73,6 +76,7 @@ public class GmRoleEntry extends AbstractEntry {
     return name;
   }
  public void setDescription(String Description) {
+    if (java.util.Objects.deepEquals(this.description, Description)) { return; }
     this.description = Description;
     autoAddCurVersion();
     markFieldDirty(2);

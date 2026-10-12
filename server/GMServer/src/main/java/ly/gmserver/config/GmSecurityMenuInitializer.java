@@ -20,7 +20,7 @@ public class GmSecurityMenuInitializer implements ApplicationRunner {
   @Override
   public void run(ApplicationArguments args) {
     GmMenuEntry securityRoot =
-        ensureMenu("安全管理", "security:view", 0, "", "fas fa-shield-alt", 900);
+        ensureMenu("安全管理", "security:view", 0L, "", "fas fa-shield-alt", 900);
     if (securityRoot == null || securityRoot.getId() == null) {
       LoggerDef.SystemLogger.error("初始化GM安全菜单失败，安全管理父菜单不存在");
       return;
@@ -38,7 +38,7 @@ public class GmSecurityMenuInitializer implements ApplicationRunner {
   private GmMenuEntry ensureMenu(
       String name,
       String permission,
-      Integer parentId,
+      Long parentId,
       String path,
       String icon,
       Integer sortOrder) {
@@ -92,11 +92,11 @@ public class GmSecurityMenuInitializer implements ApplicationRunner {
     if (path != null && !path.isBlank()) {
       return byPermission.stream()
           .filter(menu -> path.equals(menu.getPath()))
-          .min(Comparator.comparingInt(GmMenuEntry::getId))
+          .min(Comparator.comparingLong(GmMenuEntry::getId))
           .orElse(null);
     }
     return byPermission.stream()
-        .min(Comparator.comparingInt(GmMenuEntry::getId))
+        .min(Comparator.comparingLong(GmMenuEntry::getId))
         .orElse(null);
   }
 }

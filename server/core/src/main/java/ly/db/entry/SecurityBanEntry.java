@@ -92,6 +92,8 @@ public class SecurityBanEntry extends AbstractEntry {
   }
 
   public void setId(Long id) {
+    checkPrimaryKeyChange(this.id, id);
+    if (java.util.Objects.deepEquals(this.id, id)) { return; }
     this.id = id;
     autoAddCurVersion();
     markFieldDirty(0);
@@ -102,6 +104,7 @@ public class SecurityBanEntry extends AbstractEntry {
   }
 
   public void setBanType(Integer banType) {
+    if (java.util.Objects.deepEquals(this.ban_type, banType)) { return; }
     this.ban_type = banType;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -112,6 +115,7 @@ public class SecurityBanEntry extends AbstractEntry {
   }
 
   public void setTarget(String target) {
+    if (java.util.Objects.deepEquals(this.target, target)) { return; }
     this.target = target;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -122,6 +126,7 @@ public class SecurityBanEntry extends AbstractEntry {
   }
 
   public void setReason(String reason) {
+    if (java.util.Objects.deepEquals(this.reason, reason)) { return; }
     this.reason = reason;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -132,6 +137,7 @@ public class SecurityBanEntry extends AbstractEntry {
   }
 
   public void setSource(Integer source) {
+    if (java.util.Objects.deepEquals(this.source, source)) { return; }
     this.source = source;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -142,6 +148,7 @@ public class SecurityBanEntry extends AbstractEntry {
   }
 
   public void setStatus(Integer status) {
+    if (java.util.Objects.deepEquals(this.status, status)) { return; }
     this.status = status;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -152,6 +159,7 @@ public class SecurityBanEntry extends AbstractEntry {
   }
 
   public void setStartTime(java.time.LocalDateTime startTime) {
+    if (java.util.Objects.deepEquals(this.start_time, startTime)) { return; }
     this.start_time = startTime;
     autoAddCurVersion();
     markFieldDirty(6);
@@ -162,6 +170,7 @@ public class SecurityBanEntry extends AbstractEntry {
   }
 
   public void setEndTime(java.time.LocalDateTime endTime) {
+    if (java.util.Objects.deepEquals(this.end_time, endTime)) { return; }
     this.end_time = endTime;
     autoAddCurVersion();
     markFieldDirty(7);
@@ -172,6 +181,7 @@ public class SecurityBanEntry extends AbstractEntry {
   }
 
   public void setOperator(String operator) {
+    if (java.util.Objects.deepEquals(this.operator, operator)) { return; }
     this.operator = operator;
     autoAddCurVersion();
     markFieldDirty(8);
@@ -182,6 +192,7 @@ public class SecurityBanEntry extends AbstractEntry {
   }
 
   public void setCreateTime(java.time.LocalDateTime createTime) {
+    if (java.util.Objects.deepEquals(this.create_time, createTime)) { return; }
     this.create_time = createTime;
     autoAddCurVersion();
     markFieldDirty(9);
@@ -192,6 +203,7 @@ public class SecurityBanEntry extends AbstractEntry {
   }
 
   public void setUpdateTime(java.time.LocalDateTime updateTime) {
+    if (java.util.Objects.deepEquals(this.update_time, updateTime)) { return; }
     this.update_time = updateTime;
     autoAddCurVersion();
     markFieldDirty(10);

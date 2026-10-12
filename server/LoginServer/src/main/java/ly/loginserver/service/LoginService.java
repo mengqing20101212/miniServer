@@ -115,9 +115,6 @@ public class LoginService {
         return serverNodeList;
     }
 
-    public int createNewAccountId() {
-        return RandomUtils.RandomInt(Integer.MAX_VALUE);
-    }
 
     public String createToken(String account) {
         // 生成更安全的token，结合账号信息、时间戳和随机字符串
@@ -176,7 +173,6 @@ public class LoginService {
             LoginEntry entry = new LoginEntry();
             entry.setAccount(account.trim());
             entry.setChannel(channel.trim());
-            entry.setId(createNewAccountId());
             entry.setToken(createToken(account));
             entry.setCreateTime(now);
             entry.setLastLoginTime(now);

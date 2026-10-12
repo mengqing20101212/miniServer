@@ -50,10 +50,7 @@ public class HeroControllerTest {
         heroController = new HeroController();
         heroController.registerHandlerRouter();
 
-        // 加载所有配置表
-        String configDir = new File("../../excel/serverConfig").getAbsolutePath();
-        logger.info("Loading configs from: {}", configDir);
-        ly.ConfigService.getInstance().loadAllConfig(logger, configDir);
+        HeroTestConfig.load();
         // 初始化模拟玩家和游戏对象
         mockGamePlayer = new MockGamePlayer(100001L);
         // 连接 session 和 gamePlayer（消息捕获）

@@ -19,38 +19,38 @@ public class GmMenuService {
         return buildTree(menus, null);
     }
 
-    public List<MenuVO> listByRoleIds(List<Integer> roleIds) {
+    public List<MenuVO> listByRoleIds(List<Long> roleIds) {
         if (roleIds == null || roleIds.isEmpty()) return new ArrayList<>();
         // Get all menu ids for this role from gm_role_menu
         List<MenuVO> allMenus = listAll();
         // Get menu IDs that this role can see
         // For simplicity, we return menus without permission requirement OR menus assigned to the role
         List<GmMenuEntry> allEntries = GmMenuEntryHelper.select(null);
-        Map<Integer, GmMenuEntry> entryMap = allEntries.stream()
+        Map<Long, GmMenuEntry> entryMap = allEntries.stream()
             .collect(Collectors.toMap(GmMenuEntry::getId, m -> m));
         // Assign hasMenu flag - in a real app, filter by gm_role_menu
         // For now return all menus for the tree structure
         return allMenus;
     }
 
-    public MenuVO getById(Integer id) {
+    public MenuVO getById(Long id) {
         GmMenuEntry entry = GmMenuEntryHelper.getGmMenuEntryById(id);
         return entry != null ? toVO(entry) : null;
     }
 
-    public boolean create(String name, String permission, Integer parentId,
+    public boolean create(String name, String permission, Long parentId,
                           String path, String icon, Integer sortOrder) {
         GmMenuEntry entry = new GmMenuEntry();
         entry.setName(name);
         entry.setPermission(permission != null ? permission : "");
-        entry.setParentId(parentId != null ? parentId : 0);
+        entry.setParentId(parentId != null ? parentId : 0L);
         entry.setPath(path != null ? path : "");
         entry.setIcon(icon != null ? icon : "");
         entry.setSortOrder(sortOrder != null ? sortOrder : 0);
         return GmMenuEntryHelper.save(entry);
     }
 
-    public boolean update(Integer id, String name, String permission, Integer parentId,
+    public boolean update(Long id, String name, String permission, Long parentId,
                           String path, String icon, Integer sortOrder) {
         GmMenuEntry entry = GmMenuEntryHelper.getGmMenuEntryById(id);
         if (entry == null) return false;
@@ -63,7 +63,7 @@ public class GmMenuService {
         return GmMenuEntryHelper.update(entry, "name", "permission", "parent_id", "path", "icon", "sort_order");
     }
 
-    public boolean delete(Integer id) {
+    public boolean delete(Long id) {
         // check if has children
         List<GmMenuEntry> children = GmMenuEntryHelper.select(new String[]{"parent_id"}, id);
         if (!children.isEmpty()) return false; // has children, refuse
@@ -72,11 +72,11 @@ public class GmMenuService {
         return GmMenuEntryHelper.delete(entry);
     }
 
-    private List<MenuVO> buildTree(List<GmMenuEntry> allMenus, List<Integer> allowedMenuIds) {
-        Map<Integer, List<GmMenuEntry>> grouped = allMenus.stream()
-            .collect(Collectors.groupingBy(m -> m.getParentId() != null ? m.getParentId() : 0));
+    private List<MenuVO> buildTree(List<GmMenuEntry> allMenus, List<Long> allowedMenuIds) {
+        Map<Long, List<GmMenuEntry>> grouped = allMenus.stream()
+            .collect(Collectors.groupingBy(m -> m.getParentId() != null ? m.getParentId() : 0L));
         List<MenuVO> roots = new ArrayList<>();
-        for (GmMenuEntry menu : grouped.getOrDefault(0, new ArrayList<>())) {
+        for (GmMenuEntry menu : grouped.getOrDefault(0L, new ArrayList<>())) {
             MenuVO vo = buildSubTree(menu, grouped, allowedMenuIds);
             roots.add(vo);
         }
@@ -84,8 +84,8 @@ public class GmMenuService {
         return roots;
     }
 
-    private MenuVO buildSubTree(GmMenuEntry menu, Map<Integer, List<GmMenuEntry>> grouped,
-                                 List<Integer> allowedMenuIds) {
+    private MenuVO buildSubTree(GmMenuEntry menu, Map<Long, List<GmMenuEntry>> grouped,
+                                 List<Long> allowedMenuIds) {
         MenuVO vo = toVO(menu);
         List<MenuVO> children = new ArrayList<>();
         for (GmMenuEntry child : grouped.getOrDefault(menu.getId(), new ArrayList<>())) {

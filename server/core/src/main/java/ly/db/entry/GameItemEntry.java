@@ -82,6 +82,8 @@ public class GameItemEntry extends AbstractEntry {
   }
 
  public void setId(Long Id) {
+    checkPrimaryKeyChange(this.id, Id);
+    if (java.util.Objects.deepEquals(this.id, Id)) { return; }
     this.id = Id;
     autoAddCurVersion();
     markFieldDirty(0);
@@ -90,6 +92,7 @@ public class GameItemEntry extends AbstractEntry {
     return id;
   }
  public void setItemtype(Integer Itemtype) {
+    if (java.util.Objects.deepEquals(this.itemType, Itemtype)) { return; }
     this.itemType = Itemtype;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -98,6 +101,7 @@ public class GameItemEntry extends AbstractEntry {
     return itemType;
   }
  public void setItemname(String Itemname) {
+    if (java.util.Objects.deepEquals(this.itemName, Itemname)) { return; }
     this.itemName = Itemname;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -106,6 +110,7 @@ public class GameItemEntry extends AbstractEntry {
     return itemName;
   }
  public void setItemdesc(String Itemdesc) {
+    if (java.util.Objects.deepEquals(this.itemDesc, Itemdesc)) { return; }
     this.itemDesc = Itemdesc;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -114,6 +119,7 @@ public class GameItemEntry extends AbstractEntry {
     return itemDesc;
   }
  public void setQuantity(Integer Quantity) {
+    if (java.util.Objects.deepEquals(this.quantity, Quantity)) { return; }
     this.quantity = Quantity;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -122,6 +128,7 @@ public class GameItemEntry extends AbstractEntry {
     return quantity;
   }
  public void setOwnerid(Long Ownerid) {
+    if (java.util.Objects.deepEquals(this.ownerId, Ownerid)) { return; }
     this.ownerId = Ownerid;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -130,6 +137,7 @@ public class GameItemEntry extends AbstractEntry {
     return ownerId;
   }
  public void setAcquiretime(java.time.LocalDateTime Acquiretime) {
+    if (java.util.Objects.deepEquals(this.acquireTime, Acquiretime)) { return; }
     this.acquireTime = Acquiretime;
     autoAddCurVersion();
     markFieldDirty(6);
@@ -138,6 +146,7 @@ public class GameItemEntry extends AbstractEntry {
     return acquireTime;
   }
  public void setExpiretime(java.time.LocalDateTime Expiretime) {
+    if (java.util.Objects.deepEquals(this.expireTime, Expiretime)) { return; }
     this.expireTime = Expiretime;
     autoAddCurVersion();
     markFieldDirty(7);
@@ -146,6 +155,7 @@ public class GameItemEntry extends AbstractEntry {
     return expireTime;
   }
  public void setItemlevel(Integer Itemlevel) {
+    if (java.util.Objects.deepEquals(this.itemLevel, Itemlevel)) { return; }
     this.itemLevel = Itemlevel;
     autoAddCurVersion();
     markFieldDirty(8);
@@ -154,6 +164,7 @@ public class GameItemEntry extends AbstractEntry {
     return itemLevel;
   }
  public void setEnhancecount(Integer Enhancecount) {
+    if (java.util.Objects.deepEquals(this.enhanceCount, Enhancecount)) { return; }
     this.enhanceCount = Enhancecount;
     autoAddCurVersion();
     markFieldDirty(9);

@@ -44,7 +44,11 @@ public class PlayerCoroutineTask<T> {
             return;
         }
         try {
-            future.complete(localAction.apply(target));
+            T result;
+            try (ly.db.PersistenceScope persistence = ly.db.PersistenceScope.open()) {
+                result = localAction.apply(target);
+            }
+            future.complete(result);
         } catch (Throwable e) {
             future.completeExceptionally(e);
         } finally {

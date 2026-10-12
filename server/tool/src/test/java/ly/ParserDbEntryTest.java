@@ -25,7 +25,7 @@ public class ParserDbEntryTest {
     setField(tableInfo, "javaName", "Demo");
     setField(tableInfo, "tableName", "demo_table");
 
-    Object idField = newFieldInfo(parser, "id", "Integer", "主键", true);
+    Object idField = newFieldInfo(parser, "id", "Long", "主键", true);
     Object nameField = newFieldInfo(parser, "user_name", "String", "用户名", false);
 
     @SuppressWarnings("unchecked")
@@ -47,6 +47,8 @@ public class ParserDbEntryTest {
     assertTrue(entryContent.contains("private static final String[] DIRTY_FIELDS"));
     assertTrue(entryContent.contains("initDirtyState(DIRTY_FIELDS.length);"));
     assertTrue(entryContent.contains("markFieldDirty(0);"));
+    assertTrue(entryContent.contains("checkPrimaryKeyChange(this.id, Id);"));
+    assertTrue(entryContent.contains("java.util.Objects.deepEquals(this.user_name, UserName)"));
     assertTrue(entryContent.contains("markFieldDirty(1);"));
     assertTrue(entryContent.contains("protected String[] allDirtyFieldNames()"));
     assertTrue(helperContent.contains("asyncUpdate(DemoEntry DemoEntry, String... fileds)"));

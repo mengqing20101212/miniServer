@@ -12,7 +12,7 @@ public class ShareEnumConfigEntry extends AbstractEntry {
 
   @DbMeta.DbMasterKey(name="id", autoIncrement=true)
   @DbMeta.DbField(name="id")
-  private Integer id;
+  private Long id;
   @DbMeta.DbField(name="code")
   private String code;
   @DbMeta.DbField(name="name")
@@ -47,15 +47,18 @@ public class ShareEnumConfigEntry extends AbstractEntry {
     ShareEnumConfigEntryHelper.asyncUpdate(this);
   }
 
- public void setId(Integer Id) {
+ public void setId(Long Id) {
+    checkPrimaryKeyChange(this.id, Id);
+    if (java.util.Objects.deepEquals(this.id, Id)) { return; }
     this.id = Id;
     autoAddCurVersion();
     markFieldDirty(0);
   }
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
  public void setCode(String Code) {
+    if (java.util.Objects.deepEquals(this.code, Code)) { return; }
     this.code = Code;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -64,6 +67,7 @@ public class ShareEnumConfigEntry extends AbstractEntry {
     return code;
   }
  public void setName(String Name) {
+    if (java.util.Objects.deepEquals(this.name, Name)) { return; }
     this.name = Name;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -72,6 +76,7 @@ public class ShareEnumConfigEntry extends AbstractEntry {
     return name;
   }
  public void setConfigDesc(String ConfigDesc) {
+    if (java.util.Objects.deepEquals(this.config_desc, ConfigDesc)) { return; }
     this.config_desc = ConfigDesc;
     autoAddCurVersion();
     markFieldDirty(3);

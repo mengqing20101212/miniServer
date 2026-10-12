@@ -83,6 +83,8 @@ public class PlayerEntry extends AbstractEntry {
   }
 
  public void setId(Long Id) {
+    checkPrimaryKeyChange(this.id, Id);
+    if (java.util.Objects.deepEquals(this.id, Id)) { return; }
     this.id = Id;
     autoAddCurVersion();
     markFieldDirty(0);
@@ -91,6 +93,7 @@ public class PlayerEntry extends AbstractEntry {
     return id;
   }
  public void setName(String Name) {
+    if (java.util.Objects.deepEquals(this.name, Name)) { return; }
     this.name = Name;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -99,6 +102,7 @@ public class PlayerEntry extends AbstractEntry {
     return name;
   }
  public void setCreatetime(java.time.LocalDateTime Createtime) {
+    if (java.util.Objects.deepEquals(this.createTime, Createtime)) { return; }
     this.createTime = Createtime;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -107,6 +111,7 @@ public class PlayerEntry extends AbstractEntry {
     return createTime;
   }
  public void setLogintime(java.time.LocalDateTime Logintime) {
+    if (java.util.Objects.deepEquals(this.loginTime, Logintime)) { return; }
     this.loginTime = Logintime;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -115,6 +120,7 @@ public class PlayerEntry extends AbstractEntry {
     return loginTime;
   }
  public void setLogouttime(java.time.LocalDateTime Logouttime) {
+    if (java.util.Objects.deepEquals(this.logoutTime, Logouttime)) { return; }
     this.logoutTime = Logouttime;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -123,6 +129,7 @@ public class PlayerEntry extends AbstractEntry {
     return logoutTime;
   }
  public void setLevel(Integer Level) {
+    if (java.util.Objects.deepEquals(this.level, Level)) { return; }
     this.level = Level;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -131,6 +138,7 @@ public class PlayerEntry extends AbstractEntry {
     return level;
   }
  public void setViplevel(Integer Viplevel) {
+    if (java.util.Objects.deepEquals(this.vipLevel, Viplevel)) { return; }
     this.vipLevel = Viplevel;
     autoAddCurVersion();
     markFieldDirty(6);
@@ -139,6 +147,7 @@ public class PlayerEntry extends AbstractEntry {
     return vipLevel;
   }
  public void setModules(byte[] Modules) {
+    if (java.util.Objects.deepEquals(this.modules, Modules)) { return; }
     this.modules = Modules;
     autoAddCurVersion();
     markFieldDirty(7);
@@ -147,6 +156,7 @@ public class PlayerEntry extends AbstractEntry {
     return modules;
   }
  public void setGuidid(Long Guidid) {
+    if (java.util.Objects.deepEquals(this.guidId, Guidid)) { return; }
     this.guidId = Guidid;
     autoAddCurVersion();
     markFieldDirty(8);
@@ -155,6 +165,7 @@ public class PlayerEntry extends AbstractEntry {
     return guidId;
   }
  public void setAccount(String Account) {
+    if (java.util.Objects.deepEquals(this.account, Account)) { return; }
     this.account = Account;
     autoAddCurVersion();
     markFieldDirty(9);

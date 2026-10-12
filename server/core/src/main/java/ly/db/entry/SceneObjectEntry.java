@@ -95,6 +95,8 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setId(Long id) {
+    checkPrimaryKeyChange(this.id, id);
+    if (java.util.Objects.deepEquals(this.id, id)) { return; }
     this.id = id;
   }
 
@@ -103,6 +105,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setSceneId(String sceneId) {
+    if (java.util.Objects.deepEquals(this.sceneId, sceneId)) { return; }
     this.sceneId = sceneId;
     changed(0);
   }
@@ -112,6 +115,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setObjectId(Long objectId) {
+    if (java.util.Objects.deepEquals(this.objectId, objectId)) { return; }
     this.objectId = objectId;
     changed(1);
   }
@@ -121,6 +125,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setObjectType(Integer objectType) {
+    if (java.util.Objects.deepEquals(this.objectType, objectType)) { return; }
     this.objectType = objectType;
     changed(2);
   }
@@ -130,6 +135,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setOwnerId(Long ownerId) {
+    if (java.util.Objects.deepEquals(this.ownerId, ownerId)) { return; }
     this.ownerId = ownerId;
     changed(3);
   }
@@ -139,6 +145,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setX(Integer x) {
+    if (java.util.Objects.deepEquals(this.x, x)) { return; }
     this.x = x;
     changed(4);
   }
@@ -148,6 +155,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setY(Integer y) {
+    if (java.util.Objects.deepEquals(this.y, y)) { return; }
     this.y = y;
     changed(5);
   }
@@ -157,6 +165,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setStateVersion(Integer stateVersion) {
+    if (java.util.Objects.deepEquals(this.stateVersion, stateVersion)) { return; }
     this.stateVersion = stateVersion;
     changed(6);
   }
@@ -166,6 +175,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setDataTagMask(Long dataTagMask) {
+    if (java.util.Objects.deepEquals(this.dataTagMask, dataTagMask)) { return; }
     this.dataTagMask = dataTagMask;
     changed(7);
   }
@@ -184,6 +194,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setDataVersion(Integer dataVersion) {
+    if (java.util.Objects.deepEquals(this.dataVersion, dataVersion)) { return; }
     this.dataVersion = dataVersion;
     changed(9);
   }
@@ -193,6 +204,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setRevision(Long revision) {
+    if (java.util.Objects.deepEquals(this.revision, revision)) { return; }
     this.revision = revision;
     changed(10);
   }
@@ -202,6 +214,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setDeleted(Integer deleted) {
+    if (java.util.Objects.deepEquals(this.deleted, deleted)) { return; }
     this.deleted = deleted;
     changed(11);
   }
@@ -211,6 +224,7 @@ public final class SceneObjectEntry extends AbstractEntry {
   }
 
   public void setUpdateTime(LocalDateTime updateTime) {
+    if (java.util.Objects.deepEquals(this.updateTime, updateTime)) { return; }
     this.updateTime = updateTime;
     changed(12);
   }

@@ -29,6 +29,8 @@ public class MysqlConnector {
   private static final long MYSQL_INIT_RETRY_SLEEP_MS = 2000;
 
   HikariDataSource dataSource;
+  MysqlConnector(HikariDataSource source) { dataSource = source; }
+  Connection openConnection() throws java.sql.SQLException { return dataSource.getConnection(); }
   Logger logger = LoggerDef.DbLogger;
 
   // SQL 执行的最大超时时间
@@ -186,6 +188,7 @@ public class MysqlConnector {
    * @return 每行以数据库列名为 key 的 Map；异常时返回已收集结果或空列表
    */
   public List<Map<String, Object>> select(String sql, Object... params) {
+    MysqlService.getInstance().beforeQuery();
     long startTime = System.currentTimeMillis();
     List<Map<String, Object>> resultList = new ArrayList<>();
     try (Connection connection = dataSource.getConnection();
@@ -224,6 +227,7 @@ public class MysqlConnector {
    * <p>用于持久化主数据读取；查询失败时抛出异常，避免调用方把数据库故障误判为没有数据。
    */
   public List<Map<String, Object>> selectStrict(String sql, Object... params) {
+    MysqlService.getInstance().beforeQuery();
     long startTime = System.currentTimeMillis();
     List<Map<String, Object>> resultList = new ArrayList<>();
     try (Connection connection = dataSource.getConnection();

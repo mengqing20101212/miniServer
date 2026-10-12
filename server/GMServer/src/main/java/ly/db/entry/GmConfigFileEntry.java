@@ -50,6 +50,8 @@ public class GmConfigFileEntry extends AbstractEntry {
   }
 
   public void setId(Long id) {
+    checkPrimaryKeyChange(this.id, id);
+    if (java.util.Objects.deepEquals(this.id, id)) { return; }
     this.id = id;
     autoAddCurVersion();
     markFieldDirty(0);
@@ -60,6 +62,7 @@ public class GmConfigFileEntry extends AbstractEntry {
   }
 
   public void setVersion(String version) {
+    if (java.util.Objects.deepEquals(this.version, version)) { return; }
     this.version = version;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -70,6 +73,7 @@ public class GmConfigFileEntry extends AbstractEntry {
   }
 
   public void setFileName(String fileName) {
+    if (java.util.Objects.deepEquals(this.file_name, fileName)) { return; }
     this.file_name = fileName;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -80,6 +84,7 @@ public class GmConfigFileEntry extends AbstractEntry {
   }
 
   public void setContent(String content) {
+    if (java.util.Objects.deepEquals(this.content, content)) { return; }
     this.content = content;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -90,6 +95,7 @@ public class GmConfigFileEntry extends AbstractEntry {
   }
 
   public void setContentMd5(String contentMd5) {
+    if (java.util.Objects.deepEquals(this.content_md5, contentMd5)) { return; }
     this.content_md5 = contentMd5;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -100,6 +106,7 @@ public class GmConfigFileEntry extends AbstractEntry {
   }
 
   public void setFileSize(Integer fileSize) {
+    if (java.util.Objects.deepEquals(this.file_size, fileSize)) { return; }
     this.file_size = fileSize;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -110,6 +117,7 @@ public class GmConfigFileEntry extends AbstractEntry {
   }
 
   public void setCreateTime(LocalDateTime createTime) {
+    if (java.util.Objects.deepEquals(this.create_time, createTime)) { return; }
     this.create_time = createTime;
     autoAddCurVersion();
     markFieldDirty(6);
@@ -120,6 +128,7 @@ public class GmConfigFileEntry extends AbstractEntry {
   }
 
   public void setUpdateTime(LocalDateTime updateTime) {
+    if (java.util.Objects.deepEquals(this.update_time, updateTime)) { return; }
     this.update_time = updateTime;
     autoAddCurVersion();
     markFieldDirty(7);

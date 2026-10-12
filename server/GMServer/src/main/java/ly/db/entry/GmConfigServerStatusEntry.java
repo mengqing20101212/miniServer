@@ -49,21 +49,31 @@ public class GmConfigServerStatusEntry extends AbstractEntry {
   }
 
   public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; autoAddCurVersion(); markFieldDirty(0); }
+  public void setId(Long id) {
+    checkPrimaryKeyChange(this.id, id); if (java.util.Objects.deepEquals(this.id, id)) { return; }
+    this.id = id; autoAddCurVersion(); markFieldDirty(0); }
   public String getPublishId() { return publish_id; }
-  public void setPublishId(String publishId) { this.publish_id = publishId; autoAddCurVersion(); markFieldDirty(1); }
+  public void setPublishId(String publishId) { if (java.util.Objects.deepEquals(this.publish_id, publishId)) { return; }
+    this.publish_id = publishId; autoAddCurVersion(); markFieldDirty(1); }
   public String getVersion() { return version; }
-  public void setVersion(String version) { this.version = version; autoAddCurVersion(); markFieldDirty(2); }
+  public void setVersion(String version) { if (java.util.Objects.deepEquals(this.version, version)) { return; }
+    this.version = version; autoAddCurVersion(); markFieldDirty(2); }
   public String getServerId() { return server_id; }
-  public void setServerId(String serverId) { this.server_id = serverId; autoAddCurVersion(); markFieldDirty(3); }
+  public void setServerId(String serverId) { if (java.util.Objects.deepEquals(this.server_id, serverId)) { return; }
+    this.server_id = serverId; autoAddCurVersion(); markFieldDirty(3); }
   public String getServerType() { return server_type; }
-  public void setServerType(String serverType) { this.server_type = serverType; autoAddCurVersion(); markFieldDirty(4); }
+  public void setServerType(String serverType) { if (java.util.Objects.deepEquals(this.server_type, serverType)) { return; }
+    this.server_type = serverType; autoAddCurVersion(); markFieldDirty(4); }
   public String getStatus() { return status; }
-  public void setStatus(String status) { this.status = status; autoAddCurVersion(); markFieldDirty(5); }
+  public void setStatus(String status) { if (java.util.Objects.deepEquals(this.status, status)) { return; }
+    this.status = status; autoAddCurVersion(); markFieldDirty(5); }
   public String getErrorMsg() { return error_msg; }
-  public void setErrorMsg(String errorMsg) { this.error_msg = errorMsg; autoAddCurVersion(); markFieldDirty(6); }
+  public void setErrorMsg(String errorMsg) { if (java.util.Objects.deepEquals(this.error_msg, errorMsg)) { return; }
+    this.error_msg = errorMsg; autoAddCurVersion(); markFieldDirty(6); }
   public LocalDateTime getCreateTime() { return create_time; }
-  public void setCreateTime(LocalDateTime createTime) { this.create_time = createTime; autoAddCurVersion(); markFieldDirty(7); }
+  public void setCreateTime(LocalDateTime createTime) { if (java.util.Objects.deepEquals(this.create_time, createTime)) { return; }
+    this.create_time = createTime; autoAddCurVersion(); markFieldDirty(7); }
   public LocalDateTime getUpdateTime() { return update_time; }
-  public void setUpdateTime(LocalDateTime updateTime) { this.update_time = updateTime; autoAddCurVersion(); markFieldDirty(8); }
+  public void setUpdateTime(LocalDateTime updateTime) { if (java.util.Objects.deepEquals(this.update_time, updateTime)) { return; }
+    this.update_time = updateTime; autoAddCurVersion(); markFieldDirty(8); }
 }

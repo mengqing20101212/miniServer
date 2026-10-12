@@ -257,7 +257,7 @@ public class GamePlayer {
             }
             long now = System.currentTimeMillis();
             PlayerThreadContext.enter(player.getPlayerId());
-            try {
+            try (ly.db.PersistenceScope persistence = ly.db.PersistenceScope.open()) {
                 if (workItem.getType() == GamePlayerWorkItem.Type.PACKET) {
                     processPacket(workItem.getPacket());
                 } else if (workItem.getType() == GamePlayerWorkItem.Type.EVENT) {

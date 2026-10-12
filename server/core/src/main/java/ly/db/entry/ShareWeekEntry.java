@@ -14,7 +14,7 @@ public class ShareWeekEntry extends AbstractEntry {
 
   @DbMeta.DbMasterKey(name="id", autoIncrement=true)
   @DbMeta.DbField(name="id")
-  private Integer id;
+  private Long id;
   @DbMeta.DbField(name="code")
   private String code;
 
@@ -89,15 +89,18 @@ public class ShareWeekEntry extends AbstractEntry {
     ShareWeekEntryHelper.asyncUpdate(this);
   }
 
- public void setId(Integer Id) {
+ public void setId(Long Id) {
+    checkPrimaryKeyChange(this.id, Id);
+    if (java.util.Objects.deepEquals(this.id, Id)) { return; }
     this.id = Id;
     autoAddCurVersion();
     markFieldDirty(0);
   }
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
  public void setCode(String Code) {
+    if (java.util.Objects.deepEquals(this.code, Code)) { return; }
     this.code = Code;
     autoAddCurVersion();
     markFieldDirty(1);
@@ -106,6 +109,7 @@ public class ShareWeekEntry extends AbstractEntry {
     return code;
   }
  public void setDailyTime(java.time.LocalDate DailyTime) {
+    if (java.util.Objects.deepEquals(this.daily_time, DailyTime)) { return; }
     this.daily_time = DailyTime;
     autoAddCurVersion();
     markFieldDirty(2);
@@ -114,6 +118,7 @@ public class ShareWeekEntry extends AbstractEntry {
     return daily_time;
   }
  public void setOpen(String Open) {
+    if (java.util.Objects.deepEquals(this.open, Open)) { return; }
     this.open = Open;
     autoAddCurVersion();
     markFieldDirty(3);
@@ -122,6 +127,7 @@ public class ShareWeekEntry extends AbstractEntry {
     return open;
   }
  public void setHigh(String High) {
+    if (java.util.Objects.deepEquals(this.high, High)) { return; }
     this.high = High;
     autoAddCurVersion();
     markFieldDirty(4);
@@ -130,6 +136,7 @@ public class ShareWeekEntry extends AbstractEntry {
     return high;
   }
  public void setLow(String Low) {
+    if (java.util.Objects.deepEquals(this.low, Low)) { return; }
     this.low = Low;
     autoAddCurVersion();
     markFieldDirty(5);
@@ -138,6 +145,7 @@ public class ShareWeekEntry extends AbstractEntry {
     return low;
   }
  public void setClose(String Close) {
+    if (java.util.Objects.deepEquals(this.close, Close)) { return; }
     this.close = Close;
     autoAddCurVersion();
     markFieldDirty(6);
@@ -146,6 +154,7 @@ public class ShareWeekEntry extends AbstractEntry {
     return close;
   }
  public void setPreclose(String Preclose) {
+    if (java.util.Objects.deepEquals(this.preclose, Preclose)) { return; }
     this.preclose = Preclose;
     autoAddCurVersion();
     markFieldDirty(7);
@@ -154,6 +163,7 @@ public class ShareWeekEntry extends AbstractEntry {
     return preclose;
   }
  public void setVolume(Long Volume) {
+    if (java.util.Objects.deepEquals(this.volume, Volume)) { return; }
     this.volume = Volume;
     autoAddCurVersion();
     markFieldDirty(8);
@@ -162,6 +172,7 @@ public class ShareWeekEntry extends AbstractEntry {
     return volume;
   }
  public void setAmount(Long Amount) {
+    if (java.util.Objects.deepEquals(this.amount, Amount)) { return; }
     this.amount = Amount;
     autoAddCurVersion();
     markFieldDirty(9);
@@ -170,6 +181,7 @@ public class ShareWeekEntry extends AbstractEntry {
     return amount;
   }
  public void setAdjustflag(Integer Adjustflag) {
+    if (java.util.Objects.deepEquals(this.adjustflag, Adjustflag)) { return; }
     this.adjustflag = Adjustflag;
     autoAddCurVersion();
     markFieldDirty(10);
@@ -178,6 +190,7 @@ public class ShareWeekEntry extends AbstractEntry {
     return adjustflag;
   }
  public void setTurn(String Turn) {
+    if (java.util.Objects.deepEquals(this.turn, Turn)) { return; }
     this.turn = Turn;
     autoAddCurVersion();
     markFieldDirty(11);
@@ -186,6 +199,7 @@ public class ShareWeekEntry extends AbstractEntry {
     return turn;
   }
  public void setPctchg(String Pctchg) {
+    if (java.util.Objects.deepEquals(this.pctChg, Pctchg)) { return; }
     this.pctChg = Pctchg;
     autoAddCurVersion();
     markFieldDirty(12);

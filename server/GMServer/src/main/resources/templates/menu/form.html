@@ -301,7 +301,7 @@
             // Set parent
             var parentId = menu.parentId || 0;
             var parentSelect = document.getElementById('parentId');
-            if (parentId && parentId !== 0) {
+            if (parentId && String(parentId) !== '0') {
                 for (var i = 0; i < parentSelect.options.length; i++) {
                     if (String(parentSelect.options[i].value) === String(parentId)) {
                         parentSelect.value = parentId;
@@ -330,7 +330,7 @@
         }
 
         var permission = document.getElementById('permission').value.trim();
-        var parentId = parseInt(document.getElementById('parentId').value) || 0;
+        var parentId = document.getElementById('parentId').value || '0';
         var path = document.getElementById('path').value.trim();
         var icon = document.getElementById('icon').value.trim();
         var sortOrder = parseInt(document.getElementById('sortOrder').value) || 0;

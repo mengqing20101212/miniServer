@@ -22,13 +22,15 @@ public class SystemIntegrationTest
     @Test
     public void testFullSystemConnectivity()
     {
+        org.junit.Assume.assumeTrue("External integration environment not configured: MINISERVER_TEST_MYSQL_URL", System.getenv("MINISERVER_TEST_MYSQL_URL") != null);
+        org.junit.Assume.assumeTrue("External integration environment not configured: MINISERVER_TEST_REDIS_HOST", System.getenv("MINISERVER_TEST_REDIS_HOST") != null);
         boolean mysqlSuccess = false;
         boolean redisSuccess = false;
         
         // Test MySQL connection
-        String mysqlUrl = "jdbc:mysql://118.25.76.117:3306/pick_money";
-        String mysqlUsername = "root";
-        String mysqlPassword = "Ly@2026Root!8899";
+        String mysqlUrl = System.getenv("MINISERVER_TEST_MYSQL_URL");
+        String mysqlUsername = System.getenv("MINISERVER_TEST_MYSQL_USER");
+        String mysqlPassword = System.getenv("MINISERVER_TEST_MYSQL_PASSWORD");
 
         try {
             Connection conn = DriverManager.getConnection(mysqlUrl, mysqlUsername, mysqlPassword);
@@ -61,7 +63,7 @@ public class SystemIntegrationTest
         poolConfig.setTestOnReturn(true);
         poolConfig.setTestWhileIdle(true);
         
-        try (JedisPool jedisPool = new JedisPool(poolConfig, "139.224.80.204", 6379, 2000, "ly.1006897725")) {
+        try (JedisPool jedisPool = new JedisPool(poolConfig, System.getenv("MINISERVER_TEST_REDIS_HOST"), Integer.parseInt(System.getenv().getOrDefault("MINISERVER_TEST_REDIS_PORT", "6379")), 2000, System.getenv("MINISERVER_TEST_REDIS_PASSWORD"))) {
             try (Jedis jedis = jedisPool.getResource()) {
                 // 测试连接
                 String pong = jedis.ping();

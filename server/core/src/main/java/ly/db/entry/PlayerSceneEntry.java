@@ -95,6 +95,8 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setId(Long id) {
+    checkPrimaryKeyChange(this.id, id);
+    if (java.util.Objects.deepEquals(this.id, id)) { return; }
     this.id = id;
   }
 
@@ -103,6 +105,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setPlayerId(Long playerId) {
+    if (java.util.Objects.deepEquals(this.playerId, playerId)) { return; }
     this.playerId = playerId;
     changed(0);
   }
@@ -112,6 +115,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setSceneId(String sceneId) {
+    if (java.util.Objects.deepEquals(this.sceneId, sceneId)) { return; }
     this.sceneId = sceneId;
     changed(1);
   }
@@ -121,6 +125,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setCityObjectId(Long cityObjectId) {
+    if (java.util.Objects.deepEquals(this.cityObjectId, cityObjectId)) { return; }
     this.cityObjectId = cityObjectId;
     changed(2);
   }
@@ -130,6 +135,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setAllianceId(Long allianceId) {
+    if (java.util.Objects.deepEquals(this.allianceId, allianceId)) { return; }
     this.allianceId = allianceId;
     changed(3);
   }
@@ -139,6 +145,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setCityX(Integer cityX) {
+    if (java.util.Objects.deepEquals(this.cityX, cityX)) { return; }
     this.cityX = cityX;
     changed(4);
   }
@@ -148,6 +155,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setCityY(Integer cityY) {
+    if (java.util.Objects.deepEquals(this.cityY, cityY)) { return; }
     this.cityY = cityY;
     changed(5);
   }
@@ -157,6 +165,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setCityLevel(Integer cityLevel) {
+    if (java.util.Objects.deepEquals(this.cityLevel, cityLevel)) { return; }
     this.cityLevel = cityLevel;
     changed(6);
   }
@@ -166,6 +175,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setCityStateVersion(Integer cityStateVersion) {
+    if (java.util.Objects.deepEquals(this.cityStateVersion, cityStateVersion)) { return; }
     this.cityStateVersion = cityStateVersion;
     changed(7);
   }
@@ -184,6 +194,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setDataVersion(Integer dataVersion) {
+    if (java.util.Objects.deepEquals(this.dataVersion, dataVersion)) { return; }
     this.dataVersion = dataVersion;
     changed(9);
   }
@@ -193,6 +204,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setRevision(Long revision) {
+    if (java.util.Objects.deepEquals(this.revision, revision)) { return; }
     this.revision = revision;
     changed(10);
   }
@@ -202,6 +214,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setDeleted(Integer deleted) {
+    if (java.util.Objects.deepEquals(this.deleted, deleted)) { return; }
     this.deleted = deleted;
     changed(11);
   }
@@ -211,6 +224,7 @@ public final class PlayerSceneEntry extends AbstractEntry {
   }
 
   public void setUpdateTime(LocalDateTime updateTime) {
+    if (java.util.Objects.deepEquals(this.updateTime, updateTime)) { return; }
     this.updateTime = updateTime;
     changed(12);
   }
