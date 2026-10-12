@@ -9,7 +9,14 @@ public final class PersistenceScope implements AutoCloseable {
   private static final ThreadLocal<PersistenceScope> CURRENT = new ThreadLocal<>();
   private final PersistenceScope parent;
   private final Set<AbstractEntry> dirty = Collections.newSetFromMap(new IdentityHashMap<>());
+  private final java.util.Map<Object, Runnable> preparations = new IdentityHashMap<>();
   private boolean closed;
+  /** 同一保存区间按对象合并快照准备；无作用域时立即提交。 */
+  public static void registerSnapshotPreparation(Object owner, Runnable preparation) {
+    PersistenceScope scope = CURRENT.get();
+    if (scope == null) { preparation.run(); }
+    else { scope.preparations.put(owner, preparation); }
+  }
   private PersistenceScope() { parent = CURRENT.get(); CURRENT.set(this); }
   public static PersistenceScope open() { return new PersistenceScope(); }
   static void changed(AbstractEntry entry) {
@@ -34,6 +41,11 @@ public final class PersistenceScope implements AutoCloseable {
     scope.flush();
   }
   private void flush() {
+    for (Object owner : preparations.keySet().toArray()) {
+      Runnable preparation = preparations.get(owner);
+      preparation.run();
+      preparations.remove(owner);
+    }
     for (AbstractEntry entry : dirty.toArray(new AbstractEntry[0])) {
       if (entry.canSave()) { MysqlService.getInstance().update(entry); }
       dirty.remove(entry);

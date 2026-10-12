@@ -514,6 +514,12 @@ public class MysqlService {
    * @param entry
    * @return true 已接受；运行时持久化失败抛出异常
    */
+  /** 分配业务实例 ID，须在 RocksService 初始化后调用。 */
+  public long generateEntityId() {
+    if (idGenerator == null) { throw new IllegalStateException("ID generator not initialized"); }
+    return idGenerator.nextId();
+  }
+
   public boolean save(AbstractEntry entry) {
     if (rocksService != null) { return acceptEntity(entry, false, null); }
     if (entry == null) {

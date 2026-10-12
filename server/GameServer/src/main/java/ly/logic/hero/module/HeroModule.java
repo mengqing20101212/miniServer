@@ -1,43 +1,54 @@
 package ly.logic.hero.module;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.baidu.bjf.remoting.protobuf.FieldType;
-import com.baidu.bjf.remoting.protobuf.annotation.EnableZigZap;
+import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 
-import ly.config.HeroInfoConfig;
 import ly.config.HeroInfoConfigManager;
+import ly.db.entry.PlayerHeroEntry;
 import ly.logic.player.AbstractModule;
 import ly.logic.player.event.PlayerEventParam;
 import ly.logic.player.event.PlayerEventType;
 
-/**
- * 英雄模块
- * 继承 AbstractModule，自身为 @ProtobufClass，框架自动处理序列化/反序列化。
- */
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/** 英雄记录独立保存，模块 Blob 只保存容量等少量状态。 */
 @ProtobufClass
-@EnableZigZap
 public class HeroModule extends AbstractModule {
+    @Ignore private final List<PlayerHeroEntry> heroes = new ArrayList<>();
 
-    @Protobuf(fieldType = FieldType.OBJECT, order = 1, required = false)
-    public List<HeroBean> heroList = new ArrayList<>();
+    @Protobuf(fieldType = FieldType.INT32, order = 1, required = false)
+    private int maxHeroCount = 100;
 
-    @Protobuf(fieldType = FieldType.INT32, order = 2, required = false)
-    public int maxHeroCount = 100; // 最大英雄数量
+    public int getMaxHeroCount() {
+        return maxHeroCount;
+    }
+
+    public void setMaxHeroCount(int value) {
+        if (value < heroes.size()) {
+            throw new IllegalArgumentException("capacity below hero count");
+        }
+        if (maxHeroCount == value) {
+            return;
+        }
+        maxHeroCount = value;
+        markModuleDataDirty();
+    }
 
     @Override
     public void onLoadData() {
-        // 框架自动反序列化，无需特殊逻辑
+        heroes.clear();
+        heroes.addAll(player.getPlayerData().loadHeroEntries());
+        for (PlayerHeroEntry entry : heroes) {
+            player.getPlayerData().registerLoadedEntity(entry);
+        }
     }
 
     @Override
-    public void onOpenFunction() {
-        // 功能开放时的初始化
-    }
+    public void onOpenFunction() {}
 
     @Override
     public List<PlayerEventType> getRegisterEventTypes() {
@@ -45,64 +56,51 @@ public class HeroModule extends AbstractModule {
     }
 
     @Override
-    public void onEvent(PlayerEventParam param) {
-        // 不处理事件
+    public void onEvent(PlayerEventParam event) {}
+
+    public List<PlayerHeroEntry> getHeroList() {
+        return Collections.unmodifiableList(heroes);
     }
 
-    /**
-     * 获取英雄列表
-     */
-    public List<HeroBean> getHeroList() {
-        return heroList;
-    }
-
-    /**
-     * 获取单个英雄
-     */
-    public HeroBean getHero(long heroUid) {
-        for (HeroBean hero : heroList) {
-            if (hero.heroUid == heroUid) {
-                return hero;
+    public PlayerHeroEntry getHero(long uid) {
+        for (PlayerHeroEntry entry : heroes) {
+            if (entry.getId() == uid) {
+                return entry;
             }
         }
         return null;
     }
 
-    /**
-     * 添加英雄
-     */
-    public HeroBean addHero(int heroId) {
-        if (heroList.size() >= maxHeroCount) {
+    public PlayerHeroEntry addHero(int heroId) {
+        if (heroes.size() >= maxHeroCount
+                || HeroInfoConfigManager.getInstance().getConfigMap().get(heroId) == null) {
             return null;
         }
-        long heroUid = generateHeroUid(heroId);
-        if (getHero(heroUid) != null) {
-            return null;
+        for (PlayerHeroEntry entry : heroes) {
+            if (entry.getHeroId() == heroId) {
+                return null;
+            }
         }
-        HeroInfoConfig heroInfoConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(heroId);
-        if (heroInfoConfig == null) {
-            return null;
-        }
-        if (heroInfoConfig.id != heroId) {
-            return null;
-        }
-
-        HeroBean hero = new HeroBean();
-        hero.heroUid = heroUid;
-        hero.heroId = heroId;
-        hero.level = 1;
-        hero.star = 1;
-        hero.awaken = 0;
-        hero.exp = 0;
-        heroList.add(hero);
-        return hero;
+        PlayerHeroEntry entry = new PlayerHeroEntry();
+        entry.setId(player.getPlayerData().generateEntityId());
+        entry.setPlayerId(player.getPlayerId());
+        entry.setHeroId(heroId);
+        entry.setLevel(1);
+        entry.setStar(1);
+        entry.setAwaken(0);
+        entry.setExp(0L);
+        heroes.add(entry);
+        player.getPlayerData().registerNewEntity(entry);
+        return entry;
     }
 
-    /**
-     * 生成英雄唯一ID
-     * 使用 playerId * 1000000 + heroId，避免 playerId > 10000 时冲突
-     */
-    private long generateHeroUid(int heroId) {
-        return player.getPlayerId() * 1000000L + heroId;
+    public boolean removeHero(long uid) {
+        PlayerHeroEntry entry = getHero(uid);
+        if (entry == null) {
+            return false;
+        }
+        heroes.remove(entry);
+        player.getPlayerData().registerDeletedEntity(entry);
+        return true;
     }
 }

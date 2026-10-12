@@ -34,6 +34,10 @@ final class GmPlayerReflectionUtils {
             throw new IllegalArgumentException("path is blank");
         }
         String[] parts = path.split("\\.");
+        if (root instanceof ly.logic.resource.module.ResourceModule
+                && (parts.length != 3 || !parts[0].equals("resources") || !parts[2].equals("amount"))) {
+            throw new IllegalArgumentException("资源只能修改已有记录的 amount；增删须通过资源模块入口");
+        }
         Object current = root;
         for (int i = 0; i < parts.length - 1; i++) {
             current = readPart(current, parts[i]);
@@ -133,6 +137,9 @@ final class GmPlayerReflectionUtils {
                 return;
             }
             Class<?> valueType = oldKey == null || map.get(oldKey) == null ? Object.class : map.get(oldKey).getClass();
+            if (oldKey != null && map.get(oldKey) instanceof ly.db.AbstractEntry) {
+                throw new IllegalArgumentException("不能替换托管 Entity，请修改其字段");
+            }
             map.put(oldKey == null ? indexed.name() : oldKey, MAPPER.convertValue(parsed, valueType));
             return;
         }
@@ -186,6 +193,7 @@ final class GmPlayerReflectionUtils {
     private static void writeIndex(Object value, int index, Object newValue, Class<?> fallbackType) {
         if (value instanceof List list) {
             Object old = list.get(index);
+            if (old instanceof ly.db.AbstractEntry) { throw new IllegalArgumentException("不能替换托管 Entity"); }
             Class<?> targetType = old == null ? fallbackType : old.getClass();
             list.set(index, MAPPER.convertValue(newValue, targetType));
             return;
@@ -210,8 +218,16 @@ final class GmPlayerReflectionUtils {
 
     private static void setFieldValue(Object target, Field field, Object value) {
         try {
-            field.setAccessible(true);
-            field.set(target, value);
+            String setter = "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1);
+            try {
+                target.getClass().getMethod(setter, field.getType()).invoke(target, value);
+            } catch (NoSuchMethodException missing) {
+                if (target instanceof ly.db.AbstractEntry || target instanceof ly.logic.player.AbstractModule) {
+                    throw new IllegalArgumentException("field has no managed setter: " + field.getName());
+                }
+                field.setAccessible(true);
+                field.set(target, value);
+            }
         } catch (Exception e) {
             throw new IllegalArgumentException("write field failed: " + field.getName(), e);
         }

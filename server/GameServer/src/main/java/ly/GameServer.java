@@ -9,7 +9,6 @@ import ly.logic.move.MoveController;
 import ly.logic.ping.PingController;
 import ly.logic.player.Gate2GameRpcGameCallController;
 import ly.logic.player.PlayerManager;
-import ly.logic.player.persistence.PlayerModulePersistenceService;
 import ly.logic.rank.GameRankBootstrap;
 import ly.logic.scene.SceneProxyController;
 import ly.net.GameConnectSessionProvider;
@@ -34,8 +33,7 @@ public class GameServer {
         ServerContext.startUp(resolved.nacosUrl, ServerTypeEnum.GAME.getType(), resolved.serverId, resolved.env, new GameConnectSessionProvider());
         GameRankBootstrap.start();
         Runtime.getRuntime().addShutdownHook(Thread.ofPlatform().unstarted(() -> {
-            PlayerManager.getInstance().flushAllPlayerModules();
-            PlayerModulePersistenceService.getInstance().shutdown(5_000L);
+            PlayerManager.getInstance().flushAllOnlinePlayerChanges();
         }));
 
     }

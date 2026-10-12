@@ -134,11 +134,24 @@ public class PlayerManager {
         playerMap.put(player.getPlayerId(), player);
     }
 
-    public void flushAllPlayerModules() {
+    public void flushAllOnlinePlayerChanges() {
+        java.util.List<java.util.concurrent.CompletableFuture<Boolean>> pending = new java.util.ArrayList<>();
         for (Player player : playerMap.values()) {
-            if (player != null && player.getPlayerData() != null) {
-                player.getPlayerData().flushAsync();
-            }
+            if (player == null || player.getPlayerData() == null || player.getGamePlayer() == null) { continue; }
+            ly.logic.player.coroutine.PlayerCoroutineTask<Boolean> task =
+                    new ly.logic.player.coroutine.PlayerCoroutineTask<>(0, player.getPlayerId(), "停服保存玩家", target -> {
+                        return target.getPlayerData().flushPendingChanges();
+                    });
+            if (player.getGamePlayer().addCoroutineTask(task)) { pending.add(task.future()); }
+        }
+        try {
+            java.util.concurrent.CompletableFuture.allOf(
+                    pending.toArray(new java.util.concurrent.CompletableFuture<?>[0]))
+                    .get(5, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            LoggerDef.DbLogger.error("停服保存玩家未全部完成", e);
         }
     }
 

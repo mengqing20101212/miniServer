@@ -1,5 +1,7 @@
 package ly.logic.hero.module;
 
+import ly.db.entry.PlayerHeroEntry;
+
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import ly.logic.player.ModuleEnum;
@@ -15,8 +17,7 @@ import static org.junit.Assert.*;
 
 /**
  * HeroModule 单元测试
- * 注：不使用 onLoadData()/saveData()，因为 PlayerData 构造函数会触发的 protobuf
- * 类不在 classpath 上。改用反射直接管理 moduleData。
+ * 使用内存持久化边界验证英雄业务，不依赖外部数据库。
  */
 public class HeroModuleTest {
 
@@ -67,18 +68,17 @@ public class HeroModuleTest {
     @Test
     public void testAddHero() {
         // 添加英雄ID为1的英雄
-        HeroBean hero = heroModule.addHero(heroId(0));
+        PlayerHeroEntry hero = heroModule.addHero(heroId(0));
 
         assertNotNull("添加的英雄不应为空", hero);
-        assertEquals("英雄ID应为1", heroId(0), hero.heroId);
-        assertEquals("初始等级应为1", 1, hero.level);
-        assertEquals("初始星级应为1", 1, hero.star);
-        assertEquals("初始觉醒应为0", 0, hero.awaken);
-        assertEquals("初始经验应为0", 0L, hero.exp);
+        assertEquals("英雄ID应为1", heroId(0), hero.getHeroId().intValue());
+        assertEquals("初始等级应为1", 1, hero.getLevel().intValue());
+        assertEquals("初始星级应为1", 1, hero.getStar().intValue());
+        assertEquals("初始觉醒应为0", 0, hero.getAwaken().intValue());
+        assertEquals("初始经验应为0", 0L, hero.getExp().longValue());
 
         // 验证heroUid生成规则
-        long expectedUid = mockPlayer.getPlayerId() * 1000000L + heroId(0);
-        assertEquals("heroUid应按规则生成", expectedUid, hero.heroUid);
+        assertTrue("heroUid由主键生成器分配", hero.getId() > 0);
 
         // 验证英雄列表包含新英雄
         assertTrue("英雄列表应包含新英雄", heroModule.getHeroList().contains(hero));
@@ -90,15 +90,15 @@ public class HeroModuleTest {
     @Test
     public void testGetHero() {
         // 添加一个英雄
-        HeroBean addedHero = heroModule.addHero(heroId(1));
-        long heroUid = addedHero.heroUid;
+        PlayerHeroEntry addedHero = heroModule.addHero(heroId(1));
+        long heroUid = addedHero.getId();
 
         // 获取英雄
-        HeroBean hero = heroModule.getHero(heroUid);
+        PlayerHeroEntry hero = heroModule.getHero(heroUid);
 
         assertNotNull("应能获取到英雄", hero);
-        assertEquals("获取的英雄ID应正确", hero.heroId, addedHero.heroId);
-        assertEquals("获取的heroUid应正确", hero.heroUid, addedHero.heroUid);
+        assertEquals("获取的英雄ID应正确", hero.getHeroId(), addedHero.getHeroId());
+        assertEquals("获取的heroUid应正确", hero.getId(), addedHero.getId());
     }
 
     /**
@@ -106,7 +106,7 @@ public class HeroModuleTest {
      */
     @Test
     public void testGetNonExistentHero() {
-        HeroBean hero = heroModule.getHero(999999L);
+        PlayerHeroEntry hero = heroModule.getHero(999999L);
         assertNull("不存在的英雄应返回null", hero);
     }
 
@@ -150,16 +150,16 @@ public class HeroModuleTest {
         MockPlayer player1 = new MockPlayer(1L);
         HeroModule module1 = new HeroModule();
         setField(module1, "player", player1);
-        HeroBean hero1 = module1.addHero(heroId(0));
+        PlayerHeroEntry hero1 = module1.addHero(heroId(0));
 
         // 玩家2添加相同ID的英雄
         MockPlayer player2 = new MockPlayer(2L);
         HeroModule module2 = new HeroModule();
         setField(module2, "player", player2);
-        HeroBean hero2 = module2.addHero(heroId(0));
+        PlayerHeroEntry hero2 = module2.addHero(heroId(0));
 
         // 验证heroUid不同
-        assertNotEquals("不同玩家的heroUid应不同", hero1.heroUid, hero2.heroUid);
+        assertNotEquals("不同玩家的heroUid应不同", hero1.getId(), hero2.getId());
     }
 
     /**
@@ -170,6 +170,8 @@ public class HeroModuleTest {
 
         public MockPlayer(long playerId) {
             this.playerId = playerId;
+            ly.db.entry.PlayerEntry entry = new ly.db.entry.PlayerEntry(); entry.setId(playerId);
+            setPlayerData(ly.logic.player.PlayerDataTestFactory.create(entry));
         }
 
         @Override
@@ -179,7 +181,7 @@ public class HeroModuleTest {
 
         @Override
         public PlayerData getPlayerData() {
-            return null;
+            return super.getPlayerData();
         }
     }
 }

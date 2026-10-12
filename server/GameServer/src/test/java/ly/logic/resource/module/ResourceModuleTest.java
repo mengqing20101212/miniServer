@@ -30,7 +30,6 @@ public class ResourceModuleTest {
         // 初始化资源模块
         resourceModule = new ResourceModule();
         setField(resourceModule, "player", mockPlayer);
-        setField(resourceModule, "moduleData", new ResourceModuleData());
     }
 
     @After
@@ -231,6 +230,8 @@ public class ResourceModuleTest {
 
         public MockPlayer(long playerId) {
             this.playerId = playerId;
+            ly.db.entry.PlayerEntry entry = new ly.db.entry.PlayerEntry(); entry.setId(playerId);
+            setPlayerData(ly.logic.player.PlayerDataTestFactory.create(entry));
         }
 
         @Override
@@ -240,7 +241,7 @@ public class ResourceModuleTest {
 
         @Override
         public PlayerData getPlayerData() {
-            return null;
+            return super.getPlayerData();
         }
     }
 }

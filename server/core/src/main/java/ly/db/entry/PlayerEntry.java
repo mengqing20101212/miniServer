@@ -9,7 +9,7 @@ import ly.db.DbMeta;
 @DbMeta.DbTable(name = "player")
 public class PlayerEntry extends AbstractEntry {
   private static final String[] DIRTY_FIELDS = {
-      "id", "name", "createTime", "loginTime", "logoutTime", "level", "vipLevel", "modules", "guidId", "account"
+      "id", "name", "createTime", "loginTime", "logoutTime", "level", "vipLevel", "guidId", "account"
   };
 
 
@@ -42,9 +42,6 @@ public class PlayerEntry extends AbstractEntry {
   @DbMeta.DbField(name="vipLevel")
   private Integer vipLevel;
 
-  /**各个模块的养成数据*/
-  @DbMeta.DbField(name="modules", columnType="MEDIUMBLOB")
-  private byte[] modules;
 
   /**工会id*/
   @DbMeta.DbField(name="guidId")
@@ -146,15 +143,6 @@ public class PlayerEntry extends AbstractEntry {
   public Integer getViplevel() {
     return vipLevel;
   }
- public void setModules(byte[] Modules) {
-    if (java.util.Objects.deepEquals(this.modules, Modules)) { return; }
-    this.modules = Modules;
-    autoAddCurVersion();
-    markFieldDirty(7);
-  }
-  public byte[] getModules() {
-    return modules;
-  }
  public void setGuidid(Long Guidid) {
     if (java.util.Objects.deepEquals(this.guidId, Guidid)) { return; }
     this.guidId = Guidid;
@@ -189,7 +177,6 @@ public class PlayerEntry extends AbstractEntry {
         ", logoutTime="+logoutTime+
         ", level="+level+
         ", vipLevel="+vipLevel+
-        ", modules="+modules+
         ", guidId="+guidId+
         ", account="+account
         + '}';

@@ -9,6 +9,9 @@ public abstract class AbstractEntry implements Serializable {
   private long saveVersion;
   private transient boolean managed;
   private transient boolean deleted;
+  private transient Runnable changeListener;
+  /** 玩家聚合由所属玩家收集变化，保持与 Blob 相同的保存边界。 */
+  public final void bindPersistenceChangeListener(Runnable listener) { changeListener = listener; }
   boolean canSave() { return curVersion != saveVersion; }
   protected void autoAddCurVersion() {
     if (deleted) { throw new IllegalStateException("Deleted entity cannot be modified"); }
@@ -22,7 +25,8 @@ public abstract class AbstractEntry implements Serializable {
   protected final void initDirtyState(int ignored) {}
   protected abstract String[] allDirtyFieldNames();
   protected final void markFieldDirty(int ignored) {
-    if (managed && MysqlService.getInstance().isRocksEnabled()) { PersistenceScope.changed(this); }
+    if (changeListener != null) { changeListener.run(); }
+    else if (managed && MysqlService.getInstance().isRocksEnabled()) { PersistenceScope.changed(this); }
   }
   /** Compatibility for callers; persistence always snapshots every mapped column. */
   public final String[] getDirtyFieldNames() {

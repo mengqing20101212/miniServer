@@ -29,7 +29,11 @@ public class PlayerModuleSchemaGenerationTest {
                 "UNIQUE KEY `uk_player_module_player_id_module_id` (`player_id`, `module_id`)"));
         assertTrue(moduleSql.contains("`module_data` MEDIUMBLOB NOT NULL"));
         assertTrue(moduleSql.contains("`update_time` DATETIME(6) NOT NULL"));
-        assertTrue(playerSql.contains("`modules` MEDIUMBLOB DEFAULT NULL"));
+        assertTrue(!playerSql.contains("`modules`"));
+        String heroSql = (String) method.invoke(generator, ly.db.entry.PlayerHeroEntry.class);
+        String resourceSql = (String) method.invoke(generator, ly.db.entry.PlayerResourceEntry.class);
+        assertTrue(heroSql.contains("`player_id`, `hero_id`"));
+        assertTrue(resourceSql.contains("`player_id`, `resource_type`"));
     }
 
     @Test

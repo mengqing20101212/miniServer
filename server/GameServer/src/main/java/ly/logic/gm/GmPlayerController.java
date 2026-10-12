@@ -135,11 +135,7 @@ public class GmPlayerController implements IGameController {
       for (GmPlayer.gmPlayerFieldChange change : request.getChangesList()) {
         GmPlayerReflectionUtils.patch(module, change.getPath(), change.getNewValue());
       }
-      if (!module.saveData()) {
-        return updateError(
-            player.getPlayerId(), moduleEnum.name(), SAVE_UNSUPPORTED, "模块暂不支持持久化");
-      }
-      player.getPlayerData().flushAsync();
+      player.getPlayerData().flushPendingChanges();
       return GmPlayer.scGmUpdatePlayerModule.newBuilder()
           .setCode(OK)
           .setPlayerId(player.getPlayerId())

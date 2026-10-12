@@ -185,23 +185,10 @@ cmd.exe /c "cd /d D:\WORK\me\miniServer\server\BotServer && D:\Soft\env\Java\jdk
 
 ### 模块框架说明
 
-所有业务模块继承 `AbstractModule`，使用 `PlayerModuleData` 存储：
-
-```java
-public class HeroModule extends AbstractModule {
-    private HeroModuleData moduleData;
-    
-    @Override
-    public void onLoadData() {
-        // 从 player.getPlayerData() 反序列化
-    }
-    
-    @Override
-    public boolean saveData() {
-        // Protobuf 序列化到 player.getPlayerData()
-    }
-}
-```
+业务模块继承 `AbstractModule`，小状态采用模块级 Protobuf Blob，英雄和资源采用独立 Entity。
+业务 setter / 模块方法自动标脏，不调用 `saveData()` 或手动 `update()`。
+保存作用域统一准备 Blob 与 Entity 快照，再同步交给 RocksService，MySQL 后台提交。
+详细约束见 `docs/PLAYER_MODULE_PERSISTENCE_PLAN.md`。
 
 ### 协议消息处理
 

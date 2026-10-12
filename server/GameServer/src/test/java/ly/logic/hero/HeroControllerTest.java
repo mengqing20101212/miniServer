@@ -1,14 +1,13 @@
 package ly.logic.hero;
 
 import ly.config.ResourceType;
-import ly.logic.hero.module.HeroBean;
+import ly.db.entry.PlayerHeroEntry;
 import ly.logic.hero.module.HeroModule;
 import ly.logic.player.ModuleEnum;
 import ly.logic.player.Player;
 import ly.logic.player.PlayerData;
 import ly.logic.player.PlayerDataTestFactory;
 import ly.logic.resource.module.ResourceModule;
-import ly.logic.resource.module.ResourceModuleData;
 import ly.net.GameConnectSession;
 import ly.net.GameHandlerContext;
 import ly.net.GamePlayer;
@@ -67,7 +66,6 @@ public class HeroControllerTest {
 
         resourceModule = new ResourceModule();
         resourceModule.init(mockPlayer);
-        setField(resourceModule, "moduleData", new ResourceModuleData());
 
         // 给玩家添加默认资源
         resourceModule.addResource(ResourceType.GOLD, 100000);
@@ -164,12 +162,12 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroLevelUp() {
         // 添加一个英雄
-        HeroBean hero = heroModule.addHero(validHeroId(0));
-        int initialLevel = hero.level;
+        PlayerHeroEntry hero = heroModule.addHero(validHeroId(0));
+        int initialLevel = hero.getLevel();
 
         // 创建升级请求（使用经验道具 ID 列表）
         Hero.CS_HeroLevelUp request = Hero.CS_HeroLevelUp.newBuilder()
-                .setHeroUid(hero.heroUid)
+                .setHeroUid(hero.getId())
                 .addExpItemIds(1) // 添加一个经验道具 ID
                 .build();
 
@@ -216,14 +214,14 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroLevelUpInsufficientExpItems() {
         // 添加一个英雄
-        HeroBean hero = heroModule.addHero(validHeroId(0));
+        PlayerHeroEntry hero = heroModule.addHero(validHeroId(0));
 
         // 清空经验道具
         resourceModule.deductResource(ResourceType.EXP_ITEM, 5000);
 
         // 创建升级请求
         Hero.CS_HeroLevelUp request = Hero.CS_HeroLevelUp.newBuilder()
-                .setHeroUid(hero.heroUid)
+                .setHeroUid(hero.getId())
                 .addExpItemIds(1)
                 .build();
 
@@ -241,11 +239,11 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroStarUp() {
         // 添加一个英雄
-        HeroBean hero = heroModule.addHero(validHeroId(0));
+        PlayerHeroEntry hero = heroModule.addHero(validHeroId(0));
 
         // 创建升星请求
         Hero.CS_HeroStarUp request = Hero.CS_HeroStarUp.newBuilder()
-                .setHeroUid(hero.heroUid)
+                .setHeroUid(hero.getId())
                 .build();
 
         // 调用处理器
@@ -281,11 +279,11 @@ public class HeroControllerTest {
     @Test
     public void testHandleHeroAwaken() {
         // 添加一个英雄
-        HeroBean hero = heroModule.addHero(validHeroId(0));
+        PlayerHeroEntry hero = heroModule.addHero(validHeroId(0));
 
         // 创建觉醒请求
         Hero.CS_HeroAwaken request = Hero.CS_HeroAwaken.newBuilder()
-                .setHeroUid(hero.heroUid)
+                .setHeroUid(hero.getId())
                 .build();
 
         // 调用处理器
@@ -344,9 +342,9 @@ public class HeroControllerTest {
         assertEquals("应返回 1 个英雄", 1, response.getHeroListCount());
 
         // 验证英雄确实被添加
-        HeroBean addedHero = heroModule.getHero(mockPlayer.getPlayerId() * 1000000L + validHeroId(0));
+        PlayerHeroEntry addedHero = heroModule.getHeroList().stream().filter(h -> h.getHeroId() == validHeroId(0)).findFirst().orElse(null);
         assertNotNull("英雄应被添加", addedHero);
-        assertEquals("英雄 ID 应正确", validHeroId(0), addedHero.heroId);
+        assertEquals("英雄 ID 应正确", validHeroId(0), addedHero.getHeroId().intValue());
     }
 
     /**
@@ -431,11 +429,11 @@ public class HeroControllerTest {
         long initialExpItem = resourceModule.getResource(ResourceType.EXP_ITEM);
 
         // 添加英雄并尝试升级
-        HeroBean hero = heroModule.addHero(validHeroId(0));
+        PlayerHeroEntry hero = heroModule.addHero(validHeroId(0));
 
         // 创建升级请求
         Hero.CS_HeroLevelUp request = Hero.CS_HeroLevelUp.newBuilder()
-                .setHeroUid(hero.heroUid)
+                .setHeroUid(hero.getId())
                 .addExpItemIds(1)
                 .build();
 

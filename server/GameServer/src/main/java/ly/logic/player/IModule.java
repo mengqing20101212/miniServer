@@ -12,14 +12,6 @@ public interface IModule {
     public void onLoadData();
 
     /**
-     * 将模块状态保存到持久化数据，通常在玩家登出或定时保存时调用.
-     * 实现类一般来说没有特殊的业务在保存数据之前处理，那么就不需要实现代码了，直接在实现类里写个空方法体就行了。
-     * 
-     * @return
-     */
-    public boolean saveData();
-
-    /**
      * 玩家登录时调用，参数 {@code isReconnect}
      * 表示是否为断线重连。实现类可以根据需要在登录时执行一些初始化逻辑，例如刷新状态、发送欢迎消息等。
      * 

@@ -1,29 +1,44 @@
 package ly.logic.player;
 
-import java.util.List;
-import java.util.Map;
-import ly.db.entry.PlayerEntry;
-import ly.db.entry.PlayerModuleEntry;
-import ly.logic.player.persistence.PlayerModulePersistenceService;
-import ly.logic.player.persistence.PlayerModuleStore;
+import ly.db.AbstractEntry;
+import ly.db.entry.*;
+import ly.db.player.PlayerPersistenceStore;
 
-/** Creates PlayerData without requiring a test database. */
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
 public final class PlayerDataTestFactory {
-    private PlayerDataTestFactory() {
+    private PlayerDataTestFactory() {}
+
+    public static class MemoryStore implements PlayerPersistenceStore {
+        private static final AtomicLong IDS = new AtomicLong(10000);
+
+        public List<PlayerModuleEntry> loadModuleEntries(long playerId) {
+            return List.of();
+        }
+
+        public List<PlayerHeroEntry> loadHeroEntries(long playerId) {
+            return List.of();
+        }
+
+        public List<PlayerResourceEntry> loadResourceEntries(long playerId) {
+            return List.of();
+        }
+
+        public long generateEntityId() {
+            return IDS.incrementAndGet();
+        }
+
+        public boolean acceptEntitySnapshot(AbstractEntry entry) {
+            return true;
+        }
+
+        public boolean acceptEntityDeletion(AbstractEntry entry) {
+            return true;
+        }
     }
 
     public static PlayerData create(PlayerEntry entry) {
-        PlayerModuleStore store = new PlayerModuleStore() {
-            @Override
-            public Map<Integer, PlayerModuleEntry> load(long playerId) {
-                return Map.of();
-            }
-
-            @Override
-            public boolean saveBatch(long playerId, List<PlayerModuleEntry> modules) {
-                return true;
-            }
-        };
-        return new PlayerData(entry, new PlayerModulePersistenceService(store, false));
+        return new PlayerData(entry, new MemoryStore());
     }
 }

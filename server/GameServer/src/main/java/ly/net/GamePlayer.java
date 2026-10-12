@@ -284,16 +284,16 @@ public class GamePlayer {
                     workItem.getEvent() == null ? null : workItem.getEvent().getEventType(),
                     e);
         } finally {
-            flushPlayerModules();
+            flushPendingPlayerChanges();
             markWorkFinished();
         }
     }
 
-    private void flushPlayerModules() {
+    private void flushPendingPlayerChanges() {
         if (player == null || player.getPlayerData() == null) {
             return;
         }
-        if (!player.getPlayerData().flushAsync()) {
+        if (!player.getPlayerData().flushPendingChanges()) {
             LoggerDef.DbLogger.error("enqueue player module flush failed, playerId={}", playerId);
         }
     }

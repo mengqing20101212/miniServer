@@ -12,7 +12,7 @@ import ly.config.HeroInfoConfigManager;
 import ly.config.HeroStarConfig;
 import ly.config.HeroStarConfigManager;
 import ly.config.ResourceType;
-import ly.logic.hero.module.HeroBean;
+import ly.db.entry.PlayerHeroEntry;
 import ly.logic.hero.module.HeroModule;
 import ly.logic.player.ModuleEnum;
 import ly.logic.player.Player;
@@ -45,10 +45,10 @@ public class HeroController implements IGameController {
     public void handleHeroList(GameHandlerContext context, Hero.CS_HeroList request) {
         Player player = context.player();
         HeroModule heroModule = (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
-        List<HeroBean> heroList = heroModule.getHeroList();
+        List<PlayerHeroEntry> heroList = heroModule.getHeroList();
 
         Hero.SC_HeroList.Builder builder = Hero.SC_HeroList.newBuilder();
-        for (HeroBean entry : heroList) {
+        for (PlayerHeroEntry entry : heroList) {
             Hero.HeroInfo info = buildHeroInfo(entry);
             builder.addHeroList(info);
         }
@@ -65,21 +65,21 @@ public class HeroController implements IGameController {
         ResourceModule resourceModule = (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
 
         // 验证英雄存在
-        HeroBean hero = heroModule.getHero(request.getHeroUid());
+        PlayerHeroEntry hero = heroModule.getHero(request.getHeroUid());
         if (hero == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroLevelUp, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
         }
 
         // 获取英雄配置
-        HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(hero.heroId);
+        HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(hero.getHeroId());
         if (heroConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroLevelUp, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
         }
 
         // 获取升级经验配置
-        HeroExpConfig expConfig = HeroExpConfigManager.getInstance().getByModelIdAndLevel(heroConfig.expModelId, hero.level + 1);
+        HeroExpConfig expConfig = HeroExpConfigManager.getInstance().getByModelIdAndLevel(heroConfig.expModelId, hero.getLevel() + 1);
         if (expConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroLevelUp, ErrorMsg.ErrorCode.LEVEL_MAX);
             return;
@@ -107,24 +107,20 @@ public class HeroController implements IGameController {
         deductUpgradeCost(resourceModule, expConfig);
 
         // 更新英雄经验
-        hero.exp += expItemCount;
+        hero.setExp(hero.getExp() + expItemCount);
 
         // 升级逻辑
         while (true) {
-            HeroExpConfig nextLevelConfig = HeroExpConfigManager.getInstance().getByModelIdAndLevel(heroConfig.expModelId, hero.level + 1);
+            HeroExpConfig nextLevelConfig = HeroExpConfigManager.getInstance().getByModelIdAndLevel(heroConfig.expModelId, hero.getLevel() + 1);
             if (nextLevelConfig == null) {
                 break; // 已达最高等级
             }
-            if (hero.exp < nextLevelConfig.exp) {
+            if (hero.getExp() < nextLevelConfig.exp) {
                 break; // 经验不足升级
             }
-            hero.exp -= nextLevelConfig.exp;
-            hero.level++;
+            hero.setExp(hero.getExp() - nextLevelConfig.exp);
+            hero.setLevel(hero.getLevel() + 1);
         }
-
-        // 保存数据
-        heroModule.saveData();
-        resourceModule.saveData();
 
         // 返回结果
         Hero.SC_HeroLevelUp.Builder builder = Hero.SC_HeroLevelUp.newBuilder();
@@ -142,21 +138,21 @@ public class HeroController implements IGameController {
         ResourceModule resourceModule = (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
 
         // 验证英雄存在
-        HeroBean hero = heroModule.getHero(request.getHeroUid());
+        PlayerHeroEntry hero = heroModule.getHero(request.getHeroUid());
         if (hero == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroStarUp, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
         }
 
         // 获取英雄配置
-        HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(hero.heroId);
+        HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(hero.getHeroId());
         if (heroConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroStarUp, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
         }
 
         // 获取升星配置
-        HeroStarConfig starConfig = HeroStarConfigManager.getInstance().getByModelIdAndStar(heroConfig.starModelId, hero.star + 1);
+        HeroStarConfig starConfig = HeroStarConfigManager.getInstance().getByModelIdAndStar(heroConfig.starModelId, hero.getStar() + 1);
         if (starConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroStarUp, ErrorMsg.ErrorCode.STAR_MAX);
             return;
@@ -175,11 +171,7 @@ public class HeroController implements IGameController {
         }
 
         // 更新星级
-        hero.star++;
-
-        // 保存数据
-        heroModule.saveData();
-        resourceModule.saveData();
+        hero.setStar(hero.getStar() + 1);
 
         // 返回结果
         Hero.SC_HeroStarUp.Builder builder = Hero.SC_HeroStarUp.newBuilder();
@@ -197,21 +189,21 @@ public class HeroController implements IGameController {
         ResourceModule resourceModule = (ResourceModule) player.getPlayerData().getModule(ModuleEnum.RESOURCE_MODULE);
 
         // 验证英雄存在
-        HeroBean hero = heroModule.getHero(request.getHeroUid());
+        PlayerHeroEntry hero = heroModule.getHero(request.getHeroUid());
         if (hero == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroAwaken, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
         }
 
         // 获取英雄配置
-        HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(hero.heroId);
+        HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(hero.getHeroId());
         if (heroConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroAwaken, ErrorMsg.ErrorCode.HERO_NOT_FOUND);
             return;
         }
 
         // 获取觉醒配置
-        HeroAwakenConfig awakenConfig = HeroAwakenConfigManager.getInstance().getByHeroAwakenDataAndLevel(heroConfig.heroAwakenData, hero.awaken + 1);
+        HeroAwakenConfig awakenConfig = HeroAwakenConfigManager.getInstance().getByHeroAwakenDataAndLevel(heroConfig.heroAwakenData, hero.getAwaken() + 1);
         if (awakenConfig == null) {
             player.sendErrorCode(Cmd.CMD.CS_HeroAwaken, ErrorMsg.ErrorCode.AWAKEN_MAX);
             return;
@@ -229,11 +221,7 @@ public class HeroController implements IGameController {
         deductAwakenCost(resourceModule, awakenConfig);
 
         // 更新觉醒等级
-        hero.awaken++;
-
-        // 保存数据
-        heroModule.saveData();
-        resourceModule.saveData();
+        hero.setAwaken(hero.getAwaken() + 1);
 
         // 返回结果
         Hero.SC_HeroAwaken.Builder builder = Hero.SC_HeroAwaken.newBuilder();
@@ -257,15 +245,13 @@ public class HeroController implements IGameController {
         }
 
         for (int i = 0; i < request.getCount(); i++) {
-            HeroBean hero = heroModule.addHero(request.getHeroId());
+            PlayerHeroEntry hero = heroModule.addHero(request.getHeroId());
             if (hero == null) {
                 player.sendErrorCode(Cmd.CMD.CS_HeroAdd, ErrorMsg.ErrorCode.HERO_SLOT_FULL);
                 return;
             }
             builder.addHeroList(buildHeroInfo(hero));
         }
-
-        heroModule.saveData();
 
         builder.setResult(ErrorMsg.ErrorCode.Ok);
         player.sendMsg(Cmd.CMD.SC_HeroAdd, builder.build());
@@ -274,17 +260,17 @@ public class HeroController implements IGameController {
     /**
      * 构建英雄信息
      */
-    private Hero.HeroInfo buildHeroInfo(HeroBean entry) {
+    private Hero.HeroInfo buildHeroInfo(PlayerHeroEntry entry) {
         Hero.HeroInfo.Builder builder = Hero.HeroInfo.newBuilder();
-        builder.setHeroUid(entry.heroUid);
-        builder.setHeroId(entry.heroId);
-        builder.setLevel(entry.level);
-        builder.setStar(entry.star);
-        builder.setAwaken(entry.awaken);
-        builder.setExp(entry.exp);
+        builder.setHeroUid(entry.getId());
+        builder.setHeroId(entry.getHeroId());
+        builder.setLevel(entry.getLevel());
+        builder.setStar(entry.getStar());
+        builder.setAwaken(entry.getAwaken());
+        builder.setExp(entry.getExp());
 
         // 计算升级所需经验
-        long maxExp = calcMaxExp(entry.heroId, entry.level);
+        long maxExp = calcMaxExp(entry.getHeroId(), entry.getLevel());
         builder.setMaxExp(maxExp);
 
         return builder.build();

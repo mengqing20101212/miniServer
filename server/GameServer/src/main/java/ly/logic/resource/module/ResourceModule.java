@@ -1,56 +1,33 @@
 package ly.logic.resource.module;
 
-import ly.config.ResourceType;
 import ly.logic.player.AbstractModule;
-import ly.proto.Resource;
-
 import ly.logic.player.event.PlayerEventParam;
+import ly.logic.player.event.PlayerEventType;
+import ly.proto.Resource;
 
 import java.util.Collections;
 import java.util.List;
 
-import ly.logic.player.event.PlayerEventType;
-
-/**
- * 资源模块
- */
+/** 资源模块 */
 public class ResourceModule extends AbstractModule {
-    private ResourceModuleData moduleData;
+    private final java.util.Map<Integer, ly.db.entry.PlayerResourceEntry> resources =
+            new java.util.HashMap<>();
+
+    @Override
+    protected boolean usesBlobPersistence() {
+        return false;
+    }
 
     @Override
     public void onLoadData() {
-        if (moduleData == null) {
-            moduleData = new ResourceModuleData();
-            initDefaultResources();
+        for (ly.db.entry.PlayerResourceEntry entry : player.getPlayerData().loadResourceEntries()) {
+            resources.put(entry.getResourceType(), entry);
+            player.getPlayerData().registerLoadedEntity(entry);
         }
     }
 
-    private void initDefaultResources() {
-        moduleData.resources.put(ResourceType.GOLD, 0L);
-        moduleData.resources.put(ResourceType.DIAMOND, 0L);
-        moduleData.resources.put(ResourceType.HERO_DEBRIS, 0L);
-        moduleData.resources.put(ResourceType.EXP_ITEM, 0L);
-        moduleData.resources.put(ResourceType.AWAKEN_ITEM, 0L);
-    }
-
     @Override
-    protected Object getModuleDataForPersistence() {
-        return moduleData;
-    }
-
-    @Override
-    protected Class<?> getModuleDataClass() {
-        return ResourceModuleData.class;
-    }
-
-    @Override
-    protected void loadModuleData(Object moduleData) {
-        this.moduleData = (ResourceModuleData) moduleData;
-    }
-
-    @Override
-    public void onOpenFunction() {
-    }
+    public void onOpenFunction() {}
 
     @Override
     public List<PlayerEventType> getRegisterEventTypes() {
@@ -62,41 +39,45 @@ public class ResourceModule extends AbstractModule {
         // 不处理事件
     }
 
-    /**
-     * 增加资源
-     */
+    /** 增加资源 */
     public boolean addResource(int resourceType, long amount) {
         if (amount <= 0) return false;
-        long current = moduleData.resources.getOrDefault(resourceType, 0L);
-        moduleData.resources.put(resourceType, current + amount);
+        long current = getResource(resourceType);
+        long next = Math.addExact(current, amount);
+        ly.db.entry.PlayerResourceEntry entry = resources.get(resourceType);
+        if (entry == null) {
+            entry = new ly.db.entry.PlayerResourceEntry();
+            entry.setPlayerId(player.getPlayerId());
+            entry.setResourceType(resourceType);
+            entry.setAmount(next);
+            resources.put(resourceType, entry);
+            player.getPlayerData().registerNewEntity(entry);
+        } else {
+            entry.setAmount(next);
+        }
         notifyResourceChange(resourceType, amount);
         return true;
     }
 
-    /**
-     * 扣除资源
-     */
+    /** 扣除资源 */
     public boolean deductResource(int resourceType, long amount) {
         if (amount <= 0) return false;
-        long current = moduleData.resources.getOrDefault(resourceType, 0L);
+        long current = getResource(resourceType);
         if (current < amount) {
             return false;
         }
-        moduleData.resources.put(resourceType, current - amount);
+        resources.get(resourceType).setAmount(current - amount);
         notifyResourceChange(resourceType, -amount);
         return true;
     }
 
-    /**
-     * 获取资源数量
-     */
+    /** 获取资源数量 */
     public long getResource(int resourceType) {
-        return moduleData.resources.getOrDefault(resourceType, 0L);
+        ly.db.entry.PlayerResourceEntry entry = resources.get(resourceType);
+        return entry == null ? 0L : entry.getAmount();
     }
 
-    /**
-     * 通知资源变化
-     */
+    /** 通知资源变化 */
     private void notifyResourceChange(int resourceType, long amount) {
         try {
             // 发送 SC_ResourceChange 消息
@@ -105,7 +86,8 @@ public class ResourceModule extends AbstractModule {
             player.sendMsg(ly.proto.Cmd.CMD.SC_ResourceChange, builder.build());
         } catch (NoClassDefFoundError | Exception e) {
             // protobuf 版本兼容性兜底：当前运行时 protobuf 版本可能不支持 Map 反射
-            System.err.println("WARN: notifyResourceChange failed (protobuf compat): " + e.getMessage());
+            System.err.println(
+                    "WARN: notifyResourceChange failed (protobuf compat): " + e.getMessage());
         }
     }
 }

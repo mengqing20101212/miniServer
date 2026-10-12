@@ -60,35 +60,36 @@ public class Player {
         }
 
         try {
-            // 初始化玩家各个功能模块
-            // 这里可以初始化装备、技能、任务等系统
+            try (ly.db.PersistenceScope persistence = ly.db.PersistenceScope.open()) {
+                // 初始化玩家各个功能模块
+                // 这里可以初始化装备、技能、任务等系统
 
-            TimeStatisticsUtils.TimeStatisticsLog log = TimeStatisticsUtils
-                    .makeLogBegin(String.format("Player-%s-%d-InitModules", getAccount(), getPlayerId()), 1000);
-            Map<ModuleEnum, PlayerModuleEntry> loadedEntries = playerData.loadModuleEntries();
-            PlayerModuleData legacyData = playerData.loadLegacyModuleData();
+                TimeStatisticsUtils.TimeStatisticsLog log = TimeStatisticsUtils
+                        .makeLogBegin(String.format("Player-%s-%d-InitModules", getAccount(), getPlayerId()), 1000);
+                Map<ModuleEnum, PlayerModuleEntry> loadedEntries = playerData.loadModuleEntries();
 
-            for (ModuleEnum moduleEnum : ModuleEnum.values()) {
-                PlayerModuleEntry moduleEntry = loadedEntries.get(moduleEnum);
-                byte[] moduleBytes = moduleEntry == null
-                        ? getLegacyModuleData(legacyData, moduleEnum)
-                        : moduleEntry.getModuleData();
-                if (moduleEntry == null) {
-                    moduleEntry = playerData.createModuleEntry(moduleEnum);
+                for (ModuleEnum moduleEnum : ModuleEnum.values()) {
+                    PlayerModuleEntry moduleEntry = loadedEntries.get(moduleEnum);
+                    byte[] moduleBytes = moduleEntry == null
+                            ? null
+                            : moduleEntry.getModuleData();
+                    if (moduleEntry == null) {
+                        moduleEntry = playerData.createModuleEntry(moduleEnum);
+                    }
+                    TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(
+                            String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()),
+                            50);
+                    AbstractModule module = createModuleInstance(moduleEnum, moduleEntry, moduleBytes);
+                    boolean moduleDataMissing = !loadedEntries.containsKey(moduleEnum);
+                    module.init(this, moduleEnum, moduleEntry, moduleDataMissing);
+                    moduleInitLog.LogEnd();
                 }
-                TimeStatisticsUtils.TimeStatisticsLog moduleInitLog = TimeStatisticsUtils.makeLogBegin(
-                        String.format("Player-%s-%d-InitModules:%s", getAccount(), getPlayerId(), moduleEnum.getName()),
-                        50);
-                AbstractModule module = createModuleInstance(moduleEnum, moduleEntry, moduleBytes);
-                boolean moduleDataMissing = moduleEntry.getModuleData().length == 0;
-                module.init(this, moduleEnum, moduleEntry, moduleDataMissing);
-                moduleInitLog.LogEnd();
+
+                // 新建小模块及独立 Entity 统一提交。
+                playerData.flushPendingChanges();
+
+                log.LogEnd();
             }
-
-            // 老 BLOB 数据和新初始化模块统一迁移到模块表，不再回写总 modules BLOB。
-            playerData.flushAsync();
-
-            log.LogEnd();
 
             // 设置玩家状态为已初始化
             // setStatus(PlayerStatusEnum.INITIALIZED);
@@ -96,14 +97,10 @@ public class Player {
             // 分发玩家初始化完成事件
             // dispatchEvent(PlayerEventType.PLAYER_INIT_COMPLETE);
         } catch (Exception e) {
-            System.err.println("Error initializing modules for player " + getPlayerId() + ": " + e.getMessage());
+            throw new IllegalStateException("initialize player modules failed: " + getPlayerId(), e);
             // setStatus(PlayerStatusEnum.INIT_FAILED);
         }
 
-    }
-
-    private byte[] getLegacyModuleData(PlayerModuleData legacyData, ModuleEnum moduleEnum) {
-        return legacyData == null ? null : legacyData.getModuleData(moduleEnum.getName());
     }
 
     private AbstractModule createModuleInstance(
@@ -114,17 +111,7 @@ public class Player {
         if (moduleData == null || moduleData.length == 0) {
             return moduleClass.getDeclaredConstructor().newInstance();
         }
-        try {
-            return AbstractModule.deserialize(moduleClass, moduleData);
-        } catch (Exception e) {
-            LoggerDef.SystemLogger.warn(
-                    "init module fallback, playerId={}, module={}, reason={}",
-                    getPlayerId(),
-                    moduleClass.getSimpleName(),
-                    e.getMessage());
-            moduleEntry.setModuleData(new byte[0]);
-            return moduleClass.getDeclaredConstructor().newInstance();
-        }
+        return AbstractModule.deserialize(moduleClass, moduleData);
     }
 
     public void setStatus(PlayerStatusEnum playerStatusEnum) {
@@ -132,15 +119,15 @@ public class Player {
     }
 
     public long getPlayerId() {
-        return playerData.playerEntry.getId();
+        return playerData.getPlayerEntry().getId();
     }
 
     public String getPlayerName() {
-        return playerData.playerEntry.getName();
+        return playerData.getPlayerEntry().getName();
     }
 
     public String getAccount() {
-        return playerData.playerEntry.getAccount();
+        return playerData.getPlayerEntry().getAccount();
     }
 
     public String getToken() {
@@ -166,25 +153,25 @@ public class Player {
     }
 
     public long getCreateTime() {
-        return TimeUtils.getTimer(playerData.playerEntry.getCreatetime());
+        return TimeUtils.getTimer(playerData.getPlayerEntry().getCreatetime());
     }
 
     public int getLevel() {
-        Integer level = playerData.playerEntry.getLevel();
+        Integer level = playerData.getPlayerEntry().getLevel();
         return level == null ? 1 : level;
     }
 
     public int getVipLevel() {
-        Integer vipLevel = playerData.playerEntry.getViplevel();
+        Integer vipLevel = playerData.getPlayerEntry().getViplevel();
         return vipLevel == null ? 0 : vipLevel;
     }
 
     public long getLoginTime() {
-        return TimeUtils.getTimer(playerData.playerEntry.getLogintime());
+        return TimeUtils.getTimer(playerData.getPlayerEntry().getLogintime());
     }
 
     public long getLastLogoutTime() {
-        return TimeUtils.getTimer(playerData.playerEntry.getLogouttime());
+        return TimeUtils.getTimer(playerData.getPlayerEntry().getLogouttime());
     }
 
     public void setGamePlayer(GamePlayer gamePlayer) {

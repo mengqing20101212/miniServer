@@ -158,11 +158,31 @@ CREATE TABLE IF NOT EXISTS `player` (
   `logoutTime` DATETIME DEFAULT NULL,
   `level` INT DEFAULT NULL,
   `vipLevel` INT DEFAULT NULL,
-  `modules` MEDIUMBLOB DEFAULT NULL,
   `guidId` BIGINT DEFAULT NULL,
   `account` VARCHAR(255) DEFAULT NULL
 ,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `player_hero` (
+  `id` BIGINT NOT NULL,
+  `player_id` BIGINT NOT NULL,
+  `hero_id` INT NOT NULL,
+  `level` INT NOT NULL,
+  `star` INT NOT NULL,
+  `awaken` INT NOT NULL,
+  `exp` BIGINT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_player_hero_player_id_hero_id` (`player_id`, `hero_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `player_resource` (
+  `id` BIGINT NOT NULL,
+  `player_id` BIGINT NOT NULL,
+  `resource_type` INT NOT NULL,
+  `amount` BIGINT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_player_resource_player_id_resource_type` (`player_id`, `resource_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `player_module` (
