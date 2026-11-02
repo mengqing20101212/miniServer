@@ -19,18 +19,18 @@ public class ParserExcelConfigTest {
     @Rule public TemporaryFolder temporary = new TemporaryFolder();
 
     @Test
-    public void generatesCompilesAndLoadsActualExcelIncludingNestedCollections() throws Exception {
+    public void generatesCompilesAndLoadsActualExcelIncludingSimpleCollections() throws Exception {
         Path project = temporary.newFolder().toPath();
         Path excel = Files.createDirectory(project.resolve("excel"));
         Path data = project.resolve("data");
         String[] fields = {"id", "tiny", "small", "large", "ratio", "rate", "enabled", "drops",
-                "tags", "costs", "groups", "matrix", "empty", "formula", "ignored", "last"};
+                "tags", "costs", "rates", "flags", "empty", "formula", "ignored", "last"};
         String[] types = {"int", "byte", "short", "long", "float", "double", "bool", "string",
-                "list<string>", "map<int,long>", "map<string,list<double>>", "list<map<int,bool>>",
+                "list<string>", "map<int,long>", "list<double>", "map<int,bool>",
                 "list<int>", "double", "", "int"};
         Object[] values = {7, 12, 30000, "9223372036854775807", 1.25, 2.75, true, "1001;2|1002;3",
-                "[\"alpha\",\"中文<&\"]", "{\"1\":5000000000}", "{\"a\":[1.5,2.25]}",
-                "[{\"1\":true},{\"2\":false}]", "", "=1.5+2.25", "ignored", 9};
+                "alpha;中文<&", "1:5000000000", "1.5;2.25",
+                "1:true;2:false", "", "=1.5+2.25", "ignored", 9};
         writeExcel(excel.resolve("typed.xlsx"), fields, types, values);
         new ParserExcelConfig(excel.toString(), data.toString(), true).startParser();
         Path generated = project.resolve("server/config/src/main/java/ly/config");
@@ -55,15 +55,15 @@ public class ParserExcelConfigTest {
             expected.put("large", Long.MAX_VALUE); expected.put("ratio", 1.25F); expected.put("rate", 2.75D);
             expected.put("enabled", true); expected.put("drops", "1001;2|1002;3");
             expected.put("tags", List.of("alpha", "中文<&")); expected.put("costs", Map.of(1, 5000000000L));
-            expected.put("groups", Map.of("a", List.of(1.5D, 2.25D)));
-            expected.put("matrix", List.of(Map.of(1, true), Map.of(2, false)));
+            expected.put("rates", List.of(1.5D, 2.25D));
+            expected.put("flags", Map.of(1, true, 2, false));
             expected.put("empty", List.of()); expected.put("formula", 3.75D); expected.put("last", 9);
             for (Map.Entry<String, Object> entry : expected.entrySet()) {
                 Field field = config.getClass().getField(entry.getKey());
                 assertEquals(entry.getKey(), entry.getValue(), field.get(config));
             }
-            Field nested = config.getClass().getField("groups");
-            assertEquals("java.util.Map<java.lang.String, java.util.List<java.lang.Double>>", nested.getGenericType().getTypeName());
+            Field collection = config.getClass().getField("costs");
+            assertEquals("java.util.Map<java.lang.Integer, java.lang.Long>", collection.getGenericType().getTypeName());
             assertEquals(config, ((Map<?, ?>) managerClass.getMethod("getConfigMap").invoke(manager)).get(7));
             Path xml = data.resolve("typed.xml");
             org.w3c.dom.Document document = javax.xml.parsers.DocumentBuilderFactory.newInstance()
@@ -85,7 +85,7 @@ public class ParserExcelConfigTest {
         Path excel = Files.createDirectory(project.resolve("excel"));
         Path output = project.resolve("data");
         writeExcel(excel.resolve("invalid.xlsx"), new String[]{"id", "costs"},
-                new String[]{"int", "list<long>"}, new Object[]{1, "[10,\"bad\"]"});
+                new String[]{"int", "list<long>"}, new Object[]{1, "10;bad"});
         java.io.ByteArrayOutputStream errors = new java.io.ByteArrayOutputStream();
         java.io.PrintStream previous = System.err;
         try {

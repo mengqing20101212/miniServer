@@ -56,14 +56,17 @@ server/config/src/main/java/ly/config/Hero*Config*.java  ← 生成 Java
 | `float` / `double` | 对应浮点类型 | `1.25` |
 | `bool` / `boolean` | `boolean` | `true`、`false`、`1`、`0` |
 | `string`（别名 `str`、`text`） | `String` | `1001;2|1002;3` |
-| `list<int>` | `List<Integer>` | `[1,2,3]` |
-| `list<string>` | `List<String>` | `["普通","稀有"]` |
-| `map<int,long>` | `Map<Integer,Long>` | `{"1001":200,"1002":300}` |
-| `map<string,list<double>>` | `Map<String,List<Double>>` | `{"bonus":[1.5,2.5]}` |
-| `list<map<int,bool>>` | `List<Map<Integer,Boolean>>` | `[{"1":true},{"2":false}]` |
+| `list<int>` | `List<Integer>` | `1;2;3` |
+| `list<string>` | `List<String>` | `普通;稀有` |
+| `map<int,long>` | `Map<Integer,Long>` | `1001:200;1002:300` |
+| `list<double>` | `List<Double>` | `1.5;2.5` |
+| `map<int,bool>` | `Map<Integer,Boolean>` | `1:true;2:false` |
 
-集合单元格使用 JSON；Map 也支持 `[[1001,200],[1002,300]]` 的键值对数组写法。
-Map 的键支持整数、布尔和字符串，值支持基础类型或嵌套集合。重复键保留最后一个值。
+List 用分号 `;` 分隔；Map 每项使用 `键:值`，各项用分号分隔。不需要方括号、花括号或引号。
+集合元素前后空白会去掉；单独的 string 字段保留原字符串。
+Map 按第一个冒号分隔键和值，因此字符串值可以包含冒号；分号是集合分隔符，字符串键中的冒号也是分隔符，均不提供转义语法。
+Map 的键支持整数、布尔和字符串，值和 List 元素只支持基础类型；重复键保留最后一个值。
+不支持嵌套 List/Map，复杂配置拆成明细表，通过 ID 关联。不保留 JSON 集合输入格式。
 空单元格对应数值 `0`、布尔 `false`、字符串 `""`、空 List 或空 Map。集合不支持 `null` 元素。
 字符串不按通用类型系统解析业务结构：掉落、奖励、消耗仍用字符串，由业务代码封装解析，例如
 `Award.create(text)`、`Consume.create(text)`。本轮不支持结构体、枚举或配置引用。
@@ -383,9 +386,9 @@ cmd.exe /c "netstat -ano | findstr :8889 && netstat -ano | findstr :9001 && nets
 
 ```xml
 <Root>
-  <Data id="1" name="普通英雄" costs='{"1001":200}' tags='["普通","近战"]'/>
+  <Data id="1" name="普通英雄" costs="1001:200" tags="普通;近战"/>
 </Root>
 ```
 
-加载器按属性名取值，字段顺序无关。集合仍用 JSON 单元格表达；XML 转义由转表器处理。
+加载器按属性名取值，字段顺序无关。集合仍用分号和冒号表达；XML 转义由转表器处理。
 GM 上传、配置完整包和热更摘要均使用 `.xml`。类型以 Excel 表头声明为准，不根据单元格内容推断。

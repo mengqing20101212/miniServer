@@ -1,6 +1,5 @@
 package ly;
 
-import com.alibaba.fastjson2.JSON;
 import java.math.BigDecimal;
 import java.util.*;
 import javax.lang.model.SourceVersion;
@@ -42,79 +41,62 @@ public record ConfigValueType(String kind, List<ConfigValueType> arguments) {
                 default -> throw new IllegalArgumentException("类型 " + declaration() + " 不允许空单元格");
             };
         }
-        Object raw = text;
-        if (!scalar()) {
-            raw = JSON.parse(trimmed);
-        }
-        return convert(raw, "$");
+        return switch (kind) {
+            case "list" -> readList(trimmed);
+            case "map" -> readMap(trimmed);
+            default -> convert(text, "$");
+        };
     }
 
-    private Object convert(Object raw, String path) {
-        if (raw == null) throw new IllegalArgumentException(path + ": 不允许 null");
+    private List<Object> readList(String text) {
+        List<Object> result = new ArrayList<>();
+        String[] items = text.split(";", -1);
+        for (int index = 0; index < items.length; index++)
+            result.add(arguments.getFirst().convert(items[index].trim(), "$[" + index + "]"));
+        return List.copyOf(result);
+    }
+
+    private Map<Object, Object> readMap(String text) {
+        Map<Object, Object> result = new LinkedHashMap<>();
+        for (String item : text.split(";", -1)) {
+            String[] pair = item.split(":", 2);
+            if (pair.length != 2) throw new IllegalArgumentException("Map 条目应为 键:值，条目=" + item);
+            Object key = arguments.get(0).convert(pair[0].trim(), "$.key");
+            Object value = arguments.get(1).convert(pair[1].trim(), "$[" + pair[0].trim() + "]");
+            result.put(key, value);
+        }
+        return Collections.unmodifiableMap(result);
+    }
+
+    private Object convert(String raw, String path) {
         try {
             return switch (kind) {
-                case "string" -> {
-                    if (!(raw instanceof String)) throw new IllegalArgumentException("需要字符串");
-                    yield raw;
-                }
-                case "byte" -> decimal(raw).byteValueExact();
-                case "short" -> decimal(raw).shortValueExact();
-                case "int" -> decimal(raw).intValueExact();
-                case "long" -> decimal(raw).longValueExact();
+                case "string" -> raw;
+                case "byte" -> new BigDecimal(raw.trim()).byteValueExact();
+                case "short" -> new BigDecimal(raw.trim()).shortValueExact();
+                case "int" -> new BigDecimal(raw.trim()).intValueExact();
+                case "long" -> new BigDecimal(raw.trim()).longValueExact();
                 case "float" -> {
-                    float number = decimal(raw).floatValue();
+                    float number = new BigDecimal(raw.trim()).floatValue();
                     if (!Float.isFinite(number)) throw new IllegalArgumentException("float 溢出");
                     yield number;
                 }
                 case "double" -> {
-                    double number = decimal(raw).doubleValue();
+                    double number = new BigDecimal(raw.trim()).doubleValue();
                     if (!Double.isFinite(number)) throw new IllegalArgumentException("double 溢出");
                     yield number;
                 }
                 case "bool" -> {
-                    String value = raw.toString();
+                    String value = raw.trim();
                     if (value.equalsIgnoreCase("true") || value.equals("1")) yield true;
                     if (value.equalsIgnoreCase("false") || value.equals("0")) yield false;
                     throw new IllegalArgumentException("布尔值只能是 true/false/1/0");
                 }
-                case "list" -> {
-                    if (!(raw instanceof List<?> list)) throw new IllegalArgumentException("需要 JSON 数组");
-                    List<Object> result = new ArrayList<>();
-                    for (int i = 0; i < list.size(); i++)
-                        result.add(arguments.getFirst().convert(list.get(i), path + "[" + i + "]"));
-                    yield List.copyOf(result);
-                }
-                case "map" -> {
-                    Map<Object, Object> result = new LinkedHashMap<>();
-                    if (raw instanceof Map<?, ?> map) {
-                        for (Map.Entry<?, ?> entry : map.entrySet())
-                            put(result, entry.getKey(), entry.getValue(), path);
-                    } else if (raw instanceof List<?> pairs) {
-                        for (Object entry : pairs) {
-                            if (!(entry instanceof List<?> pair) || pair.size() != 2)
-                                throw new IllegalArgumentException("Map 条目必须为 [key,value]");
-                            put(result, pair.get(0), pair.get(1), path);
-                        }
-                    } else throw new IllegalArgumentException("需要 JSON 对象或键值对数组");
-                    yield Collections.unmodifiableMap(result);
-                }
-                default -> throw new IllegalArgumentException("未知类型 " + kind);
+                default -> throw new IllegalArgumentException("需要基础类型，实际为 " + kind);
             };
         } catch (RuntimeException error) {
             throw new IllegalArgumentException(path + " (" + declaration() + "): " + error.getMessage(), error);
         }
-    }
-
-    private void put(Map<Object, Object> result, Object key, Object value, String path) {
-        Object parsedKey = arguments.get(0).convert(key, path + ".key");
-        Object parsedValue = arguments.get(1).convert(value, path + "[" + key + "]");
-        result.put(parsedKey, parsedValue);
-    }
-
-    private static BigDecimal decimal(Object value) {
-        if (!(value instanceof Number) && !(value instanceof String))
-            throw new IllegalArgumentException("需要数值");
-        return new BigDecimal(value.toString().trim());
     }
 
     private static ConfigValueType type(String kind, List<ConfigValueType> args) {
@@ -160,6 +142,8 @@ public record ConfigValueType(String kind, List<ConfigValueType> arguments) {
                 args.add(read());
             }
             require('>');
+            for (ConfigValueType argument : args)
+                if (!argument.scalar()) throw error("不支持嵌套集合，复杂配置请拆成明细表并通过ID关联");
             return type(kind, args);
         }
     }
