@@ -32,6 +32,10 @@ public class NetClient {
     private volatile Channel channel;
     private final ly.rpc.RpcResponseTracker rpcResponses = new ly.rpc.RpcResponseTracker();
     private volatile boolean rpcMode;
+    private volatile java.util.function.Predicate<MessagePacket> unsolicitedPackets = packet -> false;
+    public void setUnsolicitedPacketHandler(java.util.function.Predicate<MessagePacket> handler) {
+        unsolicitedPackets = handler;
+    }
     private EventLoopGroup group;
     private final boolean isMultiplex;
     private final boolean connectFailureWarnOnly;
@@ -224,7 +228,7 @@ public class NetClient {
         if (packet.getCmd() == MessagePacket.CMD_ACK) {
             setSid(packet.getSid());
         } else {
-            if (rpcMode && routeRpcResponse(packet)) { return; }
+            if (rpcMode && (routeRpcResponse(packet) || unsolicitedPackets.test(packet))) { return; }
             if (!receivePacketQueue.offer(packet)) {
                 logger.warn("receive queue full, host={}, port={}, cmd={}", host, port, packet.getCmd());
             }

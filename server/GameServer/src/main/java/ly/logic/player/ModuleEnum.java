@@ -11,6 +11,7 @@ public enum ModuleEnum {
     PLAYER_LOGIC_MODULE(1, 1, new PlayerLogicModule()),
     HERO_MODULE(2, 1, new HeroModule()),
     RESOURCE_MODULE(3, 1, new ResourceModule()),
+    SLG_MODULE(4, 1, new ly.logic.scene.SlgModule()),
     ;
     private final int moduleId;
     private final int dataVersion;

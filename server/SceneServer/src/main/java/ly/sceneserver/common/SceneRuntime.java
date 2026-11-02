@@ -160,6 +160,8 @@ public final class SceneRuntime implements AutoCloseable {
     public final class SceneInstance {
         private final SceneConfig config;
         private final SceneStaticMap staticMap;
+        private final SceneAoiService aoi = new SceneAoiService(this);
+        public SceneAoiService aoi() { return aoi; }
         private final SceneRegionDirectory regionDirectory;
         private final SceneShard[] shards;
         /** 每个 SceneShard 独占一个虚拟线程，保持动态地图严格单写。 */
@@ -195,7 +197,9 @@ public final class SceneRuntime implements AutoCloseable {
             for (int index = 0; index < shards.length; index++) {
                 SceneShard shard = shards[index];
                 Thread thread = Thread.ofVirtual()
-                        .name("SceneShard-Tick-" + config.sceneId() + '-' + index)
+                        .name((staticMap.regionDefinitions().isEmpty() ? "SceneShard-Tick-" : "SceneRegion-Tick-")
+                                + config.sceneId() + '-' + (staticMap.regionDefinitions().isEmpty()
+                                ? index : staticMap.regionDefinitions().get(index)))
                         .unstarted(() -> runShardLoop(shard));
                 shardThreads[index] = thread;
                 thread.start();
@@ -282,6 +286,8 @@ public final class SceneRuntime implements AutoCloseable {
             }
         }
 
+        public void configureRegions() { regionDirectory.configure(staticMap); }
+
         public SceneConfig config() {
             return config;
         }
@@ -342,6 +348,8 @@ public final class SceneRuntime implements AutoCloseable {
         public CompletableFuture<SceneRegionMigrationResult> migrateRegionAsync(
                 int regionIndex,
                 int targetShardIndex) {
+            if (regionDirectory.configured()) return CompletableFuture.failedFuture(
+                    new UnsupportedOperationException("地图配置区域固定归属，不参与矩形块迁移"));
             if (!started) {
                 return CompletableFuture.failedFuture(
                         new IllegalStateException("SceneRuntime must be started before region migration"));
@@ -386,6 +394,7 @@ public final class SceneRuntime implements AutoCloseable {
 
         /** 玩家离开时从所有相交的 AOI 块取消注册；历史探索迷雾继续按 playerId 保留。 */
         public CompletableFuture<Void> removeViewerAsync(long playerId) {
+            aoi.remove(playerId);
             return withStableRegionOwnership(() -> {
                 CompletableFuture<?>[] futures = new CompletableFuture<?>[shards.length];
                 for (int i = 0; i < shards.length; i++) {
@@ -538,7 +547,10 @@ public final class SceneRuntime implements AutoCloseable {
             if (started) {
                 throw new IllegalStateException("cannot seed scene object after runtime started");
             }
-            route(object.x(), object.y()).addObject(object);
+            if (object.type() == SceneObjectType.MARCH && object.state() instanceof ly.sceneserver.common.march.SceneMarchState march) {
+                ScenePoint target = march.snapshot().target().point();
+                route(target.x(), target.y()).addMarch(march);
+            } else route(object.x(), object.y()).addObject(object);
         }
 
         /** 启动前恢复玩家永久探索记录；运行后必须使用异步投递接口。 */
@@ -802,6 +814,7 @@ public final class SceneRuntime implements AutoCloseable {
          */
         private <T> CompletableFuture<T> withStableRegionOwnership(
                 Supplier<CompletableFuture<T>> operation) {
+            if (regionDirectory.configured()) return operation.get();
             return regionDirectory.acquireAggregateLease().thenCompose(lease -> {
                 CompletableFuture<T> result;
                 try {

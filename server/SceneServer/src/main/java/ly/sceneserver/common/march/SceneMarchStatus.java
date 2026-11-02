@@ -9,5 +9,6 @@ public enum SceneMarchStatus {
     BATTLE_PENDING,
     RETURNING,
     FINISHED,
+    GATHERING,
     CANCELLED
 }

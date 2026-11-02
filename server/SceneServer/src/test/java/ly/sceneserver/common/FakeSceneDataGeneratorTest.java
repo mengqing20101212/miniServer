@@ -28,7 +28,10 @@ public class FakeSceneDataGeneratorTest {
             assertTrue(worldObjects > 0);
             assertEquals(10_000, onlinePlayers);
             assertEquals(worldObjects + onlinePlayers, scene.totalObjectCount());
-            assertTrue(findObject(scene, 30_000_001L).state() instanceof SceneMarchState);
+            boolean foundMarch = false;
+            for (int index = 0; index < scene.shardCount(); index++)
+                foundMarch |= scene.shard(index).marches().march(30_000_001L) != null;
+            assertTrue(foundMarch);
             assertTrue(findObject(scene, 30_000_002L).state() instanceof SceneRallyState);
         } finally {
             runtime.close();

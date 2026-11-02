@@ -81,6 +81,7 @@ public final class SceneRecoveryService {
             SceneRuntime.SceneInstance scene = runtime.scene(sceneId);
             long mapStartedAt = System.currentTimeMillis();
             staticMapLoader.load(scene.config(), scene.staticMap());
+            scene.configureRegions();
             staticCells += scene.staticMap().cellCount();
             LoggerDef.SystemLogger.info(
                     "scene static map initialized, sceneId={}, width={}, height={}, cells={}, cost={}ms",

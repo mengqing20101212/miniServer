@@ -42,13 +42,15 @@ public final class SceneBootstrap {
 
         String localSceneId = System.getProperty("slg.scene.local-id", "world-1");
         String crossSceneId = System.getProperty("slg.scene.cross-id", "cross-1");
-        int width = intProperty("slg.scene.width", 1_000);
-        int height = intProperty("slg.scene.height", 1_000);
-        int shardCount = intProperty("slg.scene.shards", 4);
+        int width = intProperty("slg.scene.width", 1_200);
+        int height = intProperty("slg.scene.height", 1_200);
+        boolean fakeDataEnabled = Boolean.parseBoolean(System.getProperty("slg.scene.fake-data", "false"));
+        ly.sceneserver.common.persistence.TmxSceneStaticMapLoader companyMap =
+                new ly.sceneserver.common.persistence.TmxSceneStaticMapLoader(java.nio.file.Path.of(
+                        System.getProperty("slg.scene.map-dir", "maps/slg")));
+        int shardCount = fakeDataEnabled ? intProperty("slg.scene.shards", 4) : companyMap.regionCount();
         int regionSize = intProperty("slg.scene.region-size", 32);
         int tickMillis = intProperty("slg.scene.tick-millis", 100);
-
-        boolean fakeDataEnabled = Boolean.parseBoolean(System.getProperty("slg.scene.fake-data", "false"));
         SceneRuntime created = new SceneRuntime();
         ScenePlayerPersistenceService createdPlayerPersistence = null;
         SceneAggregatePersistenceService createdAggregatePersistence = null;
@@ -60,7 +62,7 @@ public final class SceneBootstrap {
             SceneAggregateStore aggregateStore = new MysqlSceneAggregateStore();
             SceneStaticMapLoader mapLoader = fakeDataEnabled
                     ? (config, map) -> FakeSceneDataGenerator.fillStaticMap(map)
-                    : new FlatSceneStaticMapLoader();
+                    : companyMap;
             SceneRecoveryReport recovery = new SceneRecoveryService(
                     mapLoader, playerSceneStore, aggregateStore).restore(created);
             LoggerDef.SystemLogger.info(
@@ -72,6 +74,20 @@ public final class SceneBootstrap {
 
             createdPlayerPersistence = new ScenePlayerPersistenceService(playerSceneStore);
             createdAggregatePersistence = new SceneAggregatePersistenceService(aggregateStore);
+            SceneAggregatePersistenceService persistence = createdAggregatePersistence;
+            for (String sceneId : created.registeredSceneIds()) {
+                SceneRuntime.SceneInstance scene = created.scene(sceneId);
+                java.util.function.Consumer<ly.sceneserver.common.SceneObject> save = object ->
+                        persistence.snapshotAndSubmit(sceneId, object, 1, false);
+                for (int index = 0; index < scene.shardCount(); index++) {
+                    scene.shard(index).marches().onChanged(scene.aoi()::marchChanged);
+                    scene.shard(index).marches().configure(
+                            () -> ly.config.SlgWorldObjectConfigManager.getInstance().getConfigMap(), save);
+                }
+                if (!fakeDataEnabled) ly.sceneserver.common.SceneWorldSpawner.seed(scene,
+                        ly.config.SlgWorldObjectConfigManager.getInstance().getConfigList(),
+                        () -> ly.db.MysqlService.getInstance().generateEntityId(), save);
+            }
             if (fakeDataEnabled) {
                 int targetOnline = intProperty("slg.scene.fake-online", 10_000);
                 int worldObjects = FakeSceneDataGenerator.seedWorldObjects(created.scene(localSceneId));

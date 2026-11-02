@@ -19,6 +19,35 @@ import java.util.function.Consumer;
  * 不执行任何场景业务，也不等待 Tick，从而不会把迁移锁扩散到业务代码。
  */
 final class SceneRegionDirectory {
+    private SceneStaticMap configuredMap;
+    private final java.util.Map<Integer, Integer> configuredRegions = new java.util.HashMap<>();
+    private java.util.BitSet[] blocksByShard;
+
+    void configure(SceneStaticMap map) {
+        if (map.regionDefinitions().isEmpty()) return;
+        configuredMap = map;
+        blocksByShard = new java.util.BitSet[shardCount];
+        int index = 0;
+        for (int id : map.regionDefinitions()) {
+            configuredRegions.put(id, index);
+            owners.set(index, index);
+            blocksByShard[index] = new java.util.BitSet();
+            index++;
+        }
+        for (int y = 0; y < map.height(); y++) {
+            for (int x = 0; x < map.width(); x++) {
+                Integer owner = configuredRegions.get(map.regionId(x, y));
+                if (owner != null) blocksByShard[owner].set((y / regionSize) * columns + x / regionSize);
+            }
+        }
+    }
+
+    boolean configured() { return configuredMap != null; }
+
+    boolean intersectsBlock(int shard, int block) {
+        return configured() ? blocksByShard[shard].get(block) : ownerShardIndex(block) == shard;
+    }
+
     private final int regionSize;
     private final int columns;
     private final int rows;
@@ -77,10 +106,15 @@ final class SceneRegionDirectory {
     }
 
     int regionCount() {
-        return owners.length();
+        return configured() ? configuredRegions.size() : owners.length();
     }
 
     int regionIndex(int x, int y) {
+        if (configured()) {
+            Integer index = configuredRegions.get(configuredMap.regionId(x, y));
+            if (index == null) throw new IllegalArgumentException("坐标不属于配置区域: " + x + "," + y);
+            return index;
+        }
         return (y / regionSize) * columns + (x / regionSize);
     }
 

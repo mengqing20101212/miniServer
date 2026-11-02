@@ -584,6 +584,10 @@ public class RobotSession {
         return playerInfo.getPlayerId();
     }
 
+    public void registerPushAction(RobotAction action) {
+        actionRegistry.register(action);
+    }
+
     /**
      * 按当前会话状态创建上行协议包。
      *

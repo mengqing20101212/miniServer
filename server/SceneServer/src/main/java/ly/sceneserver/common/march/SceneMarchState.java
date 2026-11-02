@@ -7,7 +7,7 @@ import ly.sceneserver.common.ScenePoint;
 /**
  * SceneServer 权威行军状态。
  *
- * <p>GameServer 在发车前冻结兵种、兵量、英雄和战力版本；SceneServer 只保存地图移动所需
+ * <p>GameServer 在发车前冻结兵量和战力；SceneServer 只保存本次行军所需
  * 摘要，不直接修改玩家养成数据。战斗完成后再把结果投递给 GameServer 玩家队列。
  */
 public final class SceneMarchState {
@@ -27,6 +27,26 @@ public final class SceneMarchState {
     private long departAtMillis;
     private long arrivalAtMillis;
     private int stateVersion = 1;
+    private int targetRegionId;
+    private int resourceId;
+    private long rewardAmount;
+    private long gatherEndAtMillis;
+    private boolean victory;
+
+    public void hostInRegion(int regionId) { targetRegionId = regionId; }
+
+    public void beginGathering(long endAtMillis) {
+        status = SceneMarchStatus.GATHERING;
+        gatherEndAtMillis = endAtMillis;
+        stateVersion++;
+    }
+
+    public void setOutcome(int resourceId, long amount, boolean victory) {
+        this.resourceId = resourceId;
+        this.rewardAmount = amount;
+        this.victory = victory;
+        stateVersion++;
+    }
 
     public SceneMarchState(
             long marchId,
@@ -94,6 +114,11 @@ public final class SceneMarchState {
         state.departAtMillis = snapshot.departAtMillis();
         state.arrivalAtMillis = snapshot.arrivalAtMillis();
         state.stateVersion = snapshot.stateVersion();
+        state.targetRegionId = snapshot.targetRegionId();
+        state.resourceId = snapshot.resourceId();
+        state.rewardAmount = snapshot.rewardAmount();
+        state.gatherEndAtMillis = snapshot.gatherEndAtMillis();
+        state.victory = snapshot.victory();
         return state;
     }
 
@@ -152,6 +177,7 @@ public final class SceneMarchState {
             int speedCostPerSecond,
             long nowMillis) {
         if (status != SceneMarchStatus.ARRIVED
+                && status != SceneMarchStatus.GATHERING
                 && status != SceneMarchStatus.WAITING_RALLY
                 && status != SceneMarchStatus.BATTLE_PENDING) {
             throw new IllegalStateException("march cannot return from: " + status);
@@ -199,7 +225,7 @@ public final class SceneMarchState {
                 armySnapshotVersion,
                 departAtMillis,
                 arrivalAtMillis,
-                stateVersion);
+                stateVersion, targetRegionId, resourceId, rewardAmount, gatherEndAtMillis, victory);
     }
 
     private void requireStatus(SceneMarchStatus expected) {

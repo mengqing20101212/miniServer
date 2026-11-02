@@ -42,6 +42,11 @@ public final class SceneShard {
     private final int maxXExclusive;
     private final Queue<Runnable> inbox = new ConcurrentLinkedQueue<>();
     private final Map<Long, SceneObject> objects = new HashMap<>();
+    private final ly.sceneserver.common.march.SceneMarchService marchService =
+            new ly.sceneserver.common.march.SceneMarchService(this);
+
+    public ly.sceneserver.common.march.SceneMarchService marches() { return marchService; }
+    public java.util.Collection<SceneObject> worldObjects() { return objects.values(); }
     private final Map<Integer, LinkedHashSet<Long>> occupants = new HashMap<>();
 
     /** AOI 块到本 SceneShard 动态对象 ID 的倒排索引。 */
@@ -128,7 +133,7 @@ public final class SceneShard {
     }
 
     public int objectCount() {
-        return objects.size();
+        return objects.size() + marchService.marches().size();
     }
 
     public boolean owns(int x, int y) {
@@ -136,7 +141,7 @@ public final class SceneShard {
                 && x < config.width()
                 && y >= 0
                 && y < config.height()
-                && regionDirectory.ownerShardIndex(blockIndex(x, y)) == shardIndex;
+                && regionDirectory.ownerShardIndex(regionDirectory.regionIndex(x, y)) == shardIndex;
     }
 
     /** 将业务操作投递到 SceneShard 线程，调用方不能直接修改 shard 内对象。 */
@@ -417,17 +422,7 @@ public final class SceneShard {
     }
 
     /** 把已经冻结部队数据并完成目标校验的行军注册成地图动态对象。 */
-    public void addMarch(SceneMarchState march) {
-        SceneMarchSnapshot snapshot = march.snapshot();
-        addObject(
-                new SceneObject(
-                        snapshot.marchId(),
-                        SceneObjectType.MARCH,
-                        snapshot.ownerPlayerId(),
-                        snapshot.origin().x(),
-                        snapshot.origin().y(),
-                        march));
-    }
+    public void addMarch(SceneMarchState march) { marchService.restore(march); }
 
     /** 把集结点注册成战略动态对象，AOI 世界层也会同步其摘要。 */
     public void addRally(SceneRallyState rally) {
@@ -444,15 +439,11 @@ public final class SceneShard {
 
     /** 在 SceneShard Tick 中串行修改行军状态，并同步增加通用对象版本。 */
     public void updateMarch(long marchId, Consumer<SceneMarchState> action) {
-        SceneObject object = requireObject(marchId);
-        if (!(object.state() instanceof SceneMarchState march)) {
-            throw new IllegalArgumentException("scene object is not a march: " + marchId);
-        }
+        SceneMarchState march = marchService.march(marchId);
+        if (march == null) throw new IllegalArgumentException("march not found: " + marchId);
         action.accept(march);
-        object.state(march);
     }
 
-    /** 在 SceneShard Tick 中串行修改集结状态，并同步增加通用对象版本。 */
     public void updateRally(long rallyId, Consumer<SceneRallyState> action) {
         SceneObject object = requireObject(rallyId);
         if (!(object.state() instanceof SceneRallyState rally)) {
@@ -460,26 +451,6 @@ public final class SceneShard {
         }
         action.accept(rally);
         object.state(rally);
-    }
-
-    /**
-     * 推进行军到同一 SceneShard 内的新路径点。
-     *
-     * <p>跨 SceneShard 点会被拒绝，必须先由 SceneRuntime 协调对象所有权转移，不能直接 从当前 Tick 修改另一个分片。
-     */
-    public void advanceMarch(long marchId, int newPathIndex) {
-        SceneObject object = requireObject(marchId);
-        if (!(object.state() instanceof SceneMarchState march)) {
-            throw new IllegalArgumentException("scene object is not a march: " + marchId);
-        }
-        SceneMarchSnapshot snapshot = march.snapshot();
-        if (newPathIndex < 0 || newPathIndex >= snapshot.path().size()) {
-            throw new IllegalArgumentException("invalid path index: " + newPathIndex);
-        }
-        ScenePoint point = snapshot.path().get(newPathIndex);
-        requireShardThreadOperation(point.x(), point.y());
-        march.advanceTo(newPathIndex);
-        moveObject(marchId, point.x(), point.y());
     }
 
     /** 返回格子上的对象快照，避免把内部集合暴露给其他线程。 */
@@ -525,7 +496,7 @@ public final class SceneShard {
         ViewerState state = viewers.get(request.playerId());
         if (state == null && localVisible.isEmpty()) {
             // 不让每个玩家在所有分片都创建空状态；只在真正观察或探索过本分片时驻留。
-            return new SceneViewSnapshot(
+            return includeMarches(new SceneViewSnapshot(
                     request.playerId(),
                     new ScenePoint(
                             request.center().x() / config.regionSize(),
@@ -534,7 +505,7 @@ public final class SceneShard {
                     tickNumber,
                     List.of(),
                     List.of(),
-                    List.of());
+                    List.of()), request, visibleBlocks);
         }
         if (state == null) {
             state = new ViewerState();
@@ -551,7 +522,7 @@ public final class SceneShard {
                         request.center().y() / config.regionSize());
         state.viewLevel = request.viewLevel();
         state.requestedTagMask = request.requestedTagMask();
-        return snapshotViewer(request.playerId(), state);
+        return includeMarches(snapshotViewer(request.playerId(), state), request, visibleBlocks);
     }
 
     /** 玩家离开场景时只删除在线块订阅，不能清理该玩家已经解锁的战争迷雾。 */
@@ -646,6 +617,9 @@ public final class SceneShard {
                 }
                 processedCommands++;
             }
+            try (ly.db.PersistenceScope persistence = ly.db.PersistenceScope.open()) {
+                marchService.tick(System.currentTimeMillis());
+            }
             tickNumber++;
             lastTickMillis = System.currentTimeMillis();
             if (tickListener != null) {
@@ -710,7 +684,7 @@ public final class SceneShard {
     }
 
     private boolean intersectsBlock(int blockIndex) {
-        return regionDirectory.ownerShardIndex(blockIndex) == shardIndex;
+        return regionDirectory.intersectsBlock(shardIndex, blockIndex);
     }
 
     private BitSet localBlocks(BitSet globalBlocks) {
@@ -768,6 +742,9 @@ public final class SceneShard {
                     if (object == null) {
                         continue;
                     }
+                    if (object.state() instanceof SceneWorldObjectState worldState
+                            && ((object.type() == SceneObjectType.RESOURCE && worldState.amount() == 0)
+                            || (object.type() == SceneObjectType.MONSTER && worldState.health() == 0))) continue;
                     objectCount++;
                     aggregateTags |= object.dataTagMask();
                     if ((object.dataTagMask() & objectFilter) != 0L) {
@@ -801,6 +778,29 @@ public final class SceneShard {
                 discovered);
     }
 
+    private SceneViewSnapshot includeMarches(SceneViewSnapshot view, SceneViewRequest request, BitSet visibleBlocks) {
+        ArrayList<SceneObjectSnapshot> result = new ArrayList<>(view.objects());
+        for (SceneMarchState march : marchService.marches()) {
+            SceneMarchSnapshot snapshot = march.snapshot();
+            if (snapshot.status() == ly.sceneserver.common.march.SceneMarchStatus.FINISHED
+                    || snapshot.status() == ly.sceneserver.common.march.SceneMarchStatus.CANCELLED) continue;
+            if ((SceneDataTag.defaultMask(SceneObjectType.MARCH) & request.viewLevel().effectiveObjectTagMask(request.requestedTagMask())) == 0) continue;
+            for (int block = visibleBlocks.nextSetBit(0); block >= 0; block = visibleBlocks.nextSetBit(block + 1)) {
+                int x = block % blockColumns() * config.regionSize();
+                int y = block / blockColumns() * config.regionSize();
+                if (SceneRouteVisibility.intersects(snapshot.origin(), snapshot.target().point(),
+                        x, y, x + config.regionSize() - 1, y + config.regionSize() - 1)) {
+                    result.add(new SceneObjectSnapshot(snapshot.marchId(), SceneObjectType.MARCH,
+                            snapshot.ownerPlayerId(), snapshot.origin(), snapshot.stateVersion(),
+                            SceneDataTag.defaultMask(SceneObjectType.MARCH), snapshot, null));
+                    break;
+                }
+            }
+        }
+        return new SceneViewSnapshot(view.playerId(), view.centerBlock(), view.viewLevel(), view.tickNumber(),
+                result, view.blocks(), view.discoveredBlockIndices());
+    }
+
     private SceneObjectSnapshot snapshot(SceneObject object) {
         SceneMarchSnapshot march =
                 object.state() instanceof SceneMarchState state
@@ -818,7 +818,7 @@ public final class SceneShard {
                 object.stateVersion(),
                 object.dataTagMask(),
                 march,
-                rally);
+                rally, object.state() instanceof SceneWorldObjectState worldState ? worldState : null);
     }
 
     private void removeOccupant(int x, int y, long objectId) {

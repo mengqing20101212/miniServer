@@ -29,7 +29,8 @@ public class GameServer {
                 new PingController(),
                 new HeroController(),
                 new MoveController(),
-                new SceneProxyController());
+                new SceneProxyController(),
+                new ly.logic.resource.ResourceController());
         ServerContext.startUp(resolved.nacosUrl, ServerTypeEnum.GAME.getType(), resolved.serverId, resolved.env, new GameConnectSessionProvider());
         GameRankBootstrap.start();
         Runtime.getRuntime().addShutdownHook(Thread.ofPlatform().unstarted(() -> {

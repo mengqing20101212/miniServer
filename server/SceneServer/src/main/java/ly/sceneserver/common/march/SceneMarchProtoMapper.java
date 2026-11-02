@@ -24,7 +24,12 @@ public final class SceneMarchProtoMapper {
                 .setArmySnapshotVersion(snapshot.armySnapshotVersion())
                 .setDepartAtMillis(snapshot.departAtMillis())
                 .setArrivalAtMillis(snapshot.arrivalAtMillis())
-                .setStateVersion(snapshot.stateVersion());
+                .setStateVersion(snapshot.stateVersion())
+                .setTargetRegionId(snapshot.targetRegionId())
+                .setResourceId(snapshot.resourceId())
+                .setRewardAmount(snapshot.rewardAmount())
+                .setGatherEndAtMillis(snapshot.gatherEndAtMillis())
+                .setVictory(snapshot.victory());
         for (ScenePoint point : snapshot.path()) {
             builder.addPath(toProto(point));
         }
@@ -89,7 +94,8 @@ public final class SceneMarchProtoMapper {
                 snapshot.getArmySnapshotVersion(),
                 snapshot.getDepartAtMillis(),
                 snapshot.getArrivalAtMillis(),
-                snapshot.getStateVersion());
+                snapshot.getStateVersion(), snapshot.getTargetRegionId(), snapshot.getResourceId(),
+                snapshot.getRewardAmount(), snapshot.getGatherEndAtMillis(), snapshot.getVictory());
     }
 
     /** 从数据库中的 Protobuf 二进制恢复包含完整成员列表的集结快照。 */
@@ -158,6 +164,7 @@ public final class SceneMarchProtoMapper {
             case BATTLE_PENDING -> Scene.SceneMarchStatus.SCENE_MARCH_BATTLE_PENDING;
             case RETURNING -> Scene.SceneMarchStatus.SCENE_MARCH_RETURNING;
             case FINISHED -> Scene.SceneMarchStatus.SCENE_MARCH_FINISHED;
+            case GATHERING -> Scene.SceneMarchStatus.SCENE_MARCH_GATHERING;
             case CANCELLED -> Scene.SceneMarchStatus.SCENE_MARCH_CANCELLED;
         };
     }
@@ -248,6 +255,7 @@ public final class SceneMarchProtoMapper {
             case SCENE_MARCH_BATTLE_PENDING -> SceneMarchStatus.BATTLE_PENDING;
             case SCENE_MARCH_RETURNING -> SceneMarchStatus.RETURNING;
             case SCENE_MARCH_FINISHED -> SceneMarchStatus.FINISHED;
+            case SCENE_MARCH_GATHERING -> SceneMarchStatus.GATHERING;
             case SCENE_MARCH_CANCELLED -> SceneMarchStatus.CANCELLED;
             case UNRECOGNIZED -> throw new IllegalArgumentException("unknown scene march status");
         };

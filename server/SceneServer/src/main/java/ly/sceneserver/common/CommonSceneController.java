@@ -44,8 +44,61 @@ public final class CommonSceneController implements IController {
                 Scene.csSceneLeave.class, this::handleLeave);
         register(Cmd.CMD.CS_SceneView, ConnectSession.class, MessagePacket.class,
                 Scene.csSceneView.class, this::handleView);
+        register(Cmd.CMD.CS_SceneMarchStart, ConnectSession.class, MessagePacket.class,
+                Scene.csSceneMarchStart.class, this::handleMarchStart);
+        register(Cmd.CMD.CS_SceneMarchQuery, ConnectSession.class, MessagePacket.class,
+                Scene.csSceneMarchQuery.class, this::handleMarchQuery);
         register(Cmd.CMD.CS_ScenePathFind, ConnectSession.class, MessagePacket.class,
                 Scene.csScenePathFind.class, this::handlePathFind);
+    }
+
+    private void handleMarchStart(HandlerContext<ConnectSession, MessagePacket> context, Scene.csSceneMarchStart request) {
+        Scene.scSceneMarchStart.Builder response = Scene.scSceneMarchStart.newBuilder()
+                .setSceneId(request.getSceneId()).setRequestId(request.getRequestId());
+        try {
+            SceneRuntime.SceneInstance scene = resolve(request.getSceneId(), request.getScope());
+            if (request.getPlayerId() <= 0 || request.getMarchId() <= 0 || !request.hasTargetPoint()
+                    || (request.getType() != Scene.SceneMarchType.SCENE_MARCH_GATHER
+                    && request.getType() != Scene.SceneMarchType.SCENE_MARCH_ATTACK))
+                throw new IllegalArgumentException("发车参数错误");
+            SceneShard playerShard = scene.locateObject(request.getPlayerId()).get(OP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+            if (playerShard == null) throw new IllegalArgumentException("玩家尚未进入地图");
+            ScenePoint origin = playerShard.query(shard -> {
+                SceneObject player = shard.object(request.getPlayerId());
+                return new ScenePoint(player.x(), player.y());
+            }).get(OP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+            ScenePoint target = new ScenePoint(request.getTargetPoint().getX(), request.getTargetPoint().getY());
+            ly.sceneserver.common.march.SceneMarchSnapshot snapshot = scene.route(target.x(), target.y()).query(shard ->
+                    shard.marches().start(request.getMarchId(), request.getPlayerId(), origin,
+                            request.getTargetId(), target,
+                            request.getType() == Scene.SceneMarchType.SCENE_MARCH_GATHER
+                                    ? ly.sceneserver.common.march.SceneMarchType.GATHER : ly.sceneserver.common.march.SceneMarchType.ATTACK,
+                            request.getTroopCount(), request.getPower(), System.currentTimeMillis()))
+                    .get(OP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+            response.setResult(ErrorMsg.ErrorCode.Ok).setMarch(SceneMarchProtoMapper.toProto(snapshot));
+        } catch (Exception error) {
+            LoggerDef.NetLogger.warn("scene march start failed, playerId={}", request.getPlayerId(), error);
+            response.setResult(ErrorMsg.ErrorCode.PARAM_ERROR);
+        }
+        SceneRpcSupport.sendResponse(context.session(), Cmd.CMD.SC_SceneMarchStart, response.build());
+    }
+
+    private void handleMarchQuery(HandlerContext<ConnectSession, MessagePacket> context, Scene.csSceneMarchQuery request) {
+        Scene.scSceneMarchQuery.Builder response = Scene.scSceneMarchQuery.newBuilder()
+                .setSceneId(request.getSceneId()).setRequestId(request.getRequestId());
+        try {
+            SceneRuntime.SceneInstance scene = resolve(request.getSceneId(), request.getScope());
+            int owner = scene.staticMap().regionDefinitions().indexOf(request.getTargetRegionId());
+            if (owner < 0) throw new IllegalArgumentException("目标区域不存在");
+            ly.sceneserver.common.march.SceneMarchSnapshot snapshot = scene.shard(owner).query(shard ->
+                    shard.marches().requireOwned(request.getMarchId(), request.getPlayerId()).snapshot())
+                    .get(OP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+            response.setResult(ErrorMsg.ErrorCode.Ok).setMarch(SceneMarchProtoMapper.toProto(snapshot));
+        } catch (Exception error) {
+            LoggerDef.NetLogger.warn("scene march query failed, playerId={}", request.getPlayerId(), error);
+            response.setResult(ErrorMsg.ErrorCode.PARAM_ERROR);
+        }
+        SceneRpcSupport.sendResponse(context.session(), Cmd.CMD.SC_SceneMarchQuery, response.build());
     }
 
     private void handleQuery(HandlerContext<ConnectSession, MessagePacket> context, Scene.csSceneQuery request) {
@@ -237,32 +290,18 @@ public final class CommonSceneController implements IController {
             } else if (!inBounds(scene, request.getCenterPoint())) {
                 response.setResult(ErrorMsg.ErrorCode.SCENE_OUT_OF_BOUNDS);
             } else {
-                SceneViewSnapshot snapshot = scene.updateViewAsync(new SceneViewRequest(
-                                request.getPlayerId(),
-                                new ScenePoint(
-                                        request.getCenterPoint().getX(),
-                                        request.getCenterPoint().getY()),
-                                request.getRadiusBlocks(),
-                                fromProtoViewLevel(request.getViewLevel()),
-                                request.getRequestedTagMask()))
+                SceneViewRequest subscribed = new SceneViewRequest(request.getPlayerId(),
+                        new ScenePoint(request.getCenterPoint().getX(), request.getCenterPoint().getY()),
+                        request.getRadiusBlocks(), fromProtoViewLevel(request.getViewLevel()), request.getRequestedTagMask());
+                SceneViewSnapshot snapshot = scene.updateViewAsync(subscribed)
                         .get(OP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-                response.setResult(ErrorMsg.ErrorCode.Ok)
-                        .setCenterBlock(toProtoPoint(snapshot.centerBlock()))
-                        .setTickNumber(snapshot.tickNumber());
-                for (SceneObjectSnapshot object : snapshot.objects()) {
-                    response.addObjects(toProtoSnapshot(object));
-                }
-                for (SceneBlockSnapshot block : snapshot.blocks()) {
-                    response.addBlocks(Scene.SceneBlockSnapshot.newBuilder()
-                            .setBlockIndex(block.blockIndex())
-                            .setBlockPoint(toProtoPoint(block.blockX(), block.blockY()))
-                            .setVisible(block.visible())
-                            .setDiscovered(block.discovered())
-                            .setObjectCount(block.objectCount())
-                            .setDataTagMask(block.dataTagMask())
-                            .build());
-                }
-                response.addAllDiscoveredBlockIndices(snapshot.discoveredBlockIndices());
+                response.mergeFrom(toProtoView(request, snapshot));
+                scene.aoi().subscribe(subscribed, visible -> {
+                    Scene.scSceneChanged change = Scene.scSceneChanged.newBuilder()
+                            .setView(toProtoView(request, visible).toBuilder().clearRequestId()).build();
+                    context.session().addSendPacket(ly.net.packet.MessagePacketFactory.createMessagePacket(
+                            request.getPlayerId(), Cmd.CMD.SC_SceneChanged_VALUE, change, 0, 0));
+                });
             }
         } catch (IndexOutOfBoundsException error) {
             response.setResult(ErrorMsg.ErrorCode.SCENE_OUT_OF_BOUNDS);
@@ -462,6 +501,19 @@ public final class CommonSceneController implements IController {
         };
     }
 
+    private Scene.scSceneView toProtoView(Scene.csSceneView request, SceneViewSnapshot snapshot) {
+        Scene.scSceneView.Builder view = Scene.scSceneView.newBuilder().setSceneId(request.getSceneId())
+                .setPlayerId(request.getPlayerId()).setRequestId(request.getRequestId()).setResult(ErrorMsg.ErrorCode.Ok)
+                .setCenterBlock(toProtoPoint(snapshot.centerBlock())).setViewLevel(request.getViewLevel())
+                .setTickNumber(snapshot.tickNumber()).addAllDiscoveredBlockIndices(snapshot.discoveredBlockIndices());
+        for (SceneObjectSnapshot object : snapshot.objects()) view.addObjects(toProtoSnapshot(object));
+        for (SceneBlockSnapshot block : snapshot.blocks()) view.addBlocks(Scene.SceneBlockSnapshot.newBuilder()
+                .setBlockIndex(block.blockIndex()).setBlockPoint(toProtoPoint(block.blockX(), block.blockY()))
+                .setVisible(block.visible()).setDiscovered(block.discovered()).setObjectCount(block.objectCount())
+                .setDataTagMask(block.dataTagMask()));
+        return view.build();
+    }
+
     private Scene.SceneObjectSnapshot toProtoSnapshot(SceneObjectSnapshot object) {
         Scene.SceneObjectSnapshot.Builder builder = Scene.SceneObjectSnapshot.newBuilder()
                 .setObjectId(object.objectId())
@@ -476,6 +528,8 @@ public final class CommonSceneController implements IController {
         if (object.rally() != null) {
             builder.setRally(SceneMarchProtoMapper.toProto(object.rally()));
         }
+        if (object.worldState() != null)
+            builder.setPersistentState(SceneWorldObjectProtoMapper.toProto(object.worldState()));
         return builder.build();
     }
 

@@ -12,7 +12,12 @@ public record SceneObjectSnapshot(
         int stateVersion,
         long dataTagMask,
         SceneMarchSnapshot march,
-        SceneRallySnapshot rally) {
+        SceneRallySnapshot rally,
+        SceneWorldObjectState worldState) {
+    public SceneObjectSnapshot(long objectId, SceneObjectType type, long ownerId, ScenePoint point,
+            int stateVersion, long dataTagMask, SceneMarchSnapshot march, SceneRallySnapshot rally) {
+        this(objectId, type, ownerId, point, stateVersion, dataTagMask, march, rally, null);
+    }
 
     public SceneObjectSnapshot(
             long objectId,
@@ -21,6 +26,6 @@ public record SceneObjectSnapshot(
             ScenePoint point,
             int stateVersion,
             long dataTagMask) {
-        this(objectId, type, ownerId, point, stateVersion, dataTagMask, null, null);
+        this(objectId, type, ownerId, point, stateVersion, dataTagMask, null, null, null);
     }
 }

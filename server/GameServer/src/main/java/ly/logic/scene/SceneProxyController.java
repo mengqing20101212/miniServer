@@ -37,7 +37,40 @@ public final class SceneProxyController implements IGameController {
         gameHandlerRegister(Cmd.CMD.CS_SceneMove, this::handleMove);
         gameHandlerRegister(Cmd.CMD.CS_SceneLeave, this::handleLeave);
         gameHandlerRegister(Cmd.CMD.CS_SceneView, this::handleView);
+        gameHandlerRegister(Cmd.CMD.SC_SceneChanged, (GameHandlerContext context, Scene.scSceneChanged changed) ->
+                context.player().sendMsg(Cmd.CMD.SC_SceneChanged, changed));
+        gameHandlerRegister(Cmd.CMD.CS_SceneMarchStart, this::handleMarchStart);
+        gameHandlerRegister(Cmd.CMD.CS_SceneMarchQuery, this::handleMarchQuery);
         gameHandlerRegister(Cmd.CMD.CS_ScenePathFind, this::handlePathFind);
+    }
+
+    private void handleMarchStart(GameHandlerContext context, Scene.csSceneMarchStart request) {
+        Player player = context.player();
+        // 部队系统尚未接入，基础验证部队由Game配置冻结，客户端传入的兵量和战力不参与结算。
+        Scene.csSceneMarchStart bound = request.toBuilder().setPlayerId(player.getPlayerId())
+                .clearOrigin().setMarchId(ly.db.MysqlService.getInstance().generateEntityId())
+                .setTroopCount(Integer.getInteger("slg.march.troops", 100))
+                .setPower(Long.getLong("slg.march.power", 100L)).build();
+        Scene.scSceneMarchStart response = call(player, Cmd.CMD.CS_SceneMarchStart, bound,
+                Scene.scSceneMarchStart.class, NORMAL_TIMEOUT_MILLIS, RpcFailSavePolicy.NONE);
+        if (response == null) response = Scene.scSceneMarchStart.newBuilder()
+                .setSceneId(request.getSceneId()).setRequestId(request.getRequestId())
+                .setResult(ErrorMsg.ErrorCode.SCENE_NOT_READY).build();
+        player.sendMsg(Cmd.CMD.SC_SceneMarchStart, response);
+    }
+
+    private void handleMarchQuery(GameHandlerContext context, Scene.csSceneMarchQuery request) {
+        Player player = context.player();
+        Scene.scSceneMarchQuery response = call(player, Cmd.CMD.CS_SceneMarchQuery,
+                request.toBuilder().setPlayerId(player.getPlayerId()).build(),
+                Scene.scSceneMarchQuery.class, NORMAL_TIMEOUT_MILLIS, RpcFailSavePolicy.NONE);
+        if (response == null) response = Scene.scSceneMarchQuery.newBuilder()
+                .setSceneId(request.getSceneId()).setRequestId(request.getRequestId())
+                .setResult(ErrorMsg.ErrorCode.SCENE_NOT_READY).build();
+        if (response.getResult() == ErrorMsg.ErrorCode.Ok)
+            ((SlgModule) player.getPlayerData().getModule(ly.logic.player.ModuleEnum.SLG_MODULE))
+                    .settle(response.getMarch());
+        player.sendMsg(Cmd.CMD.SC_SceneMarchQuery, response);
     }
 
     private void handleQuery(GameHandlerContext context, Scene.csSceneQuery request) {
@@ -184,6 +217,7 @@ public final class SceneProxyController implements IGameController {
                     requestCmd);
             return null;
         }
+        connector.getClient().setUnsolicitedPacketHandler(SceneProxyController::routeSceneNotification);
         AbstractMessage response = connector.syncSendProtoMessage(
                 player.getPlayerId(),
                 requestCmd.getNumber(),
@@ -200,6 +234,13 @@ public final class SceneProxyController implements IGameController {
             return null;
         }
         return responseType.cast(response);
+    }
+
+    private static boolean routeSceneNotification(ly.net.packet.MessagePacket packet) {
+        if (packet.getCmd() != Cmd.CMD.SC_SceneChanged_VALUE) return false;
+        Player player = ly.logic.player.PlayerManager.getInstance().getOnlinePlayer(packet.getGuid());
+        if (player != null) player.getGamePlayer().addPacket(packet);
+        return true;
     }
 
     // 以下方法保持 package-private，单元测试会用伪造 playerId 验证所有玩家态协议都被覆盖。

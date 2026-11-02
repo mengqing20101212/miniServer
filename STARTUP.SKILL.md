@@ -118,3 +118,12 @@ Do not start BotServer until Login/Game/Scene/Gate are actually listening on `88
 - Nacos gRPC errors such as `Request stream error`, `Server check fail`, or `Connection reset` can appear when duplicate stale processes exist or the remote Nacos connection resets. Do a clean restart before treating them as code failures.
 - `Nacos Logging don't find adapter`, Netty DNS fallback warnings, and GameServer `SLF4J StaticLoggerBinder` warnings are known startup noise unless accompanied by functional failure.
 - `generated-sql/create-tables.sql` files are tracked; do not delete them as temporary files.
+
+## Configured SLG map
+
+- Map dimensions: 1200 × 1200.
+- Start SceneServer with `-Dslg.scene.map-dir=/home/liuyang/.ssh/miniServer/maps/slg` (or another map export directory).
+- Required files: `WorldMap2.tmx`, `world-regions.json`.
+- Each configured region owns one execution thread; current map has 25 regions per logical scene.
+- AOI blocks remain independent (32 × 32 logical cells). Marches stay in their target region throughout outbound/gather/battle/return.
+- Generate and deploy `slgWorldObject.xml` from `excel/slgWorldObject.xlsx` with other XML tables.

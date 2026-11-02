@@ -73,6 +73,7 @@ enum SceneMarchStatus {
   SCENE_MARCH_FINISHED = 6;
   // 行军在允许取消的阶段被终止。
   SCENE_MARCH_CANCELLED = 7;
+  SCENE_MARCH_GATHERING = 8;
 }
 
 // 行军目标类型，用于校验攻击、增援、采集、集结等业务能力。
@@ -203,6 +204,7 @@ message SceneObjectSnapshot {
   SceneMarchSnapshot march = 7;
   // kind=RALLY 时携带的集结明细。
   SceneRallySnapshot rally = 8;
+  ScenePersistentObjectState persistent_state = 9;
 }
 
 // 行军目标及其能力标签；target_version 用于抵御到达前目标迁移或换主。
@@ -237,9 +239,9 @@ message SceneMarchSnapshot {
   ScenePoint origin = 7;
   // 已冻结的行军目标描述。
   SceneMarchTarget target = 8;
-  // SceneServer 确认的完整格子路径，包含首尾坐标。
+  // SceneServer 确认的路线，基础直线行军包含起点和终点。
   repeated ScenePoint path = 9;
-  // 当前已经到达的 path 下标。
+  // 路线展示进度，不表示途经格子的托管归属。
   int32 path_index = 10;
   // 发车时部队总兵力；战斗后以结果中的剩余兵力为准。
   int32 troop_count = 11;
@@ -253,6 +255,11 @@ message SceneMarchSnapshot {
   int64 arrival_at_millis = 15;
   // 行军状态版本，用于客户端增量更新和服务端幂等校验。
   int32 state_version = 16;
+  int32 target_region_id = 17;
+  int32 resource_id = 18;
+  int64 reward_amount = 19;
+  int64 gather_end_at_millis = 20;
+  bool victory = 21;
 }
 
 // 集结中的单个成员快照；发车后保留冻结版本，不能被 GameServer 实时属性覆盖。
@@ -590,3 +597,41 @@ message scScenePathFind {
   // A* 完成后回投到的 SceneShard Tick。
   int64 completed_tick = 7;
 }
+
+// 发车坐标、兵量与战力由GameServer在玩家队列中绑定，客户端只指定目标与动作。
+message csSceneMarchStart {
+  string scene_id = 1;
+  SceneScope scope = 2;
+  int64 player_id = 3;
+  int64 request_id = 4;
+  ScenePoint origin = 5;
+  int64 target_id = 6;
+  ScenePoint target_point = 7;
+  SceneMarchType type = 8;
+  int32 troop_count = 9;
+  int64 power = 10;
+  int64 march_id = 11;
+}
+message scSceneMarchStart {
+  ErrorCode result = 1;
+  string scene_id = 2;
+  int64 request_id = 3;
+  SceneMarchSnapshot march = 4;
+}
+message csSceneMarchQuery {
+  string scene_id = 1;
+  SceneScope scope = 2;
+  int64 player_id = 3;
+  int64 request_id = 4;
+  int64 march_id = 5;
+  int32 target_region_id = 6;
+}
+message scSceneMarchQuery {
+  ErrorCode result = 1;
+  string scene_id = 2;
+  int64 request_id = 3;
+  SceneMarchSnapshot march = 4;
+}
+
+// 完整可见快照替换，用于资源、怪物和行军变化推送；资产领取仍查询权威行军结果。
+message scSceneChanged { scSceneView view = 1; }

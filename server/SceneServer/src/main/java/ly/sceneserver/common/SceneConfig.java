@@ -29,8 +29,8 @@ public record SceneConfig(
         }
     }
 
-    /** 创建当前 SLG 第一阶段使用的标准地图配置。 */
+    /** 创建基础测试地图配置；正式区域线程数由地图文件决定。 */
     public static SceneConfig standard(String sceneId) {
-        return new SceneConfig(sceneId, 1_000, 1_000, 4, 32, 100);
+        return new SceneConfig(sceneId, 1_200, 1_200, 4, 32, 100);
     }
 }

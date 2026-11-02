@@ -63,6 +63,24 @@ public class BotServer {
             boolean success = SceneRpcSmokeTestModule.runStandalone(sceneHost, scenePort, requireFakeData);
             System.exit(success ? 0 : 1);
         }
+        if (args != null && args.length == 5 && "--test-slg-gameplay".equals(args[0])) {
+            ly.bot.session.RobotSession observer = new ly.bot.session.RobotSession(2, args[1],
+                    Integer.parseInt(args[2]), args[4] + "_observer", args[3], ignored -> {});
+            ly.bot.scenario.SlgGameplayScenario scenario = new ly.bot.scenario.SlgGameplayScenario(observer);
+            ly.bot.session.RobotSession session = new ly.bot.session.RobotSession(1, args[1],
+                    Integer.parseInt(args[2]), args[4], args[3], scenario);
+            boolean success = false;
+            try {
+                observer.startLoginProcess();
+                observer.loginFuture().get(120, java.util.concurrent.TimeUnit.SECONDS);
+                session.startLoginProcess();
+                session.loginFuture().get(120, java.util.concurrent.TimeUnit.SECONDS);
+                scenario.completion().get(21, java.util.concurrent.TimeUnit.MINUTES);
+                success = true;
+            } catch (Exception error) { error.printStackTrace(); }
+            finally { session.shutdown(); observer.shutdown(); }
+            System.exit(success ? 0 : 1);
+        }
         if (args != null && args.length > 0 && "--test-scene-load".equals(args[0])) {
             String loginHost = args.length >= 2 ? args[1] : "127.0.0.1";
             int loginHttpPort = args.length >= 3 ? Integer.parseInt(args[2]) : 8889;

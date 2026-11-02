@@ -23,6 +23,8 @@ public final class SceneStaticMap {
     private final int[] spawnRuleId;
     /** 每次加载器修改静态数组都会增加，用于使旧 Region 连通图失效。 */
     private long modificationVersion;
+    private int[] regionIds;
+    private java.util.List<Integer> regionDefinitions = java.util.List.of();
     /** SceneRuntime 启动前置为 true；冻结后只能通过动态对象/阻挡快照表达变化。 */
     private boolean frozen;
 
@@ -37,6 +39,21 @@ public final class SceneStaticMap {
         this.configId = new int[cellCount];
         this.flags = new byte[cellCount];
         this.spawnRuleId = new int[cellCount];
+    }
+
+    public void loadRegionIds(int[] regionIds) {
+        requireMutable();
+        this.regionIds = regionIds;
+    }
+
+    public void loadRegionDefinitions(java.util.List<Integer> definitions) {
+        regionDefinitions = java.util.List.copyOf(definitions);
+    }
+
+    public java.util.List<Integer> regionDefinitions() { return regionDefinitions; }
+
+    public int regionId(int x, int y) {
+        return regionIds == null ? 0 : regionIds[index(x, y)];
     }
 
     public int width() {

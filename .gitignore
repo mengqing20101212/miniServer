@@ -18,3 +18,7 @@ logs/net.log
 /local-dev/logs/
 /local-dev/run/
 /local-dev/work/
+
+# Local company map exports (large assets supplied by the map editor)
+/maps/slg/WorldMap2.tmx
+/maps/slg/world-regions.json

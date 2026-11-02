@@ -61,6 +61,11 @@ enum CMD{
   SC_SceneLeave = 2010;
   CS_SceneView = 2011;                                                              // 移动 AOI 视野或切换缩放层
   SC_SceneView = 2012;
+  SC_SceneChanged = 2019;
+  CS_SceneMarchStart = 2015;
+  SC_SceneMarchStart = 2016;
+  CS_SceneMarchQuery = 2017;
+  SC_SceneMarchQuery = 2018;
   CS_ScenePathFind = 2013;                                                          // 异步地形和战争迷雾 A* 寻路
   SC_ScenePathFind = 2014;
   MaxServeMsgId = 20000;                                                         //maxServeMsgId 服务器之间通信消息号最大值

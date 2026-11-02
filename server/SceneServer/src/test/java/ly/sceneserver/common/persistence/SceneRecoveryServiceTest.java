@@ -154,12 +154,13 @@ public class SceneRecoveryServiceTest {
             assertEquals(1L, report.restoredMarchCount());
             assertEquals(1L, report.restoredRallyCount());
             SceneObject restoredObject = runtime.scene("world-1").route(2, 3).object(5_001L);
-            SceneObject restoredMarch = runtime.scene("world-1").route(1, 0).object(1_001L);
+            SceneMarchState restoredMarch = runtime.scene("world-1")
+                    .route(marchState.snapshot().target().point().x(), marchState.snapshot().target().point().y())
+                    .marches().requireOwned(1_001L, marchState.snapshot().ownerPlayerId());
             SceneObject restoredRally = runtime.scene("world-1").route(10, 10).object(3_001L);
             assertEquals(resourceState, restoredObject.state());
             assertEquals(6, restoredObject.stateVersion());
-            assertTrue(restoredMarch.state() instanceof SceneMarchState);
-            assertEquals(marchState.snapshot(), ((SceneMarchState) restoredMarch.state()).snapshot());
+            assertEquals(marchState.snapshot(), restoredMarch.snapshot());
             assertTrue(restoredRally.state() instanceof SceneRallyState);
             assertEquals(rallyState.snapshot(), ((SceneRallyState) restoredRally.state()).snapshot());
             assertFalse(runtime.isStarted());

@@ -392,3 +392,42 @@ cmd.exe /c "netstat -ano | findstr :8889 && netstat -ano | findstr :9001 && nets
 
 加载器按属性名取值，字段顺序无关。集合仍用分号和冒号表达；XML 转义由转表器处理。
 GM 上传、配置完整包和热更摘要均使用 `.xml`。类型以 Excel 表头声明为准，不根据单元格内容推断。
+
+### 1200×1200 SLG 地图与基础玩法
+
+SceneServer 使用公司导出的 `WorldMap2.tmx` 和 `world-regions.json`。启动增加：
+
+```text
+-Dslg.scene.map-dir=/home/liuyang/.ssh/miniServer/maps/slg
+```
+
+正式启动每张地图的执行线程数取自 `regionDefs`，当前为25；不由固定32×32块或X轴条带决定。
+AOI/迷雾/寻路的空间方格仍由 `slg.scene.region-size` 指定，默认32。九宫格用 `radius_blocks=1`。
+
+新配置源表为 `excel/slgWorldObject.xlsx`，通过已有转表器生成 `slgWorldObject.xml`，需放到服务配置目录。
+`countPerRegion` 控制每个区域的资源点/怪物数量。地图恢复后只补足缺少的配置实例，不覆盖已消耗的存档。
+
+基础行军流程：
+
+1. 客户端发送 `CS_SceneMarchStart`，指定目标ID、坐标及 GATHER/ATTACK。
+2. Game绑定真实玩家和服务端部队参数，Scene读取玩家当前地图坐标作为出发点。
+3. 发车后直到返程结束，行军始终托管在目标区域；不占用途经格子，不逐格搬迁。
+4. 到达资源点后采集，携带量暂按兵量计算；到达怪物后用冻结战力与血量比较，暂不产生战损。
+5. 返程完成后查询 `CS_SceneMarchQuery` 领取资源；Game保存领取凭据，重复查询不重复发奖。
+
+部队系统尚未接入，Game使用 `slg.march.troops=100`、`slg.march.power=100` 冻结基础部队，忽略客户端兵量和战力。
+Scene的 `slg.march.speed=10` 单位为格/秒。采集时长、资源存量、怪物血量、奖励均由新配置表控制。
+行军和目标变化继续走已有异步实体持久化，恢复后由目标区域接续状态。
+
+路线与视野相交即可见，起终点可以都在九宫格外。`SC_SceneChanged` 是完整可见快照替换，客户端应删除快照中不再存在的对象。
+前端可判断拦截意图；本轮没有拦截协议或实际战斗模块，也没有引入公司的战斗依赖。
+
+沿用现有机器人链路验证（首次运行会注册主账号及后缀 `_observer` 的观察者账号，并分配到指定GameServer）：
+
+```text
+--test-slg-gameplay 127.0.0.1 8889 game1001 本次测试账号
+```
+
+该入口针对当前公司地图中央区域25，走 Login→Gate→Game→Scene，检查采集与打怪、返程期间不发奖、返程后实际资源余额、重复查询不重复发奖，以及第二个玩家在路线中段收到行军出现和结束移除的AOI推送；观察者视野不包含行军两端。
+
+2026-11-02 本地已完成构建、专项测试及1200×1200地图启动。真实机器人验证阻塞在远程Nacos的gRPC订阅超时，尚未跑通完整链路；不能据此认定上述机器人断言已经通过。
