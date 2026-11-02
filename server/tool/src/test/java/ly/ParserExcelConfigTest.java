@@ -98,6 +98,29 @@ public class ParserExcelConfigTest {
         assertFalse(Files.readString(output.resolve("invalid.xml")).contains("<Data"));
     }
 
+    @Test
+    public void invalidFormulaRowIsLoggedAndFollowingRowsStillExport() throws Exception {
+        Path project = temporary.newFolder().toPath();
+        Path excel = Files.createDirectory(project.resolve("excel"));
+        Path file = excel.resolve("formula.xlsx");
+        writeExcel(file, new String[]{"id", "amount"}, new String[]{"int", "int"}, new Object[]{1, 10});
+        try (java.io.InputStream input = Files.newInputStream(file); Workbook workbook = new XSSFWorkbook(input)) {
+            Sheet sheet = workbook.getSheet("Sheet1");
+            sheet.shiftRows(5, 5, 1);
+            Row invalid = sheet.createRow(5);
+            invalid.createCell(0).setCellValue("#");
+            invalid.createCell(1).setCellValue(2);
+            invalid.createCell(2).setCellFormula("1/0");
+            try (java.io.OutputStream output = Files.newOutputStream(file)) { workbook.write(output); }
+        }
+        Path output = project.resolve("data");
+        new ParserExcelConfig(excel.toString(), output.toString(), false).startParser();
+        org.w3c.dom.Document xml = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                .parse(output.resolve("formula.xml").toFile());
+        assertEquals(1, xml.getElementsByTagName("Data").getLength());
+        assertEquals("1", ((org.w3c.dom.Element) xml.getElementsByTagName("Data").item(0)).getAttribute("id"));
+    }
+
     private void writeExcel(Path file, String[] fields, String[] types, Object[] values) throws Exception {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Sheet1");

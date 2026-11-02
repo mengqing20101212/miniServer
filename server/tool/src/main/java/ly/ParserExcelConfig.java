@@ -131,7 +131,12 @@ public class ParserExcelConfig {
                     } else if (row.getRowNum() == 3) {
                         addDescHeadTitle(row);
                     } else if (row.getRowNum() >= 5) {
-                        makeXmlData(document, evaluator, row);
+                        try {
+                            makeXmlData(document, evaluator, row);
+                        } catch (RuntimeException error) {
+                            System.err.println(filepathName + " / Sheet1 第" + (row.getRowNum() + 1)
+                                    + "行跳过: " + error.getMessage());
+                        }
                     }
                 }
                 writeServerXmlConfig(document);
