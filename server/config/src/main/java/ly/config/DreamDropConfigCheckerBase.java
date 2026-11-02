@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class DreamDropConfigCheckerBase extends AbstractConfigChecker<DreamDropConfig> {
   @Override
   public String getConfigFileName() {
-    return "dreamDrop.txt";
+    return "dreamDrop.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "dreamMainId", "INT"),
-        new ConfigColumnMeta(2, "appraise", "STRING"),
-        new ConfigColumnMeta(3, "heroCount", "INT"),
-        new ConfigColumnMeta(4, "dropShow", "STRING"),
-        new ConfigColumnMeta(5, "drop", "INT"),
-        new ConfigColumnMeta(6, "settlement", "INT"),
-        new ConfigColumnMeta(7, "display", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "dreamMainId", "int"),
+        new ConfigColumnMeta(2, "appraise", "string"),
+        new ConfigColumnMeta(3, "heroCount", "int"),
+        new ConfigColumnMeta(4, "dropShow", "string"),
+        new ConfigColumnMeta(5, "drop", "int"),
+        new ConfigColumnMeta(6, "settlement", "int"),
+        new ConfigColumnMeta(7, "display", "string"));
   }
 }

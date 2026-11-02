@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class CookSkillConfigCheckerBase extends AbstractConfigChecker<CookSkillConfig> {
   @Override
   public String getConfigFileName() {
-    return "cookSkill.txt";
+    return "cookSkill.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "skill", "INT"),
-        new ConfigColumnMeta(1, "group", "INT"),
-        new ConfigColumnMeta(2, "nextExp", "INT"),
-        new ConfigColumnMeta(3, "bonus", "INT"));
+        new ConfigColumnMeta(0, "skill", "int"),
+        new ConfigColumnMeta(1, "group", "int"),
+        new ConfigColumnMeta(2, "nextExp", "int"),
+        new ConfigColumnMeta(3, "bonus", "int"));
   }
 }

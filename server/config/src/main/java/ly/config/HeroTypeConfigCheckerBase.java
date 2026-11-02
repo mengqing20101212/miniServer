@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class HeroTypeConfigCheckerBase extends AbstractConfigChecker<HeroTypeConfig> {
   @Override
   public String getConfigFileName() {
-    return "heroType.txt";
+    return "heroType.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "icon", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "icon", "int"));
   }
 }

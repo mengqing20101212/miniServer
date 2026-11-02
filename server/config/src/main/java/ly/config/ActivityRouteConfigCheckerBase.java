@@ -8,26 +8,26 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityRouteConfigCheckerBase extends AbstractConfigChecker<ActivityRouteConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityRoute.txt";
+    return "activityRoute.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "drop", "INT"),
-        new ConfigColumnMeta(2, "rewardShow", "STRING"),
-        new ConfigColumnMeta(3, "score", "INT"),
-        new ConfigColumnMeta(4, "array", "INT"),
-        new ConfigColumnMeta(5, "row", "INT"),
-        new ConfigColumnMeta(6, "front", "STRING"),
-        new ConfigColumnMeta(7, "payGift", "INT"),
-        new ConfigColumnMeta(8, "payGiftShow", "STRING"),
-        new ConfigColumnMeta(9, "rechargeId", "INT"),
-        new ConfigColumnMeta(10, "isCrossNode", "INT"),
-        new ConfigColumnMeta(11, "drop2", "INT"),
-        new ConfigColumnMeta(12, "rewardShow2", "STRING"),
-        new ConfigColumnMeta(13, "line", "STRING"),
-        new ConfigColumnMeta(14, "circle", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "drop", "int"),
+        new ConfigColumnMeta(2, "rewardShow", "string"),
+        new ConfigColumnMeta(3, "score", "int"),
+        new ConfigColumnMeta(4, "array", "int"),
+        new ConfigColumnMeta(5, "row", "int"),
+        new ConfigColumnMeta(6, "front", "string"),
+        new ConfigColumnMeta(7, "payGift", "int"),
+        new ConfigColumnMeta(8, "payGiftShow", "string"),
+        new ConfigColumnMeta(9, "rechargeId", "int"),
+        new ConfigColumnMeta(10, "isCrossNode", "int"),
+        new ConfigColumnMeta(11, "drop2", "int"),
+        new ConfigColumnMeta(12, "rewardShow2", "string"),
+        new ConfigColumnMeta(13, "line", "string"),
+        new ConfigColumnMeta(14, "circle", "string"));
   }
 }

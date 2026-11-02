@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class DreamEventNewConfigCheckerBase extends AbstractConfigChecker<DreamEventNewConfig> {
   @Override
   public String getConfigFileName() {
-    return "dreamEventNew.txt";
+    return "dreamEventNew.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "resourceId", "INT"),
-        new ConfigColumnMeta(2, "mechanism", "STRING"),
-        new ConfigColumnMeta(3, "heroCount", "INT"),
-        new ConfigColumnMeta(4, "limit", "LIST<INT>"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "resourceId", "int"),
+        new ConfigColumnMeta(2, "mechanism", "string"),
+        new ConfigColumnMeta(3, "heroCount", "int"),
+        new ConfigColumnMeta(4, "limit", "list<int>"));
   }
 }

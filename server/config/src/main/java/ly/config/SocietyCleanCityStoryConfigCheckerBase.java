@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class SocietyCleanCityStoryConfigCheckerBase extends AbstractConfigChecker<SocietyCleanCityStoryConfig> {
   @Override
   public String getConfigFileName() {
-    return "societyCleanCityStory.txt";
+    return "societyCleanCityStory.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "group", "INT"),
-        new ConfigColumnMeta(3, "para", "INT"),
-        new ConfigColumnMeta(4, "questionPool", "STRING"),
-        new ConfigColumnMeta(5, "dropSuccess", "INT"),
-        new ConfigColumnMeta(6, "dropFail", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "group", "int"),
+        new ConfigColumnMeta(3, "para", "int"),
+        new ConfigColumnMeta(4, "questionPool", "string"),
+        new ConfigColumnMeta(5, "dropSuccess", "int"),
+        new ConfigColumnMeta(6, "dropFail", "int"));
   }
 }

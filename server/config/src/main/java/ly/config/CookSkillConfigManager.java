@@ -27,7 +27,7 @@ public class CookSkillConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new CookSkillConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "cookSkill.txt"; }
+  public String getConfigFileName() { return "cookSkill.xml"; }
 
   public static class CookSkillConfigManagerImpl extends AbstractConfigManger {
     private List<CookSkillConfig> configList = List.of();
@@ -37,63 +37,37 @@ public class CookSkillConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       CookSkillConfigChecker checker = new CookSkillConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<CookSkillConfig> newList = new ArrayList<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 4) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int skill = 0;
-          int group = 0;
-          int nextExp = 0;
-          int bonus = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
           try {
-            // 解析 等级
-            if (!arr[0].trim().isEmpty()) {
-              skill = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 技巧组
-            if (!arr[1].trim().isEmpty()) {
-              group = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 下一级所需经验
-            if (!arr[2].trim().isEmpty()) {
-              nextExp = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 加成系数（%）
-            if (!arr[3].trim().isEmpty()) {
-              bonus = Integer.parseInt(arr[3].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("skill"), fileName + ":行" + lineNumber + ":字段 skill");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("group"), fileName + ":行" + lineNumber + ":字段 group");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("nextExp"), fileName + ":行" + lineNumber + ":字段 nextExp");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("bonus"), fileName + ":行" + lineNumber + ":字段 bonus");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          CookSkillConfig config = new CookSkillConfig(skill, group, nextExp, bonus);
-          config.afterLoad();
+          CookSkillConfig config = new CookSkillConfig(parsedField0, parsedField1, parsedField2, parsedField3);
           newList.add(config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+      });
+      configList = List.copyOf(newList);
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (CookSkillConfig config : configList) config.afterLoad();
+      new CookSkillConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -104,45 +78,13 @@ public class CookSkillConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法结束区@@@@@
     }
 
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
-    }
-
     public List<CookSkillConfig> getConfigList() {
       return configList;
     }
 
     @Override
     public String getConfigFileName() {
-      return "cookSkill.txt";
+      return "cookSkill.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

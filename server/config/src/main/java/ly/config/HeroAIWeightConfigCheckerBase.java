@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class HeroAIWeightConfigCheckerBase extends AbstractConfigChecker<HeroAIWeightConfig> {
   @Override
   public String getConfigFileName() {
-    return "heroAIWeight.txt";
+    return "heroAIWeight.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "heroId", "INT"),
-        new ConfigColumnMeta(1, "modelId", "INT"),
-        new ConfigColumnMeta(2, "name", "STRING"),
-        new ConfigColumnMeta(3, "des", "STRING"),
-        new ConfigColumnMeta(4, "CLASS", "INT"),
-        new ConfigColumnMeta(5, "sequence", "INT"),
-        new ConfigColumnMeta(6, "weight", "INT"));
+        new ConfigColumnMeta(0, "heroId", "int"),
+        new ConfigColumnMeta(1, "modelId", "int"),
+        new ConfigColumnMeta(2, "name", "string"),
+        new ConfigColumnMeta(3, "des", "string"),
+        new ConfigColumnMeta(4, "CLASS", "int"),
+        new ConfigColumnMeta(5, "sequence", "int"),
+        new ConfigColumnMeta(6, "weight", "int"));
   }
 }

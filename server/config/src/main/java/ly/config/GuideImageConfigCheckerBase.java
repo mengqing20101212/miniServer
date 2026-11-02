@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class GuideImageConfigCheckerBase extends AbstractConfigChecker<GuideImageConfig> {
   @Override
   public String getConfigFileName() {
-    return "guideImage.txt";
+    return "guideImage.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "beizhu", "STRING"),
-        new ConfigColumnMeta(2, "title", "STRING"),
-        new ConfigColumnMeta(3, "resourceList", "STRING"),
-        new ConfigColumnMeta(4, "triggerNext", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "beizhu", "string"),
+        new ConfigColumnMeta(2, "title", "string"),
+        new ConfigColumnMeta(3, "resourceList", "string"),
+        new ConfigColumnMeta(4, "triggerNext", "int"));
   }
 }

@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class GuildRefreshShopNumConfigCheckerBase extends AbstractConfigChecker<GuildRefreshShopNumConfig> {
   @Override
   public String getConfigFileName() {
-    return "guildRefreshShopNum.txt";
+    return "guildRefreshShopNum.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "refreshNum", "STRING"),
-        new ConfigColumnMeta(2, "spend", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "refreshNum", "string"),
+        new ConfigColumnMeta(2, "spend", "int"));
   }
 }

@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class CheckPointConfigCheckerBase extends AbstractConfigChecker<CheckPointConfig> {
   @Override
   public String getConfigFileName() {
-    return "checkPoint.txt";
+    return "checkPoint.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "des", "STRING"),
-        new ConfigColumnMeta(2, "pointType", "INT"),
-        new ConfigColumnMeta(3, "para", "STRING"),
-        new ConfigColumnMeta(4, "functionName", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "des", "string"),
+        new ConfigColumnMeta(2, "pointType", "int"),
+        new ConfigColumnMeta(3, "para", "string"),
+        new ConfigColumnMeta(4, "functionName", "string"));
   }
 }

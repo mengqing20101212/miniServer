@@ -27,7 +27,7 @@ public class GuildBossConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new GuildBossConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "guildBoss.txt"; }
+  public String getConfigFileName() { return "guildBoss.xml"; }
 
   public static class GuildBossConfigManagerImpl extends AbstractConfigManger {
     private List<GuildBossConfig> configList = List.of();
@@ -39,132 +39,73 @@ public class GuildBossConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("list<int>");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       GuildBossConfigChecker checker = new GuildBossConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<GuildBossConfig> newList = new ArrayList<>();
       Map<Integer, GuildBossConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 15) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int sceneId = 0;
-          int level = 0;
-          int group = 0;
-          int icon = 0;
-          String battleReward = null;
-          int killReward = 0;
-          String disPlayBattleReward = null;
-          String disPlayKillReward = null;
-          String bossDesc = null;
-          String battleDesc = null;
-          String name = null;
-          int bossId = 0;
-          String bossSkill = null;
-          int bossDamageStatisticsType = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          String parsedField5 = null;
+          int parsedField6 = 0;
+          String parsedField7 = null;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          int parsedField12 = 0;
+          java.util.List<Integer> parsedField13 = null;
+          int parsedField14 = 0;
           try {
-            // 解析 状态编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 对应关卡
-            if (!arr[1].trim().isEmpty()) {
-              sceneId = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 BOSS等级
-            if (!arr[2].trim().isEmpty()) {
-              level = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 BOSS组ID
-            if (!arr[3].trim().isEmpty()) {
-              group = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 boss半身像
-            if (!arr[4].trim().isEmpty()) {
-              icon = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 战斗奖励
-            if (!arr[5].trim().isEmpty()) {
-              battleReward = arr[5].trim();
-            }
-
-            // 解析 击败奖励
-            if (!arr[6].trim().isEmpty()) {
-              killReward = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 前端展示战斗奖励
-            if (!arr[7].trim().isEmpty()) {
-              disPlayBattleReward = arr[7].trim();
-            }
-
-            // 解析 前端展示击败奖励
-            if (!arr[8].trim().isEmpty()) {
-              disPlayKillReward = arr[8].trim();
-            }
-
-            // 解析 BOSS特性
-            if (!arr[9].trim().isEmpty()) {
-              bossDesc = arr[9].trim();
-            }
-
-            // 解析 战斗限制
-            if (!arr[10].trim().isEmpty()) {
-              battleDesc = arr[10].trim();
-            }
-
-            // 解析 boss名字
-            if (!arr[11].trim().isEmpty()) {
-              name = arr[11].trim();
-            }
-
-            // 解析 bossId
-            if (!arr[12].trim().isEmpty()) {
-              bossId = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 boss技能
-            if (!arr[13].trim().isEmpty()) {
-              bossSkill = arr[13].trim();
-            }
-
-            // 解析 BOSS伤害计算
-            if (!arr[14].trim().isEmpty()) {
-              bossDamageStatisticsType = Integer.parseInt(arr[14].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("sceneId"), fileName + ":行" + lineNumber + ":字段 sceneId");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("level"), fileName + ":行" + lineNumber + ":字段 level");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("group"), fileName + ":行" + lineNumber + ":字段 group");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("icon"), fileName + ":行" + lineNumber + ":字段 icon");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("battleReward"), fileName + ":行" + lineNumber + ":字段 battleReward");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("killReward"), fileName + ":行" + lineNumber + ":字段 killReward");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("disPlayBattleReward"), fileName + ":行" + lineNumber + ":字段 disPlayBattleReward");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("disPlayKillReward"), fileName + ":行" + lineNumber + ":字段 disPlayKillReward");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("bossDesc"), fileName + ":行" + lineNumber + ":字段 bossDesc");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("battleDesc"), fileName + ":行" + lineNumber + ":字段 battleDesc");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("bossId"), fileName + ":行" + lineNumber + ":字段 bossId");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("bossSkill"), fileName + ":行" + lineNumber + ":字段 bossSkill");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("bossDamageStatisticsType"), fileName + ":行" + lineNumber + ":字段 bossDamageStatisticsType");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          GuildBossConfig config = new GuildBossConfig(id, sceneId, level, group, icon, battleReward, killReward, disPlayBattleReward, disPlayKillReward, bossDesc, battleDesc, name, bossId, bossSkill, bossDamageStatisticsType);
-          config.afterLoad();
+          GuildBossConfig config = new GuildBossConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (GuildBossConfig config : configList) config.afterLoad();
+      new GuildBossConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -174,38 +115,6 @@ public class GuildBossConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<GuildBossConfig> getConfigList() {
@@ -218,7 +127,7 @@ public class GuildBossConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "guildBoss.txt";
+      return "guildBoss.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

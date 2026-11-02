@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class PlayerLvConfigCheckerBase extends AbstractConfigChecker<PlayerLvConfig> {
   @Override
   public String getConfigFileName() {
-    return "playerLv.txt";
+    return "playerLv.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "dropId", "INT"),
-        new ConfigColumnMeta(2, "hintId", "STRING"),
-        new ConfigColumnMeta(3, "addStamina", "INT"),
-        new ConfigColumnMeta(4, "trialTimes", "INT"),
-        new ConfigColumnMeta(5, "dropShow", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "dropId", "int"),
+        new ConfigColumnMeta(2, "hintId", "string"),
+        new ConfigColumnMeta(3, "addStamina", "int"),
+        new ConfigColumnMeta(4, "trialTimes", "int"),
+        new ConfigColumnMeta(5, "dropShow", "int"));
   }
 }

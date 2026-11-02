@@ -27,7 +27,7 @@ public class Mail_templateConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new Mail_templateConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "mail_template.txt"; }
+  public String getConfigFileName() { return "mail_template.xml"; }
 
   public static class Mail_templateConfigManagerImpl extends AbstractConfigManger {
     private List<Mail_templateConfig> configList = List.of();
@@ -37,105 +37,58 @@ public class Mail_templateConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       Mail_templateConfigChecker checker = new Mail_templateConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<Mail_templateConfig> newList = new ArrayList<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 11) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int icon = 0;
-          String des = null;
-          int part_begin = 0;
-          int part_end = 0;
-          int type = 0;
-          String stamp = null;
-          int valid_time = 0;
-          String sender = null;
-          String titile = null;
-          String content = null;
-          String attach = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          String parsedField5 = null;
+          int parsedField6 = 0;
+          String parsedField7 = null;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          String parsedField10 = null;
           try {
-            // 解析 邮件列表中, 邮件图标ID
-            if (!arr[0].trim().isEmpty()) {
-              icon = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 邮件列表中, 描述
-            if (!arr[1].trim().isEmpty()) {
-              des = arr[1].trim();
-            }
-
-            // 解析 影响分区开始区间，仅福利类邮件有效
-            if (!arr[2].trim().isEmpty()) {
-              part_begin = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 影响分区结束区间，仅福利类邮件有效
-            if (!arr[3].trim().isEmpty()) {
-              part_end = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 邮件模版类型
-            if (!arr[4].trim().isEmpty()) {
-              type = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 预设发送邮件时间,仅福利类邮件用
-            if (!arr[5].trim().isEmpty()) {
-              stamp = arr[5].trim();
-            }
-
-            // 解析 有效时间秒数, （无论是否阅读，到时间销毁）
-            if (!arr[6].trim().isEmpty()) {
-              valid_time = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 发件人
-            if (!arr[7].trim().isEmpty()) {
-              sender = arr[7].trim();
-            }
-
-            // 解析 标题
-            if (!arr[8].trim().isEmpty()) {
-              titile = arr[8].trim();
-            }
-
-            // 解析 内容
-            if (!arr[9].trim().isEmpty()) {
-              content = arr[9].trim();
-            }
-
-            // 解析 附件
-            if (!arr[10].trim().isEmpty()) {
-              attach = arr[10].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("icon"), fileName + ":行" + lineNumber + ":字段 icon");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("des"), fileName + ":行" + lineNumber + ":字段 des");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("part_begin"), fileName + ":行" + lineNumber + ":字段 part_begin");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("part_end"), fileName + ":行" + lineNumber + ":字段 part_end");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("type"), fileName + ":行" + lineNumber + ":字段 type");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("stamp"), fileName + ":行" + lineNumber + ":字段 stamp");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("valid_time"), fileName + ":行" + lineNumber + ":字段 valid_time");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("sender"), fileName + ":行" + lineNumber + ":字段 sender");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("titile"), fileName + ":行" + lineNumber + ":字段 titile");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("content"), fileName + ":行" + lineNumber + ":字段 content");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("attach"), fileName + ":行" + lineNumber + ":字段 attach");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          Mail_templateConfig config = new Mail_templateConfig(icon, des, part_begin, part_end, type, stamp, valid_time, sender, titile, content, attach);
-          config.afterLoad();
+          Mail_templateConfig config = new Mail_templateConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10);
           newList.add(config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+      });
+      configList = List.copyOf(newList);
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (Mail_templateConfig config : configList) config.afterLoad();
+      new Mail_templateConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -146,45 +99,13 @@ public class Mail_templateConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法结束区@@@@@
     }
 
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
-    }
-
     public List<Mail_templateConfig> getConfigList() {
       return configList;
     }
 
     @Override
     public String getConfigFileName() {
-      return "mail_template.txt";
+      return "mail_template.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

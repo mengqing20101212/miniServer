@@ -8,20 +8,20 @@ import ly.ConfigColumnMeta;
 public abstract class JusticeMainConfigCheckerBase extends AbstractConfigChecker<JusticeMainConfig> {
   @Override
   public String getConfigFileName() {
-    return "justiceMain.txt";
+    return "justiceMain.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "stageGroup", "STRING"),
-        new ConfigColumnMeta(3, "dropId", "INT"),
-        new ConfigColumnMeta(4, "dropShow", "STRING"),
-        new ConfigColumnMeta(5, "nextZone", "INT"),
-        new ConfigColumnMeta(6, "lastZone", "INT"),
-        new ConfigColumnMeta(7, "background", "INT"),
-        new ConfigColumnMeta(8, "finishSmallBackground", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "stageGroup", "string"),
+        new ConfigColumnMeta(3, "dropId", "int"),
+        new ConfigColumnMeta(4, "dropShow", "string"),
+        new ConfigColumnMeta(5, "nextZone", "int"),
+        new ConfigColumnMeta(6, "lastZone", "int"),
+        new ConfigColumnMeta(7, "background", "int"),
+        new ConfigColumnMeta(8, "finishSmallBackground", "int"));
   }
 }

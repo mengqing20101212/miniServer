@@ -7,50 +7,37 @@ import ly.utils.KV;
  * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
  */
 public class SceneChangeInfoConfig {
-  /**编号*/
   public final int id;
 
-  /**生命继承*/
-  public final String hpInherit;
+  public final boolean hpInherit;
 
-  /**气绝值继承*/
-  public final String spInherit;
+  public final boolean spInherit;
 
-  /**鬼火继承*/
-  public final String energyInherit;
+  public final boolean energyInherit;
 
-  /**鬼火条继承*/
-  public final String energyBarInherit;
+  public final boolean energyBarInherit;
 
-  /**s能量继承*/
-  public final String sPowerInherit;
+  public final boolean sPowerInherit;
 
-  /**行动条继承*/
-  public final String actionBarInherit;
+  public final boolean actionBarInherit;
 
-  /**技能冷却继承*/
-  public final String skillCDInherit;
+  public final boolean skillCDInherit;
 
-  /**Bonus*/
-  public final String bonusInherit;
+  public final boolean bonusInherit;
 
-  /**buff*/
-  public final String buffInherit;
+  public final boolean buffInherit;
 
-  /**全局论累计*/
-  public final String globalRound;
+  public final boolean globalRound;
 
-  /**阵营轮累计*/
-  public final String campRound;
+  public final boolean campRound;
 
-  /**角色轮累计*/
-  public final String charRound;
+  public final boolean charRound;
 
   // @@@@@自定义属性开始区@@@@@
 
   // @@@@@自定义属性结束区@@@@@
 
-  public SceneChangeInfoConfig(int id, String hpInherit, String spInherit, String energyInherit, String energyBarInherit, String sPowerInherit, String actionBarInherit, String skillCDInherit, String bonusInherit, String buffInherit, String globalRound, String campRound, String charRound) {
+  public SceneChangeInfoConfig(int id, boolean hpInherit, boolean spInherit, boolean energyInherit, boolean energyBarInherit, boolean sPowerInherit, boolean actionBarInherit, boolean skillCDInherit, boolean bonusInherit, boolean buffInherit, boolean globalRound, boolean campRound, boolean charRound) {
     this.id = id;
     this.hpInherit = hpInherit;
     this.spInherit = spInherit;

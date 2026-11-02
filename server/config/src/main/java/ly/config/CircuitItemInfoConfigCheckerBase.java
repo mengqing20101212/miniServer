@@ -8,27 +8,27 @@ import ly.ConfigColumnMeta;
 public abstract class CircuitItemInfoConfigCheckerBase extends AbstractConfigChecker<CircuitItemInfoConfig> {
   @Override
   public String getConfigFileName() {
-    return "circuitItemInfo.txt";
+    return "circuitItemInfo.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "description", "STRING"),
-        new ConfigColumnMeta(2, "type", "INT"),
-        new ConfigColumnMeta(3, "school", "INT"),
-        new ConfigColumnMeta(4, "grade", "INT"),
-        new ConfigColumnMeta(5, "sequence", "INT"),
-        new ConfigColumnMeta(6, "pos", "INT"),
-        new ConfigColumnMeta(7, "suitIds", "STRING"),
-        new ConfigColumnMeta(8, "mainAttrPoolId", "INT"),
-        new ConfigColumnMeta(9, "subAttrPoolId", "INT"),
-        new ConfigColumnMeta(10, "subAttrUpgradePoolId", "INT"),
-        new ConfigColumnMeta(11, "upgradeType", "INT"),
-        new ConfigColumnMeta(12, "decomposeGold", "INT"),
-        new ConfigColumnMeta(13, "decomposeDG", "INT"),
-        new ConfigColumnMeta(14, "quality", "INT"),
-        new ConfigColumnMeta(15, "lightAttrPoolId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "description", "string"),
+        new ConfigColumnMeta(2, "type", "int"),
+        new ConfigColumnMeta(3, "school", "int"),
+        new ConfigColumnMeta(4, "grade", "int"),
+        new ConfigColumnMeta(5, "sequence", "int"),
+        new ConfigColumnMeta(6, "pos", "int"),
+        new ConfigColumnMeta(7, "suitIds", "string"),
+        new ConfigColumnMeta(8, "mainAttrPoolId", "int"),
+        new ConfigColumnMeta(9, "subAttrPoolId", "int"),
+        new ConfigColumnMeta(10, "subAttrUpgradePoolId", "int"),
+        new ConfigColumnMeta(11, "upgradeType", "int"),
+        new ConfigColumnMeta(12, "decomposeGold", "int"),
+        new ConfigColumnMeta(13, "decomposeDG", "int"),
+        new ConfigColumnMeta(14, "quality", "int"),
+        new ConfigColumnMeta(15, "lightAttrPoolId", "int"));
   }
 }

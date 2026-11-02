@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class SupportTeamResumeConfigCheckerBase extends AbstractConfigChecker<SupportTeamResumeConfig> {
   @Override
   public String getConfigFileName() {
-    return "supportTeamResume.txt";
+    return "supportTeamResume.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "dropId", "INT"),
-        new ConfigColumnMeta(2, "dropShow", "INT"),
-        new ConfigColumnMeta(3, "group", "INT"),
-        new ConfigColumnMeta(4, "heroId", "INT"),
-        new ConfigColumnMeta(5, "beizhu", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "dropId", "int"),
+        new ConfigColumnMeta(2, "dropShow", "int"),
+        new ConfigColumnMeta(3, "group", "int"),
+        new ConfigColumnMeta(4, "heroId", "int"),
+        new ConfigColumnMeta(5, "beizhu", "string"));
   }
 }

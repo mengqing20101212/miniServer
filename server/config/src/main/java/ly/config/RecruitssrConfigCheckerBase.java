@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class RecruitssrConfigCheckerBase extends AbstractConfigChecker<RecruitssrConfig> {
   @Override
   public String getConfigFileName() {
-    return "recruitssr.txt";
+    return "recruitssr.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "section", "INT"),
-        new ConfigColumnMeta(2, "awardpool", "INT"),
-        new ConfigColumnMeta(3, "scheDuling", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "section", "int"),
+        new ConfigColumnMeta(2, "awardpool", "int"),
+        new ConfigColumnMeta(3, "scheDuling", "int"));
   }
 }

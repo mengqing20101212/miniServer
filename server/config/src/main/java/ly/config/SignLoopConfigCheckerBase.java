@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class SignLoopConfigCheckerBase extends AbstractConfigChecker<SignLoopConfig> {
   @Override
   public String getConfigFileName() {
-    return "signLoop.txt";
+    return "signLoop.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "guoup", "INT"),
-        new ConfigColumnMeta(2, "drop", "INT"),
-        new ConfigColumnMeta(3, "dropShow", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "guoup", "int"),
+        new ConfigColumnMeta(2, "drop", "int"),
+        new ConfigColumnMeta(3, "dropShow", "int"));
   }
 }

@@ -27,7 +27,7 @@ public class SceneChangeInfoConfigManager implements InterfaceConfigManagerProxy
   public AbstractConfigManger createTable() { return new SceneChangeInfoConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "sceneChangeInfo.txt"; }
+  public String getConfigFileName() { return "sceneChangeInfo.xml"; }
 
   public static class SceneChangeInfoConfigManagerImpl extends AbstractConfigManger {
     private List<SceneChangeInfoConfig> configList = List.of();
@@ -39,120 +39,67 @@ public class SceneChangeInfoConfigManager implements InterfaceConfigManagerProxy
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("bool");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       SceneChangeInfoConfigChecker checker = new SceneChangeInfoConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<SceneChangeInfoConfig> newList = new ArrayList<>();
       Map<Integer, SceneChangeInfoConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 13) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String hpInherit = null;
-          String spInherit = null;
-          String energyInherit = null;
-          String energyBarInherit = null;
-          String sPowerInherit = null;
-          String actionBarInherit = null;
-          String skillCDInherit = null;
-          String bonusInherit = null;
-          String buffInherit = null;
-          String globalRound = null;
-          String campRound = null;
-          String charRound = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          boolean parsedField1 = false;
+          boolean parsedField2 = false;
+          boolean parsedField3 = false;
+          boolean parsedField4 = false;
+          boolean parsedField5 = false;
+          boolean parsedField6 = false;
+          boolean parsedField7 = false;
+          boolean parsedField8 = false;
+          boolean parsedField9 = false;
+          boolean parsedField10 = false;
+          boolean parsedField11 = false;
+          boolean parsedField12 = false;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 生命继承
-            if (!arr[1].trim().isEmpty()) {
-              hpInherit = arr[1].trim();
-            }
-
-            // 解析 气绝值继承
-            if (!arr[2].trim().isEmpty()) {
-              spInherit = arr[2].trim();
-            }
-
-            // 解析 鬼火继承
-            if (!arr[3].trim().isEmpty()) {
-              energyInherit = arr[3].trim();
-            }
-
-            // 解析 鬼火条继承
-            if (!arr[4].trim().isEmpty()) {
-              energyBarInherit = arr[4].trim();
-            }
-
-            // 解析 s能量继承
-            if (!arr[5].trim().isEmpty()) {
-              sPowerInherit = arr[5].trim();
-            }
-
-            // 解析 行动条继承
-            if (!arr[6].trim().isEmpty()) {
-              actionBarInherit = arr[6].trim();
-            }
-
-            // 解析 技能冷却继承
-            if (!arr[7].trim().isEmpty()) {
-              skillCDInherit = arr[7].trim();
-            }
-
-            // 解析 Bonus
-            if (!arr[8].trim().isEmpty()) {
-              bonusInherit = arr[8].trim();
-            }
-
-            // 解析 buff
-            if (!arr[9].trim().isEmpty()) {
-              buffInherit = arr[9].trim();
-            }
-
-            // 解析 全局论累计
-            if (!arr[10].trim().isEmpty()) {
-              globalRound = arr[10].trim();
-            }
-
-            // 解析 阵营轮累计
-            if (!arr[11].trim().isEmpty()) {
-              campRound = arr[11].trim();
-            }
-
-            // 解析 角色轮累计
-            if (!arr[12].trim().isEmpty()) {
-              charRound = arr[12].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("hpInherit"), fileName + ":行" + lineNumber + ":字段 hpInherit");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("spInherit"), fileName + ":行" + lineNumber + ":字段 spInherit");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("energyInherit"), fileName + ":行" + lineNumber + ":字段 energyInherit");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("energyBarInherit"), fileName + ":行" + lineNumber + ":字段 energyBarInherit");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("sPowerInherit"), fileName + ":行" + lineNumber + ":字段 sPowerInherit");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("actionBarInherit"), fileName + ":行" + lineNumber + ":字段 actionBarInherit");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("skillCDInherit"), fileName + ":行" + lineNumber + ":字段 skillCDInherit");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("bonusInherit"), fileName + ":行" + lineNumber + ":字段 bonusInherit");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("buffInherit"), fileName + ":行" + lineNumber + ":字段 buffInherit");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("globalRound"), fileName + ":行" + lineNumber + ":字段 globalRound");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("campRound"), fileName + ":行" + lineNumber + ":字段 campRound");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("charRound"), fileName + ":行" + lineNumber + ":字段 charRound");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          SceneChangeInfoConfig config = new SceneChangeInfoConfig(id, hpInherit, spInherit, energyInherit, energyBarInherit, sPowerInherit, actionBarInherit, skillCDInherit, bonusInherit, buffInherit, globalRound, campRound, charRound);
-          config.afterLoad();
+          SceneChangeInfoConfig config = new SceneChangeInfoConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (SceneChangeInfoConfig config : configList) config.afterLoad();
+      new SceneChangeInfoConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -162,38 +109,6 @@ public class SceneChangeInfoConfigManager implements InterfaceConfigManagerProxy
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<SceneChangeInfoConfig> getConfigList() {
@@ -206,7 +121,7 @@ public class SceneChangeInfoConfigManager implements InterfaceConfigManagerProxy
 
     @Override
     public String getConfigFileName() {
-      return "sceneChangeInfo.txt";
+      return "sceneChangeInfo.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

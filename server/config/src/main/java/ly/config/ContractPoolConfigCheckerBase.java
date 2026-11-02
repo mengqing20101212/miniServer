@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class ContractPoolConfigCheckerBase extends AbstractConfigChecker<ContractPoolConfig> {
   @Override
   public String getConfigFileName() {
-    return "contractPool.txt";
+    return "contractPool.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "oneDrawId", "INT"),
-        new ConfigColumnMeta(3, "tenDrawId", "INT"),
-        new ConfigColumnMeta(4, "chanceText", "STRING"),
-        new ConfigColumnMeta(5, "topId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "oneDrawId", "int"),
+        new ConfigColumnMeta(3, "tenDrawId", "int"),
+        new ConfigColumnMeta(4, "chanceText", "string"),
+        new ConfigColumnMeta(5, "topId", "int"));
   }
 }

@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class PeakCompetitionSeasonTimeConfigCheckerBase extends AbstractConfigChecker<PeakCompetitionSeasonTimeConfig> {
   @Override
   public String getConfigFileName() {
-    return "peakCompetitionSeasonTime.txt";
+    return "peakCompetitionSeasonTime.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "seasonStartTime", "STRING"),
-        new ConfigColumnMeta(2, "seasonEndingTime", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "seasonStartTime", "string"),
+        new ConfigColumnMeta(2, "seasonEndingTime", "string"));
   }
 }

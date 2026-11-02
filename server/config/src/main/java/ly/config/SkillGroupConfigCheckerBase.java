@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class SkillGroupConfigCheckerBase extends AbstractConfigChecker<SkillGroupConfig> {
   @Override
   public String getConfigFileName() {
-    return "skillGroup.txt";
+    return "skillGroup.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "description", "STRING"),
-        new ConfigColumnMeta(3, "skillList", "STRING"),
-        new ConfigColumnMeta(4, "skillIcon", "LIST<INT>"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "description", "string"),
+        new ConfigColumnMeta(3, "skillList", "string"),
+        new ConfigColumnMeta(4, "skillIcon", "list<int>"));
   }
 }

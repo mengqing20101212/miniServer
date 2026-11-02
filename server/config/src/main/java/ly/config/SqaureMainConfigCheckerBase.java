@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class SqaureMainConfigCheckerBase extends AbstractConfigChecker<SqaureMainConfig> {
   @Override
   public String getConfigFileName() {
-    return "sqaureMain.txt";
+    return "sqaureMain.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "pic", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "pic", "int"));
   }
 }

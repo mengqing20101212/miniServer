@@ -8,13 +8,13 @@ import ly.ConfigColumnMeta;
 public abstract class PatrolGroupConfigCheckerBase extends AbstractConfigChecker<PatrolGroupConfig> {
   @Override
   public String getConfigFileName() {
-    return "patrolGroup.txt";
+    return "patrolGroup.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "unlockLv", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "unlockLv", "int"));
   }
 }

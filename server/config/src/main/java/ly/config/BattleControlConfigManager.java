@@ -27,7 +27,7 @@ public class BattleControlConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new BattleControlConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "battleControl.txt"; }
+  public String getConfigFileName() { return "battleControl.xml"; }
 
   public static class BattleControlConfigManagerImpl extends AbstractConfigManger {
     private List<BattleControlConfig> configList = List.of();
@@ -39,102 +39,58 @@ public class BattleControlConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       BattleControlConfigChecker checker = new BattleControlConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<BattleControlConfig> newList = new ArrayList<>();
       Map<Integer, BattleControlConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 10) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          int lineupId = 0;
-          int isOnlineBattle = 0;
-          int loadingTime = 0;
-          int readyTime = 0;
-          int changeHeroTime = 0;
-          int isShare = 0;
-          int chaoiceWaitTime = 0;
-          int isSaveDate = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 活动名称
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 阵容id
-            if (!arr[2].trim().isEmpty()) {
-              lineupId = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 是否是服务器战斗
-            if (!arr[3].trim().isEmpty()) {
-              isOnlineBattle = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 在线战斗通用LOADING界面最大等待时间
-            if (!arr[4].trim().isEmpty()) {
-              loadingTime = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 战前准备时间限制
-            if (!arr[5].trim().isEmpty()) {
-              readyTime = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 战前换阵容时间限制（单位s）
-            if (!arr[6].trim().isEmpty()) {
-              changeHeroTime = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 时间是否共用
-            if (!arr[7].trim().isEmpty()) {
-              isShare = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 每回合行动时间限制（单位s）
-            if (!arr[8].trim().isEmpty()) {
-              chaoiceWaitTime = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 是否保存战斗数据
-            if (!arr[9].trim().isEmpty()) {
-              isSaveDate = Integer.parseInt(arr[9].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("lineupId"), fileName + ":行" + lineNumber + ":字段 lineupId");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("isOnlineBattle"), fileName + ":行" + lineNumber + ":字段 isOnlineBattle");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("loadingTime"), fileName + ":行" + lineNumber + ":字段 loadingTime");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("readyTime"), fileName + ":行" + lineNumber + ":字段 readyTime");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("changeHeroTime"), fileName + ":行" + lineNumber + ":字段 changeHeroTime");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("isShare"), fileName + ":行" + lineNumber + ":字段 isShare");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("chaoiceWaitTime"), fileName + ":行" + lineNumber + ":字段 chaoiceWaitTime");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("isSaveDate"), fileName + ":行" + lineNumber + ":字段 isSaveDate");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          BattleControlConfig config = new BattleControlConfig(id, name, lineupId, isOnlineBattle, loadingTime, readyTime, changeHeroTime, isShare, chaoiceWaitTime, isSaveDate);
-          config.afterLoad();
+          BattleControlConfig config = new BattleControlConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (BattleControlConfig config : configList) config.afterLoad();
+      new BattleControlConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -144,38 +100,6 @@ public class BattleControlConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<BattleControlConfig> getConfigList() {
@@ -188,7 +112,7 @@ public class BattleControlConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "battleControl.txt";
+      return "battleControl.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityStoryConfigCheckerBase extends AbstractConfigChecker<ActivityStoryConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityStory.txt";
+    return "activityStory.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "scheDuling", "INT"),
-        new ConfigColumnMeta(2, "name", "STRING"),
-        new ConfigColumnMeta(3, "picture", "STRING"),
-        new ConfigColumnMeta(4, "holographic", "INT"),
-        new ConfigColumnMeta(5, "activtyId", "INT"),
-        new ConfigColumnMeta(6, "trueActivityId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "scheDuling", "int"),
+        new ConfigColumnMeta(2, "name", "string"),
+        new ConfigColumnMeta(3, "picture", "string"),
+        new ConfigColumnMeta(4, "holographic", "int"),
+        new ConfigColumnMeta(5, "activtyId", "int"),
+        new ConfigColumnMeta(6, "trueActivityId", "int"));
   }
 }

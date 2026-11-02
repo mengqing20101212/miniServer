@@ -8,26 +8,26 @@ import ly.ConfigColumnMeta;
 public abstract class GuildBossConfigCheckerBase extends AbstractConfigChecker<GuildBossConfig> {
   @Override
   public String getConfigFileName() {
-    return "guildBoss.txt";
+    return "guildBoss.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "sceneId", "INT"),
-        new ConfigColumnMeta(2, "level", "INT"),
-        new ConfigColumnMeta(3, "group", "INT"),
-        new ConfigColumnMeta(4, "icon", "INT"),
-        new ConfigColumnMeta(5, "battleReward", "STRING"),
-        new ConfigColumnMeta(6, "killReward", "INT"),
-        new ConfigColumnMeta(7, "disPlayBattleReward", "STRING"),
-        new ConfigColumnMeta(8, "disPlayKillReward", "STRING"),
-        new ConfigColumnMeta(9, "bossDesc", "STRING"),
-        new ConfigColumnMeta(10, "battleDesc", "STRING"),
-        new ConfigColumnMeta(11, "name", "STRING"),
-        new ConfigColumnMeta(12, "bossId", "INT"),
-        new ConfigColumnMeta(13, "bossSkill", "LIST<INT>"),
-        new ConfigColumnMeta(14, "bossDamageStatisticsType", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "sceneId", "int"),
+        new ConfigColumnMeta(2, "level", "int"),
+        new ConfigColumnMeta(3, "group", "int"),
+        new ConfigColumnMeta(4, "icon", "int"),
+        new ConfigColumnMeta(5, "battleReward", "string"),
+        new ConfigColumnMeta(6, "killReward", "int"),
+        new ConfigColumnMeta(7, "disPlayBattleReward", "string"),
+        new ConfigColumnMeta(8, "disPlayKillReward", "string"),
+        new ConfigColumnMeta(9, "bossDesc", "string"),
+        new ConfigColumnMeta(10, "battleDesc", "string"),
+        new ConfigColumnMeta(11, "name", "string"),
+        new ConfigColumnMeta(12, "bossId", "int"),
+        new ConfigColumnMeta(13, "bossSkill", "list<int>"),
+        new ConfigColumnMeta(14, "bossDamageStatisticsType", "int"));
   }
 }

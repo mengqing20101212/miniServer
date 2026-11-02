@@ -8,30 +8,30 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityNpcConfigCheckerBase extends AbstractConfigChecker<ActivityNpcConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityNpc.txt";
+    return "activityNpc.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "config_name", "STRING"),
-        new ConfigColumnMeta(2, "characterModelId", "STRING"),
-        new ConfigColumnMeta(3, "defaultAni", "STRING"),
-        new ConfigColumnMeta(4, "bornShowAni", "STRING"),
-        new ConfigColumnMeta(5, "clickType", "STRING"),
-        new ConfigColumnMeta(6, "clickAniList", "STRING"),
-        new ConfigColumnMeta(7, "clickCameraList", "STRING"),
-        new ConfigColumnMeta(8, "moveDistance", "STRING"),
-        new ConfigColumnMeta(9, "cameraDistance", "STRING"),
-        new ConfigColumnMeta(10, "clickText", "STRING"),
-        new ConfigColumnMeta(11, "groupText", "STRING"),
-        new ConfigColumnMeta(12, "ActivityType", "STRING"),
-        new ConfigColumnMeta(13, "param_1", "STRING"),
-        new ConfigColumnMeta(14, "param_2", "STRING"),
-        new ConfigColumnMeta(15, "npcGrounpId", "STRING"),
-        new ConfigColumnMeta(16, "showPriority", "STRING"),
-        new ConfigColumnMeta(17, "decorationId", "STRING"),
-        new ConfigColumnMeta(18, "decorationPoint", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "config_name", "string"),
+        new ConfigColumnMeta(2, "characterModelId", "string"),
+        new ConfigColumnMeta(3, "defaultAni", "string"),
+        new ConfigColumnMeta(4, "bornShowAni", "string"),
+        new ConfigColumnMeta(5, "clickType", "string"),
+        new ConfigColumnMeta(6, "clickAniList", "string"),
+        new ConfigColumnMeta(7, "clickCameraList", "string"),
+        new ConfigColumnMeta(8, "moveDistance", "string"),
+        new ConfigColumnMeta(9, "cameraDistance", "string"),
+        new ConfigColumnMeta(10, "clickText", "string"),
+        new ConfigColumnMeta(11, "groupText", "string"),
+        new ConfigColumnMeta(12, "ActivityType", "string"),
+        new ConfigColumnMeta(13, "param_1", "string"),
+        new ConfigColumnMeta(14, "param_2", "string"),
+        new ConfigColumnMeta(15, "npcGrounpId", "string"),
+        new ConfigColumnMeta(16, "showPriority", "string"),
+        new ConfigColumnMeta(17, "decorationId", "string"),
+        new ConfigColumnMeta(18, "decorationPoint", "string"));
   }
 }

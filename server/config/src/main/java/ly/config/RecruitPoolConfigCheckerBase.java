@@ -8,27 +8,27 @@ import ly.ConfigColumnMeta;
 public abstract class RecruitPoolConfigCheckerBase extends AbstractConfigChecker<RecruitPoolConfig> {
   @Override
   public String getConfigFileName() {
-    return "recruitPool.txt";
+    return "recruitPool.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "recruitType", "INT"),
-        new ConfigColumnMeta(3, "showStyleType", "INT"),
-        new ConfigColumnMeta(4, "oneDrawId", "INT"),
-        new ConfigColumnMeta(5, "tenDrawId", "INT"),
-        new ConfigColumnMeta(6, "scheDuling", "INT"),
-        new ConfigColumnMeta(7, "type", "INT"),
-        new ConfigColumnMeta(8, "timesShowType", "STRING"),
-        new ConfigColumnMeta(9, "video", "STRING"),
-        new ConfigColumnMeta(10, "lastDateShow", "STRING"),
-        new ConfigColumnMeta(11, "chanceText", "STRING"),
-        new ConfigColumnMeta(12, "topId", "INT"),
-        new ConfigColumnMeta(13, "recruitEndTopId", "INT"),
-        new ConfigColumnMeta(14, "recruitmentshow", "INT"),
-        new ConfigColumnMeta(15, "trueActivityId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "recruitType", "int"),
+        new ConfigColumnMeta(3, "showStyleType", "int"),
+        new ConfigColumnMeta(4, "oneDrawId", "int"),
+        new ConfigColumnMeta(5, "tenDrawId", "int"),
+        new ConfigColumnMeta(6, "scheDuling", "int"),
+        new ConfigColumnMeta(7, "type", "int"),
+        new ConfigColumnMeta(8, "timesShowType", "string"),
+        new ConfigColumnMeta(9, "video", "string"),
+        new ConfigColumnMeta(10, "lastDateShow", "string"),
+        new ConfigColumnMeta(11, "chanceText", "string"),
+        new ConfigColumnMeta(12, "topId", "int"),
+        new ConfigColumnMeta(13, "recruitEndTopId", "int"),
+        new ConfigColumnMeta(14, "recruitmentshow", "int"),
+        new ConfigColumnMeta(15, "trueActivityId", "int"));
   }
 }

@@ -7,287 +7,195 @@ import ly.utils.KV;
  * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
  */
 public class HeroAttrConfig {
-  /**模板名*/
   public final int modelName;
 
-  /**等级*/
   public final int level;
 
-  /**生命*/
-  public final String maxHP;
+  public final java.util.List<Integer> maxHP;
 
-  /**攻击*/
-  public final String attack;
+  public final java.util.List<Integer> attack;
 
-  /**防御*/
-  public final String defence;
+  public final java.util.List<Integer> defence;
 
-  /**速度*/
-  public final String speed;
+  public final java.util.List<Integer> speed;
 
-  /**暴击*/
-  public final String crit;
+  public final java.util.List<Integer> crit;
 
-  /**暴伤*/
-  public final String critRatio;
+  public final java.util.List<Integer> critRatio;
 
-  /**命中*/
-  public final String effectHit;
+  public final java.util.List<Integer> effectHit;
 
-  /**抵抗*/
-  public final String effectDodge;
+  public final java.util.List<Integer> effectDodge;
 
-  /**生命2*/
   public final int maxHP2;
 
-  /**攻击2*/
   public final int attack2;
 
-  /**防御2*/
   public final int defence2;
 
-  /**速度2*/
   public final int speed2;
 
-  /**暴击2*/
   public final int crit2;
 
-  /**暴伤2*/
   public final int critRatio2;
 
-  /**命中2*/
   public final int effectHit2;
 
-  /**抵抗2*/
   public final int effectDodge2;
 
-  /**生命3*/
   public final int maxHP3;
 
-  /**攻击3*/
   public final int attack3;
 
-  /**防御3*/
   public final int defence3;
 
-  /**速度3*/
   public final int speed3;
 
-  /**暴击3*/
   public final int crit3;
 
-  /**暴伤3*/
   public final int critRatio3;
 
-  /**命中3*/
   public final int effectHit3;
 
-  /**抵抗3*/
   public final int effectDodge3;
 
-  /**生命4*/
   public final int maxHP4;
 
-  /**攻击4*/
   public final int attack4;
 
-  /**防御4*/
   public final int defence4;
 
-  /**速度4*/
   public final int speed4;
 
-  /**暴击4*/
   public final int crit4;
 
-  /**暴伤4*/
   public final int critRatio4;
 
-  /**命中4*/
   public final int effectHit4;
 
-  /**抵抗4*/
   public final int effectDodge4;
 
-  /**生命5*/
   public final int maxHP5;
 
-  /**攻击5*/
   public final int attack5;
 
-  /**防御5*/
   public final int defence5;
 
-  /**速度5*/
   public final int speed5;
 
-  /**暴击5*/
   public final int crit5;
 
-  /**暴伤5*/
   public final int critRatio5;
 
-  /**命中5*/
   public final int effectHit5;
 
-  /**抵抗5*/
   public final int effectDodge5;
 
-  /**生命6*/
   public final int maxHP6;
 
-  /**攻击6*/
   public final int attack6;
 
-  /**防御6*/
   public final int defence6;
 
-  /**速度6*/
   public final int speed6;
 
-  /**暴击6*/
   public final int crit6;
 
-  /**暴伤6*/
   public final int critRatio6;
 
-  /**命中6*/
   public final int effectHit6;
 
-  /**抵抗6*/
   public final int effectDodge6;
 
-  /**生命7*/
   public final int maxHP7;
 
-  /**攻击7*/
   public final int attack7;
 
-  /**防御7*/
   public final int defence7;
 
-  /**速度7*/
   public final int speed7;
 
-  /**暴击7*/
   public final int crit7;
 
-  /**暴伤7*/
   public final int critRatio7;
 
-  /**命中7*/
   public final int effectHit7;
 
-  /**抵抗7*/
   public final int effectDodge7;
 
-  /**生命8*/
   public final int maxHP8;
 
-  /**攻击8*/
   public final int attack8;
 
-  /**防御8*/
   public final int defence8;
 
-  /**速度8*/
   public final int speed8;
 
-  /**暴击8*/
   public final int crit8;
 
-  /**暴伤8*/
   public final int critRatio8;
 
-  /**命中8*/
   public final int effectHit8;
 
-  /**抵抗8*/
   public final int effectDodge8;
 
-  /**生命9*/
   public final int maxHP9;
 
-  /**攻击9*/
   public final int attack9;
 
-  /**防御9*/
   public final int defence9;
 
-  /**速度9*/
   public final int speed9;
 
-  /**暴击9*/
   public final int crit9;
 
-  /**暴伤9*/
   public final int critRatio9;
 
-  /**命中9*/
   public final int effectHit9;
 
-  /**抵抗9*/
   public final int effectDodge9;
 
-  /**生命10*/
   public final int maxHP10;
 
-  /**攻击10*/
   public final int attack10;
 
-  /**防御10*/
   public final int defence10;
 
-  /**速度10*/
   public final int speed10;
 
-  /**暴击10*/
   public final int crit10;
 
-  /**暴伤10*/
   public final int critRatio10;
 
-  /**命中10*/
   public final int effectHit10;
 
-  /**抵抗10*/
   public final int effectDodge10;
 
-  /**回能*/
-  public final String spCoe;
+  public final java.util.List<Integer> spCoe;
 
-  /**回能2*/
   public final int spCoe2;
 
-  /**回能3*/
   public final int spCoe3;
 
-  /**回能4*/
   public final int spCoe4;
 
-  /**回能5*/
   public final int spCoe5;
 
-  /**回能6*/
   public final int spCoe6;
 
-  /**回能7*/
   public final int spCoe7;
 
-  /**回能8*/
   public final int spCoe8;
 
-  /**回能9*/
   public final int spCoe9;
 
-  /**回能10*/
   public final int spCoe10;
 
   // @@@@@自定义属性开始区@@@@@
 
   // @@@@@自定义属性结束区@@@@@
 
-  public HeroAttrConfig(int modelName, int level, String maxHP, String attack, String defence, String speed, String crit, String critRatio, String effectHit, String effectDodge, int maxHP2, int attack2, int defence2, int speed2, int crit2, int critRatio2, int effectHit2, int effectDodge2, int maxHP3, int attack3, int defence3, int speed3, int crit3, int critRatio3, int effectHit3, int effectDodge3, int maxHP4, int attack4, int defence4, int speed4, int crit4, int critRatio4, int effectHit4, int effectDodge4, int maxHP5, int attack5, int defence5, int speed5, int crit5, int critRatio5, int effectHit5, int effectDodge5, int maxHP6, int attack6, int defence6, int speed6, int crit6, int critRatio6, int effectHit6, int effectDodge6, int maxHP7, int attack7, int defence7, int speed7, int crit7, int critRatio7, int effectHit7, int effectDodge7, int maxHP8, int attack8, int defence8, int speed8, int crit8, int critRatio8, int effectHit8, int effectDodge8, int maxHP9, int attack9, int defence9, int speed9, int crit9, int critRatio9, int effectHit9, int effectDodge9, int maxHP10, int attack10, int defence10, int speed10, int crit10, int critRatio10, int effectHit10, int effectDodge10, String spCoe, int spCoe2, int spCoe3, int spCoe4, int spCoe5, int spCoe6, int spCoe7, int spCoe8, int spCoe9, int spCoe10) {
+  public HeroAttrConfig(int modelName, int level, java.util.List<Integer> maxHP, java.util.List<Integer> attack, java.util.List<Integer> defence, java.util.List<Integer> speed, java.util.List<Integer> crit, java.util.List<Integer> critRatio, java.util.List<Integer> effectHit, java.util.List<Integer> effectDodge, int maxHP2, int attack2, int defence2, int speed2, int crit2, int critRatio2, int effectHit2, int effectDodge2, int maxHP3, int attack3, int defence3, int speed3, int crit3, int critRatio3, int effectHit3, int effectDodge3, int maxHP4, int attack4, int defence4, int speed4, int crit4, int critRatio4, int effectHit4, int effectDodge4, int maxHP5, int attack5, int defence5, int speed5, int crit5, int critRatio5, int effectHit5, int effectDodge5, int maxHP6, int attack6, int defence6, int speed6, int crit6, int critRatio6, int effectHit6, int effectDodge6, int maxHP7, int attack7, int defence7, int speed7, int crit7, int critRatio7, int effectHit7, int effectDodge7, int maxHP8, int attack8, int defence8, int speed8, int crit8, int critRatio8, int effectHit8, int effectDodge8, int maxHP9, int attack9, int defence9, int speed9, int crit9, int critRatio9, int effectHit9, int effectDodge9, int maxHP10, int attack10, int defence10, int speed10, int crit10, int critRatio10, int effectHit10, int effectDodge10, java.util.List<Integer> spCoe, int spCoe2, int spCoe3, int spCoe4, int spCoe5, int spCoe6, int spCoe7, int spCoe8, int spCoe9, int spCoe10) {
     this.modelName = modelName;
     this.level = level;
     this.maxHP = maxHP;

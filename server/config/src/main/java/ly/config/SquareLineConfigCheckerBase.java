@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class SquareLineConfigCheckerBase extends AbstractConfigChecker<SquareLineConfig> {
   @Override
   public String getConfigFileName() {
-    return "squareLine.txt";
+    return "squareLine.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "pos", "STRING"),
-        new ConfigColumnMeta(2, "direction", "INT"),
-        new ConfigColumnMeta(3, "speed", "INT"),
-        new ConfigColumnMeta(4, "interval", "INT"),
-        new ConfigColumnMeta(5, "shift", "STRING"),
-        new ConfigColumnMeta(6, "square", "STRING"),
-        new ConfigColumnMeta(7, "effectPool", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "pos", "string"),
+        new ConfigColumnMeta(2, "direction", "int"),
+        new ConfigColumnMeta(3, "speed", "int"),
+        new ConfigColumnMeta(4, "interval", "int"),
+        new ConfigColumnMeta(5, "shift", "string"),
+        new ConfigColumnMeta(6, "square", "string"),
+        new ConfigColumnMeta(7, "effectPool", "string"));
   }
 }

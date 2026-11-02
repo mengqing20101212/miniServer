@@ -27,7 +27,7 @@ public class RobotPoolConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new RobotPoolConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "robotPool.txt"; }
+  public String getConfigFileName() { return "robotPool.xml"; }
 
   public static class RobotPoolConfigManagerImpl extends AbstractConfigManger {
     private List<RobotPoolConfig> configList = List.of();
@@ -39,72 +39,43 @@ public class RobotPoolConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       RobotPoolConfigChecker checker = new RobotPoolConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<RobotPoolConfig> newList = new ArrayList<>();
       Map<Integer, RobotPoolConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 5) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String robotId = null;
-          String weight = null;
-          int levelmin = 0;
-          int levelmax = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 机器人id
-            if (!arr[1].trim().isEmpty()) {
-              robotId = arr[1].trim();
-            }
-
-            // 解析 权重
-            if (!arr[2].trim().isEmpty()) {
-              weight = arr[2].trim();
-            }
-
-            // 解析 最小等级
-            if (!arr[3].trim().isEmpty()) {
-              levelmin = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 最大等级
-            if (!arr[4].trim().isEmpty()) {
-              levelmax = Integer.parseInt(arr[4].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("robotId"), fileName + ":行" + lineNumber + ":字段 robotId");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("weight"), fileName + ":行" + lineNumber + ":字段 weight");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("levelmin"), fileName + ":行" + lineNumber + ":字段 levelmin");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("levelmax"), fileName + ":行" + lineNumber + ":字段 levelmax");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          RobotPoolConfig config = new RobotPoolConfig(id, robotId, weight, levelmin, levelmax);
-          config.afterLoad();
+          RobotPoolConfig config = new RobotPoolConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (RobotPoolConfig config : configList) config.afterLoad();
+      new RobotPoolConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -114,38 +85,6 @@ public class RobotPoolConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<RobotPoolConfig> getConfigList() {
@@ -158,7 +97,7 @@ public class RobotPoolConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "robotPool.txt";
+      return "robotPool.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

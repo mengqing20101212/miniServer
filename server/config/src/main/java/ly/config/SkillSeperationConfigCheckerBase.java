@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class SkillSeperationConfigCheckerBase extends AbstractConfigChecker<SkillSeperationConfig> {
   @Override
   public String getConfigFileName() {
-    return "skillSeperation.txt";
+    return "skillSeperation.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "mainAni", "STRING"),
-        new ConfigColumnMeta(1, "sperationAni_1", "STRING"),
-        new ConfigColumnMeta(2, "sperationAni_2", "STRING"),
-        new ConfigColumnMeta(3, "sperationAni_3", "STRING"),
-        new ConfigColumnMeta(4, "sperationAni_4", "STRING"));
+        new ConfigColumnMeta(0, "mainAni", "string"),
+        new ConfigColumnMeta(1, "sperationAni_1", "string"),
+        new ConfigColumnMeta(2, "sperationAni_2", "string"),
+        new ConfigColumnMeta(3, "sperationAni_3", "string"),
+        new ConfigColumnMeta(4, "sperationAni_4", "string"));
   }
 }

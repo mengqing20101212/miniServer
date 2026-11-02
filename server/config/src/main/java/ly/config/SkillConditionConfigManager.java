@@ -27,7 +27,7 @@ public class SkillConditionConfigManager implements InterfaceConfigManagerProxy 
   public AbstractConfigManger createTable() { return new SkillConditionConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "skillCondition.txt"; }
+  public String getConfigFileName() { return "skillCondition.xml"; }
 
   public static class SkillConditionConfigManagerImpl extends AbstractConfigManger {
     private List<SkillConditionConfig> configList = List.of();
@@ -39,138 +39,76 @@ public class SkillConditionConfigManager implements InterfaceConfigManagerProxy 
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       SkillConditionConfigChecker checker = new SkillConditionConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<SkillConditionConfig> newList = new ArrayList<>();
       Map<Integer, SkillConditionConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 16) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int type = 0;
-          String des = null;
-          String param_1 = null;
-          String param_2 = null;
-          String param_3 = null;
-          String param_4 = null;
-          String param_5 = null;
-          String param_6 = null;
-          String param_7 = null;
-          String param_8 = null;
-          String param_9 = null;
-          String param_10 = null;
-          int heroId = 0;
-          int skillSequence = 0;
-          int effectSequence = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          String parsedField12 = null;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          int parsedField15 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 类型
-            if (!arr[1].trim().isEmpty()) {
-              type = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 备注
-            if (!arr[2].trim().isEmpty()) {
-              des = arr[2].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[3].trim().isEmpty()) {
-              param_1 = arr[3].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[4].trim().isEmpty()) {
-              param_2 = arr[4].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[5].trim().isEmpty()) {
-              param_3 = arr[5].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[6].trim().isEmpty()) {
-              param_4 = arr[6].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[7].trim().isEmpty()) {
-              param_5 = arr[7].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[8].trim().isEmpty()) {
-              param_6 = arr[8].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[9].trim().isEmpty()) {
-              param_7 = arr[9].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[10].trim().isEmpty()) {
-              param_8 = arr[10].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[11].trim().isEmpty()) {
-              param_9 = arr[11].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[12].trim().isEmpty()) {
-              param_10 = arr[12].trim();
-            }
-
-            // 解析 英雄id
-            if (!arr[13].trim().isEmpty()) {
-              heroId = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 技能序列
-            if (!arr[14].trim().isEmpty()) {
-              skillSequence = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 效果序列
-            if (!arr[15].trim().isEmpty()) {
-              effectSequence = Integer.parseInt(arr[15].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("type"), fileName + ":行" + lineNumber + ":字段 type");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("des"), fileName + ":行" + lineNumber + ":字段 des");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("param_1"), fileName + ":行" + lineNumber + ":字段 param_1");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("param_2"), fileName + ":行" + lineNumber + ":字段 param_2");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("param_3"), fileName + ":行" + lineNumber + ":字段 param_3");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("param_4"), fileName + ":行" + lineNumber + ":字段 param_4");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("param_5"), fileName + ":行" + lineNumber + ":字段 param_5");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("param_6"), fileName + ":行" + lineNumber + ":字段 param_6");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("param_7"), fileName + ":行" + lineNumber + ":字段 param_7");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("param_8"), fileName + ":行" + lineNumber + ":字段 param_8");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("param_9"), fileName + ":行" + lineNumber + ":字段 param_9");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("param_10"), fileName + ":行" + lineNumber + ":字段 param_10");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("heroId"), fileName + ":行" + lineNumber + ":字段 heroId");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("skillSequence"), fileName + ":行" + lineNumber + ":字段 skillSequence");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("effectSequence"), fileName + ":行" + lineNumber + ":字段 effectSequence");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          SkillConditionConfig config = new SkillConditionConfig(id, type, des, param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9, param_10, heroId, skillSequence, effectSequence);
-          config.afterLoad();
+          SkillConditionConfig config = new SkillConditionConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (SkillConditionConfig config : configList) config.afterLoad();
+      new SkillConditionConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -180,38 +118,6 @@ public class SkillConditionConfigManager implements InterfaceConfigManagerProxy 
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<SkillConditionConfig> getConfigList() {
@@ -224,7 +130,7 @@ public class SkillConditionConfigManager implements InterfaceConfigManagerProxy 
 
     @Override
     public String getConfigFileName() {
-      return "skillCondition.txt";
+      return "skillCondition.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

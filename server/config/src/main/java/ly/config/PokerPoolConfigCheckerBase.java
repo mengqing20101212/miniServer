@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class PokerPoolConfigCheckerBase extends AbstractConfigChecker<PokerPoolConfig> {
   @Override
   public String getConfigFileName() {
-    return "pokerPool.txt";
+    return "pokerPool.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "randomNumber", "INT"),
-        new ConfigColumnMeta(3, "pool", "STRING"),
-        new ConfigColumnMeta(4, "hinder", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "randomNumber", "int"),
+        new ConfigColumnMeta(3, "pool", "string"),
+        new ConfigColumnMeta(4, "hinder", "string"));
   }
 }

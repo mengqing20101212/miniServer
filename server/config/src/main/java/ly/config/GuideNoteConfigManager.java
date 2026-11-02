@@ -27,7 +27,7 @@ public class GuideNoteConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new GuideNoteConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "guideNote.txt"; }
+  public String getConfigFileName() { return "guideNote.xml"; }
 
   public static class GuideNoteConfigManagerImpl extends AbstractConfigManger {
     private List<GuideNoteConfig> configList = List.of();
@@ -39,120 +39,67 @@ public class GuideNoteConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("list<int>");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("list<int>");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       GuideNoteConfigChecker checker = new GuideNoteConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<GuideNoteConfig> newList = new ArrayList<>();
       Map<Integer, GuideNoteConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 13) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String guideCond = null;
-          String guidePara1 = null;
-          String linkPart = null;
-          int linkParam = 0;
-          int uiType = 0;
-          String linkShift = null;
-          int noticeType = 0;
-          String word = null;
-          String endType = null;
-          String endPara = null;
-          int turnId = 0;
-          String beizhu = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          java.util.List<Integer> parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          String parsedField6 = null;
+          int parsedField7 = 0;
+          String parsedField8 = null;
+          java.util.List<Integer> parsedField9 = null;
+          String parsedField10 = null;
+          int parsedField11 = 0;
+          String parsedField12 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 引导触发条件
-            if (!arr[1].trim().isEmpty()) {
-              guideCond = arr[1].trim();
-            }
-
-            // 解析 触发参数1
-            if (!arr[2].trim().isEmpty()) {
-              guidePara1 = arr[2].trim();
-            }
-
-            // 解析 关联组件
-            if (!arr[3].trim().isEmpty()) {
-              linkPart = arr[3].trim();
-            }
-
-            // 解析 关联组件查询参数
-            if (!arr[4].trim().isEmpty()) {
-              linkParam = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 界面类型
-            if (!arr[5].trim().isEmpty()) {
-              uiType = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 出现偏移
-            if (!arr[6].trim().isEmpty()) {
-              linkShift = arr[6].trim();
-            }
-
-            // 解析 提示类型
-            if (!arr[7].trim().isEmpty()) {
-              noticeType = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 提示内容
-            if (!arr[8].trim().isEmpty()) {
-              word = arr[8].trim();
-            }
-
-            // 解析 结束条件
-            if (!arr[9].trim().isEmpty()) {
-              endType = arr[9].trim();
-            }
-
-            // 解析 结束参数
-            if (!arr[10].trim().isEmpty()) {
-              endPara = arr[10].trim();
-            }
-
-            // 解析 跳转id
-            if (!arr[11].trim().isEmpty()) {
-              turnId = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 备注
-            if (!arr[12].trim().isEmpty()) {
-              beizhu = arr[12].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("guideCond"), fileName + ":行" + lineNumber + ":字段 guideCond");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("guidePara1"), fileName + ":行" + lineNumber + ":字段 guidePara1");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("linkPart"), fileName + ":行" + lineNumber + ":字段 linkPart");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("linkParam"), fileName + ":行" + lineNumber + ":字段 linkParam");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("uiType"), fileName + ":行" + lineNumber + ":字段 uiType");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("linkShift"), fileName + ":行" + lineNumber + ":字段 linkShift");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("noticeType"), fileName + ":行" + lineNumber + ":字段 noticeType");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("word"), fileName + ":行" + lineNumber + ":字段 word");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("endType"), fileName + ":行" + lineNumber + ":字段 endType");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("endPara"), fileName + ":行" + lineNumber + ":字段 endPara");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("turnId"), fileName + ":行" + lineNumber + ":字段 turnId");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("beizhu"), fileName + ":行" + lineNumber + ":字段 beizhu");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          GuideNoteConfig config = new GuideNoteConfig(id, guideCond, guidePara1, linkPart, linkParam, uiType, linkShift, noticeType, word, endType, endPara, turnId, beizhu);
-          config.afterLoad();
+          GuideNoteConfig config = new GuideNoteConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (GuideNoteConfig config : configList) config.afterLoad();
+      new GuideNoteConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -162,38 +109,6 @@ public class GuideNoteConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<GuideNoteConfig> getConfigList() {
@@ -206,7 +121,7 @@ public class GuideNoteConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "guideNote.txt";
+      return "guideNote.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

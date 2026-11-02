@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class DailyDivinationConfigCheckerBase extends AbstractConfigChecker<DailyDivinationConfig> {
   @Override
   public String getConfigFileName() {
-    return "dailyDivination.txt";
+    return "dailyDivination.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "times", "INT"),
-        new ConfigColumnMeta(2, "reward", "INT"),
-        new ConfigColumnMeta(3, "num", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "times", "int"),
+        new ConfigColumnMeta(2, "reward", "int"),
+        new ConfigColumnMeta(3, "num", "int"));
   }
 }

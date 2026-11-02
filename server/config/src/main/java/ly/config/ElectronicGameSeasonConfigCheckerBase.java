@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class ElectronicGameSeasonConfigCheckerBase extends AbstractConfigChecker<ElectronicGameSeasonConfig> {
   @Override
   public String getConfigFileName() {
-    return "electronicGameSeason.txt";
+    return "electronicGameSeason.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "duanBig", "INT"),
-        new ConfigColumnMeta(2, "duanSmall", "INT"),
-        new ConfigColumnMeta(3, "duan", "STRING"),
-        new ConfigColumnMeta(4, "awardSeason", "INT"),
-        new ConfigColumnMeta(5, "awardSeasonPre", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "duanBig", "int"),
+        new ConfigColumnMeta(2, "duanSmall", "int"),
+        new ConfigColumnMeta(3, "duan", "string"),
+        new ConfigColumnMeta(4, "awardSeason", "int"),
+        new ConfigColumnMeta(5, "awardSeasonPre", "string"));
   }
 }

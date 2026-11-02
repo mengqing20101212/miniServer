@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityConnectConfigCheckerBase extends AbstractConfigChecker<ActivityConnectConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityConnect.txt";
+    return "activityConnect.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "stage", "INT"),
-        new ConfigColumnMeta(2, "drop", "INT"),
-        new ConfigColumnMeta(3, "dropShow", "INT"),
-        new ConfigColumnMeta(4, "position", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "stage", "int"),
+        new ConfigColumnMeta(2, "drop", "int"),
+        new ConfigColumnMeta(3, "dropShow", "int"),
+        new ConfigColumnMeta(4, "position", "string"));
   }
 }

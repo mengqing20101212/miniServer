@@ -8,13 +8,13 @@ import ly.ConfigColumnMeta;
 public abstract class Device_switchConfigCheckerBase extends AbstractConfigChecker<Device_switchConfig> {
   @Override
   public String getConfigFileName() {
-    return "device_switch.txt";
+    return "device_switch.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "model", "STRING"),
-        new ConfigColumnMeta(1, "grade", "INT"));
+        new ConfigColumnMeta(0, "model", "string"),
+        new ConfigColumnMeta(1, "grade", "int"));
   }
 }

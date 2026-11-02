@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class Game_logicConfigCheckerBase extends AbstractConfigChecker<Game_logicConfig> {
   @Override
   public String getConfigFileName() {
-    return "game_logic.txt";
+    return "game_logic.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "des", "STRING"),
-        new ConfigColumnMeta(3, "value", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "des", "string"),
+        new ConfigColumnMeta(3, "value", "string"));
   }
 }

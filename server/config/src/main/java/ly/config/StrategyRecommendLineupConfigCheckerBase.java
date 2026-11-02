@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class StrategyRecommendLineupConfigCheckerBase extends AbstractConfigChecker<StrategyRecommendLineupConfig> {
   @Override
   public String getConfigFileName() {
-    return "strategyRecommendLineup.txt";
+    return "strategyRecommendLineup.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "heroIds", "STRING"),
-        new ConfigColumnMeta(2, "sceneId", "INT"),
-        new ConfigColumnMeta(3, "title", "STRING"),
-        new ConfigColumnMeta(4, "actorDetail", "STRING"),
-        new ConfigColumnMeta(5, "playDetail", "STRING"),
-        new ConfigColumnMeta(6, "effectDetail", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "heroIds", "string"),
+        new ConfigColumnMeta(2, "sceneId", "int"),
+        new ConfigColumnMeta(3, "title", "string"),
+        new ConfigColumnMeta(4, "actorDetail", "string"),
+        new ConfigColumnMeta(5, "playDetail", "string"),
+        new ConfigColumnMeta(6, "effectDetail", "string"));
   }
 }

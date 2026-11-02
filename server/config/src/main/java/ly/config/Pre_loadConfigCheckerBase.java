@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class Pre_loadConfigCheckerBase extends AbstractConfigChecker<Pre_loadConfig> {
   @Override
   public String getConfigFileName() {
-    return "pre_load.txt";
+    return "pre_load.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "desc", "STRING"),
-        new ConfigColumnMeta(2, "resid", "INT"),
-        new ConfigColumnMeta(3, "restype", "INT"),
-        new ConfigColumnMeta(4, "type", "INT"),
-        new ConfigColumnMeta(5, "holdstate", "INT"),
-        new ConfigColumnMeta(6, "param", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "desc", "string"),
+        new ConfigColumnMeta(2, "resid", "int"),
+        new ConfigColumnMeta(3, "restype", "int"),
+        new ConfigColumnMeta(4, "type", "int"),
+        new ConfigColumnMeta(5, "holdstate", "int"),
+        new ConfigColumnMeta(6, "param", "string"));
   }
 }

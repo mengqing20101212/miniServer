@@ -8,21 +8,21 @@ import ly.ConfigColumnMeta;
 public abstract class HeroItemConfigCheckerBase extends AbstractConfigChecker<HeroItemConfig> {
   @Override
   public String getConfigFileName() {
-    return "heroItem.txt";
+    return "heroItem.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "type", "INT"),
-        new ConfigColumnMeta(3, "school", "INT"),
-        new ConfigColumnMeta(4, "grade", "INT"),
-        new ConfigColumnMeta(5, "sequence", "INT"),
-        new ConfigColumnMeta(6, "heroId", "INT"),
-        new ConfigColumnMeta(7, "decomposeItemId", "STRING"),
-        new ConfigColumnMeta(8, "currencyType", "INT"),
-        new ConfigColumnMeta(9, "currencyNum", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "type", "int"),
+        new ConfigColumnMeta(3, "school", "int"),
+        new ConfigColumnMeta(4, "grade", "int"),
+        new ConfigColumnMeta(5, "sequence", "int"),
+        new ConfigColumnMeta(6, "heroId", "int"),
+        new ConfigColumnMeta(7, "decomposeItemId", "string"),
+        new ConfigColumnMeta(8, "currencyType", "int"),
+        new ConfigColumnMeta(9, "currencyNum", "int"));
   }
 }

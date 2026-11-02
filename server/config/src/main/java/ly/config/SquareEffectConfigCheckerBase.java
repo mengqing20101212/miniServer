@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class SquareEffectConfigCheckerBase extends AbstractConfigChecker<SquareEffectConfig> {
   @Override
   public String getConfigFileName() {
-    return "squareEffect.txt";
+    return "squareEffect.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "count", "INT"),
-        new ConfigColumnMeta(3, "para", "INT"),
-        new ConfigColumnMeta(4, "attackEffect", "INT"),
-        new ConfigColumnMeta(5, "hitEffect", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "count", "int"),
+        new ConfigColumnMeta(3, "para", "int"),
+        new ConfigColumnMeta(4, "attackEffect", "int"),
+        new ConfigColumnMeta(5, "hitEffect", "int"));
   }
 }

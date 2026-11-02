@@ -27,7 +27,7 @@ public class AbnormalStateConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new AbnormalStateConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "abnormalState.txt"; }
+  public String getConfigFileName() { return "abnormalState.xml"; }
 
   public static class AbnormalStateConfigManagerImpl extends AbstractConfigManger {
     private List<AbnormalStateConfig> configList = List.of();
@@ -39,186 +39,100 @@ public class AbnormalStateConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       AbnormalStateConfigChecker checker = new AbnormalStateConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<AbnormalStateConfig> newList = new ArrayList<>();
       Map<Integer, AbnormalStateConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 24) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          int type = 0;
-          int canReTrigger = 0;
-          int playAni = 0;
-          int playShowAni = 0;
-          int skipTurn = 0;
-          int banEnergySkill = 0;
-          int banPassiveSkill = 0;
-          int banSSkill = 0;
-          int canTriggerSkill = 0;
-          int selectType = 0;
-          String dispelList = null;
-          String preventList = null;
-          int isPlayAnim = 0;
-          String stateAnim = null;
-          String stateDead = null;
-          String stateStart = null;
-          String stateFinish = null;
-          String startEffect = null;
-          String runEffect = null;
-          String endEffect = null;
-          int statePriority = 0;
-          int damageHitPro = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          String parsedField12 = null;
+          String parsedField13 = null;
+          int parsedField14 = 0;
+          String parsedField15 = null;
+          String parsedField16 = null;
+          String parsedField17 = null;
+          String parsedField18 = null;
+          String parsedField19 = null;
+          String parsedField20 = null;
+          String parsedField21 = null;
+          int parsedField22 = 0;
+          int parsedField23 = 0;
           try {
-            // 解析 状态编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 状态名
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 类型
-            if (!arr[2].trim().isEmpty()) {
-              type = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 类型功能是否触发多次
-            if (!arr[3].trim().isEmpty()) {
-              canReTrigger = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 进入状态后是否播其他动作
-            if (!arr[4].trim().isEmpty()) {
-              playAni = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 进入状态后是否播展示动作
-            if (!arr[5].trim().isEmpty()) {
-              playShowAni = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 跳过回合
-            if (!arr[6].trim().isEmpty()) {
-              skipTurn = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 是否封主动
-            if (!arr[7].trim().isEmpty()) {
-              banEnergySkill = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 是否封被动
-            if (!arr[8].trim().isEmpty()) {
-              banPassiveSkill = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 是否封S技
-            if (!arr[9].trim().isEmpty()) {
-              banSSkill = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 进入状态后是否触发技能
-            if (!arr[10].trim().isEmpty()) {
-              canTriggerSkill = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 进入状态后选择类型
-            if (!arr[11].trim().isEmpty()) {
-              selectType = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 驱散状态列表
-            if (!arr[12].trim().isEmpty()) {
-              dispelList = arr[12].trim();
-            }
-
-            // 解析 阻止状态列表
-            if (!arr[13].trim().isEmpty()) {
-              preventList = arr[13].trim();
-            }
-
-            // 解析 是否有状态动作
-            if (!arr[14].trim().isEmpty()) {
-              isPlayAnim = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 状态待机
-            if (!arr[15].trim().isEmpty()) {
-              stateAnim = arr[15].trim();
-            }
-
-            // 解析 状态死亡
-            if (!arr[16].trim().isEmpty()) {
-              stateDead = arr[16].trim();
-            }
-
-            // 解析 开始动作
-            if (!arr[17].trim().isEmpty()) {
-              stateStart = arr[17].trim();
-            }
-
-            // 解析 结束动作
-            if (!arr[18].trim().isEmpty()) {
-              stateFinish = arr[18].trim();
-            }
-
-            // 解析 开始特效
-            if (!arr[19].trim().isEmpty()) {
-              startEffect = arr[19].trim();
-            }
-
-            // 解析 持续特效
-            if (!arr[20].trim().isEmpty()) {
-              runEffect = arr[20].trim();
-            }
-
-            // 解析 结束特效
-            if (!arr[21].trim().isEmpty()) {
-              endEffect = arr[21].trim();
-            }
-
-            // 解析 状态优先级
-            if (!arr[22].trim().isEmpty()) {
-              statePriority = Integer.parseInt(arr[22].trim());
-            }
-
-            // 解析 伤害命中加成
-            if (!arr[23].trim().isEmpty()) {
-              damageHitPro = Integer.parseInt(arr[23].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("type"), fileName + ":行" + lineNumber + ":字段 type");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("canReTrigger"), fileName + ":行" + lineNumber + ":字段 canReTrigger");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("playAni"), fileName + ":行" + lineNumber + ":字段 playAni");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("playShowAni"), fileName + ":行" + lineNumber + ":字段 playShowAni");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("skipTurn"), fileName + ":行" + lineNumber + ":字段 skipTurn");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("banEnergySkill"), fileName + ":行" + lineNumber + ":字段 banEnergySkill");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("banPassiveSkill"), fileName + ":行" + lineNumber + ":字段 banPassiveSkill");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("banSSkill"), fileName + ":行" + lineNumber + ":字段 banSSkill");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("canTriggerSkill"), fileName + ":行" + lineNumber + ":字段 canTriggerSkill");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("selectType"), fileName + ":行" + lineNumber + ":字段 selectType");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("dispelList"), fileName + ":行" + lineNumber + ":字段 dispelList");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("preventList"), fileName + ":行" + lineNumber + ":字段 preventList");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("isPlayAnim"), fileName + ":行" + lineNumber + ":字段 isPlayAnim");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("stateAnim"), fileName + ":行" + lineNumber + ":字段 stateAnim");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("stateDead"), fileName + ":行" + lineNumber + ":字段 stateDead");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("stateStart"), fileName + ":行" + lineNumber + ":字段 stateStart");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("stateFinish"), fileName + ":行" + lineNumber + ":字段 stateFinish");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("startEffect"), fileName + ":行" + lineNumber + ":字段 startEffect");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("runEffect"), fileName + ":行" + lineNumber + ":字段 runEffect");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("endEffect"), fileName + ":行" + lineNumber + ":字段 endEffect");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("statePriority"), fileName + ":行" + lineNumber + ":字段 statePriority");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("damageHitPro"), fileName + ":行" + lineNumber + ":字段 damageHitPro");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          AbnormalStateConfig config = new AbnormalStateConfig(id, name, type, canReTrigger, playAni, playShowAni, skipTurn, banEnergySkill, banPassiveSkill, banSSkill, canTriggerSkill, selectType, dispelList, preventList, isPlayAnim, stateAnim, stateDead, stateStart, stateFinish, startEffect, runEffect, endEffect, statePriority, damageHitPro);
-          config.afterLoad();
+          AbnormalStateConfig config = new AbnormalStateConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (AbnormalStateConfig config : configList) config.afterLoad();
+      new AbnormalStateConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -228,38 +142,6 @@ public class AbnormalStateConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<AbnormalStateConfig> getConfigList() {
@@ -272,7 +154,7 @@ public class AbnormalStateConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "abnormalState.txt";
+      return "abnormalState.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

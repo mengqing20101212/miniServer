@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class QuestionnaireConfigCheckerBase extends AbstractConfigChecker<QuestionnaireConfig> {
   @Override
   public String getConfigFileName() {
-    return "questionnaire.txt";
+    return "questionnaire.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "level", "INT"),
-        new ConfigColumnMeta(2, "stratTime", "INT"),
-        new ConfigColumnMeta(3, "mail", "INT"),
-        new ConfigColumnMeta(4, "connect", "STRING"),
-        new ConfigColumnMeta(5, "channelId", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "level", "int"),
+        new ConfigColumnMeta(2, "stratTime", "int"),
+        new ConfigColumnMeta(3, "mail", "int"),
+        new ConfigColumnMeta(4, "connect", "string"),
+        new ConfigColumnMeta(5, "channelId", "string"));
   }
 }

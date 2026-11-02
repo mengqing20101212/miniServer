@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class IndividuationConfigCheckerBase extends AbstractConfigChecker<IndividuationConfig> {
   @Override
   public String getConfigFileName() {
-    return "individuation.txt";
+    return "individuation.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "item", "INT"),
-        new ConfigColumnMeta(3, "param_1", "STRING"),
-        new ConfigColumnMeta(4, "sceneInfoId", "STRING"),
-        new ConfigColumnMeta(5, "picRes", "STRING"),
-        new ConfigColumnMeta(6, "name", "STRING"),
-        new ConfigColumnMeta(7, "dec", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "item", "int"),
+        new ConfigColumnMeta(3, "param_1", "string"),
+        new ConfigColumnMeta(4, "sceneInfoId", "string"),
+        new ConfigColumnMeta(5, "picRes", "string"),
+        new ConfigColumnMeta(6, "name", "string"),
+        new ConfigColumnMeta(7, "dec", "string"));
   }
 }

@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class ScoreWeightConfigCheckerBase extends AbstractConfigChecker<ScoreWeightConfig> {
   @Override
   public String getConfigFileName() {
-    return "scoreWeight.txt";
+    return "scoreWeight.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "star", "INT"),
-        new ConfigColumnMeta(2, "weight", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "star", "int"),
+        new ConfigColumnMeta(2, "weight", "int"));
   }
 }

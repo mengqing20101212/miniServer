@@ -27,7 +27,7 @@ public class ActivityCommendgiftConfigManager implements InterfaceConfigManagerP
   public AbstractConfigManger createTable() { return new ActivityCommendgiftConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "activityCommendgift.txt"; }
+  public String getConfigFileName() { return "activityCommendgift.xml"; }
 
   public static class ActivityCommendgiftConfigManagerImpl extends AbstractConfigManger {
     private List<ActivityCommendgiftConfig> configList = List.of();
@@ -39,84 +39,49 @@ public class ActivityCommendgiftConfigManager implements InterfaceConfigManagerP
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ActivityCommendgiftConfigChecker checker = new ActivityCommendgiftConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ActivityCommendgiftConfig> newList = new ArrayList<>();
       Map<Integer, ActivityCommendgiftConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 7) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int CommendLevel = 0;
-          int Commendtype = 0;
-          int RewardShow = 0;
-          int drop = 0;
-          int rechargShow = 0;
-          int rechargdrop = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
           try {
-            // 解析 ID
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 表彰等级
-            if (!arr[1].trim().isEmpty()) {
-              CommendLevel = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 表彰类型
-            if (!arr[2].trim().isEmpty()) {
-              Commendtype = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 免费奖励展示
-            if (!arr[3].trim().isEmpty()) {
-              RewardShow = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 实际掉落
-            if (!arr[4].trim().isEmpty()) {
-              drop = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 付费奖励展示
-            if (!arr[5].trim().isEmpty()) {
-              rechargShow = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 实际掉落
-            if (!arr[6].trim().isEmpty()) {
-              rechargdrop = Integer.parseInt(arr[6].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("CommendLevel"), fileName + ":行" + lineNumber + ":字段 CommendLevel");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("Commendtype"), fileName + ":行" + lineNumber + ":字段 Commendtype");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("RewardShow"), fileName + ":行" + lineNumber + ":字段 RewardShow");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("drop"), fileName + ":行" + lineNumber + ":字段 drop");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("rechargShow"), fileName + ":行" + lineNumber + ":字段 rechargShow");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("rechargdrop"), fileName + ":行" + lineNumber + ":字段 rechargdrop");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ActivityCommendgiftConfig config = new ActivityCommendgiftConfig(id, CommendLevel, Commendtype, RewardShow, drop, rechargShow, rechargdrop);
-          config.afterLoad();
+          ActivityCommendgiftConfig config = new ActivityCommendgiftConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ActivityCommendgiftConfig config : configList) config.afterLoad();
+      new ActivityCommendgiftConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -126,38 +91,6 @@ public class ActivityCommendgiftConfigManager implements InterfaceConfigManagerP
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ActivityCommendgiftConfig> getConfigList() {
@@ -170,7 +103,7 @@ public class ActivityCommendgiftConfigManager implements InterfaceConfigManagerP
 
     @Override
     public String getConfigFileName() {
-      return "activityCommendgift.txt";
+      return "activityCommendgift.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

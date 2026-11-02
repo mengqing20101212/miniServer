@@ -27,7 +27,7 @@ public class ContractInfoConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new ContractInfoConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "contractInfo.txt"; }
+  public String getConfigFileName() { return "contractInfo.xml"; }
 
   public static class ContractInfoConfigManagerImpl extends AbstractConfigManger {
     private List<ContractInfoConfig> configList = List.of();
@@ -39,96 +39,55 @@ public class ContractInfoConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ContractInfoConfigChecker checker = new ContractInfoConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ContractInfoConfig> newList = new ArrayList<>();
       Map<Integer, ContractInfoConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 9) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int welfareId = 0;
-          int contractType = 0;
-          int item = 0;
-          int num = 0;
-          int contractNum = 0;
-          int dropId = 0;
-          String sumAwardId = null;
-          String desc = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          String parsedField7 = null;
+          String parsedField8 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 品质保底类型
-            if (!arr[1].trim().isEmpty()) {
-              welfareId = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 招募类型
-            if (!arr[2].trim().isEmpty()) {
-              contractType = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 招募道具
-            if (!arr[3].trim().isEmpty()) {
-              item = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 消耗数量
-            if (!arr[4].trim().isEmpty()) {
-              num = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 招募次数
-            if (!arr[5].trim().isEmpty()) {
-              contractNum = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 对应掉落组
-            if (!arr[6].trim().isEmpty()) {
-              dropId = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 累计次数掉落组
-            if (!arr[7].trim().isEmpty()) {
-              sumAwardId = arr[7].trim();
-            }
-
-            // 解析 注释
-            if (!arr[8].trim().isEmpty()) {
-              desc = arr[8].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("welfareId"), fileName + ":行" + lineNumber + ":字段 welfareId");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("contractType"), fileName + ":行" + lineNumber + ":字段 contractType");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("item"), fileName + ":行" + lineNumber + ":字段 item");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("num"), fileName + ":行" + lineNumber + ":字段 num");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("contractNum"), fileName + ":行" + lineNumber + ":字段 contractNum");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("dropId"), fileName + ":行" + lineNumber + ":字段 dropId");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("sumAwardId"), fileName + ":行" + lineNumber + ":字段 sumAwardId");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("desc"), fileName + ":行" + lineNumber + ":字段 desc");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ContractInfoConfig config = new ContractInfoConfig(id, welfareId, contractType, item, num, contractNum, dropId, sumAwardId, desc);
-          config.afterLoad();
+          ContractInfoConfig config = new ContractInfoConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ContractInfoConfig config : configList) config.afterLoad();
+      new ContractInfoConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -138,38 +97,6 @@ public class ContractInfoConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ContractInfoConfig> getConfigList() {
@@ -182,7 +109,7 @@ public class ContractInfoConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "contractInfo.txt";
+      return "contractInfo.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

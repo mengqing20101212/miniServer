@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class AssociationTestQuestionConfigCheckerBase extends AbstractConfigChecker<AssociationTestQuestionConfig> {
   @Override
   public String getConfigFileName() {
-    return "associationTestQuestion.txt";
+    return "associationTestQuestion.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "beizhu", "STRING"),
-        new ConfigColumnMeta(2, "question", "STRING"),
-        new ConfigColumnMeta(3, "type", "INT"),
-        new ConfigColumnMeta(4, "answer1", "STRING"),
-        new ConfigColumnMeta(5, "answer2", "STRING"),
-        new ConfigColumnMeta(6, "answer3", "STRING"),
-        new ConfigColumnMeta(7, "rightAnswer", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "beizhu", "string"),
+        new ConfigColumnMeta(2, "question", "string"),
+        new ConfigColumnMeta(3, "type", "int"),
+        new ConfigColumnMeta(4, "answer1", "string"),
+        new ConfigColumnMeta(5, "answer2", "string"),
+        new ConfigColumnMeta(6, "answer3", "string"),
+        new ConfigColumnMeta(7, "rightAnswer", "int"));
   }
 }

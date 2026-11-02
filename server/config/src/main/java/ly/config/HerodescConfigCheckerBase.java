@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class HerodescConfigCheckerBase extends AbstractConfigChecker<HerodescConfig> {
   @Override
   public String getConfigFileName() {
-    return "herodesc.txt";
+    return "herodesc.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "description", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "description", "string"));
   }
 }

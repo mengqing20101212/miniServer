@@ -17,6 +17,8 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -101,7 +103,7 @@ public class ParserExcelConfig {
         String filepathName;
         List<String> serverHeadTitleList = new ArrayList<>(128);
         List<String> clientHeadTitleList = new ArrayList<>(128);
-        List<String> tokenType = new ArrayList<>(128);
+        List<ConfigValueType> tokenType = new ArrayList<>(128);
         List<String> descList = new ArrayList<>(128);
 
         ExcelConfig(String configName, String filepathName) {
@@ -117,7 +119,8 @@ public class ParserExcelConfig {
                                 : new HSSFWorkbook(fis);
                 FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
                 Sheet sheet = workbook.getSheet("Sheet1");
-                StringBuilder serverLines = new StringBuilder();
+                org.w3c.dom.Document document = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                document.appendChild(document.createElement("Root"));
                 for (Row row : sheet) {
                     if (row.getRowNum() == 0) {
                         addServerHeadTitle(row);
@@ -128,10 +131,10 @@ public class ParserExcelConfig {
                     } else if (row.getRowNum() == 3) {
                         addDescHeadTitle(row);
                     } else if (row.getRowNum() >= 5) {
-                        makeTextData(serverLines, evaluator, row);
+                        makeXmlData(document, evaluator, row);
                     }
                 }
-                writeServerLineConfig(serverLines);
+                writeServerXmlConfig(document);
                 return true;
             } catch (NotOfficeXmlFileException e) {
                 // 目录里历史上存在把制表符文本误命名成 .xlsx 的样例文件，不能让它阻断全量转表。
@@ -144,27 +147,26 @@ public class ParserExcelConfig {
         }
 
         private void addTokens(Row row) {
-            int emptyNum = 0;
-            for (Cell cell : row) {
-                if (cell.getColumnIndex() == 0) continue;
-                if (cell.getCellType() == CellType.STRING) {
-                    tokenType.add(cell.getStringCellValue().trim());
-                } else {
-                    emptyNum++;
-                    if (emptyNum > 2) {
-                        return;
-                    }
+            for (int column = 1; column <= serverHeadTitleList.size(); column++) {
+                Cell cell = row.getCell(column, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                String value = cell.getCellType() == CellType.STRING ? cell.getStringCellValue().trim() : "";
+                if (serverHeadTitleList.get(column - 1) == null || value.isBlank()) {
                     tokenType.add(null);
-                    System.err.printf(
-                            "表 %s, 数据类型 第 %d 列 为空, 请检查%n", configName, cell.getColumnIndex());
+                } else {
+                    try {
+                        tokenType.add(ConfigValueType.parse(value));
+                    } catch (IllegalArgumentException error) {
+                        throw new IllegalArgumentException(filepathName + " / Sheet1 第3行 第" + (column + 1)
+                                + "列，字段 " + serverHeadTitleList.get(column - 1) + ": " + error.getMessage(), error);
+                    }
                 }
             }
         }
 
-        private void makeTextData(StringBuilder serverLines, FormulaEvaluator evaluator, Row row) {
+        private void makeXmlData(org.w3c.dom.Document document, FormulaEvaluator evaluator, Row row) {
             List<String> serverDataList = new ArrayList<>(128);
             for (int i = 0; i < serverHeadTitleList.size(); i++) {
-                serverDataList.add(defaultTextValue(typeAt(i)));
+                serverDataList.add("");
             }
             Cell flagCell = row.getCell(0);
             if (flagCell == null || !"#".equals(getCellValue(evaluator, flagCell))) {
@@ -180,34 +182,37 @@ public class ParserExcelConfig {
                 }
                 String value = getCellValue(evaluator, cell);
                 if (value != null) {
-                    serverDataList.set(index - 1, value.replace('\r', ' ').replace('\n', ' '));
+                    serverDataList.set(index - 1, value);
                 }
             }
-            appendNotNullLine(serverLines, serverDataList);
-        }
-
-        private String defaultTextValue(String type) {
-            return type != null && type.equalsIgnoreCase("INT") ? "0" : " ";
-        }
-
-        private void appendNotNullLine(StringBuilder out, List<String> values) {
-            boolean first = true;
-            for (int i = 0; i < values.size(); i++) {
-                if (serverHeadTitleList.get(i) == null) {
-                    continue;
-                }
-                if (!first) {
-                    out.append("\t");
-                }
-                out.append(values.get(i));
-                first = false;
+            if (!validateRow(serverDataList, row.getRowNum() + 1)) return;
+            org.w3c.dom.Element data = document.createElement("Data");
+            for (int index = 0; index < serverDataList.size(); index++) {
+                if (serverHeadTitleList.get(index) != null && typeAt(index) != null)
+                    data.setAttribute(serverHeadTitleList.get(index), serverDataList.get(index));
             }
-            out.append("\n");
+            document.getDocumentElement().appendChild(data);
+        }
+
+        private boolean validateRow(List<String> values, int rowNumber) {
+            for (int index = 0; index < values.size(); index++) {
+                ConfigValueType type = typeAt(index);
+                if (serverHeadTitleList.get(index) == null || type == null) continue;
+                try {
+                    ConfigValues.read(type, values.get(index),
+                        filepathName + " / Sheet1 第" + rowNumber + "行 第" + (index + 2)
+                                + "列，字段 " + serverHeadTitleList.get(index));
+                } catch (ConfigLoadException error) {
+                    System.err.println(error.getMessage());
+                    return false;
+                }
+            }
+            return true;
         }
 
         private void addDescHeadTitle(Row row) {
-            for (Cell cell : row) {
-                if (cell.getColumnIndex() == 0) continue;
+            for (int column = 1; column < row.getLastCellNum(); column++) {
+                Cell cell = row.getCell(column, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                 if (cell.getCellType() == CellType.STRING) {
                     descList.add(cell.getStringCellValue().replaceAll("\n", ", "));
                 } else {
@@ -217,16 +222,16 @@ public class ParserExcelConfig {
         }
 
         private void addClientHeadTitle(Row row) {
-            for (Cell cell : row) {
-                if (cell.getColumnIndex() == 0) continue;
+            for (int column = 1; column < row.getLastCellNum(); column++) {
+                Cell cell = row.getCell(column, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                 clientHeadTitleList.add(
                         cell.getCellType() == CellType.STRING ? cell.getStringCellValue() : null);
             }
         }
 
         private void addServerHeadTitle(Row row) {
-            for (Cell cell : row) {
-                if (cell.getColumnIndex() == 0) continue;
+            for (int column = 1; column < row.getLastCellNum(); column++) {
+                Cell cell = row.getCell(column, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                 if (cell.getCellType() == CellType.STRING) {
                     String value = cell.getStringCellValue().trim();
                     if (isJavaKeyValue(value)) {
@@ -247,9 +252,10 @@ public class ParserExcelConfig {
         private String getCellValue(FormulaEvaluator evaluator, Cell cell) {
             return switch (cell.getCellType()) {
                 case STRING -> cell.getStringCellValue();
-                case NUMERIC -> (int) cell.getNumericCellValue() + "";
+                case NUMERIC -> numericText(cell.getNumericCellValue());
                 case BOOLEAN -> cell.getBooleanCellValue() + "";
                 case FORMULA -> getFormulaValue(evaluator, cell);
+                case ERROR -> throw new IllegalArgumentException("Excel 错误单元格: " + cell.getAddress());
                 default -> null;
             };
         }
@@ -258,31 +264,29 @@ public class ParserExcelConfig {
             try {
                 CellValue cellValue = evaluator.evaluate(cell);
                 return switch (cellValue.getCellType()) {
-                    case NUMERIC -> (int) cellValue.getNumberValue() + "";
+                    case NUMERIC -> numericText(cellValue.getNumberValue());
                     case BOOLEAN -> cellValue.getBooleanValue() + "";
                     case STRING -> cellValue.getStringValue();
+                    case ERROR -> throw new IllegalArgumentException("Excel 公式错误: " + cell.getAddress());
                     default -> null;
                 };
             } catch (Exception e) {
-                return null;
+                throw new IllegalArgumentException(filepathName + " 单元格 " + cell.getAddress() + " 公式求值失败", e);
             }
         }
 
-        private void writeServerLineConfig(StringBuilder text) throws IOException {
-            File dir = serverConfigDir;
-            if (!dir.exists() && !dir.mkdirs()) {
-                throw new IOException("创建 serverConfig 目录失败:" + dir.getAbsolutePath());
-            }
-            File file = new File(dir, configName + ".txt");
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write("#fields");
-                forEachGeneratedColumn((title, type, index) -> writer.write("\t" + title));
-                writer.write("\r\n#types");
-                forEachGeneratedColumn(
-                        (title, type, index) -> writer.write("\t" + normalizeType(type)));
-                writer.write("\r\n");
-                writer.write(text.toString());
-            }
+        private String numericText(double value) {
+            if (!Double.isFinite(value)) throw new IllegalArgumentException("非有限数值");
+            return BigDecimal.valueOf(value).stripTrailingZeros().toPlainString();
+        }
+
+        private void writeServerXmlConfig(org.w3c.dom.Document document) throws Exception {
+            Files.createDirectories(serverConfigDir.toPath());
+            javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(javax.xml.transform.OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
+            transformer.transform(new javax.xml.transform.dom.DOMSource(document),
+                    new javax.xml.transform.stream.StreamResult(new File(serverConfigDir, configName + ".xml")));
         }
 
         private void createJavaFile() {
@@ -466,7 +470,7 @@ public class ParserExcelConfig {
                                 + "  @Override\n"
                                 + "  public String getConfigFileName() { return \""
                                 + configName
-                                + ".txt"
+                                + ".xml"
                                 + "\"; }\n\n"
                                 + "  public static class "
                                 + simple
@@ -482,46 +486,21 @@ public class ParserExcelConfig {
                                 + "    @Override\n"
                                 + "    public void reload(Logger logger, String configDir) throws"
                                 + " ConfigLoadException {\n"
+                                + typeConstants()
                                 + "      String fileName = configDir + File.separator +"
                                 + " getConfigFileName();\n"
-                                + "      File file = new File(fileName);\n"
-                                + "      if (!file.exists()) {\n"
-                                + "        logger.error(fileName + \" does not exist\");\n"
-                                + "        throw new ConfigLoadException(\"Config file does not"
-                                + " exist :\" + fileName);\n"
-                                + "      }\n"
-                                + "      "
-                                + simple
-                                + "ConfigChecker checker = new "
-                                + simple
-                                + "ConfigChecker();\n"
-                                + "      checker.checkHeader(logger, configDir);\n"
+                                + "      " + simple + "ConfigChecker checker = new " + simple + "ConfigChecker();\n"
                                 + "      List<"
                                 + simple
                                 + "Config> newList = new ArrayList<>();\n"
                                 + newMap
-                                + "      try (BufferedReader br = new BufferedReader(new"
-                                + " FileReader(file))) {\n"
-                                + "        String rowText;\n"
-                                + "        br.readLine();\n"
-                                + "        br.readLine();\n"
-                                + "        while ((rowText = br.readLine()) != null) {\n"
-                                + "          if (rowText.isBlank()) { continue; }\n"
-                                + "          String[] arr = rowText.split(\"\\\\t\", -1);\n"
-                                + "          if (arr.length < "
-                                + generatedColumnCount()
-                                + ") {\n"
-                                + "            throw new ConfigLoadException(\"Config column size"
-                                + " mismatch :\" + fileName + \", line=\" + rowText);\n"
-                                + "          }\n"
+                                + "      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {\n"
                                 + localVars
                                 + "          try {\n"
                                 + parseCode
-                                + "          } catch (Exception e) {\n"
-                                + "            logger.error(String.format(\"解析配置 %s 表, 字符串:%s"
-                                + " 报错，请检查:%s\", fileName, rowText, e.getMessage()));\n"
-                                + "            throw new ConfigLoadException(\"Error parsing config"
-                                + " file :\" + fileName);\n"
+                                + "          } catch (ConfigLoadException error) {\n"
+                                + "            logger.error(error.getMessage());\n"
+                                + "            return;\n"
                                 + "          }\n"
                                 + "          "
                                 + simple
@@ -530,17 +509,16 @@ public class ParserExcelConfig {
                                 + "Config("
                                 + ctorArgs
                                 + ");\n"
-                                + "          config.afterLoad();\n"
                                 + "          newList.add(config);\n"
                                 + putMap
-                                + "        }\n"
-                                + "        checker.checkAfterParse(logger, newList);\n"
-                                + "        configList = List.copyOf(newList);\n"
+                                + "      });\n"
+                                + "      configList = List.copyOf(newList);\n"
                                 + publishMap
-                                + "      } catch (IOException e) {\n"
-                                + "        throw new ConfigLoadException(\"Config file could not be"
-                                + " read :\" + fileName);\n"
-                                + "      }\n"
+                                + "    }\n\n"
+                                + "    @Override\n"
+                                + "    protected void finishLoad(Logger logger) {\n"
+                                + "      for (" + simple + "Config config : configList) config.afterLoad();\n"
+                                + "      new " + simple + "ConfigChecker().checkAfterParse(logger, configList);\n"
                                 + "    }\n\n"
                                 + "    @Override\n"
                                 + "    public void clear() {\n"
@@ -550,7 +528,6 @@ public class ParserExcelConfig {
                                 + clearStr
                                 + "\n      // @@@@@自定义clear方法结束区@@@@@\n"
                                 + "    }\n\n"
-                                + parserHelpers()
                                 + "    public List<"
                                 + simple
                                 + "Config> getConfigList() {\n      return configList;\n    }\n\n"
@@ -558,7 +535,7 @@ public class ParserExcelConfig {
                                 + "    @Override\n"
                                 + "    public String getConfigFileName() {\n      return \""
                                 + configName
-                                + ".txt\";\n    }\n\n"
+                                + ".xml\";\n    }\n\n"
                                 + "    // @@@@@自定义方法开始区@@@@@\n"
                                 + methodStr
                                 + "\n    // @@@@@自定义方法结束区@@@@@\n"
@@ -601,7 +578,7 @@ public class ParserExcelConfig {
                             + "  @Override\n"
                             + "  public String getConfigFileName() {\n    return \""
                             + configName
-                            + ".txt\";\n  }\n\n"
+                            + ".xml\";\n  }\n\n"
                             + "  @Override\n"
                             + "  public List<ConfigColumnMeta> getExpectedColumns() {\n"
                             + "    return List.of(\n"
@@ -645,39 +622,33 @@ public class ParserExcelConfig {
                             sb.append("          ")
                                     .append(javaType(type))
                                     .append(" ")
-                                    .append(title)
+                                    .append("parsedField").append(index)
                                     .append(" = ")
                                     .append(defaultJavaValue(type))
                                     .append(";\n"));
             return sb.toString();
         }
 
+        private String typeConstants() {
+            StringBuilder result = new StringBuilder();
+            forEachGeneratedColumn((title, type, index) -> result.append("      ly.ConfigValueType type")
+                    .append(index).append(" = ly.ConfigValueType.parse(\"").append(normalizeType(type)).append("\");\n"));
+            return result.toString();
+        }
+
         private String buildParseCode() {
-            StringBuilder sb = new StringBuilder();
-            forEachGeneratedColumn(
-                    (title, type, index) -> {
-                        String desc = index < descList.size() ? descList.get(index) : "";
-                        if (desc != null && !desc.isBlank()) {
-                            sb.append("            // 解析 ")
-                                    .append(desc.replace("\n", " "))
-                                    .append("\n");
-                        }
-                        sb.append("            if (!arr[")
-                                .append(index)
-                                .append("].trim().isEmpty()) {\n")
-                                .append("              ")
-                                .append(title)
-                                .append(" = ")
-                                .append(parseExpression(index, type))
-                                .append(";\n")
-                                .append("            }\n\n");
-                    });
-            return sb.toString();
+            StringBuilder result = new StringBuilder();
+            forEachGeneratedColumn((title, type, index) -> result.append("            ")
+                    .append("parsedField").append(index).append(" = ly.ConfigValues.read(type").append(index)
+                    .append(", values.get(\"").append(title)
+                    .append("\"), fileName + \":行\" + lineNumber + \":字段 ")
+                    .append(title).append("\");\n"));
+            return result.toString();
         }
 
         private String buildCtorArgs() {
             List<String> args = new ArrayList<>();
-            forEachGeneratedColumn((title, type, index) -> args.add(title));
+            forEachGeneratedColumn((title, type, index) -> args.add("parsedField" + index));
             return String.join(", ", args);
         }
 
@@ -694,8 +665,8 @@ public class ParserExcelConfig {
                 if (title == null) {
                     continue;
                 }
-                String type = typeAt(i);
-                if (type == null || type.isBlank()) {
+                ConfigValueType type = typeAt(i);
+                if (type == null) {
                     continue;
                 }
                 try {
@@ -714,93 +685,31 @@ public class ParserExcelConfig {
             return null;
         }
 
-        private String typeAt(int index) {
+        private ConfigValueType typeAt(int index) {
             return index >= 0 && index < tokenType.size() ? tokenType.get(index) : null;
         }
 
-        private String parserHelpers() {
-            return "    private List<Integer> parseIntList(String value) {\n"
-                       + "      if (value == null || value.trim().isEmpty()) { return new"
-                       + " ArrayList<>(); }\n"
-                       + "      String[] parts = value.split(\",\");\n"
-                       + "      List<Integer> result = new ArrayList<>();\n"
-                       + "      for (String part : parts) {\n"
-                       + "        if (!part.trim().isEmpty()) {"
-                       + " result.add(Integer.parseInt(part.trim())); }\n"
-                       + "      }\n"
-                       + "      return result;\n"
-                       + "    }\n\n"
-                       + "    private List<KV<Integer, Integer>> parseIntKVList(String value) {\n"
-                       + "      if (value == null || value.trim().isEmpty()) { return new"
-                       + " ArrayList<>(); }\n"
-                       + "      List<KV<Integer, Integer>> result = new ArrayList<>();\n"
-                       + "      for (String pair : value.split(\",\")) {\n"
-                       + "        int idx = pair.indexOf(\":\");\n"
-                       + "        if (idx > 0) {\n"
-                       + "          result.add(new KV<>(Integer.parseInt(pair.substring(0,"
-                       + " idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));\n"
-                       + "        }\n"
-                       + "      }\n"
-                       + "      return result;\n"
-                       + "    }\n\n"
-                       + "    private List<KV<String, String>> parseStringKVList(String value) {\n"
-                       + "      if (value == null || value.trim().isEmpty()) { return new"
-                       + " ArrayList<>(); }\n"
-                       + "      List<KV<String, String>> result = new ArrayList<>();\n"
-                       + "      for (String pair : value.split(\",\")) {\n"
-                       + "        int idx = pair.indexOf(\":\");\n"
-                       + "        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(),"
-                       + " pair.substring(idx + 1).trim())); }\n"
-                       + "      }\n"
-                       + "      return result;\n"
-                       + "    }\n\n";
+        private String javaType(ConfigValueType type) {
+            return ConfigTypeJava.javaType(type, false);
         }
 
-        private String javaType(String type) {
-            if (type.equalsIgnoreCase("INT")) return "int";
-            if (type.equalsIgnoreCase("LONG")) return "long";
-            if (type.equalsIgnoreCase("DOUBLE")) return "double";
-            if (type.equalsIgnoreCase("BOOLEAN")) return "boolean";
-            if (type.equalsIgnoreCase("FLOAT")) return "float";
-            if (type.equalsIgnoreCase("INT1")) return "List<Integer>";
-            if (type.equalsIgnoreCase("INT2")) return "List<KV<Integer, Integer>>";
-            if (type.equalsIgnoreCase("STRING2")) return "List<KV<String, String>>";
-            return "String";
+        private String boxedJavaType(ConfigValueType type) {
+            return ConfigTypeJava.javaType(type, true);
         }
 
-        private String boxedJavaType(String type) {
-            if (type.equalsIgnoreCase("INT")) return "Integer";
-            if (type.equalsIgnoreCase("LONG")) return "Long";
-            if (type.equalsIgnoreCase("DOUBLE")) return "Double";
-            if (type.equalsIgnoreCase("BOOLEAN")) return "Boolean";
-            if (type.equalsIgnoreCase("FLOAT")) return "Float";
-            return "String";
+        private String defaultJavaValue(ConfigValueType type) {
+            return switch (type.kind()) {
+                case "byte", "short", "int" -> "0";
+                case "long" -> "0L";
+                case "float" -> "0F";
+                case "double" -> "0D";
+                case "bool" -> "false";
+                default -> "null";
+            };
         }
 
-        private String defaultJavaValue(String type) {
-            if (type.equalsIgnoreCase("INT")) return "0";
-            if (type.equalsIgnoreCase("LONG")) return "0L";
-            if (type.equalsIgnoreCase("DOUBLE")) return "0D";
-            if (type.equalsIgnoreCase("BOOLEAN")) return "false";
-            if (type.equalsIgnoreCase("FLOAT")) return "0F";
-            return "null";
-        }
-
-        private String parseExpression(int i, String type) {
-            if (type.equalsIgnoreCase("INT")) return "Integer.parseInt(arr[" + i + "].trim())";
-            if (type.equalsIgnoreCase("LONG")) return "Long.parseLong(arr[" + i + "].trim())";
-            if (type.equalsIgnoreCase("DOUBLE")) return "Double.parseDouble(arr[" + i + "].trim())";
-            if (type.equalsIgnoreCase("BOOLEAN"))
-                return "Boolean.parseBoolean(arr[" + i + "].trim())";
-            if (type.equalsIgnoreCase("FLOAT")) return "Float.parseFloat(arr[" + i + "].trim())";
-            if (type.equalsIgnoreCase("INT1")) return "parseIntList(arr[" + i + "].trim())";
-            if (type.equalsIgnoreCase("INT2")) return "parseIntKVList(arr[" + i + "].trim())";
-            if (type.equalsIgnoreCase("STRING2")) return "parseStringKVList(arr[" + i + "].trim())";
-            return "arr[" + i + "].trim()";
-        }
-
-        private String normalizeType(String type) {
-            return type == null ? "" : type.trim().toUpperCase();
+        private String normalizeType(ConfigValueType type) {
+            return type.declaration();
         }
 
         private String classSimpleName() {
@@ -809,7 +718,7 @@ public class ParserExcelConfig {
 
         private void writeFile(File file, String source) throws IOException {
             Files.createDirectories(file.toPath().getParent());
-            try (FileWriter writer = new FileWriter(file)) {
+            try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
                 writer.write(source);
             }
         }
@@ -854,7 +763,7 @@ public class ParserExcelConfig {
 
     @FunctionalInterface
     interface ColumnConsumer {
-        void accept(String title, String type, int index) throws IOException;
+        void accept(String title, ConfigValueType type, int index) throws IOException;
     }
 
     public static void main(String[] args) {

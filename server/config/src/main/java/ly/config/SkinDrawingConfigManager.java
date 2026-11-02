@@ -27,7 +27,7 @@ public class SkinDrawingConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new SkinDrawingConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "skinDrawing.txt"; }
+  public String getConfigFileName() { return "skinDrawing.xml"; }
 
   public static class SkinDrawingConfigManagerImpl extends AbstractConfigManger {
     private List<SkinDrawingConfig> configList = List.of();
@@ -39,120 +39,67 @@ public class SkinDrawingConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       SkinDrawingConfigChecker checker = new SkinDrawingConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<SkinDrawingConfig> newList = new ArrayList<>();
       Map<Integer, SkinDrawingConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 13) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int heroId = 0;
-          String name = null;
-          String skinName = null;
-          String skinGet = null;
-          int turnId = 0;
-          int headResource = 0;
-          int headResource_2 = 0;
-          int headResource_3 = 0;
-          int headResource_4 = 0;
-          String sSkillCutUp = null;
-          String sSkipCutUp = null;
-          int cardBust = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          int parsedField12 = 0;
           try {
-            // 解析 id
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 对应英雄
-            if (!arr[1].trim().isEmpty()) {
-              heroId = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 名字
-            if (!arr[2].trim().isEmpty()) {
-              name = arr[2].trim();
-            }
-
-            // 解析 皮肤名称
-            if (!arr[3].trim().isEmpty()) {
-              skinName = arr[3].trim();
-            }
-
-            // 解析 获取途径
-            if (!arr[4].trim().isEmpty()) {
-              skinGet = arr[4].trim();
-            }
-
-            // 解析 跳转ID
-            if (!arr[5].trim().isEmpty()) {
-              turnId = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 行动序列头像
-            if (!arr[6].trim().isEmpty()) {
-              headResource = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 右侧头像
-            if (!arr[7].trim().isEmpty()) {
-              headResource_2 = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 立绘头像
-            if (!arr[8].trim().isEmpty()) {
-              headResource_3 = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 全身立绘
-            if (!arr[9].trim().isEmpty()) {
-              headResource_4 = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 s技能立绘切割坐标
-            if (!arr[10].trim().isEmpty()) {
-              sSkillCutUp = arr[10].trim();
-            }
-
-            // 解析 s技能跳过立绘切割坐标
-            if (!arr[11].trim().isEmpty()) {
-              sSkipCutUp = arr[11].trim();
-            }
-
-            // 解析 512尺寸半身像
-            if (!arr[12].trim().isEmpty()) {
-              cardBust = Integer.parseInt(arr[12].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("heroId"), fileName + ":行" + lineNumber + ":字段 heroId");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("skinName"), fileName + ":行" + lineNumber + ":字段 skinName");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("skinGet"), fileName + ":行" + lineNumber + ":字段 skinGet");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("turnId"), fileName + ":行" + lineNumber + ":字段 turnId");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("headResource"), fileName + ":行" + lineNumber + ":字段 headResource");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("headResource_2"), fileName + ":行" + lineNumber + ":字段 headResource_2");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("headResource_3"), fileName + ":行" + lineNumber + ":字段 headResource_3");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("headResource_4"), fileName + ":行" + lineNumber + ":字段 headResource_4");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("sSkillCutUp"), fileName + ":行" + lineNumber + ":字段 sSkillCutUp");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("sSkipCutUp"), fileName + ":行" + lineNumber + ":字段 sSkipCutUp");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("cardBust"), fileName + ":行" + lineNumber + ":字段 cardBust");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          SkinDrawingConfig config = new SkinDrawingConfig(id, heroId, name, skinName, skinGet, turnId, headResource, headResource_2, headResource_3, headResource_4, sSkillCutUp, sSkipCutUp, cardBust);
-          config.afterLoad();
+          SkinDrawingConfig config = new SkinDrawingConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (SkinDrawingConfig config : configList) config.afterLoad();
+      new SkinDrawingConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -162,38 +109,6 @@ public class SkinDrawingConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<SkinDrawingConfig> getConfigList() {
@@ -206,7 +121,7 @@ public class SkinDrawingConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "skinDrawing.txt";
+      return "skinDrawing.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -27,7 +27,7 @@ public class CommodityRandPoolConfigManager implements InterfaceConfigManagerPro
   public AbstractConfigManger createTable() { return new CommodityRandPoolConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "commodityRandPool.txt"; }
+  public String getConfigFileName() { return "commodityRandPool.xml"; }
 
   public static class CommodityRandPoolConfigManagerImpl extends AbstractConfigManger {
     private List<CommodityRandPoolConfig> configList = List.of();
@@ -39,168 +39,91 @@ public class CommodityRandPoolConfigManager implements InterfaceConfigManagerPro
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       CommodityRandPoolConfigChecker checker = new CommodityRandPoolConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<CommodityRandPoolConfig> newList = new ArrayList<>();
       Map<Integer, CommodityRandPoolConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 21) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int grade = 0;
-          int school = 0;
-          int group = 0;
-          String des = null;
-          String poolOneLevel = null;
-          String poolOne = null;
-          String poolTwoLevel = null;
-          String poolTwo = null;
-          String poolThreeLevel = null;
-          String poolThree = null;
-          String poolFourLevel = null;
-          String poolFour = null;
-          String poolFiveLevel = null;
-          String poolFive = null;
-          String poolSixLevel = null;
-          String poolSix = null;
-          String poolSevenLevel = null;
-          String poolSeven = null;
-          String poolEightLevel = null;
-          String poolEight = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          String parsedField4 = null;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          String parsedField12 = null;
+          String parsedField13 = null;
+          String parsedField14 = null;
+          String parsedField15 = null;
+          String parsedField16 = null;
+          String parsedField17 = null;
+          String parsedField18 = null;
+          String parsedField19 = null;
+          String parsedField20 = null;
           try {
-            // 解析 商品随机池ID
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 一级商店id
-            if (!arr[1].trim().isEmpty()) {
-              grade = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 二级商店id
-            if (!arr[2].trim().isEmpty()) {
-              school = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 商品组id
-            if (!arr[3].trim().isEmpty()) {
-              group = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 注释
-            if (!arr[4].trim().isEmpty()) {
-              des = arr[4].trim();
-            }
-
-            // 解析 随机组1等级条件
-            if (!arr[5].trim().isEmpty()) {
-              poolOneLevel = arr[5].trim();
-            }
-
-            // 解析 随机组1
-            if (!arr[6].trim().isEmpty()) {
-              poolOne = arr[6].trim();
-            }
-
-            // 解析 随机组2等级条件
-            if (!arr[7].trim().isEmpty()) {
-              poolTwoLevel = arr[7].trim();
-            }
-
-            // 解析 随机组2
-            if (!arr[8].trim().isEmpty()) {
-              poolTwo = arr[8].trim();
-            }
-
-            // 解析 随机组3等级条件
-            if (!arr[9].trim().isEmpty()) {
-              poolThreeLevel = arr[9].trim();
-            }
-
-            // 解析 随机组3
-            if (!arr[10].trim().isEmpty()) {
-              poolThree = arr[10].trim();
-            }
-
-            // 解析 随机组4等级条件
-            if (!arr[11].trim().isEmpty()) {
-              poolFourLevel = arr[11].trim();
-            }
-
-            // 解析 随机组4
-            if (!arr[12].trim().isEmpty()) {
-              poolFour = arr[12].trim();
-            }
-
-            // 解析 随机组5等级条件
-            if (!arr[13].trim().isEmpty()) {
-              poolFiveLevel = arr[13].trim();
-            }
-
-            // 解析 随机组5
-            if (!arr[14].trim().isEmpty()) {
-              poolFive = arr[14].trim();
-            }
-
-            // 解析 随机组6等级条件
-            if (!arr[15].trim().isEmpty()) {
-              poolSixLevel = arr[15].trim();
-            }
-
-            // 解析 随机组6
-            if (!arr[16].trim().isEmpty()) {
-              poolSix = arr[16].trim();
-            }
-
-            // 解析 随机组7等级条件
-            if (!arr[17].trim().isEmpty()) {
-              poolSevenLevel = arr[17].trim();
-            }
-
-            // 解析 随机组7
-            if (!arr[18].trim().isEmpty()) {
-              poolSeven = arr[18].trim();
-            }
-
-            // 解析 随机组8等级条件
-            if (!arr[19].trim().isEmpty()) {
-              poolEightLevel = arr[19].trim();
-            }
-
-            // 解析 随机组8
-            if (!arr[20].trim().isEmpty()) {
-              poolEight = arr[20].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("grade"), fileName + ":行" + lineNumber + ":字段 grade");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("school"), fileName + ":行" + lineNumber + ":字段 school");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("group"), fileName + ":行" + lineNumber + ":字段 group");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("des"), fileName + ":行" + lineNumber + ":字段 des");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("poolOneLevel"), fileName + ":行" + lineNumber + ":字段 poolOneLevel");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("poolOne"), fileName + ":行" + lineNumber + ":字段 poolOne");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("poolTwoLevel"), fileName + ":行" + lineNumber + ":字段 poolTwoLevel");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("poolTwo"), fileName + ":行" + lineNumber + ":字段 poolTwo");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("poolThreeLevel"), fileName + ":行" + lineNumber + ":字段 poolThreeLevel");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("poolThree"), fileName + ":行" + lineNumber + ":字段 poolThree");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("poolFourLevel"), fileName + ":行" + lineNumber + ":字段 poolFourLevel");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("poolFour"), fileName + ":行" + lineNumber + ":字段 poolFour");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("poolFiveLevel"), fileName + ":行" + lineNumber + ":字段 poolFiveLevel");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("poolFive"), fileName + ":行" + lineNumber + ":字段 poolFive");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("poolSixLevel"), fileName + ":行" + lineNumber + ":字段 poolSixLevel");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("poolSix"), fileName + ":行" + lineNumber + ":字段 poolSix");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("poolSevenLevel"), fileName + ":行" + lineNumber + ":字段 poolSevenLevel");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("poolSeven"), fileName + ":行" + lineNumber + ":字段 poolSeven");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("poolEightLevel"), fileName + ":行" + lineNumber + ":字段 poolEightLevel");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("poolEight"), fileName + ":行" + lineNumber + ":字段 poolEight");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          CommodityRandPoolConfig config = new CommodityRandPoolConfig(id, grade, school, group, des, poolOneLevel, poolOne, poolTwoLevel, poolTwo, poolThreeLevel, poolThree, poolFourLevel, poolFour, poolFiveLevel, poolFive, poolSixLevel, poolSix, poolSevenLevel, poolSeven, poolEightLevel, poolEight);
-          config.afterLoad();
+          CommodityRandPoolConfig config = new CommodityRandPoolConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (CommodityRandPoolConfig config : configList) config.afterLoad();
+      new CommodityRandPoolConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -210,38 +133,6 @@ public class CommodityRandPoolConfigManager implements InterfaceConfigManagerPro
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<CommodityRandPoolConfig> getConfigList() {
@@ -254,7 +145,7 @@ public class CommodityRandPoolConfigManager implements InterfaceConfigManagerPro
 
     @Override
     public String getConfigFileName() {
-      return "commodityRandPool.txt";
+      return "commodityRandPool.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

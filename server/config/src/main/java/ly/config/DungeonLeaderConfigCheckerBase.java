@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class DungeonLeaderConfigCheckerBase extends AbstractConfigChecker<DungeonLeaderConfig> {
   @Override
   public String getConfigFileName() {
-    return "dungeonLeader.txt";
+    return "dungeonLeader.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "para", "INT"),
-        new ConfigColumnMeta(3, "type", "INT"),
-        new ConfigColumnMeta(4, "leaderEffectContent", "STRING"),
-        new ConfigColumnMeta(5, "bodyPic", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "para", "int"),
+        new ConfigColumnMeta(3, "type", "int"),
+        new ConfigColumnMeta(4, "leaderEffectContent", "string"),
+        new ConfigColumnMeta(5, "bodyPic", "int"));
   }
 }

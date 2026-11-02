@@ -27,7 +27,7 @@ public class StrongRoadConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new StrongRoadConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "strongRoad.txt"; }
+  public String getConfigFileName() { return "strongRoad.xml"; }
 
   public static class StrongRoadConfigManagerImpl extends AbstractConfigManger {
     private List<StrongRoadConfig> configList = List.of();
@@ -39,96 +39,55 @@ public class StrongRoadConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       StrongRoadConfigChecker checker = new StrongRoadConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<StrongRoadConfig> newList = new ArrayList<>();
       Map<Integer, StrongRoadConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 9) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int type = 0;
-          String para = null;
-          int iconShow = 0;
-          int show = 0;
-          String name = null;
-          int icon = 0;
-          int turnId = 0;
-          String des = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          String parsedField5 = null;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          String parsedField8 = null;
           try {
-            // 解析 id
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 类型
-            if (!arr[1].trim().isEmpty()) {
-              type = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 参数
-            if (!arr[2].trim().isEmpty()) {
-              para = arr[2].trim();
-            }
-
-            // 解析 主界面显示
-            if (!arr[3].trim().isEmpty()) {
-              iconShow = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 是否显示
-            if (!arr[4].trim().isEmpty()) {
-              show = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 名称
-            if (!arr[5].trim().isEmpty()) {
-              name = arr[5].trim();
-            }
-
-            // 解析 图标
-            if (!arr[6].trim().isEmpty()) {
-              icon = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 跳转id
-            if (!arr[7].trim().isEmpty()) {
-              turnId = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 描述
-            if (!arr[8].trim().isEmpty()) {
-              des = arr[8].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("type"), fileName + ":行" + lineNumber + ":字段 type");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("para"), fileName + ":行" + lineNumber + ":字段 para");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("iconShow"), fileName + ":行" + lineNumber + ":字段 iconShow");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("show"), fileName + ":行" + lineNumber + ":字段 show");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("icon"), fileName + ":行" + lineNumber + ":字段 icon");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("turnId"), fileName + ":行" + lineNumber + ":字段 turnId");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("des"), fileName + ":行" + lineNumber + ":字段 des");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          StrongRoadConfig config = new StrongRoadConfig(id, type, para, iconShow, show, name, icon, turnId, des);
-          config.afterLoad();
+          StrongRoadConfig config = new StrongRoadConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (StrongRoadConfig config : configList) config.afterLoad();
+      new StrongRoadConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -138,38 +97,6 @@ public class StrongRoadConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<StrongRoadConfig> getConfigList() {
@@ -182,7 +109,7 @@ public class StrongRoadConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "strongRoad.txt";
+      return "strongRoad.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

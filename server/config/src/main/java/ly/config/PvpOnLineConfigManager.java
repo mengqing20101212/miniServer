@@ -27,7 +27,7 @@ public class PvpOnLineConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new PvpOnLineConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "pvpOnLine.txt"; }
+  public String getConfigFileName() { return "pvpOnLine.xml"; }
 
   public static class PvpOnLineConfigManagerImpl extends AbstractConfigManger {
     private List<PvpOnLineConfig> configList = List.of();
@@ -39,264 +39,139 @@ public class PvpOnLineConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("float");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type24 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type25 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type26 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type27 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type28 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type29 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type30 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type31 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type32 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type33 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type34 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type35 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type36 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       PvpOnLineConfigChecker checker = new PvpOnLineConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<PvpOnLineConfig> newList = new ArrayList<>();
       Map<Integer, PvpOnLineConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 37) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String duan = null;
-          String duanBigName = null;
-          int duanBig = 0;
-          int duanSmall = 0;
-          int duanIconBig = 0;
-          int duanIconSmall = 0;
-          int starNum = 0;
-          int starCollect = 0;
-          float eloKValue = 0F;
-          int scoreMax = 0;
-          int scoreProtection = 0;
-          int isScoreProtection = 0;
-          int winningStreak = 0;
-          int dropProtection = 0;
-          int duanProtection = 0;
-          int bestMatchScore = 0;
-          int bestMatchTime = 0;
-          int bestMatchStar = 0;
-          int fuzzyMatchScore = 0;
-          int fuzzyMatchTime = 0;
-          int fuzzyMatchStar = 0;
-          int leastMatchScore = 0;
-          int leastMatchTime = 0;
-          int leastMatchStar = 0;
-          int isTimeOutRebotMatch = 0;
-          int isLoseRobotMatch = 0;
-          int isPick = 0;
-          int winReward = 0;
-          int loseReward = 0;
-          int honorLimit = 0;
-          String awardWeek = null;
-          String awardWeekPre = null;
-          String bossTimeSetting = null;
-          int robotPool = 0;
-          int sceneMatch = 0;
-          int bestMatchLevelDiff = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          float parsedField9 = 0F;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          int parsedField15 = 0;
+          int parsedField16 = 0;
+          int parsedField17 = 0;
+          int parsedField18 = 0;
+          int parsedField19 = 0;
+          int parsedField20 = 0;
+          int parsedField21 = 0;
+          int parsedField22 = 0;
+          int parsedField23 = 0;
+          int parsedField24 = 0;
+          int parsedField25 = 0;
+          int parsedField26 = 0;
+          int parsedField27 = 0;
+          int parsedField28 = 0;
+          int parsedField29 = 0;
+          int parsedField30 = 0;
+          String parsedField31 = null;
+          String parsedField32 = null;
+          String parsedField33 = null;
+          int parsedField34 = 0;
+          int parsedField35 = 0;
+          int parsedField36 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 段位
-            if (!arr[1].trim().isEmpty()) {
-              duan = arr[1].trim();
-            }
-
-            // 解析 大段名
-            if (!arr[2].trim().isEmpty()) {
-              duanBigName = arr[2].trim();
-            }
-
-            // 解析 大段位
-            if (!arr[3].trim().isEmpty()) {
-              duanBig = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 小段位
-            if (!arr[4].trim().isEmpty()) {
-              duanSmall = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 段位图标
-            if (!arr[5].trim().isEmpty()) {
-              duanIconBig = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 段位图标
-            if (!arr[6].trim().isEmpty()) {
-              duanIconSmall = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 星级数量
-            if (!arr[7].trim().isEmpty()) {
-              starNum = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 累积星数
-            if (!arr[8].trim().isEmpty()) {
-              starCollect = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 ELO分K值
-            if (!arr[9].trim().isEmpty()) {
-              eloKValue = Float.parseFloat(arr[9].trim());
-            }
-
-            // 解析 勇者积分上限
-            if (!arr[10].trim().isEmpty()) {
-              scoreMax = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 保星积分
-            if (!arr[11].trim().isEmpty()) {
-              scoreProtection = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 是否开启积分保星
-            if (!arr[12].trim().isEmpty()) {
-              isScoreProtection = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 连胜加星
-            if (!arr[13].trim().isEmpty()) {
-              winningStreak = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 掉段保护
-            if (!arr[14].trim().isEmpty()) {
-              dropProtection = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 保大段
-            if (!arr[15].trim().isEmpty()) {
-              duanProtection = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 精确匹配分数
-            if (!arr[16].trim().isEmpty()) {
-              bestMatchScore = Integer.parseInt(arr[16].trim());
-            }
-
-            // 解析 精确匹配时间
-            if (!arr[17].trim().isEmpty()) {
-              bestMatchTime = Integer.parseInt(arr[17].trim());
-            }
-
-            // 解析 精确匹配星数
-            if (!arr[18].trim().isEmpty()) {
-              bestMatchStar = Integer.parseInt(arr[18].trim());
-            }
-
-            // 解析 模糊匹配分数
-            if (!arr[19].trim().isEmpty()) {
-              fuzzyMatchScore = Integer.parseInt(arr[19].trim());
-            }
-
-            // 解析 模糊匹配时间
-            if (!arr[20].trim().isEmpty()) {
-              fuzzyMatchTime = Integer.parseInt(arr[20].trim());
-            }
-
-            // 解析 模糊匹配星数
-            if (!arr[21].trim().isEmpty()) {
-              fuzzyMatchStar = Integer.parseInt(arr[21].trim());
-            }
-
-            // 解析 保底匹配分数
-            if (!arr[22].trim().isEmpty()) {
-              leastMatchScore = Integer.parseInt(arr[22].trim());
-            }
-
-            // 解析 保底匹配时间
-            if (!arr[23].trim().isEmpty()) {
-              leastMatchTime = Integer.parseInt(arr[23].trim());
-            }
-
-            // 解析 保底匹配星数
-            if (!arr[24].trim().isEmpty()) {
-              leastMatchStar = Integer.parseInt(arr[24].trim());
-            }
-
-            // 解析 是否超时保底匹配机器人
-            if (!arr[25].trim().isEmpty()) {
-              isTimeOutRebotMatch = Integer.parseInt(arr[25].trim());
-            }
-
-            // 解析 是否战败保底匹配机器人
-            if (!arr[26].trim().isEmpty()) {
-              isLoseRobotMatch = Integer.parseInt(arr[26].trim());
-            }
-
-            // 解析 是否轮选
-            if (!arr[27].trim().isEmpty()) {
-              isPick = Integer.parseInt(arr[27].trim());
-            }
-
-            // 解析 战斗胜利荣誉
-            if (!arr[28].trim().isEmpty()) {
-              winReward = Integer.parseInt(arr[28].trim());
-            }
-
-            // 解析 战斗失败荣誉
-            if (!arr[29].trim().isEmpty()) {
-              loseReward = Integer.parseInt(arr[29].trim());
-            }
-
-            // 解析 每周荣誉上限
-            if (!arr[30].trim().isEmpty()) {
-              honorLimit = Integer.parseInt(arr[30].trim());
-            }
-
-            // 解析 每周结算奖励
-            if (!arr[31].trim().isEmpty()) {
-              awardWeek = arr[31].trim();
-            }
-
-            // 解析 每周结算奖励预览
-            if (!arr[32].trim().isEmpty()) {
-              awardWeekPre = arr[32].trim();
-            }
-
-            // 解析 匹配服务器
-            if (!arr[33].trim().isEmpty()) {
-              bossTimeSetting = arr[33].trim();
-            }
-
-            // 解析 对应机器人范围
-            if (!arr[34].trim().isEmpty()) {
-              robotPool = Integer.parseInt(arr[34].trim());
-            }
-
-            // 解析 对应场次
-            if (!arr[35].trim().isEmpty()) {
-              sceneMatch = Integer.parseInt(arr[35].trim());
-            }
-
-            // 解析 精准匹配等级差
-            if (!arr[36].trim().isEmpty()) {
-              bestMatchLevelDiff = Integer.parseInt(arr[36].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("duan"), fileName + ":行" + lineNumber + ":字段 duan");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("duanBigName"), fileName + ":行" + lineNumber + ":字段 duanBigName");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("duanBig"), fileName + ":行" + lineNumber + ":字段 duanBig");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("duanSmall"), fileName + ":行" + lineNumber + ":字段 duanSmall");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("duanIconBig"), fileName + ":行" + lineNumber + ":字段 duanIconBig");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("duanIconSmall"), fileName + ":行" + lineNumber + ":字段 duanIconSmall");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("starNum"), fileName + ":行" + lineNumber + ":字段 starNum");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("starCollect"), fileName + ":行" + lineNumber + ":字段 starCollect");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("eloKValue"), fileName + ":行" + lineNumber + ":字段 eloKValue");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("scoreMax"), fileName + ":行" + lineNumber + ":字段 scoreMax");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("scoreProtection"), fileName + ":行" + lineNumber + ":字段 scoreProtection");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("isScoreProtection"), fileName + ":行" + lineNumber + ":字段 isScoreProtection");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("winningStreak"), fileName + ":行" + lineNumber + ":字段 winningStreak");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("dropProtection"), fileName + ":行" + lineNumber + ":字段 dropProtection");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("duanProtection"), fileName + ":行" + lineNumber + ":字段 duanProtection");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("bestMatchScore"), fileName + ":行" + lineNumber + ":字段 bestMatchScore");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("bestMatchTime"), fileName + ":行" + lineNumber + ":字段 bestMatchTime");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("bestMatchStar"), fileName + ":行" + lineNumber + ":字段 bestMatchStar");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("fuzzyMatchScore"), fileName + ":行" + lineNumber + ":字段 fuzzyMatchScore");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("fuzzyMatchTime"), fileName + ":行" + lineNumber + ":字段 fuzzyMatchTime");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("fuzzyMatchStar"), fileName + ":行" + lineNumber + ":字段 fuzzyMatchStar");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("leastMatchScore"), fileName + ":行" + lineNumber + ":字段 leastMatchScore");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("leastMatchTime"), fileName + ":行" + lineNumber + ":字段 leastMatchTime");
+            parsedField24 = ly.ConfigValues.read(type24, values.get("leastMatchStar"), fileName + ":行" + lineNumber + ":字段 leastMatchStar");
+            parsedField25 = ly.ConfigValues.read(type25, values.get("isTimeOutRebotMatch"), fileName + ":行" + lineNumber + ":字段 isTimeOutRebotMatch");
+            parsedField26 = ly.ConfigValues.read(type26, values.get("isLoseRobotMatch"), fileName + ":行" + lineNumber + ":字段 isLoseRobotMatch");
+            parsedField27 = ly.ConfigValues.read(type27, values.get("isPick"), fileName + ":行" + lineNumber + ":字段 isPick");
+            parsedField28 = ly.ConfigValues.read(type28, values.get("winReward"), fileName + ":行" + lineNumber + ":字段 winReward");
+            parsedField29 = ly.ConfigValues.read(type29, values.get("loseReward"), fileName + ":行" + lineNumber + ":字段 loseReward");
+            parsedField30 = ly.ConfigValues.read(type30, values.get("honorLimit"), fileName + ":行" + lineNumber + ":字段 honorLimit");
+            parsedField31 = ly.ConfigValues.read(type31, values.get("awardWeek"), fileName + ":行" + lineNumber + ":字段 awardWeek");
+            parsedField32 = ly.ConfigValues.read(type32, values.get("awardWeekPre"), fileName + ":行" + lineNumber + ":字段 awardWeekPre");
+            parsedField33 = ly.ConfigValues.read(type33, values.get("bossTimeSetting"), fileName + ":行" + lineNumber + ":字段 bossTimeSetting");
+            parsedField34 = ly.ConfigValues.read(type34, values.get("robotPool"), fileName + ":行" + lineNumber + ":字段 robotPool");
+            parsedField35 = ly.ConfigValues.read(type35, values.get("sceneMatch"), fileName + ":行" + lineNumber + ":字段 sceneMatch");
+            parsedField36 = ly.ConfigValues.read(type36, values.get("bestMatchLevelDiff"), fileName + ":行" + lineNumber + ":字段 bestMatchLevelDiff");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          PvpOnLineConfig config = new PvpOnLineConfig(id, duan, duanBigName, duanBig, duanSmall, duanIconBig, duanIconSmall, starNum, starCollect, eloKValue, scoreMax, scoreProtection, isScoreProtection, winningStreak, dropProtection, duanProtection, bestMatchScore, bestMatchTime, bestMatchStar, fuzzyMatchScore, fuzzyMatchTime, fuzzyMatchStar, leastMatchScore, leastMatchTime, leastMatchStar, isTimeOutRebotMatch, isLoseRobotMatch, isPick, winReward, loseReward, honorLimit, awardWeek, awardWeekPre, bossTimeSetting, robotPool, sceneMatch, bestMatchLevelDiff);
-          config.afterLoad();
+          PvpOnLineConfig config = new PvpOnLineConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24, parsedField25, parsedField26, parsedField27, parsedField28, parsedField29, parsedField30, parsedField31, parsedField32, parsedField33, parsedField34, parsedField35, parsedField36);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (PvpOnLineConfig config : configList) config.afterLoad();
+      new PvpOnLineConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -306,38 +181,6 @@ public class PvpOnLineConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<PvpOnLineConfig> getConfigList() {
@@ -350,7 +193,7 @@ public class PvpOnLineConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "pvpOnLine.txt";
+      return "pvpOnLine.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class SupportTeamExpConfigCheckerBase extends AbstractConfigChecker<SupportTeamExpConfig> {
   @Override
   public String getConfigFileName() {
-    return "supportTeamExp.txt";
+    return "supportTeamExp.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "modelId", "INT"),
-        new ConfigColumnMeta(1, "level", "INT"),
-        new ConfigColumnMeta(2, "exp", "INT"));
+        new ConfigColumnMeta(0, "modelId", "int"),
+        new ConfigColumnMeta(1, "level", "int"),
+        new ConfigColumnMeta(2, "exp", "int"));
   }
 }

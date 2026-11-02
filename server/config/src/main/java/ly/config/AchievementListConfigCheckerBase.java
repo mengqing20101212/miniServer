@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class AchievementListConfigCheckerBase extends AbstractConfigChecker<AchievementListConfig> {
   @Override
   public String getConfigFileName() {
-    return "achievementList.txt";
+    return "achievementList.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "level", "INT"),
-        new ConfigColumnMeta(3, "subIdList", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "level", "int"),
+        new ConfigColumnMeta(3, "subIdList", "string"));
   }
 }

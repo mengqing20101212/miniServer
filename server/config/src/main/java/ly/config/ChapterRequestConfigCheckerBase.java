@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class ChapterRequestConfigCheckerBase extends AbstractConfigChecker<ChapterRequestConfig> {
   @Override
   public String getConfigFileName() {
-    return "chapterRequest.txt";
+    return "chapterRequest.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "patterntype", "INT"),
-        new ConfigColumnMeta(2, "content", "STRING"),
-        new ConfigColumnMeta(3, "beizhu", "STRING"),
-        new ConfigColumnMeta(4, "dropGroup", "INT"),
-        new ConfigColumnMeta(5, "firstDrop", "INT"),
-        new ConfigColumnMeta(6, "target", "STRING"),
-        new ConfigColumnMeta(7, "result", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "patterntype", "int"),
+        new ConfigColumnMeta(2, "content", "string"),
+        new ConfigColumnMeta(3, "beizhu", "string"),
+        new ConfigColumnMeta(4, "dropGroup", "int"),
+        new ConfigColumnMeta(5, "firstDrop", "int"),
+        new ConfigColumnMeta(6, "target", "string"),
+        new ConfigColumnMeta(7, "result", "string"));
   }
 }

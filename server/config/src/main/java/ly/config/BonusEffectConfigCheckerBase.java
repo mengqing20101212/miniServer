@@ -8,21 +8,21 @@ import ly.ConfigColumnMeta;
 public abstract class BonusEffectConfigCheckerBase extends AbstractConfigChecker<BonusEffectConfig> {
   @Override
   public String getConfigFileName() {
-    return "bonusEffect.txt";
+    return "bonusEffect.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "description", "STRING"),
-        new ConfigColumnMeta(2, "icon", "INT"),
-        new ConfigColumnMeta(3, "bonusEffect", "INT"),
-        new ConfigColumnMeta(4, "isBonusBuff", "BOOL"),
-        new ConfigColumnMeta(5, "bonusType", "STRING"),
-        new ConfigColumnMeta(6, "param_1", "STRING"),
-        new ConfigColumnMeta(7, "isVanish", "STRING"),
-        new ConfigColumnMeta(8, "group", "INT"),
-        new ConfigColumnMeta(9, "level", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "description", "string"),
+        new ConfigColumnMeta(2, "icon", "int"),
+        new ConfigColumnMeta(3, "bonusEffect", "int"),
+        new ConfigColumnMeta(4, "isBonusBuff", "bool"),
+        new ConfigColumnMeta(5, "bonusType", "string"),
+        new ConfigColumnMeta(6, "param_1", "string"),
+        new ConfigColumnMeta(7, "isVanish", "string"),
+        new ConfigColumnMeta(8, "group", "int"),
+        new ConfigColumnMeta(9, "level", "int"));
   }
 }

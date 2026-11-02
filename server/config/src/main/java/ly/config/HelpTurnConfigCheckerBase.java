@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class HelpTurnConfigCheckerBase extends AbstractConfigChecker<HelpTurnConfig> {
   @Override
   public String getConfigFileName() {
-    return "helpTurn.txt";
+    return "helpTurn.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "turn", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "turn", "string"));
   }
 }

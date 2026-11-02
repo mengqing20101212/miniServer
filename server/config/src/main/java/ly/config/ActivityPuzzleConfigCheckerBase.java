@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityPuzzleConfigCheckerBase extends AbstractConfigChecker<ActivityPuzzleConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityPuzzle.txt";
+    return "activityPuzzle.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "Puzzleid", "INT"),
-        new ConfigColumnMeta(2, "lossItem", "STRING"),
-        new ConfigColumnMeta(3, "poolGift", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "Puzzleid", "int"),
+        new ConfigColumnMeta(2, "lossItem", "string"),
+        new ConfigColumnMeta(3, "poolGift", "int"));
   }
 }

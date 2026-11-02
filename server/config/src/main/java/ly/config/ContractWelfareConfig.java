@@ -7,23 +7,19 @@ import ly.utils.KV;
  * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
  */
 public class ContractWelfareConfig {
-  /**编号*/
   public final int id;
 
-  /**保底次数*/
   public final int welfareNum;
 
-  /**保底奖池*/
   public final int welfareDropId;
 
-  /**保底奖池展示*/
-  public final String welfareShow;
+  public final java.util.List<Integer> welfareShow;
 
   // @@@@@自定义属性开始区@@@@@
 
   // @@@@@自定义属性结束区@@@@@
 
-  public ContractWelfareConfig(int id, int welfareNum, int welfareDropId, String welfareShow) {
+  public ContractWelfareConfig(int id, int welfareNum, int welfareDropId, java.util.List<Integer> welfareShow) {
     this.id = id;
     this.welfareNum = welfareNum;
     this.welfareDropId = welfareDropId;

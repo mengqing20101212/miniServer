@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class SupportTeamHeroAttrConfigCheckerBase extends AbstractConfigChecker<SupportTeamHeroAttrConfig> {
   @Override
   public String getConfigFileName() {
-    return "supportTeamHeroAttr.txt";
+    return "supportTeamHeroAttr.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "attrClass", "INT"),
-        new ConfigColumnMeta(2, "attrLevel", "INT"),
-        new ConfigColumnMeta(3, "upCostItemNum", "INT"),
-        new ConfigColumnMeta(4, "attrType", "STRING"),
-        new ConfigColumnMeta(5, "attrName", "STRING"),
-        new ConfigColumnMeta(6, "unlcok", "INT"),
-        new ConfigColumnMeta(7, "icon", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "attrClass", "int"),
+        new ConfigColumnMeta(2, "attrLevel", "int"),
+        new ConfigColumnMeta(3, "upCostItemNum", "int"),
+        new ConfigColumnMeta(4, "attrType", "string"),
+        new ConfigColumnMeta(5, "attrName", "string"),
+        new ConfigColumnMeta(6, "unlcok", "int"),
+        new ConfigColumnMeta(7, "icon", "string"));
   }
 }

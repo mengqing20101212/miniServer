@@ -27,7 +27,7 @@ public class SkillEffectConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new SkillEffectConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "skillEffect.txt"; }
+  public String getConfigFileName() { return "skillEffect.xml"; }
 
   public static class SkillEffectConfigManagerImpl extends AbstractConfigManger {
     private List<SkillEffectConfig> configList = List.of();
@@ -39,264 +39,139 @@ public class SkillEffectConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type24 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type25 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type26 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type27 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type28 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type29 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type30 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type31 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type32 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type33 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type34 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type35 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type36 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       SkillEffectConfigChecker checker = new SkillEffectConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<SkillEffectConfig> newList = new ArrayList<>();
       Map<Integer, SkillEffectConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 37) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int effectType = 0;
-          String targetType = null;
-          String name = null;
-          String description = null;
-          int isTriggerCircuit = 0;
-          int isTriggerPassiveSkill = 0;
-          int casterStrikeFlyTriggerFlag = 0;
-          int targetStrikeFlyTriggerFlag = 0;
-          int targetTypeEx = 0;
-          String targetTypeEx2 = null;
-          int rangeType = 0;
-          String buffInfluence = null;
-          int addProType = 0;
-          int addPro = 0;
-          String entityTagFilters = null;
-          String endEffects = null;
-          int spCoa1 = 0;
-          int spCoa2 = 0;
-          String startPerformance = null;
-          String runPerformance = null;
-          String missPerformance = null;
-          String endPerformance = null;
-          String param_1 = null;
-          String param_2 = null;
-          String param_3 = null;
-          String param_4 = null;
-          String param_5 = null;
-          String param_6 = null;
-          String param_7 = null;
-          String param_8 = null;
-          String param_9 = null;
-          String param_10 = null;
-          int heroId = 0;
-          int skillSequence = 0;
-          int effectSequence = 0;
-          String effectRenew = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          String parsedField10 = null;
+          int parsedField11 = 0;
+          String parsedField12 = null;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          String parsedField15 = null;
+          String parsedField16 = null;
+          int parsedField17 = 0;
+          int parsedField18 = 0;
+          String parsedField19 = null;
+          String parsedField20 = null;
+          String parsedField21 = null;
+          String parsedField22 = null;
+          String parsedField23 = null;
+          String parsedField24 = null;
+          String parsedField25 = null;
+          String parsedField26 = null;
+          String parsedField27 = null;
+          String parsedField28 = null;
+          String parsedField29 = null;
+          String parsedField30 = null;
+          String parsedField31 = null;
+          String parsedField32 = null;
+          int parsedField33 = 0;
+          int parsedField34 = 0;
+          int parsedField35 = 0;
+          String parsedField36 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 效果类型
-            if (!arr[1].trim().isEmpty()) {
-              effectType = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 作用目标类型
-            if (!arr[2].trim().isEmpty()) {
-              targetType = arr[2].trim();
-            }
-
-            // 解析 效果名称
-            if (!arr[3].trim().isEmpty()) {
-              name = arr[3].trim();
-            }
-
-            // 解析 效果描述
-            if (!arr[4].trim().isEmpty()) {
-              description = arr[4].trim();
-            }
-
-            // 解析 是否触发源核
-            if (!arr[5].trim().isEmpty()) {
-              isTriggerCircuit = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 是否触发被动技能
-            if (!arr[6].trim().isEmpty()) {
-              isTriggerPassiveSkill = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 释放者击飞buff能否触发
-            if (!arr[7].trim().isEmpty()) {
-              casterStrikeFlyTriggerFlag = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 依附者击飞buff能否触发
-            if (!arr[8].trim().isEmpty()) {
-              targetStrikeFlyTriggerFlag = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 对死亡目标处理
-            if (!arr[9].trim().isEmpty()) {
-              targetTypeEx = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 目标属性筛选
-            if (!arr[10].trim().isEmpty()) {
-              targetTypeEx2 = arr[10].trim();
-            }
-
-            // 解析 伤害类型
-            if (!arr[11].trim().isEmpty()) {
-              rangeType = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 buff影响
-            if (!arr[12].trim().isEmpty()) {
-              buffInfluence = arr[12].trim();
-            }
-
-            // 解析 效果添加类型
-            if (!arr[13].trim().isEmpty()) {
-              addProType = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 效果添加几率
-            if (!arr[14].trim().isEmpty()) {
-              addPro = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 生效标记过滤
-            if (!arr[15].trim().isEmpty()) {
-              entityTagFilters = arr[15].trim();
-            }
-
-            // 解析 结束后续效果
-            if (!arr[16].trim().isEmpty()) {
-              endEffects = arr[16].trim();
-            }
-
-            // 解析 s能量获取系数
-            if (!arr[17].trim().isEmpty()) {
-              spCoa1 = Integer.parseInt(arr[17].trim());
-            }
-
-            // 解析 s能量获取系数
-            if (!arr[18].trim().isEmpty()) {
-              spCoa2 = Integer.parseInt(arr[18].trim());
-            }
-
-            // 解析 效果开始表现
-            if (!arr[19].trim().isEmpty()) {
-              startPerformance = arr[19].trim();
-            }
-
-            // 解析 效果持续表现
-            if (!arr[20].trim().isEmpty()) {
-              runPerformance = arr[20].trim();
-            }
-
-            // 解析 效果未命中表现
-            if (!arr[21].trim().isEmpty()) {
-              missPerformance = arr[21].trim();
-            }
-
-            // 解析 效果结束表现
-            if (!arr[22].trim().isEmpty()) {
-              endPerformance = arr[22].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[23].trim().isEmpty()) {
-              param_1 = arr[23].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[24].trim().isEmpty()) {
-              param_2 = arr[24].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[25].trim().isEmpty()) {
-              param_3 = arr[25].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[26].trim().isEmpty()) {
-              param_4 = arr[26].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[27].trim().isEmpty()) {
-              param_5 = arr[27].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[28].trim().isEmpty()) {
-              param_6 = arr[28].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[29].trim().isEmpty()) {
-              param_7 = arr[29].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[30].trim().isEmpty()) {
-              param_8 = arr[30].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[31].trim().isEmpty()) {
-              param_9 = arr[31].trim();
-            }
-
-            // 解析 效果参数
-            if (!arr[32].trim().isEmpty()) {
-              param_10 = arr[32].trim();
-            }
-
-            // 解析 英雄id
-            if (!arr[33].trim().isEmpty()) {
-              heroId = Integer.parseInt(arr[33].trim());
-            }
-
-            // 解析 技能序列
-            if (!arr[34].trim().isEmpty()) {
-              skillSequence = Integer.parseInt(arr[34].trim());
-            }
-
-            // 解析 效果序列
-            if (!arr[35].trim().isEmpty()) {
-              effectSequence = Integer.parseInt(arr[35].trim());
-            }
-
-            // 解析 特效恢复信息
-            if (!arr[36].trim().isEmpty()) {
-              effectRenew = arr[36].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("effectType"), fileName + ":行" + lineNumber + ":字段 effectType");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("targetType"), fileName + ":行" + lineNumber + ":字段 targetType");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("description"), fileName + ":行" + lineNumber + ":字段 description");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("isTriggerCircuit"), fileName + ":行" + lineNumber + ":字段 isTriggerCircuit");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("isTriggerPassiveSkill"), fileName + ":行" + lineNumber + ":字段 isTriggerPassiveSkill");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("casterStrikeFlyTriggerFlag"), fileName + ":行" + lineNumber + ":字段 casterStrikeFlyTriggerFlag");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("targetStrikeFlyTriggerFlag"), fileName + ":行" + lineNumber + ":字段 targetStrikeFlyTriggerFlag");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("targetTypeEx"), fileName + ":行" + lineNumber + ":字段 targetTypeEx");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("targetTypeEx2"), fileName + ":行" + lineNumber + ":字段 targetTypeEx2");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("rangeType"), fileName + ":行" + lineNumber + ":字段 rangeType");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("buffInfluence"), fileName + ":行" + lineNumber + ":字段 buffInfluence");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("addProType"), fileName + ":行" + lineNumber + ":字段 addProType");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("addPro"), fileName + ":行" + lineNumber + ":字段 addPro");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("entityTagFilters"), fileName + ":行" + lineNumber + ":字段 entityTagFilters");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("endEffects"), fileName + ":行" + lineNumber + ":字段 endEffects");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("spCoa1"), fileName + ":行" + lineNumber + ":字段 spCoa1");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("spCoa2"), fileName + ":行" + lineNumber + ":字段 spCoa2");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("startPerformance"), fileName + ":行" + lineNumber + ":字段 startPerformance");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("runPerformance"), fileName + ":行" + lineNumber + ":字段 runPerformance");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("missPerformance"), fileName + ":行" + lineNumber + ":字段 missPerformance");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("endPerformance"), fileName + ":行" + lineNumber + ":字段 endPerformance");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("param_1"), fileName + ":行" + lineNumber + ":字段 param_1");
+            parsedField24 = ly.ConfigValues.read(type24, values.get("param_2"), fileName + ":行" + lineNumber + ":字段 param_2");
+            parsedField25 = ly.ConfigValues.read(type25, values.get("param_3"), fileName + ":行" + lineNumber + ":字段 param_3");
+            parsedField26 = ly.ConfigValues.read(type26, values.get("param_4"), fileName + ":行" + lineNumber + ":字段 param_4");
+            parsedField27 = ly.ConfigValues.read(type27, values.get("param_5"), fileName + ":行" + lineNumber + ":字段 param_5");
+            parsedField28 = ly.ConfigValues.read(type28, values.get("param_6"), fileName + ":行" + lineNumber + ":字段 param_6");
+            parsedField29 = ly.ConfigValues.read(type29, values.get("param_7"), fileName + ":行" + lineNumber + ":字段 param_7");
+            parsedField30 = ly.ConfigValues.read(type30, values.get("param_8"), fileName + ":行" + lineNumber + ":字段 param_8");
+            parsedField31 = ly.ConfigValues.read(type31, values.get("param_9"), fileName + ":行" + lineNumber + ":字段 param_9");
+            parsedField32 = ly.ConfigValues.read(type32, values.get("param_10"), fileName + ":行" + lineNumber + ":字段 param_10");
+            parsedField33 = ly.ConfigValues.read(type33, values.get("heroId"), fileName + ":行" + lineNumber + ":字段 heroId");
+            parsedField34 = ly.ConfigValues.read(type34, values.get("skillSequence"), fileName + ":行" + lineNumber + ":字段 skillSequence");
+            parsedField35 = ly.ConfigValues.read(type35, values.get("effectSequence"), fileName + ":行" + lineNumber + ":字段 effectSequence");
+            parsedField36 = ly.ConfigValues.read(type36, values.get("effectRenew"), fileName + ":行" + lineNumber + ":字段 effectRenew");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          SkillEffectConfig config = new SkillEffectConfig(id, effectType, targetType, name, description, isTriggerCircuit, isTriggerPassiveSkill, casterStrikeFlyTriggerFlag, targetStrikeFlyTriggerFlag, targetTypeEx, targetTypeEx2, rangeType, buffInfluence, addProType, addPro, entityTagFilters, endEffects, spCoa1, spCoa2, startPerformance, runPerformance, missPerformance, endPerformance, param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9, param_10, heroId, skillSequence, effectSequence, effectRenew);
-          config.afterLoad();
+          SkillEffectConfig config = new SkillEffectConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24, parsedField25, parsedField26, parsedField27, parsedField28, parsedField29, parsedField30, parsedField31, parsedField32, parsedField33, parsedField34, parsedField35, parsedField36);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (SkillEffectConfig config : configList) config.afterLoad();
+      new SkillEffectConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -306,38 +181,6 @@ public class SkillEffectConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<SkillEffectConfig> getConfigList() {
@@ -350,7 +193,7 @@ public class SkillEffectConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "skillEffect.txt";
+      return "skillEffect.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

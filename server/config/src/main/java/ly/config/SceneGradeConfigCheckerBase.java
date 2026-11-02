@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class SceneGradeConfigCheckerBase extends AbstractConfigChecker<SceneGradeConfig> {
   @Override
   public String getConfigFileName() {
-    return "sceneGrade.txt";
+    return "sceneGrade.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "beizhu", "STRING"),
-        new ConfigColumnMeta(2, "grade1", "INT"),
-        new ConfigColumnMeta(3, "grade2", "INT"),
-        new ConfigColumnMeta(4, "grade3", "INT"),
-        new ConfigColumnMeta(5, "grade4", "INT"),
-        new ConfigColumnMeta(6, "grade5", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "beizhu", "string"),
+        new ConfigColumnMeta(2, "grade1", "int"),
+        new ConfigColumnMeta(3, "grade2", "int"),
+        new ConfigColumnMeta(4, "grade3", "int"),
+        new ConfigColumnMeta(5, "grade4", "int"),
+        new ConfigColumnMeta(6, "grade5", "int"));
   }
 }

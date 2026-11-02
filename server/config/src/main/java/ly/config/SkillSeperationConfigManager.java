@@ -27,7 +27,7 @@ public class SkillSeperationConfigManager implements InterfaceConfigManagerProxy
   public AbstractConfigManger createTable() { return new SkillSeperationConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "skillSeperation.txt"; }
+  public String getConfigFileName() { return "skillSeperation.xml"; }
 
   public static class SkillSeperationConfigManagerImpl extends AbstractConfigManger {
     private List<SkillSeperationConfig> configList = List.of();
@@ -37,69 +37,40 @@ public class SkillSeperationConfigManager implements InterfaceConfigManagerProxy
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       SkillSeperationConfigChecker checker = new SkillSeperationConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<SkillSeperationConfig> newList = new ArrayList<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 5) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          String mainAni = null;
-          String sperationAni_1 = null;
-          String sperationAni_2 = null;
-          String sperationAni_3 = null;
-          String sperationAni_4 = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          String parsedField0 = null;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
           try {
-            // 解析 主身动作
-            if (!arr[0].trim().isEmpty()) {
-              mainAni = arr[0].trim();
-            }
-
-            // 解析 分身动作（动作，延时）
-            if (!arr[1].trim().isEmpty()) {
-              sperationAni_1 = arr[1].trim();
-            }
-
-            // 解析 分身动作（动作，延时）
-            if (!arr[2].trim().isEmpty()) {
-              sperationAni_2 = arr[2].trim();
-            }
-
-            // 解析 分身动作（动作，延时）
-            if (!arr[3].trim().isEmpty()) {
-              sperationAni_3 = arr[3].trim();
-            }
-
-            // 解析 分身动作（动作，延时）
-            if (!arr[4].trim().isEmpty()) {
-              sperationAni_4 = arr[4].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("mainAni"), fileName + ":行" + lineNumber + ":字段 mainAni");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("sperationAni_1"), fileName + ":行" + lineNumber + ":字段 sperationAni_1");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("sperationAni_2"), fileName + ":行" + lineNumber + ":字段 sperationAni_2");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("sperationAni_3"), fileName + ":行" + lineNumber + ":字段 sperationAni_3");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("sperationAni_4"), fileName + ":行" + lineNumber + ":字段 sperationAni_4");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          SkillSeperationConfig config = new SkillSeperationConfig(mainAni, sperationAni_1, sperationAni_2, sperationAni_3, sperationAni_4);
-          config.afterLoad();
+          SkillSeperationConfig config = new SkillSeperationConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4);
           newList.add(config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+      });
+      configList = List.copyOf(newList);
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (SkillSeperationConfig config : configList) config.afterLoad();
+      new SkillSeperationConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -110,45 +81,13 @@ public class SkillSeperationConfigManager implements InterfaceConfigManagerProxy
       // @@@@@自定义clear方法结束区@@@@@
     }
 
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
-    }
-
     public List<SkillSeperationConfig> getConfigList() {
       return configList;
     }
 
     @Override
     public String getConfigFileName() {
-      return "skillSeperation.txt";
+      return "skillSeperation.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -8,25 +8,25 @@ import ly.ConfigColumnMeta;
 public abstract class StrongerConfigCheckerBase extends AbstractConfigChecker<StrongerConfig> {
   @Override
   public String getConfigFileName() {
-    return "stronger.txt";
+    return "stronger.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "resType", "INT"),
-        new ConfigColumnMeta(2, "resName", "STRING"),
-        new ConfigColumnMeta(3, "resPic", "INT"),
-        new ConfigColumnMeta(4, "resDes", "STRING"),
-        new ConfigColumnMeta(5, "resSort", "INT"),
-        new ConfigColumnMeta(6, "playType", "INT"),
-        new ConfigColumnMeta(7, "playName", "STRING"),
-        new ConfigColumnMeta(8, "playStar", "INT"),
-        new ConfigColumnMeta(9, "playJump", "INT"),
-        new ConfigColumnMeta(10, "playSort", "INT"),
-        new ConfigColumnMeta(11, "itemId", "INT"),
-        new ConfigColumnMeta(12, "itemName", "STRING"),
-        new ConfigColumnMeta(13, "itemSort", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "resType", "int"),
+        new ConfigColumnMeta(2, "resName", "string"),
+        new ConfigColumnMeta(3, "resPic", "int"),
+        new ConfigColumnMeta(4, "resDes", "string"),
+        new ConfigColumnMeta(5, "resSort", "int"),
+        new ConfigColumnMeta(6, "playType", "int"),
+        new ConfigColumnMeta(7, "playName", "string"),
+        new ConfigColumnMeta(8, "playStar", "int"),
+        new ConfigColumnMeta(9, "playJump", "int"),
+        new ConfigColumnMeta(10, "playSort", "int"),
+        new ConfigColumnMeta(11, "itemId", "int"),
+        new ConfigColumnMeta(12, "itemName", "string"),
+        new ConfigColumnMeta(13, "itemSort", "int"));
   }
 }

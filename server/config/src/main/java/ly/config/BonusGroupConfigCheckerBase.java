@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class BonusGroupConfigCheckerBase extends AbstractConfigChecker<BonusGroupConfig> {
   @Override
   public String getConfigFileName() {
-    return "bonusGroup.txt";
+    return "bonusGroup.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "bonusList", "STRING"),
-        new ConfigColumnMeta(2, "bonusPro", "STRING"),
-        new ConfigColumnMeta(3, "bonusTimes", "STRING"),
-        new ConfigColumnMeta(4, "bonusRelativePro", "STRING"),
-        new ConfigColumnMeta(5, "beizhu", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "bonusList", "string"),
+        new ConfigColumnMeta(2, "bonusPro", "string"),
+        new ConfigColumnMeta(3, "bonusTimes", "string"),
+        new ConfigColumnMeta(4, "bonusRelativePro", "string"),
+        new ConfigColumnMeta(5, "beizhu", "string"));
   }
 }

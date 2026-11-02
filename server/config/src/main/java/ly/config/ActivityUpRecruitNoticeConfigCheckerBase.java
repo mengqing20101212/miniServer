@@ -8,35 +8,35 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityUpRecruitNoticeConfigCheckerBase extends AbstractConfigChecker<ActivityUpRecruitNoticeConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityUpRecruitNotice.txt";
+    return "activityUpRecruitNotice.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "scheDuling", "INT"),
-        new ConfigColumnMeta(2, "name", "STRING"),
-        new ConfigColumnMeta(3, "heroShowStyleType", "INT"),
-        new ConfigColumnMeta(4, "rolePic", "INT"),
-        new ConfigColumnMeta(5, "rolePicPosOffset", "STRING"),
-        new ConfigColumnMeta(6, "rolePicScaleOffset", "STRING"),
-        new ConfigColumnMeta(7, "getDesPicResId", "INT"),
-        new ConfigColumnMeta(8, "skillPicResId1", "INT"),
-        new ConfigColumnMeta(9, "skillPicResId1PosOffset", "STRING"),
-        new ConfigColumnMeta(10, "skillPicResId2", "INT"),
-        new ConfigColumnMeta(11, "skillPicResId2PosOffset", "STRING"),
-        new ConfigColumnMeta(12, "jumpType", "INT"),
-        new ConfigColumnMeta(13, "sceneId", "INT"),
-        new ConfigColumnMeta(14, "drawCardDecPic", "INT"),
-        new ConfigColumnMeta(15, "bgPic", "INT"),
-        new ConfigColumnMeta(16, "bgHeroPics", "STRING"),
-        new ConfigColumnMeta(17, "bgPicPosOffset", "STRING"),
-        new ConfigColumnMeta(18, "bgPicScaleOffset", "STRING"),
-        new ConfigColumnMeta(19, "numberPic", "STRING"),
-        new ConfigColumnMeta(20, "activityId", "INT"),
-        new ConfigColumnMeta(21, "trueActivityId", "INT"),
-        new ConfigColumnMeta(22, "holographic", "INT"),
-        new ConfigColumnMeta(23, "SpecialEffects", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "scheDuling", "int"),
+        new ConfigColumnMeta(2, "name", "string"),
+        new ConfigColumnMeta(3, "heroShowStyleType", "int"),
+        new ConfigColumnMeta(4, "rolePic", "int"),
+        new ConfigColumnMeta(5, "rolePicPosOffset", "string"),
+        new ConfigColumnMeta(6, "rolePicScaleOffset", "string"),
+        new ConfigColumnMeta(7, "getDesPicResId", "int"),
+        new ConfigColumnMeta(8, "skillPicResId1", "int"),
+        new ConfigColumnMeta(9, "skillPicResId1PosOffset", "string"),
+        new ConfigColumnMeta(10, "skillPicResId2", "int"),
+        new ConfigColumnMeta(11, "skillPicResId2PosOffset", "string"),
+        new ConfigColumnMeta(12, "jumpType", "int"),
+        new ConfigColumnMeta(13, "sceneId", "int"),
+        new ConfigColumnMeta(14, "drawCardDecPic", "int"),
+        new ConfigColumnMeta(15, "bgPic", "int"),
+        new ConfigColumnMeta(16, "bgHeroPics", "string"),
+        new ConfigColumnMeta(17, "bgPicPosOffset", "string"),
+        new ConfigColumnMeta(18, "bgPicScaleOffset", "string"),
+        new ConfigColumnMeta(19, "numberPic", "string"),
+        new ConfigColumnMeta(20, "activityId", "int"),
+        new ConfigColumnMeta(21, "trueActivityId", "int"),
+        new ConfigColumnMeta(22, "holographic", "int"),
+        new ConfigColumnMeta(23, "SpecialEffects", "int"));
   }
 }

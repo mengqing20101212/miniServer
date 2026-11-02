@@ -8,22 +8,22 @@ import ly.ConfigColumnMeta;
 public abstract class Mail_templateConfigCheckerBase extends AbstractConfigChecker<Mail_templateConfig> {
   @Override
   public String getConfigFileName() {
-    return "mail_template.txt";
+    return "mail_template.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "icon", "INT"),
-        new ConfigColumnMeta(1, "des", "STRING"),
-        new ConfigColumnMeta(2, "part_begin", "INT"),
-        new ConfigColumnMeta(3, "part_end", "INT"),
-        new ConfigColumnMeta(4, "type", "INT"),
-        new ConfigColumnMeta(5, "stamp", "STRING"),
-        new ConfigColumnMeta(6, "valid_time", "INT"),
-        new ConfigColumnMeta(7, "sender", "STRING"),
-        new ConfigColumnMeta(8, "titile", "STRING"),
-        new ConfigColumnMeta(9, "content", "STRING"),
-        new ConfigColumnMeta(10, "attach", "STRING"));
+        new ConfigColumnMeta(0, "icon", "int"),
+        new ConfigColumnMeta(1, "des", "string"),
+        new ConfigColumnMeta(2, "part_begin", "int"),
+        new ConfigColumnMeta(3, "part_end", "int"),
+        new ConfigColumnMeta(4, "type", "int"),
+        new ConfigColumnMeta(5, "stamp", "string"),
+        new ConfigColumnMeta(6, "valid_time", "int"),
+        new ConfigColumnMeta(7, "sender", "string"),
+        new ConfigColumnMeta(8, "titile", "string"),
+        new ConfigColumnMeta(9, "content", "string"),
+        new ConfigColumnMeta(10, "attach", "string"));
   }
 }

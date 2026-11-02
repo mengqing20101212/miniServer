@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class SubtitleConfigCheckerBase extends AbstractConfigChecker<SubtitleConfig> {
   @Override
   public String getConfigFileName() {
-    return "subtitle.txt";
+    return "subtitle.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "name", "STRING"),
-        new ConfigColumnMeta(1, "index", "INT"),
-        new ConfigColumnMeta(2, "style", "LIST<INT>"),
-        new ConfigColumnMeta(3, "start_time", "FLOAT"),
-        new ConfigColumnMeta(4, "end_time", "FLOAT"),
-        new ConfigColumnMeta(5, "content", "STRING"));
+        new ConfigColumnMeta(0, "name", "string"),
+        new ConfigColumnMeta(1, "index", "int"),
+        new ConfigColumnMeta(2, "style", "list<int>"),
+        new ConfigColumnMeta(3, "start_time", "float"),
+        new ConfigColumnMeta(4, "end_time", "float"),
+        new ConfigColumnMeta(5, "content", "string"));
   }
 }

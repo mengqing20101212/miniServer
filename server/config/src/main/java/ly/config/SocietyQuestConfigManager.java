@@ -27,7 +27,7 @@ public class SocietyQuestConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new SocietyQuestConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "societyQuest.txt"; }
+  public String getConfigFileName() { return "societyQuest.xml"; }
 
   public static class SocietyQuestConfigManagerImpl extends AbstractConfigManger {
     private List<SocietyQuestConfig> configList = List.of();
@@ -39,180 +39,97 @@ public class SocietyQuestConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       SocietyQuestConfigChecker checker = new SocietyQuestConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<SocietyQuestConfig> newList = new ArrayList<>();
       Map<Integer, SocietyQuestConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 23) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int questId = 0;
-          int questId2 = 0;
-          int minLevel = 0;
-          int maxLevel = 0;
-          String title = null;
-          String name = null;
-          String name2 = null;
-          int star = 0;
-          int rewardType = 0;
-          String beizhu1 = null;
-          int weights = 0;
-          int isCooperate = 0;
-          int isRare = 0;
-          String rewardShow = null;
-          int drop = 0;
-          String beizhu2 = null;
-          String beizhu3 = null;
-          String beizhu4 = null;
-          String beizhu5 = null;
-          int redirectionId = 0;
-          int redirectionId2 = 0;
-          int goundId = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          String parsedField10 = null;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          String parsedField14 = null;
+          int parsedField15 = 0;
+          String parsedField16 = null;
+          String parsedField17 = null;
+          String parsedField18 = null;
+          String parsedField19 = null;
+          int parsedField20 = 0;
+          int parsedField21 = 0;
+          int parsedField22 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 索引编号
-            if (!arr[1].trim().isEmpty()) {
-              questId = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 索引编号2
-            if (!arr[2].trim().isEmpty()) {
-              questId2 = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 最小等级
-            if (!arr[3].trim().isEmpty()) {
-              minLevel = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 最大等级
-            if (!arr[4].trim().isEmpty()) {
-              maxLevel = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 任务标题
-            if (!arr[5].trim().isEmpty()) {
-              title = arr[5].trim();
-            }
-
-            // 解析 任务名称
-            if (!arr[6].trim().isEmpty()) {
-              name = arr[6].trim();
-            }
-
-            // 解析 任务名称2
-            if (!arr[7].trim().isEmpty()) {
-              name2 = arr[7].trim();
-            }
-
-            // 解析 任务星级
-            if (!arr[8].trim().isEmpty()) {
-              star = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 奖励类型
-            if (!arr[9].trim().isEmpty()) {
-              rewardType = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 物品名称
-            if (!arr[10].trim().isEmpty()) {
-              beizhu1 = arr[10].trim();
-            }
-
-            // 解析 任务权重
-            if (!arr[11].trim().isEmpty()) {
-              weights = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 协作标记
-            if (!arr[12].trim().isEmpty()) {
-              isCooperate = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 稀有标记
-            if (!arr[13].trim().isEmpty()) {
-              isRare = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 奖励展示
-            if (!arr[14].trim().isEmpty()) {
-              rewardShow = arr[14].trim();
-            }
-
-            // 解析 实际掉落
-            if (!arr[15].trim().isEmpty()) {
-              drop = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 beizhu2
-            if (!arr[16].trim().isEmpty()) {
-              beizhu2 = arr[16].trim();
-            }
-
-            // 解析 beizhu3
-            if (!arr[17].trim().isEmpty()) {
-              beizhu3 = arr[17].trim();
-            }
-
-            // 解析 beizhu4
-            if (!arr[18].trim().isEmpty()) {
-              beizhu4 = arr[18].trim();
-            }
-
-            // 解析 beizhu5
-            if (!arr[19].trim().isEmpty()) {
-              beizhu5 = arr[19].trim();
-            }
-
-            // 解析 跳转
-            if (!arr[20].trim().isEmpty()) {
-              redirectionId = Integer.parseInt(arr[20].trim());
-            }
-
-            // 解析 跳转
-            if (!arr[21].trim().isEmpty()) {
-              redirectionId2 = Integer.parseInt(arr[21].trim());
-            }
-
-            // 解析 组ID
-            if (!arr[22].trim().isEmpty()) {
-              goundId = Integer.parseInt(arr[22].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("questId"), fileName + ":行" + lineNumber + ":字段 questId");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("questId2"), fileName + ":行" + lineNumber + ":字段 questId2");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("minLevel"), fileName + ":行" + lineNumber + ":字段 minLevel");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("maxLevel"), fileName + ":行" + lineNumber + ":字段 maxLevel");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("title"), fileName + ":行" + lineNumber + ":字段 title");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("name2"), fileName + ":行" + lineNumber + ":字段 name2");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("star"), fileName + ":行" + lineNumber + ":字段 star");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("rewardType"), fileName + ":行" + lineNumber + ":字段 rewardType");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("beizhu1"), fileName + ":行" + lineNumber + ":字段 beizhu1");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("weights"), fileName + ":行" + lineNumber + ":字段 weights");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("isCooperate"), fileName + ":行" + lineNumber + ":字段 isCooperate");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("isRare"), fileName + ":行" + lineNumber + ":字段 isRare");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("rewardShow"), fileName + ":行" + lineNumber + ":字段 rewardShow");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("drop"), fileName + ":行" + lineNumber + ":字段 drop");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("beizhu2"), fileName + ":行" + lineNumber + ":字段 beizhu2");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("beizhu3"), fileName + ":行" + lineNumber + ":字段 beizhu3");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("beizhu4"), fileName + ":行" + lineNumber + ":字段 beizhu4");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("beizhu5"), fileName + ":行" + lineNumber + ":字段 beizhu5");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("redirectionId"), fileName + ":行" + lineNumber + ":字段 redirectionId");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("redirectionId2"), fileName + ":行" + lineNumber + ":字段 redirectionId2");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("goundId"), fileName + ":行" + lineNumber + ":字段 goundId");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          SocietyQuestConfig config = new SocietyQuestConfig(id, questId, questId2, minLevel, maxLevel, title, name, name2, star, rewardType, beizhu1, weights, isCooperate, isRare, rewardShow, drop, beizhu2, beizhu3, beizhu4, beizhu5, redirectionId, redirectionId2, goundId);
-          config.afterLoad();
+          SocietyQuestConfig config = new SocietyQuestConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (SocietyQuestConfig config : configList) config.afterLoad();
+      new SocietyQuestConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -222,38 +139,6 @@ public class SocietyQuestConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<SocietyQuestConfig> getConfigList() {
@@ -266,7 +151,7 @@ public class SocietyQuestConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "societyQuest.txt";
+      return "societyQuest.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

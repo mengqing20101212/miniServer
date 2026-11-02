@@ -27,7 +27,7 @@ public class MainStoryConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new MainStoryConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "mainStory.txt"; }
+  public String getConfigFileName() { return "mainStory.xml"; }
 
   public static class MainStoryConfigManagerImpl extends AbstractConfigManger {
     private List<MainStoryConfig> configList = List.of();
@@ -39,144 +39,79 @@ public class MainStoryConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       MainStoryConfigChecker checker = new MainStoryConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<MainStoryConfig> newList = new ArrayList<>();
       Map<Integer, MainStoryConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 17) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          String titile = null;
-          String target = null;
-          String eventIds = null;
-          int chapterRes = 0;
-          int chapterNum = 0;
-          int chapterId = 0;
-          int requireLv = 0;
-          int preIds = 0;
-          int followID = 0;
-          int dropGroupId = 0;
-          String dropshow = null;
-          String lockWord = null;
-          int pic = 0;
-          int showId = 0;
-          int pic2 = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          String parsedField12 = null;
+          String parsedField13 = null;
+          int parsedField14 = 0;
+          int parsedField15 = 0;
+          int parsedField16 = 0;
           try {
-            // 解析 ID（任务唯一id）
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 任务名称
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 任务栏处名称
-            if (!arr[2].trim().isEmpty()) {
-              titile = arr[2].trim();
-            }
-
-            // 解析 任务栏目标
-            if (!arr[3].trim().isEmpty()) {
-              target = arr[3].trim();
-            }
-
-            // 解析 事件ID（多个用,隔开）
-            if (!arr[4].trim().isEmpty()) {
-              eventIds = arr[4].trim();
-            }
-
-            // 解析 章节名称图片资源
-            if (!arr[5].trim().isEmpty()) {
-              chapterRes = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 章节数字
-            if (!arr[6].trim().isEmpty()) {
-              chapterNum = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 通关全息调查
-            if (!arr[7].trim().isEmpty()) {
-              chapterId = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 解锁等级
-            if (!arr[8].trim().isEmpty()) {
-              requireLv = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 前续任务ID
-            if (!arr[9].trim().isEmpty()) {
-              preIds = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 后续任务ID
-            if (!arr[10].trim().isEmpty()) {
-              followID = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 掉落
-            if (!arr[11].trim().isEmpty()) {
-              dropGroupId = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 掉落展示
-            if (!arr[12].trim().isEmpty()) {
-              dropshow = arr[12].trim();
-            }
-
-            // 解析 未解锁提示
-            if (!arr[13].trim().isEmpty()) {
-              lockWord = arr[13].trim();
-            }
-
-            // 解析 图片
-            if (!arr[14].trim().isEmpty()) {
-              pic = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 关联showID
-            if (!arr[15].trim().isEmpty()) {
-              showId = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 图片2
-            if (!arr[16].trim().isEmpty()) {
-              pic2 = Integer.parseInt(arr[16].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("titile"), fileName + ":行" + lineNumber + ":字段 titile");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("target"), fileName + ":行" + lineNumber + ":字段 target");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("eventIds"), fileName + ":行" + lineNumber + ":字段 eventIds");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("chapterRes"), fileName + ":行" + lineNumber + ":字段 chapterRes");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("chapterNum"), fileName + ":行" + lineNumber + ":字段 chapterNum");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("chapterId"), fileName + ":行" + lineNumber + ":字段 chapterId");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("requireLv"), fileName + ":行" + lineNumber + ":字段 requireLv");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("preIds"), fileName + ":行" + lineNumber + ":字段 preIds");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("followID"), fileName + ":行" + lineNumber + ":字段 followID");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("dropGroupId"), fileName + ":行" + lineNumber + ":字段 dropGroupId");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("dropshow"), fileName + ":行" + lineNumber + ":字段 dropshow");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("lockWord"), fileName + ":行" + lineNumber + ":字段 lockWord");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("pic"), fileName + ":行" + lineNumber + ":字段 pic");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("showId"), fileName + ":行" + lineNumber + ":字段 showId");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("pic2"), fileName + ":行" + lineNumber + ":字段 pic2");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          MainStoryConfig config = new MainStoryConfig(id, name, titile, target, eventIds, chapterRes, chapterNum, chapterId, requireLv, preIds, followID, dropGroupId, dropshow, lockWord, pic, showId, pic2);
-          config.afterLoad();
+          MainStoryConfig config = new MainStoryConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (MainStoryConfig config : configList) config.afterLoad();
+      new MainStoryConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -186,38 +121,6 @@ public class MainStoryConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<MainStoryConfig> getConfigList() {
@@ -230,7 +133,7 @@ public class MainStoryConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "mainStory.txt";
+      return "mainStory.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

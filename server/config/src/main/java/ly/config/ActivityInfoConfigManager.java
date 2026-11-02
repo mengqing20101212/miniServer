@@ -27,7 +27,7 @@ public class ActivityInfoConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new ActivityInfoConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "activityInfo.txt"; }
+  public String getConfigFileName() { return "activityInfo.xml"; }
 
   public static class ActivityInfoConfigManagerImpl extends AbstractConfigManger {
     private List<ActivityInfoConfig> configList = List.of();
@@ -39,276 +39,145 @@ public class ActivityInfoConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type24 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type25 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type26 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type27 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type28 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type29 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type30 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type31 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type32 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type33 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type34 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type35 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type36 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type37 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type38 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ActivityInfoConfigChecker checker = new ActivityInfoConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ActivityInfoConfig> newList = new ArrayList<>();
       Map<Integer, ActivityInfoConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 39) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          int openType = 0;
-          int scheDuling = 0;
-          int openPara1 = 0;
-          int openPara2 = 0;
-          int openPara3 = 0;
-          int timeType = 0;
-          String startTime = null;
-          String endTime = null;
-          String specialEndTime = null;
-          String freshTime = null;
-          int closeTime = 0;
-          int closeActivity = 0;
-          int OpenServiceActivity = 0;
-          int integralType = 0;
-          String integralStage = null;
-          String integralReward = null;
-          String integralRewardShow = null;
-          String title = null;
-          String picture = null;
-          String description = null;
-          String para1 = null;
-          String para2 = null;
-          String para3 = null;
-          int mailTemplateId = 0;
-          String exchangeResources = null;
-          int enterType = 0;
-          int sort = 0;
-          int des = 0;
-          String destime = null;
-          int timeDown = 0;
-          String desPic = null;
-          String RechargeId = null;
-          int iACTIVITYTYPE = 0;
-          int topId = 0;
-          int NoShow = 0;
-          int DisplayFunctionType = 0;
-          String DisplayFunctionParam = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          int parsedField15 = 0;
+          String parsedField16 = null;
+          String parsedField17 = null;
+          String parsedField18 = null;
+          String parsedField19 = null;
+          String parsedField20 = null;
+          String parsedField21 = null;
+          String parsedField22 = null;
+          String parsedField23 = null;
+          String parsedField24 = null;
+          int parsedField25 = 0;
+          String parsedField26 = null;
+          int parsedField27 = 0;
+          int parsedField28 = 0;
+          int parsedField29 = 0;
+          String parsedField30 = null;
+          int parsedField31 = 0;
+          String parsedField32 = null;
+          String parsedField33 = null;
+          int parsedField34 = 0;
+          int parsedField35 = 0;
+          int parsedField36 = 0;
+          int parsedField37 = 0;
+          String parsedField38 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 功能名称
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 开启类型
-            if (!arr[2].trim().isEmpty()) {
-              openType = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 活动排期
-            if (!arr[3].trim().isEmpty()) {
-              scheDuling = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 开启参数1
-            if (!arr[4].trim().isEmpty()) {
-              openPara1 = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 开启参数2
-            if (!arr[5].trim().isEmpty()) {
-              openPara2 = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 开启参数3
-            if (!arr[6].trim().isEmpty()) {
-              openPara3 = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 时间类型
-            if (!arr[7].trim().isEmpty()) {
-              timeType = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 开始时间
-            if (!arr[8].trim().isEmpty()) {
-              startTime = arr[8].trim();
-            }
-
-            // 解析 结束时间
-            if (!arr[9].trim().isEmpty()) {
-              endTime = arr[9].trim();
-            }
-
-            // 解析 特殊时间
-            if (!arr[10].trim().isEmpty()) {
-              specialEndTime = arr[10].trim();
-            }
-
-            // 解析 刷新时间
-            if (!arr[11].trim().isEmpty()) {
-              freshTime = arr[11].trim();
-            }
-
-            // 解析 关闭时间
-            if (!arr[12].trim().isEmpty()) {
-              closeTime = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 任务领取完是否关闭活动
-            if (!arr[13].trim().isEmpty()) {
-              closeActivity = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 开服区间
-            if (!arr[14].trim().isEmpty()) {
-              OpenServiceActivity = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 积分类型
-            if (!arr[15].trim().isEmpty()) {
-              integralType = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 阶段积分
-            if (!arr[16].trim().isEmpty()) {
-              integralStage = arr[16].trim();
-            }
-
-            // 解析 积分奖励（掉落表id）
-            if (!arr[17].trim().isEmpty()) {
-              integralReward = arr[17].trim();
-            }
-
-            // 解析 积分奖励（前端）
-            if (!arr[18].trim().isEmpty()) {
-              integralRewardShow = arr[18].trim();
-            }
-
-            // 解析 活动标题
-            if (!arr[19].trim().isEmpty()) {
-              title = arr[19].trim();
-            }
-
-            // 解析 立绘
-            if (!arr[20].trim().isEmpty()) {
-              picture = arr[20].trim();
-            }
-
-            // 解析 立绘描述
-            if (!arr[21].trim().isEmpty()) {
-              description = arr[21].trim();
-            }
-
-            // 解析 功能参数1
-            if (!arr[22].trim().isEmpty()) {
-              para1 = arr[22].trim();
-            }
-
-            // 解析 功能参数2
-            if (!arr[23].trim().isEmpty()) {
-              para2 = arr[23].trim();
-            }
-
-            // 解析 功能参数3
-            if (!arr[24].trim().isEmpty()) {
-              para3 = arr[24].trim();
-            }
-
-            // 解析 邮件模板ID
-            if (!arr[25].trim().isEmpty()) {
-              mailTemplateId = Integer.parseInt(arr[25].trim());
-            }
-
-            // 解析 活动剩余道具转换资源
-            if (!arr[26].trim().isEmpty()) {
-              exchangeResources = arr[26].trim();
-            }
-
-            // 解析 活动入口类型
-            if (!arr[27].trim().isEmpty()) {
-              enterType = Integer.parseInt(arr[27].trim());
-            }
-
-            // 解析 排序
-            if (!arr[28].trim().isEmpty()) {
-              sort = Integer.parseInt(arr[28].trim());
-            }
-
-            // 解析 活动描述
-            if (!arr[29].trim().isEmpty()) {
-              des = Integer.parseInt(arr[29].trim());
-            }
-
-            // 解析 活动时间描述
-            if (!arr[30].trim().isEmpty()) {
-              destime = arr[30].trim();
-            }
-
-            // 解析 是否显示倒计时
-            if (!arr[31].trim().isEmpty()) {
-              timeDown = Integer.parseInt(arr[31].trim());
-            }
-
-            // 解析 活动描述
-            if (!arr[32].trim().isEmpty()) {
-              desPic = arr[32].trim();
-            }
-
-            // 解析 商品ID
-            if (!arr[33].trim().isEmpty()) {
-              RechargeId = arr[33].trim();
-            }
-
-            // 解析 活动类型
-            if (!arr[34].trim().isEmpty()) {
-              iACTIVITYTYPE = Integer.parseInt(arr[34].trim());
-            }
-
-            // 解析 topID
-            if (!arr[35].trim().isEmpty()) {
-              topId = Integer.parseInt(arr[35].trim());
-            }
-
-            // 解析 是否不显示在活动栏
-            if (!arr[36].trim().isEmpty()) {
-              NoShow = Integer.parseInt(arr[36].trim());
-            }
-
-            // 解析 功能显示解锁类型
-            if (!arr[37].trim().isEmpty()) {
-              DisplayFunctionType = Integer.parseInt(arr[37].trim());
-            }
-
-            // 解析 解锁类型参数
-            if (!arr[38].trim().isEmpty()) {
-              DisplayFunctionParam = arr[38].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("openType"), fileName + ":行" + lineNumber + ":字段 openType");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("scheDuling"), fileName + ":行" + lineNumber + ":字段 scheDuling");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("openPara1"), fileName + ":行" + lineNumber + ":字段 openPara1");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("openPara2"), fileName + ":行" + lineNumber + ":字段 openPara2");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("openPara3"), fileName + ":行" + lineNumber + ":字段 openPara3");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("timeType"), fileName + ":行" + lineNumber + ":字段 timeType");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("startTime"), fileName + ":行" + lineNumber + ":字段 startTime");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("endTime"), fileName + ":行" + lineNumber + ":字段 endTime");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("specialEndTime"), fileName + ":行" + lineNumber + ":字段 specialEndTime");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("freshTime"), fileName + ":行" + lineNumber + ":字段 freshTime");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("closeTime"), fileName + ":行" + lineNumber + ":字段 closeTime");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("closeActivity"), fileName + ":行" + lineNumber + ":字段 closeActivity");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("OpenServiceActivity"), fileName + ":行" + lineNumber + ":字段 OpenServiceActivity");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("integralType"), fileName + ":行" + lineNumber + ":字段 integralType");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("integralStage"), fileName + ":行" + lineNumber + ":字段 integralStage");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("integralReward"), fileName + ":行" + lineNumber + ":字段 integralReward");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("integralRewardShow"), fileName + ":行" + lineNumber + ":字段 integralRewardShow");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("title"), fileName + ":行" + lineNumber + ":字段 title");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("picture"), fileName + ":行" + lineNumber + ":字段 picture");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("description"), fileName + ":行" + lineNumber + ":字段 description");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("para1"), fileName + ":行" + lineNumber + ":字段 para1");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("para2"), fileName + ":行" + lineNumber + ":字段 para2");
+            parsedField24 = ly.ConfigValues.read(type24, values.get("para3"), fileName + ":行" + lineNumber + ":字段 para3");
+            parsedField25 = ly.ConfigValues.read(type25, values.get("mailTemplateId"), fileName + ":行" + lineNumber + ":字段 mailTemplateId");
+            parsedField26 = ly.ConfigValues.read(type26, values.get("exchangeResources"), fileName + ":行" + lineNumber + ":字段 exchangeResources");
+            parsedField27 = ly.ConfigValues.read(type27, values.get("enterType"), fileName + ":行" + lineNumber + ":字段 enterType");
+            parsedField28 = ly.ConfigValues.read(type28, values.get("sort"), fileName + ":行" + lineNumber + ":字段 sort");
+            parsedField29 = ly.ConfigValues.read(type29, values.get("des"), fileName + ":行" + lineNumber + ":字段 des");
+            parsedField30 = ly.ConfigValues.read(type30, values.get("destime"), fileName + ":行" + lineNumber + ":字段 destime");
+            parsedField31 = ly.ConfigValues.read(type31, values.get("timeDown"), fileName + ":行" + lineNumber + ":字段 timeDown");
+            parsedField32 = ly.ConfigValues.read(type32, values.get("desPic"), fileName + ":行" + lineNumber + ":字段 desPic");
+            parsedField33 = ly.ConfigValues.read(type33, values.get("RechargeId"), fileName + ":行" + lineNumber + ":字段 RechargeId");
+            parsedField34 = ly.ConfigValues.read(type34, values.get("iACTIVITYTYPE"), fileName + ":行" + lineNumber + ":字段 iACTIVITYTYPE");
+            parsedField35 = ly.ConfigValues.read(type35, values.get("topId"), fileName + ":行" + lineNumber + ":字段 topId");
+            parsedField36 = ly.ConfigValues.read(type36, values.get("NoShow"), fileName + ":行" + lineNumber + ":字段 NoShow");
+            parsedField37 = ly.ConfigValues.read(type37, values.get("DisplayFunctionType"), fileName + ":行" + lineNumber + ":字段 DisplayFunctionType");
+            parsedField38 = ly.ConfigValues.read(type38, values.get("DisplayFunctionParam"), fileName + ":行" + lineNumber + ":字段 DisplayFunctionParam");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ActivityInfoConfig config = new ActivityInfoConfig(id, name, openType, scheDuling, openPara1, openPara2, openPara3, timeType, startTime, endTime, specialEndTime, freshTime, closeTime, closeActivity, OpenServiceActivity, integralType, integralStage, integralReward, integralRewardShow, title, picture, description, para1, para2, para3, mailTemplateId, exchangeResources, enterType, sort, des, destime, timeDown, desPic, RechargeId, iACTIVITYTYPE, topId, NoShow, DisplayFunctionType, DisplayFunctionParam);
-          config.afterLoad();
+          ActivityInfoConfig config = new ActivityInfoConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24, parsedField25, parsedField26, parsedField27, parsedField28, parsedField29, parsedField30, parsedField31, parsedField32, parsedField33, parsedField34, parsedField35, parsedField36, parsedField37, parsedField38);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ActivityInfoConfig config : configList) config.afterLoad();
+      new ActivityInfoConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -318,38 +187,6 @@ public class ActivityInfoConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ActivityInfoConfig> getConfigList() {
@@ -362,7 +199,7 @@ public class ActivityInfoConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "activityInfo.txt";
+      return "activityInfo.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -29,5 +29,7 @@ public abstract class AbstractConfigManger {
     clear();
   }
 
+  protected void finishLoad(Logger logger) {}
+
   protected abstract void afterLoad();
 }

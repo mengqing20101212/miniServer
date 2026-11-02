@@ -27,7 +27,7 @@ public class ActivityUpRecruitNoticeConfigManager implements InterfaceConfigMana
   public AbstractConfigManger createTable() { return new ActivityUpRecruitNoticeConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "activityUpRecruitNotice.txt"; }
+  public String getConfigFileName() { return "activityUpRecruitNotice.xml"; }
 
   public static class ActivityUpRecruitNoticeConfigManagerImpl extends AbstractConfigManger {
     private List<ActivityUpRecruitNoticeConfig> configList = List.of();
@@ -39,186 +39,100 @@ public class ActivityUpRecruitNoticeConfigManager implements InterfaceConfigMana
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ActivityUpRecruitNoticeConfigChecker checker = new ActivityUpRecruitNoticeConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ActivityUpRecruitNoticeConfig> newList = new ArrayList<>();
       Map<Integer, ActivityUpRecruitNoticeConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 24) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int scheDuling = 0;
-          String name = null;
-          int heroShowStyleType = 0;
-          int rolePic = 0;
-          String rolePicPosOffset = null;
-          String rolePicScaleOffset = null;
-          int getDesPicResId = 0;
-          int skillPicResId1 = 0;
-          String skillPicResId1PosOffset = null;
-          int skillPicResId2 = 0;
-          String skillPicResId2PosOffset = null;
-          int jumpType = 0;
-          int sceneId = 0;
-          int drawCardDecPic = 0;
-          int bgPic = 0;
-          String bgHeroPics = null;
-          String bgPicPosOffset = null;
-          String bgPicScaleOffset = null;
-          String numberPic = null;
-          int activityId = 0;
-          int trueActivityId = 0;
-          int holographic = 0;
-          int SpecialEffects = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          String parsedField9 = null;
+          int parsedField10 = 0;
+          String parsedField11 = null;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          int parsedField15 = 0;
+          String parsedField16 = null;
+          String parsedField17 = null;
+          String parsedField18 = null;
+          String parsedField19 = null;
+          int parsedField20 = 0;
+          int parsedField21 = 0;
+          int parsedField22 = 0;
+          int parsedField23 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 活动排期
-            if (!arr[1].trim().isEmpty()) {
-              scheDuling = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 名称
-            if (!arr[2].trim().isEmpty()) {
-              name = arr[2].trim();
-            }
-
-            // 解析 英雄显示样式模板
-            if (!arr[3].trim().isEmpty()) {
-              heroShowStyleType = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 角色立绘
-            if (!arr[4].trim().isEmpty()) {
-              rolePic = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 角色立绘坐标偏移
-            if (!arr[5].trim().isEmpty()) {
-              rolePicPosOffset = arr[5].trim();
-            }
-
-            // 解析 角色立绘缩放偏移
-            if (!arr[6].trim().isEmpty()) {
-              rolePicScaleOffset = arr[6].trim();
-            }
-
-            // 解析 获取描述文本图片id
-            if (!arr[7].trim().isEmpty()) {
-              getDesPicResId = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 技能描述图片id1
-            if (!arr[8].trim().isEmpty()) {
-              skillPicResId1 = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 技能描述图片1坐标
-            if (!arr[9].trim().isEmpty()) {
-              skillPicResId1PosOffset = arr[9].trim();
-            }
-
-            // 解析 技能描述图片id2
-            if (!arr[10].trim().isEmpty()) {
-              skillPicResId2 = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 技能描述图片2坐标
-            if (!arr[11].trim().isEmpty()) {
-              skillPicResId2PosOffset = arr[11].trim();
-            }
-
-            // 解析 跳转类型
-            if (!arr[12].trim().isEmpty()) {
-              jumpType = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 试玩关卡ID
-            if (!arr[13].trim().isEmpty()) {
-              sceneId = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 抽卡说明（SSR概率小字）
-            if (!arr[14].trim().isEmpty()) {
-              drawCardDecPic = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 背景图
-            if (!arr[15].trim().isEmpty()) {
-              bgPic = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 背景中角色小图(多个)
-            if (!arr[16].trim().isEmpty()) {
-              bgHeroPics = arr[16].trim();
-            }
-
-            // 解析 小图立绘坐标偏移
-            if (!arr[17].trim().isEmpty()) {
-              bgPicPosOffset = arr[17].trim();
-            }
-
-            // 解析 小图立绘缩放偏移
-            if (!arr[18].trim().isEmpty()) {
-              bgPicScaleOffset = arr[18].trim();
-            }
-
-            // 解析 倒计时图片(1,2,3,...)
-            if (!arr[19].trim().isEmpty()) {
-              numberPic = arr[19].trim();
-            }
-
-            // 解析 对应卡池活动ID
-            if (!arr[20].trim().isEmpty()) {
-              activityId = Integer.parseInt(arr[20].trim());
-            }
-
-            // 解析 对应的活动id
-            if (!arr[21].trim().isEmpty()) {
-              trueActivityId = Integer.parseInt(arr[21].trim());
-            }
-
-            // 解析 全息标记
-            if (!arr[22].trim().isEmpty()) {
-              holographic = Integer.parseInt(arr[22].trim());
-            }
-
-            // 解析 是否显示特效
-            if (!arr[23].trim().isEmpty()) {
-              SpecialEffects = Integer.parseInt(arr[23].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("scheDuling"), fileName + ":行" + lineNumber + ":字段 scheDuling");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("heroShowStyleType"), fileName + ":行" + lineNumber + ":字段 heroShowStyleType");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("rolePic"), fileName + ":行" + lineNumber + ":字段 rolePic");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("rolePicPosOffset"), fileName + ":行" + lineNumber + ":字段 rolePicPosOffset");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("rolePicScaleOffset"), fileName + ":行" + lineNumber + ":字段 rolePicScaleOffset");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("getDesPicResId"), fileName + ":行" + lineNumber + ":字段 getDesPicResId");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("skillPicResId1"), fileName + ":行" + lineNumber + ":字段 skillPicResId1");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("skillPicResId1PosOffset"), fileName + ":行" + lineNumber + ":字段 skillPicResId1PosOffset");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("skillPicResId2"), fileName + ":行" + lineNumber + ":字段 skillPicResId2");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("skillPicResId2PosOffset"), fileName + ":行" + lineNumber + ":字段 skillPicResId2PosOffset");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("jumpType"), fileName + ":行" + lineNumber + ":字段 jumpType");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("sceneId"), fileName + ":行" + lineNumber + ":字段 sceneId");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("drawCardDecPic"), fileName + ":行" + lineNumber + ":字段 drawCardDecPic");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("bgPic"), fileName + ":行" + lineNumber + ":字段 bgPic");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("bgHeroPics"), fileName + ":行" + lineNumber + ":字段 bgHeroPics");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("bgPicPosOffset"), fileName + ":行" + lineNumber + ":字段 bgPicPosOffset");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("bgPicScaleOffset"), fileName + ":行" + lineNumber + ":字段 bgPicScaleOffset");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("numberPic"), fileName + ":行" + lineNumber + ":字段 numberPic");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("activityId"), fileName + ":行" + lineNumber + ":字段 activityId");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("trueActivityId"), fileName + ":行" + lineNumber + ":字段 trueActivityId");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("holographic"), fileName + ":行" + lineNumber + ":字段 holographic");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("SpecialEffects"), fileName + ":行" + lineNumber + ":字段 SpecialEffects");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ActivityUpRecruitNoticeConfig config = new ActivityUpRecruitNoticeConfig(id, scheDuling, name, heroShowStyleType, rolePic, rolePicPosOffset, rolePicScaleOffset, getDesPicResId, skillPicResId1, skillPicResId1PosOffset, skillPicResId2, skillPicResId2PosOffset, jumpType, sceneId, drawCardDecPic, bgPic, bgHeroPics, bgPicPosOffset, bgPicScaleOffset, numberPic, activityId, trueActivityId, holographic, SpecialEffects);
-          config.afterLoad();
+          ActivityUpRecruitNoticeConfig config = new ActivityUpRecruitNoticeConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ActivityUpRecruitNoticeConfig config : configList) config.afterLoad();
+      new ActivityUpRecruitNoticeConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -228,38 +142,6 @@ public class ActivityUpRecruitNoticeConfigManager implements InterfaceConfigMana
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ActivityUpRecruitNoticeConfig> getConfigList() {
@@ -272,7 +154,7 @@ public class ActivityUpRecruitNoticeConfigManager implements InterfaceConfigMana
 
     @Override
     public String getConfigFileName() {
-      return "activityUpRecruitNotice.txt";
+      return "activityUpRecruitNotice.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

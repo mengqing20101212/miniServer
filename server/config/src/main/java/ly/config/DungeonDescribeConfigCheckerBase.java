@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class DungeonDescribeConfigCheckerBase extends AbstractConfigChecker<DungeonDescribeConfig> {
   @Override
   public String getConfigFileName() {
-    return "dungeonDescribe.txt";
+    return "dungeonDescribe.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "title", "STRING"),
-        new ConfigColumnMeta(2, "content", "STRING"),
-        new ConfigColumnMeta(3, "res", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "title", "string"),
+        new ConfigColumnMeta(2, "content", "string"),
+        new ConfigColumnMeta(3, "res", "int"));
   }
 }

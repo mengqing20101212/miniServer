@@ -27,7 +27,7 @@ public class HeroAwakenConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new HeroAwakenConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "heroAwaken.txt"; }
+  public String getConfigFileName() { return "heroAwaken.xml"; }
 
   public static class HeroAwakenConfigManagerImpl extends AbstractConfigManger {
     private List<HeroAwakenConfig> configList = List.of();
@@ -39,192 +39,103 @@ public class HeroAwakenConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type24 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       HeroAwakenConfigChecker checker = new HeroAwakenConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<HeroAwakenConfig> newList = new ArrayList<>();
       Map<Integer, HeroAwakenConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 25) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int modelName = 0;
-          int sequence = 0;
-          int awakenType = 0;
-          int awakenskill_1 = 0;
-          int awakenskill_2 = 0;
-          int awakenskill_3 = 0;
-          int awakenskill_s1 = 0;
-          int awakenskill_s2 = 0;
-          int moreAwakenSkill1 = 0;
-          int moreAwakenSkill2 = 0;
-          int moreAwakenSkill3 = 0;
-          int attrType = 0;
-          int attrNum = 0;
-          String awakenPhase = null;
-          int awakenIcon = 0;
-          String awakenTitle = null;
-          String awakenAttrDes = null;
-          String awakenItem = null;
-          int awakenCurrencyType = 0;
-          int awakenCurrencyNum = 0;
-          int isReset = 0;
-          String retainItem = null;
-          int currencyType = 0;
-          int currencyNum = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          String parsedField14 = null;
+          int parsedField15 = 0;
+          String parsedField16 = null;
+          String parsedField17 = null;
+          String parsedField18 = null;
+          int parsedField19 = 0;
+          int parsedField20 = 0;
+          int parsedField21 = 0;
+          String parsedField22 = null;
+          int parsedField23 = 0;
+          int parsedField24 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 英雄模板名
-            if (!arr[1].trim().isEmpty()) {
-              modelName = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 觉醒次序
-            if (!arr[2].trim().isEmpty()) {
-              sequence = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 觉醒类型
-            if (!arr[3].trim().isEmpty()) {
-              awakenType = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 觉醒后常规技能
-            if (!arr[4].trim().isEmpty()) {
-              awakenskill_1 = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析   null
-            if (!arr[5].trim().isEmpty()) {
-              awakenskill_2 = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析   null
-            if (!arr[6].trim().isEmpty()) {
-              awakenskill_3 = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 觉醒超级技能
-            if (!arr[7].trim().isEmpty()) {
-              awakenskill_s1 = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 觉醒超级技能
-            if (!arr[8].trim().isEmpty()) {
-              awakenskill_s2 = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 多段觉醒技能
-            if (!arr[9].trim().isEmpty()) {
-              moreAwakenSkill1 = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 多段觉醒技能
-            if (!arr[10].trim().isEmpty()) {
-              moreAwakenSkill2 = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 多段觉醒技能
-            if (!arr[11].trim().isEmpty()) {
-              moreAwakenSkill3 = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 属性类型
-            if (!arr[12].trim().isEmpty()) {
-              attrType = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 属性数值
-            if (!arr[13].trim().isEmpty()) {
-              attrNum = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 觉醒阶段
-            if (!arr[14].trim().isEmpty()) {
-              awakenPhase = arr[14].trim();
-            }
-
-            // 解析 觉醒图标
-            if (!arr[15].trim().isEmpty()) {
-              awakenIcon = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 觉醒标题
-            if (!arr[16].trim().isEmpty()) {
-              awakenTitle = arr[16].trim();
-            }
-
-            // 解析 觉醒属性描述
-            if (!arr[17].trim().isEmpty()) {
-              awakenAttrDes = arr[17].trim();
-            }
-
-            // 解析 觉醒材料需求
-            if (!arr[18].trim().isEmpty()) {
-              awakenItem = arr[18].trim();
-            }
-
-            // 解析 觉醒货币类型
-            if (!arr[19].trim().isEmpty()) {
-              awakenCurrencyType = Integer.parseInt(arr[19].trim());
-            }
-
-            // 解析 觉醒货币数量
-            if (!arr[20].trim().isEmpty()) {
-              awakenCurrencyNum = Integer.parseInt(arr[20].trim());
-            }
-
-            // 解析 是否还原
-            if (!arr[21].trim().isEmpty()) {
-              isReset = Integer.parseInt(arr[21].trim());
-            }
-
-            // 解析 还原返还
-            if (!arr[22].trim().isEmpty()) {
-              retainItem = arr[22].trim();
-            }
-
-            // 解析 分解消耗货币类型
-            if (!arr[23].trim().isEmpty()) {
-              currencyType = Integer.parseInt(arr[23].trim());
-            }
-
-            // 解析 分解消耗货币数量
-            if (!arr[24].trim().isEmpty()) {
-              currencyNum = Integer.parseInt(arr[24].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("modelName"), fileName + ":行" + lineNumber + ":字段 modelName");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("sequence"), fileName + ":行" + lineNumber + ":字段 sequence");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("awakenType"), fileName + ":行" + lineNumber + ":字段 awakenType");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("awakenskill_1"), fileName + ":行" + lineNumber + ":字段 awakenskill_1");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("awakenskill_2"), fileName + ":行" + lineNumber + ":字段 awakenskill_2");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("awakenskill_3"), fileName + ":行" + lineNumber + ":字段 awakenskill_3");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("awakenskill_s1"), fileName + ":行" + lineNumber + ":字段 awakenskill_s1");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("awakenskill_s2"), fileName + ":行" + lineNumber + ":字段 awakenskill_s2");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("moreAwakenSkill1"), fileName + ":行" + lineNumber + ":字段 moreAwakenSkill1");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("moreAwakenSkill2"), fileName + ":行" + lineNumber + ":字段 moreAwakenSkill2");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("moreAwakenSkill3"), fileName + ":行" + lineNumber + ":字段 moreAwakenSkill3");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("attrType"), fileName + ":行" + lineNumber + ":字段 attrType");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("attrNum"), fileName + ":行" + lineNumber + ":字段 attrNum");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("awakenPhase"), fileName + ":行" + lineNumber + ":字段 awakenPhase");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("awakenIcon"), fileName + ":行" + lineNumber + ":字段 awakenIcon");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("awakenTitle"), fileName + ":行" + lineNumber + ":字段 awakenTitle");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("awakenAttrDes"), fileName + ":行" + lineNumber + ":字段 awakenAttrDes");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("awakenItem"), fileName + ":行" + lineNumber + ":字段 awakenItem");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("awakenCurrencyType"), fileName + ":行" + lineNumber + ":字段 awakenCurrencyType");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("awakenCurrencyNum"), fileName + ":行" + lineNumber + ":字段 awakenCurrencyNum");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("isReset"), fileName + ":行" + lineNumber + ":字段 isReset");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("retainItem"), fileName + ":行" + lineNumber + ":字段 retainItem");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("currencyType"), fileName + ":行" + lineNumber + ":字段 currencyType");
+            parsedField24 = ly.ConfigValues.read(type24, values.get("currencyNum"), fileName + ":行" + lineNumber + ":字段 currencyNum");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          HeroAwakenConfig config = new HeroAwakenConfig(id, modelName, sequence, awakenType, awakenskill_1, awakenskill_2, awakenskill_3, awakenskill_s1, awakenskill_s2, moreAwakenSkill1, moreAwakenSkill2, moreAwakenSkill3, attrType, attrNum, awakenPhase, awakenIcon, awakenTitle, awakenAttrDes, awakenItem, awakenCurrencyType, awakenCurrencyNum, isReset, retainItem, currencyType, currencyNum);
-          config.afterLoad();
+          HeroAwakenConfig config = new HeroAwakenConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (HeroAwakenConfig config : configList) config.afterLoad();
+      new HeroAwakenConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -234,38 +145,6 @@ public class HeroAwakenConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<HeroAwakenConfig> getConfigList() {
@@ -278,7 +157,7 @@ public class HeroAwakenConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "heroAwaken.txt";
+      return "heroAwaken.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

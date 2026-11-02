@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class DungeonPointConfigCheckerBase extends AbstractConfigChecker<DungeonPointConfig> {
   @Override
   public String getConfigFileName() {
-    return "dungeonPoint.txt";
+    return "dungeonPoint.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "beizhu", "STRING"),
-        new ConfigColumnMeta(2, "type", "INT"),
-        new ConfigColumnMeta(3, "para", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "beizhu", "string"),
+        new ConfigColumnMeta(2, "type", "int"),
+        new ConfigColumnMeta(3, "para", "string"));
   }
 }

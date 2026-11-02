@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class SaitamaInfoConfigCheckerBase extends AbstractConfigChecker<SaitamaInfoConfig> {
   @Override
   public String getConfigFileName() {
-    return "saitamaInfo.txt";
+    return "saitamaInfo.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "title", "STRING"),
-        new ConfigColumnMeta(2, "icon", "INT"),
-        new ConfigColumnMeta(3, "label", "STRING"),
-        new ConfigColumnMeta(4, "word", "STRING"),
-        new ConfigColumnMeta(5, "preWord", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "title", "string"),
+        new ConfigColumnMeta(2, "icon", "int"),
+        new ConfigColumnMeta(3, "label", "string"),
+        new ConfigColumnMeta(4, "word", "string"),
+        new ConfigColumnMeta(5, "preWord", "string"));
   }
 }

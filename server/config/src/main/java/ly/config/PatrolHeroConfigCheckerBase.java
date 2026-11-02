@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class PatrolHeroConfigCheckerBase extends AbstractConfigChecker<PatrolHeroConfig> {
   @Override
   public String getConfigFileName() {
-    return "patrolHero.txt";
+    return "patrolHero.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "workSentiment", "STRING"),
-        new ConfigColumnMeta(3, "workDay", "STRING"),
-        new ConfigColumnMeta(4, "workDayDesc", "STRING"),
-        new ConfigColumnMeta(5, "heroFetter", "INT"),
-        new ConfigColumnMeta(6, "baseAdd", "INT"),
-        new ConfigColumnMeta(7, "extraAdd", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "workSentiment", "string"),
+        new ConfigColumnMeta(3, "workDay", "string"),
+        new ConfigColumnMeta(4, "workDayDesc", "string"),
+        new ConfigColumnMeta(5, "heroFetter", "int"),
+        new ConfigColumnMeta(6, "baseAdd", "int"),
+        new ConfigColumnMeta(7, "extraAdd", "int"));
   }
 }

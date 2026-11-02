@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class LevelHintConfigCheckerBase extends AbstractConfigChecker<LevelHintConfig> {
   @Override
   public String getConfigFileName() {
-    return "levelHint.txt";
+    return "levelHint.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "icon", "INT"),
-        new ConfigColumnMeta(2, "hint", "STRING"),
-        new ConfigColumnMeta(3, "des", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "icon", "int"),
+        new ConfigColumnMeta(2, "hint", "string"),
+        new ConfigColumnMeta(3, "des", "string"));
   }
 }

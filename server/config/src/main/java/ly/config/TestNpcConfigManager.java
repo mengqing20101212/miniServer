@@ -27,7 +27,7 @@ public class TestNpcConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new TestNpcConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "testNpc.txt"; }
+  public String getConfigFileName() { return "testNpc.xml"; }
 
   public static class TestNpcConfigManagerImpl extends AbstractConfigManger {
     private List<TestNpcConfig> configList = List.of();
@@ -39,132 +39,73 @@ public class TestNpcConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       TestNpcConfigChecker checker = new TestNpcConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<TestNpcConfig> newList = new ArrayList<>();
       Map<Integer, TestNpcConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 15) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          int level = 0;
-          int maxHP = 0;
-          int attack = 0;
-          int defence = 0;
-          int speed = 0;
-          int crit = 0;
-          int critRatio = 0;
-          int effectHit = 0;
-          int effectDodge = 0;
-          String skillList = null;
-          String Sskill = null;
-          String aiName = null;
-          int modelId = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          String parsedField11 = null;
+          String parsedField12 = null;
+          String parsedField13 = null;
+          int parsedField14 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 名字
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 等级
-            if (!arr[2].trim().isEmpty()) {
-              level = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 生命上限
-            if (!arr[3].trim().isEmpty()) {
-              maxHP = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 攻击
-            if (!arr[4].trim().isEmpty()) {
-              attack = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 防御
-            if (!arr[5].trim().isEmpty()) {
-              defence = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 速度
-            if (!arr[6].trim().isEmpty()) {
-              speed = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 暴击
-            if (!arr[7].trim().isEmpty()) {
-              crit = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 暴击伤害
-            if (!arr[8].trim().isEmpty()) {
-              critRatio = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 效果命中
-            if (!arr[9].trim().isEmpty()) {
-              effectHit = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 效果抵抗
-            if (!arr[10].trim().isEmpty()) {
-              effectDodge = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 常规技能组
-            if (!arr[11].trim().isEmpty()) {
-              skillList = arr[11].trim();
-            }
-
-            // 解析 S技能
-            if (!arr[12].trim().isEmpty()) {
-              Sskill = arr[12].trim();
-            }
-
-            // 解析 AI模板
-            if (!arr[13].trim().isEmpty()) {
-              aiName = arr[13].trim();
-            }
-
-            // 解析 模型id
-            if (!arr[14].trim().isEmpty()) {
-              modelId = Integer.parseInt(arr[14].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("level"), fileName + ":行" + lineNumber + ":字段 level");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("maxHP"), fileName + ":行" + lineNumber + ":字段 maxHP");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("attack"), fileName + ":行" + lineNumber + ":字段 attack");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("defence"), fileName + ":行" + lineNumber + ":字段 defence");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("speed"), fileName + ":行" + lineNumber + ":字段 speed");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("crit"), fileName + ":行" + lineNumber + ":字段 crit");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("critRatio"), fileName + ":行" + lineNumber + ":字段 critRatio");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("effectHit"), fileName + ":行" + lineNumber + ":字段 effectHit");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("effectDodge"), fileName + ":行" + lineNumber + ":字段 effectDodge");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("skillList"), fileName + ":行" + lineNumber + ":字段 skillList");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("Sskill"), fileName + ":行" + lineNumber + ":字段 Sskill");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("aiName"), fileName + ":行" + lineNumber + ":字段 aiName");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("modelId"), fileName + ":行" + lineNumber + ":字段 modelId");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          TestNpcConfig config = new TestNpcConfig(id, name, level, maxHP, attack, defence, speed, crit, critRatio, effectHit, effectDodge, skillList, Sskill, aiName, modelId);
-          config.afterLoad();
+          TestNpcConfig config = new TestNpcConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (TestNpcConfig config : configList) config.afterLoad();
+      new TestNpcConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -174,38 +115,6 @@ public class TestNpcConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<TestNpcConfig> getConfigList() {
@@ -218,7 +127,7 @@ public class TestNpcConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "testNpc.txt";
+      return "testNpc.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

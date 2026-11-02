@@ -8,21 +8,21 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityNpcGroupConfigCheckerBase extends AbstractConfigChecker<ActivityNpcGroupConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityNpcGroup.txt";
+    return "activityNpcGroup.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "defaultAni", "STRING"),
-        new ConfigColumnMeta(2, "p1", "STRING"),
-        new ConfigColumnMeta(3, "groupName", "STRING"),
-        new ConfigColumnMeta(4, "clickAniList", "STRING"),
-        new ConfigColumnMeta(5, "moveDistance", "STRING"),
-        new ConfigColumnMeta(6, "cameraHight", "STRING"),
-        new ConfigColumnMeta(7, "cameraDistance", "STRING"),
-        new ConfigColumnMeta(8, "npcDistance", "STRING"),
-        new ConfigColumnMeta(9, "textPrefabType", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "defaultAni", "string"),
+        new ConfigColumnMeta(2, "p1", "string"),
+        new ConfigColumnMeta(3, "groupName", "string"),
+        new ConfigColumnMeta(4, "clickAniList", "string"),
+        new ConfigColumnMeta(5, "moveDistance", "string"),
+        new ConfigColumnMeta(6, "cameraHight", "string"),
+        new ConfigColumnMeta(7, "cameraDistance", "string"),
+        new ConfigColumnMeta(8, "npcDistance", "string"),
+        new ConfigColumnMeta(9, "textPrefabType", "string"));
   }
 }

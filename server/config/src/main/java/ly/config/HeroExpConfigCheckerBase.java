@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class HeroExpConfigCheckerBase extends AbstractConfigChecker<HeroExpConfig> {
   @Override
   public String getConfigFileName() {
-    return "heroExp.txt";
+    return "heroExp.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "level", "INT"),
-        new ConfigColumnMeta(1, "modelId", "INT"),
-        new ConfigColumnMeta(2, "exp", "INT"),
-        new ConfigColumnMeta(3, "retainExp", "INT"),
-        new ConfigColumnMeta(4, "currencyType", "INT"),
-        new ConfigColumnMeta(5, "currencyNum", "STRING"),
-        new ConfigColumnMeta(6, "item", "STRING"));
+        new ConfigColumnMeta(0, "level", "int"),
+        new ConfigColumnMeta(1, "modelId", "int"),
+        new ConfigColumnMeta(2, "exp", "int"),
+        new ConfigColumnMeta(3, "retainExp", "int"),
+        new ConfigColumnMeta(4, "currencyType", "int"),
+        new ConfigColumnMeta(5, "currencyNum", "string"),
+        new ConfigColumnMeta(6, "item", "string"));
   }
 }

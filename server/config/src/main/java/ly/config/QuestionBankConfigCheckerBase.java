@@ -8,30 +8,30 @@ import ly.ConfigColumnMeta;
 public abstract class QuestionBankConfigCheckerBase extends AbstractConfigChecker<QuestionBankConfig> {
   @Override
   public String getConfigFileName() {
-    return "questionBank.txt";
+    return "questionBank.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "questionContent", "STRING"),
-        new ConfigColumnMeta(2, "questionNote", "STRING"),
-        new ConfigColumnMeta(3, "type", "INT"),
-        new ConfigColumnMeta(4, "questionShow", "INT"),
-        new ConfigColumnMeta(5, "questionPicture", "STRING"),
-        new ConfigColumnMeta(6, "optionShow", "INT"),
-        new ConfigColumnMeta(7, "simpleA", "STRING"),
-        new ConfigColumnMeta(8, "simpleB", "STRING"),
-        new ConfigColumnMeta(9, "simpleC", "STRING"),
-        new ConfigColumnMeta(10, "simpleD", "STRING"),
-        new ConfigColumnMeta(11, "simpleAnswer", "STRING"),
-        new ConfigColumnMeta(12, "simpleNote", "STRING"),
-        new ConfigColumnMeta(13, "hardA", "STRING"),
-        new ConfigColumnMeta(14, "hardB", "STRING"),
-        new ConfigColumnMeta(15, "hardC", "STRING"),
-        new ConfigColumnMeta(16, "hardD", "STRING"),
-        new ConfigColumnMeta(17, "hardAnswer", "STRING"),
-        new ConfigColumnMeta(18, "hardNote", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "questionContent", "string"),
+        new ConfigColumnMeta(2, "questionNote", "string"),
+        new ConfigColumnMeta(3, "type", "int"),
+        new ConfigColumnMeta(4, "questionShow", "int"),
+        new ConfigColumnMeta(5, "questionPicture", "string"),
+        new ConfigColumnMeta(6, "optionShow", "int"),
+        new ConfigColumnMeta(7, "simpleA", "string"),
+        new ConfigColumnMeta(8, "simpleB", "string"),
+        new ConfigColumnMeta(9, "simpleC", "string"),
+        new ConfigColumnMeta(10, "simpleD", "string"),
+        new ConfigColumnMeta(11, "simpleAnswer", "string"),
+        new ConfigColumnMeta(12, "simpleNote", "string"),
+        new ConfigColumnMeta(13, "hardA", "string"),
+        new ConfigColumnMeta(14, "hardB", "string"),
+        new ConfigColumnMeta(15, "hardC", "string"),
+        new ConfigColumnMeta(16, "hardD", "string"),
+        new ConfigColumnMeta(17, "hardAnswer", "string"),
+        new ConfigColumnMeta(18, "hardNote", "string"));
   }
 }

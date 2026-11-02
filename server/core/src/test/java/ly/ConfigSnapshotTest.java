@@ -14,14 +14,14 @@ public class ConfigSnapshotTest {
 
         protected void reload(Logger logger, String directory) {
             try {
-                value = Integer.parseInt(Files.readString(Path.of(directory, "numbers.txt")));
+                value = Integer.parseInt(Files.readString(Path.of(directory, "numbers.xml")));
             } catch (Exception error) {
                 throw new ConfigLoadException("invalid number");
             }
         }
 
         public String getConfigFileName() {
-            return "numbers.txt";
+            return "numbers.xml";
         }
 
         protected void clear() {
@@ -48,15 +48,15 @@ public class ConfigSnapshotTest {
                     }
 
                     public String getConfigFileName() {
-                        return "numbers.txt";
+                        return "numbers.xml";
                     }
                 });
         try {
-            Files.writeString(directory.resolve("numbers.txt"), "1");
+            Files.writeString(directory.resolve("numbers.xml"), "1");
             service.loadAllConfig(null, directory.toString());
             ConfigSnapshot old = service.snapshot();
             try (ConfigScope scope = ConfigScope.open()) {
-                Files.writeString(directory.resolve("numbers.txt"), "2");
+                Files.writeString(directory.resolve("numbers.xml"), "2");
                 service.loadAllConfigToStandby(null, directory.toString(), "V2");
                 service.schedulePreparedSwitch("V2", System.currentTimeMillis() + 50, () -> {});
                 service.awaitVersion("V2", 2000);
@@ -68,12 +68,12 @@ public class ConfigSnapshotTest {
                 assertEquals(2, service.snapshot().table(NumberTable.class).value);
             }
             assertEquals(2, service.table(NumberTable.class).value);
-            Files.writeString(directory.resolve("numbers.txt"), "bad");
+            Files.writeString(directory.resolve("numbers.xml"), "bad");
             assertThrows(
                     ConfigLoadException.class,
                     () -> service.loadAllConfigToStandby(null, directory.toString(), "bad"));
             assertEquals("V2", service.getActiveVersion());
-            Files.writeString(directory.resolve("numbers.txt"), "3");
+            Files.writeString(directory.resolve("numbers.xml"), "3");
             service.loadAllConfigToStandby(null, directory.toString(), "V3");
             service.schedulePreparedSwitch("V3", System.currentTimeMillis(), () -> {});
             service.awaitVersion("V3", 2000);
@@ -84,7 +84,7 @@ public class ConfigSnapshotTest {
             service.configManagerList.addAll(original);
             active.set(service, previous);
             service.resume();
-            Files.deleteIfExists(directory.resolve("numbers.txt"));
+            Files.deleteIfExists(directory.resolve("numbers.xml"));
             Files.deleteIfExists(directory);
         }
     }

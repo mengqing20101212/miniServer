@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class Err_codeConfigCheckerBase extends AbstractConfigChecker<Err_codeConfig> {
   @Override
   public String getConfigFileName() {
-    return "err_code.txt";
+    return "err_code.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "define", "STRING"),
-        new ConfigColumnMeta(2, "des", "STRING"),
-        new ConfigColumnMeta(3, "handletype", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "define", "string"),
+        new ConfigColumnMeta(2, "des", "string"),
+        new ConfigColumnMeta(3, "handletype", "int"));
   }
 }

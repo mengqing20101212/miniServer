@@ -27,7 +27,7 @@ public class Filter_wordsConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new Filter_wordsConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "filter_words.txt"; }
+  public String getConfigFileName() { return "filter_words.xml"; }
 
   public static class Filter_wordsConfigManagerImpl extends AbstractConfigManger {
     private List<Filter_wordsConfig> configList = List.of();
@@ -37,45 +37,28 @@ public class Filter_wordsConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       Filter_wordsConfigChecker checker = new Filter_wordsConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<Filter_wordsConfig> newList = new ArrayList<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 1) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int flag = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
           try {
-            // 解析 标记1 版署屏蔽字 2游戏屏蔽字
-            if (!arr[0].trim().isEmpty()) {
-              flag = Integer.parseInt(arr[0].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("flag"), fileName + ":行" + lineNumber + ":字段 flag");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          Filter_wordsConfig config = new Filter_wordsConfig(flag);
-          config.afterLoad();
+          Filter_wordsConfig config = new Filter_wordsConfig(parsedField0);
           newList.add(config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+      });
+      configList = List.copyOf(newList);
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (Filter_wordsConfig config : configList) config.afterLoad();
+      new Filter_wordsConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -86,45 +69,13 @@ public class Filter_wordsConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法结束区@@@@@
     }
 
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
-    }
-
     public List<Filter_wordsConfig> getConfigList() {
       return configList;
     }
 
     @Override
     public String getConfigFileName() {
-      return "filter_words.txt";
+      return "filter_words.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -8,24 +8,24 @@ import ly.ConfigColumnMeta;
 public abstract class SocietyCleanCityConfigCheckerBase extends AbstractConfigChecker<SocietyCleanCityConfig> {
   @Override
   public String getConfigFileName() {
-    return "societyCleanCity.txt";
+    return "societyCleanCity.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "cell", "STRING"),
-        new ConfigColumnMeta(2, "progressdrop25", "INT"),
-        new ConfigColumnMeta(3, "progressdrop50", "INT"),
-        new ConfigColumnMeta(4, "progressdrop75", "INT"),
-        new ConfigColumnMeta(5, "progressdrop100", "INT"),
-        new ConfigColumnMeta(6, "rewardEvent", "STRING"),
-        new ConfigColumnMeta(7, "giveEvent", "STRING"),
-        new ConfigColumnMeta(8, "greatReward", "STRING"),
-        new ConfigColumnMeta(9, "repairEvent", "STRING"),
-        new ConfigColumnMeta(10, "storyEvent", "STRING"),
-        new ConfigColumnMeta(11, "trapEvent", "STRING"),
-        new ConfigColumnMeta(12, "bossEvent", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "cell", "string"),
+        new ConfigColumnMeta(2, "progressdrop25", "int"),
+        new ConfigColumnMeta(3, "progressdrop50", "int"),
+        new ConfigColumnMeta(4, "progressdrop75", "int"),
+        new ConfigColumnMeta(5, "progressdrop100", "int"),
+        new ConfigColumnMeta(6, "rewardEvent", "string"),
+        new ConfigColumnMeta(7, "giveEvent", "string"),
+        new ConfigColumnMeta(8, "greatReward", "string"),
+        new ConfigColumnMeta(9, "repairEvent", "string"),
+        new ConfigColumnMeta(10, "storyEvent", "string"),
+        new ConfigColumnMeta(11, "trapEvent", "string"),
+        new ConfigColumnMeta(12, "bossEvent", "string"));
   }
 }

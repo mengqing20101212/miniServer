@@ -27,7 +27,7 @@ public class StrongerConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new StrongerConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "stronger.txt"; }
+  public String getConfigFileName() { return "stronger.xml"; }
 
   public static class StrongerConfigManagerImpl extends AbstractConfigManger {
     private List<StrongerConfig> configList = List.of();
@@ -39,126 +39,70 @@ public class StrongerConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       StrongerConfigChecker checker = new StrongerConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<StrongerConfig> newList = new ArrayList<>();
       Map<Integer, StrongerConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 14) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int resType = 0;
-          String resName = null;
-          int resPic = 0;
-          String resDes = null;
-          int resSort = 0;
-          int playType = 0;
-          String playName = null;
-          int playStar = 0;
-          int playJump = 0;
-          int playSort = 0;
-          int itemId = 0;
-          String itemName = null;
-          int itemSort = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          int parsedField3 = 0;
+          String parsedField4 = null;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          String parsedField7 = null;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          String parsedField12 = null;
+          int parsedField13 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 资源类型
-            if (!arr[1].trim().isEmpty()) {
-              resType = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 资源名称
-            if (!arr[2].trim().isEmpty()) {
-              resName = arr[2].trim();
-            }
-
-            // 解析 资源图标
-            if (!arr[3].trim().isEmpty()) {
-              resPic = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 资源描述
-            if (!arr[4].trim().isEmpty()) {
-              resDes = arr[4].trim();
-            }
-
-            // 解析 资源排序
-            if (!arr[5].trim().isEmpty()) {
-              resSort = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 玩法类型
-            if (!arr[6].trim().isEmpty()) {
-              playType = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 玩法名称（作废）
-            if (!arr[7].trim().isEmpty()) {
-              playName = arr[7].trim();
-            }
-
-            // 解析 推荐星级
-            if (!arr[8].trim().isEmpty()) {
-              playStar = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 跳转
-            if (!arr[9].trim().isEmpty()) {
-              playJump = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 玩法排序
-            if (!arr[10].trim().isEmpty()) {
-              playSort = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 道具类型
-            if (!arr[11].trim().isEmpty()) {
-              itemId = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 道具名称（作废）
-            if (!arr[12].trim().isEmpty()) {
-              itemName = arr[12].trim();
-            }
-
-            // 解析 道具排序
-            if (!arr[13].trim().isEmpty()) {
-              itemSort = Integer.parseInt(arr[13].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("resType"), fileName + ":行" + lineNumber + ":字段 resType");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("resName"), fileName + ":行" + lineNumber + ":字段 resName");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("resPic"), fileName + ":行" + lineNumber + ":字段 resPic");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("resDes"), fileName + ":行" + lineNumber + ":字段 resDes");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("resSort"), fileName + ":行" + lineNumber + ":字段 resSort");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("playType"), fileName + ":行" + lineNumber + ":字段 playType");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("playName"), fileName + ":行" + lineNumber + ":字段 playName");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("playStar"), fileName + ":行" + lineNumber + ":字段 playStar");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("playJump"), fileName + ":行" + lineNumber + ":字段 playJump");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("playSort"), fileName + ":行" + lineNumber + ":字段 playSort");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("itemId"), fileName + ":行" + lineNumber + ":字段 itemId");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("itemName"), fileName + ":行" + lineNumber + ":字段 itemName");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("itemSort"), fileName + ":行" + lineNumber + ":字段 itemSort");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          StrongerConfig config = new StrongerConfig(id, resType, resName, resPic, resDes, resSort, playType, playName, playStar, playJump, playSort, itemId, itemName, itemSort);
-          config.afterLoad();
+          StrongerConfig config = new StrongerConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (StrongerConfig config : configList) config.afterLoad();
+      new StrongerConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -168,38 +112,6 @@ public class StrongerConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<StrongerConfig> getConfigList() {
@@ -212,7 +124,7 @@ public class StrongerConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "stronger.txt";
+      return "stronger.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

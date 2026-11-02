@@ -8,22 +8,22 @@ import ly.ConfigColumnMeta;
 public abstract class HeroAttrRankConfigCheckerBase extends AbstractConfigChecker<HeroAttrRankConfig> {
   @Override
   public String getConfigFileName() {
-    return "heroAttrRank.txt";
+    return "heroAttrRank.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "des", "STRING"),
-        new ConfigColumnMeta(2, "maxHP", "INT"),
-        new ConfigColumnMeta(3, "attack", "INT"),
-        new ConfigColumnMeta(4, "defence", "INT"),
-        new ConfigColumnMeta(5, "speed", "INT"),
-        new ConfigColumnMeta(6, "crit", "INT"),
-        new ConfigColumnMeta(7, "critRatio", "INT"),
-        new ConfigColumnMeta(8, "effectHit", "INT"),
-        new ConfigColumnMeta(9, "effectDodge", "INT"),
-        new ConfigColumnMeta(10, "spCoe", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "des", "string"),
+        new ConfigColumnMeta(2, "maxHP", "int"),
+        new ConfigColumnMeta(3, "attack", "int"),
+        new ConfigColumnMeta(4, "defence", "int"),
+        new ConfigColumnMeta(5, "speed", "int"),
+        new ConfigColumnMeta(6, "crit", "int"),
+        new ConfigColumnMeta(7, "critRatio", "int"),
+        new ConfigColumnMeta(8, "effectHit", "int"),
+        new ConfigColumnMeta(9, "effectDodge", "int"),
+        new ConfigColumnMeta(10, "spCoe", "int"));
   }
 }

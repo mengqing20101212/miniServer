@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class SocietyCleanCityRepairConfigCheckerBase extends AbstractConfigChecker<SocietyCleanCityRepairConfig> {
   @Override
   public String getConfigFileName() {
-    return "societyCleanCityRepair.txt";
+    return "societyCleanCityRepair.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "group", "INT"),
-        new ConfigColumnMeta(2, "payItem", "STRING"),
-        new ConfigColumnMeta(3, "drop", "INT"),
-        new ConfigColumnMeta(4, "desc", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "group", "int"),
+        new ConfigColumnMeta(2, "payItem", "string"),
+        new ConfigColumnMeta(3, "drop", "int"),
+        new ConfigColumnMeta(4, "desc", "string"));
   }
 }

@@ -8,29 +8,29 @@ import ly.ConfigColumnMeta;
 public abstract class CookMaterialConfigCheckerBase extends AbstractConfigChecker<CookMaterialConfig> {
   @Override
   public String getConfigFileName() {
-    return "cookMaterial.txt";
+    return "cookMaterial.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "type", "INT"),
-        new ConfigColumnMeta(3, "classify", "INT"),
-        new ConfigColumnMeta(4, "para", "INT"),
-        new ConfigColumnMeta(5, "star", "INT"),
-        new ConfigColumnMeta(6, "showId", "INT"),
-        new ConfigColumnMeta(7, "price", "INT"),
-        new ConfigColumnMeta(8, "note", "STRING"),
-        new ConfigColumnMeta(9, "rewardId", "INT"),
-        new ConfigColumnMeta(10, "rewardNum", "INT"),
-        new ConfigColumnMeta(11, "friendNum", "INT"),
-        new ConfigColumnMeta(12, "critRewardNum", "INT"),
-        new ConfigColumnMeta(13, "critFriendNum", "INT"),
-        new ConfigColumnMeta(14, "exRewardNum", "INT"),
-        new ConfigColumnMeta(15, "exFriendNum", "INT"),
-        new ConfigColumnMeta(16, "qteRewardNum", "STRING"),
-        new ConfigColumnMeta(17, "qteFriendNum", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "type", "int"),
+        new ConfigColumnMeta(3, "classify", "int"),
+        new ConfigColumnMeta(4, "para", "int"),
+        new ConfigColumnMeta(5, "star", "int"),
+        new ConfigColumnMeta(6, "showId", "int"),
+        new ConfigColumnMeta(7, "price", "int"),
+        new ConfigColumnMeta(8, "note", "string"),
+        new ConfigColumnMeta(9, "rewardId", "int"),
+        new ConfigColumnMeta(10, "rewardNum", "int"),
+        new ConfigColumnMeta(11, "friendNum", "int"),
+        new ConfigColumnMeta(12, "critRewardNum", "int"),
+        new ConfigColumnMeta(13, "critFriendNum", "int"),
+        new ConfigColumnMeta(14, "exRewardNum", "int"),
+        new ConfigColumnMeta(15, "exFriendNum", "int"),
+        new ConfigColumnMeta(16, "qteRewardNum", "string"),
+        new ConfigColumnMeta(17, "qteFriendNum", "string"));
   }
 }

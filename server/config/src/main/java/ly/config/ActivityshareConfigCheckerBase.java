@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityshareConfigCheckerBase extends AbstractConfigChecker<ActivityshareConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityshare.txt";
+    return "activityshare.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "beizhu", "STRING"),
-        new ConfigColumnMeta(2, "share_type", "INT"),
-        new ConfigColumnMeta(3, "drop", "INT"),
-        new ConfigColumnMeta(4, "dropShow", "INT"),
-        new ConfigColumnMeta(5, "name", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "beizhu", "string"),
+        new ConfigColumnMeta(2, "share_type", "int"),
+        new ConfigColumnMeta(3, "drop", "int"),
+        new ConfigColumnMeta(4, "dropShow", "int"),
+        new ConfigColumnMeta(5, "name", "string"));
   }
 }

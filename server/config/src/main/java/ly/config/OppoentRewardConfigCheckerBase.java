@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class OppoentRewardConfigCheckerBase extends AbstractConfigChecker<OppoentRewardConfig> {
   @Override
   public String getConfigFileName() {
-    return "oppoentReward.txt";
+    return "oppoentReward.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "rank", "STRING"),
-        new ConfigColumnMeta(2, "reward", "INT"),
-        new ConfigColumnMeta(3, "rewardShow", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "rank", "string"),
+        new ConfigColumnMeta(2, "reward", "int"),
+        new ConfigColumnMeta(3, "rewardShow", "int"));
   }
 }

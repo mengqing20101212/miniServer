@@ -7,26 +7,21 @@ import ly.utils.KV;
  * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
  */
 public class SkillGroupConfig {
-  /**技能组ID*/
   public final int id;
 
-  /**技能组名称*/
   public final String name;
 
-  /**技能组描述*/
   public final String description;
 
-  /**技能组*/
   public final String skillList;
 
-  /**技能图标*/
-  public final String skillIcon;
+  public final java.util.List<Integer> skillIcon;
 
   // @@@@@自定义属性开始区@@@@@
 
   // @@@@@自定义属性结束区@@@@@
 
-  public SkillGroupConfig(int id, String name, String description, String skillList, String skillIcon) {
+  public SkillGroupConfig(int id, String name, String description, String skillList, java.util.List<Integer> skillIcon) {
     this.id = id;
     this.name = name;
     this.description = description;

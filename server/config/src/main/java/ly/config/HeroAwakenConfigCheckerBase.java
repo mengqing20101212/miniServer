@@ -8,36 +8,36 @@ import ly.ConfigColumnMeta;
 public abstract class HeroAwakenConfigCheckerBase extends AbstractConfigChecker<HeroAwakenConfig> {
   @Override
   public String getConfigFileName() {
-    return "heroAwaken.txt";
+    return "heroAwaken.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "modelName", "INT"),
-        new ConfigColumnMeta(2, "sequence", "INT"),
-        new ConfigColumnMeta(3, "awakenType", "INT"),
-        new ConfigColumnMeta(4, "awakenskill_1", "INT"),
-        new ConfigColumnMeta(5, "awakenskill_2", "INT"),
-        new ConfigColumnMeta(6, "awakenskill_3", "INT"),
-        new ConfigColumnMeta(7, "awakenskill_s1", "INT"),
-        new ConfigColumnMeta(8, "awakenskill_s2", "INT"),
-        new ConfigColumnMeta(9, "moreAwakenSkill1", "INT"),
-        new ConfigColumnMeta(10, "moreAwakenSkill2", "INT"),
-        new ConfigColumnMeta(11, "moreAwakenSkill3", "INT"),
-        new ConfigColumnMeta(12, "attrType", "INT"),
-        new ConfigColumnMeta(13, "attrNum", "INT"),
-        new ConfigColumnMeta(14, "awakenPhase", "STRING"),
-        new ConfigColumnMeta(15, "awakenIcon", "INT"),
-        new ConfigColumnMeta(16, "awakenTitle", "STRING"),
-        new ConfigColumnMeta(17, "awakenAttrDes", "STRING"),
-        new ConfigColumnMeta(18, "awakenItem", "STRING"),
-        new ConfigColumnMeta(19, "awakenCurrencyType", "INT"),
-        new ConfigColumnMeta(20, "awakenCurrencyNum", "INT"),
-        new ConfigColumnMeta(21, "isReset", "INT"),
-        new ConfigColumnMeta(22, "retainItem", "STRING"),
-        new ConfigColumnMeta(23, "currencyType", "INT"),
-        new ConfigColumnMeta(24, "currencyNum", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "modelName", "int"),
+        new ConfigColumnMeta(2, "sequence", "int"),
+        new ConfigColumnMeta(3, "awakenType", "int"),
+        new ConfigColumnMeta(4, "awakenskill_1", "int"),
+        new ConfigColumnMeta(5, "awakenskill_2", "int"),
+        new ConfigColumnMeta(6, "awakenskill_3", "int"),
+        new ConfigColumnMeta(7, "awakenskill_s1", "int"),
+        new ConfigColumnMeta(8, "awakenskill_s2", "int"),
+        new ConfigColumnMeta(9, "moreAwakenSkill1", "int"),
+        new ConfigColumnMeta(10, "moreAwakenSkill2", "int"),
+        new ConfigColumnMeta(11, "moreAwakenSkill3", "int"),
+        new ConfigColumnMeta(12, "attrType", "int"),
+        new ConfigColumnMeta(13, "attrNum", "int"),
+        new ConfigColumnMeta(14, "awakenPhase", "string"),
+        new ConfigColumnMeta(15, "awakenIcon", "int"),
+        new ConfigColumnMeta(16, "awakenTitle", "string"),
+        new ConfigColumnMeta(17, "awakenAttrDes", "string"),
+        new ConfigColumnMeta(18, "awakenItem", "string"),
+        new ConfigColumnMeta(19, "awakenCurrencyType", "int"),
+        new ConfigColumnMeta(20, "awakenCurrencyNum", "int"),
+        new ConfigColumnMeta(21, "isReset", "int"),
+        new ConfigColumnMeta(22, "retainItem", "string"),
+        new ConfigColumnMeta(23, "currencyType", "int"),
+        new ConfigColumnMeta(24, "currencyNum", "int"));
   }
 }

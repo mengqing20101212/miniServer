@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class ShopFreeDicConfigCheckerBase extends AbstractConfigChecker<ShopFreeDicConfig> {
   @Override
   public String getConfigFileName() {
-    return "shopFreeDic.txt";
+    return "shopFreeDic.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "showShopId", "INT"),
-        new ConfigColumnMeta(2, "trueShopId", "INT"),
-        new ConfigColumnMeta(3, "showCommodityId", "INT"),
-        new ConfigColumnMeta(4, "trueCommodityId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "showShopId", "int"),
+        new ConfigColumnMeta(2, "trueShopId", "int"),
+        new ConfigColumnMeta(3, "showCommodityId", "int"),
+        new ConfigColumnMeta(4, "trueCommodityId", "int"));
   }
 }

@@ -8,25 +8,25 @@ import ly.ConfigColumnMeta;
 public abstract class CookMainConfigCheckerBase extends AbstractConfigChecker<CookMainConfig> {
   @Override
   public String getConfigFileName() {
-    return "cookMain.txt";
+    return "cookMain.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "name", "STRING"),
-        new ConfigColumnMeta(3, "icon", "INT"),
-        new ConfigColumnMeta(4, "star", "INT"),
-        new ConfigColumnMeta(5, "recipe", "STRING"),
-        new ConfigColumnMeta(6, "cookSkill", "STRING"),
-        new ConfigColumnMeta(7, "skillExp", "INT"),
-        new ConfigColumnMeta(8, "skillIncrease", "INT"),
-        new ConfigColumnMeta(9, "baseReward", "STRING"),
-        new ConfigColumnMeta(10, "activityId", "INT"),
-        new ConfigColumnMeta(11, "saitamaExp", "INT"),
-        new ConfigColumnMeta(12, "dropId", "INT"),
-        new ConfigColumnMeta(13, "word", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "name", "string"),
+        new ConfigColumnMeta(3, "icon", "int"),
+        new ConfigColumnMeta(4, "star", "int"),
+        new ConfigColumnMeta(5, "recipe", "string"),
+        new ConfigColumnMeta(6, "cookSkill", "string"),
+        new ConfigColumnMeta(7, "skillExp", "int"),
+        new ConfigColumnMeta(8, "skillIncrease", "int"),
+        new ConfigColumnMeta(9, "baseReward", "string"),
+        new ConfigColumnMeta(10, "activityId", "int"),
+        new ConfigColumnMeta(11, "saitamaExp", "int"),
+        new ConfigColumnMeta(12, "dropId", "int"),
+        new ConfigColumnMeta(13, "word", "string"));
   }
 }

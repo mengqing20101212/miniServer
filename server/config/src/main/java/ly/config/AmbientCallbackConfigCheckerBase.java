@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class AmbientCallbackConfigCheckerBase extends AbstractConfigChecker<AmbientCallbackConfig> {
   @Override
   public String getConfigFileName() {
-    return "ambientCallback.txt";
+    return "ambientCallback.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "callback", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "callback", "int"));
   }
 }

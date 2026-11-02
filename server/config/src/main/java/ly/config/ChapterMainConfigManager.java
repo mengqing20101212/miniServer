@@ -27,7 +27,7 @@ public class ChapterMainConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new ChapterMainConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "chapterMain.txt"; }
+  public String getConfigFileName() { return "chapterMain.xml"; }
 
   public static class ChapterMainConfigManagerImpl extends AbstractConfigManger {
     private List<ChapterMainConfig> configList = List.of();
@@ -39,126 +39,70 @@ public class ChapterMainConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ChapterMainConfigChecker checker = new ChapterMainConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ChapterMainConfig> newList = new ArrayList<>();
       Map<Integer, ChapterMainConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 14) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int patterntype = 0;
-          String storyName = null;
-          String chapterShow = null;
-          int unlockLv = 0;
-          int storyId = 0;
-          int nextChapter = 0;
-          int lastChapter = 0;
-          String chapterStage = null;
-          String starReward = null;
-          String rewardShow = null;
-          String unlockWord = null;
-          int background = 0;
-          String introduce = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          int parsedField12 = 0;
+          String parsedField13 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 类型
-            if (!arr[1].trim().isEmpty()) {
-              patterntype = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 名称
-            if (!arr[2].trim().isEmpty()) {
-              storyName = arr[2].trim();
-            }
-
-            // 解析 章节展示
-            if (!arr[3].trim().isEmpty()) {
-              chapterShow = arr[3].trim();
-            }
-
-            // 解析 解锁等级
-            if (!arr[4].trim().isEmpty()) {
-              unlockLv = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 解锁主线
-            if (!arr[5].trim().isEmpty()) {
-              storyId = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 下一章节
-            if (!arr[6].trim().isEmpty()) {
-              nextChapter = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 上一章节
-            if (!arr[7].trim().isEmpty()) {
-              lastChapter = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 关卡
-            if (!arr[8].trim().isEmpty()) {
-              chapterStage = arr[8].trim();
-            }
-
-            // 解析 星级宝箱
-            if (!arr[9].trim().isEmpty()) {
-              starReward = arr[9].trim();
-            }
-
-            // 解析 奖励预览
-            if (!arr[10].trim().isEmpty()) {
-              rewardShow = arr[10].trim();
-            }
-
-            // 解析 未解锁提示
-            if (!arr[11].trim().isEmpty()) {
-              unlockWord = arr[11].trim();
-            }
-
-            // 解析 背景资源
-            if (!arr[12].trim().isEmpty()) {
-              background = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 章节介绍
-            if (!arr[13].trim().isEmpty()) {
-              introduce = arr[13].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("patterntype"), fileName + ":行" + lineNumber + ":字段 patterntype");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("storyName"), fileName + ":行" + lineNumber + ":字段 storyName");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("chapterShow"), fileName + ":行" + lineNumber + ":字段 chapterShow");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("unlockLv"), fileName + ":行" + lineNumber + ":字段 unlockLv");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("storyId"), fileName + ":行" + lineNumber + ":字段 storyId");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("nextChapter"), fileName + ":行" + lineNumber + ":字段 nextChapter");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("lastChapter"), fileName + ":行" + lineNumber + ":字段 lastChapter");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("chapterStage"), fileName + ":行" + lineNumber + ":字段 chapterStage");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("starReward"), fileName + ":行" + lineNumber + ":字段 starReward");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("rewardShow"), fileName + ":行" + lineNumber + ":字段 rewardShow");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("unlockWord"), fileName + ":行" + lineNumber + ":字段 unlockWord");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("background"), fileName + ":行" + lineNumber + ":字段 background");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("introduce"), fileName + ":行" + lineNumber + ":字段 introduce");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ChapterMainConfig config = new ChapterMainConfig(id, patterntype, storyName, chapterShow, unlockLv, storyId, nextChapter, lastChapter, chapterStage, starReward, rewardShow, unlockWord, background, introduce);
-          config.afterLoad();
+          ChapterMainConfig config = new ChapterMainConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ChapterMainConfig config : configList) config.afterLoad();
+      new ChapterMainConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -168,38 +112,6 @@ public class ChapterMainConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ChapterMainConfig> getConfigList() {
@@ -212,7 +124,7 @@ public class ChapterMainConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "chapterMain.txt";
+      return "chapterMain.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

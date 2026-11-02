@@ -27,7 +27,7 @@ public class SaitamaRewardConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new SaitamaRewardConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "saitamaReward.txt"; }
+  public String getConfigFileName() { return "saitamaReward.xml"; }
 
   public static class SaitamaRewardConfigManagerImpl extends AbstractConfigManger {
     private List<SaitamaRewardConfig> configList = List.of();
@@ -39,84 +39,49 @@ public class SaitamaRewardConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       SaitamaRewardConfigChecker checker = new SaitamaRewardConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<SaitamaRewardConfig> newList = new ArrayList<>();
       Map<Integer, SaitamaRewardConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 7) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int from = 0;
-          String name = null;
-          String title = null;
-          int titleRes = 0;
-          int headId = 0;
-          String word = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          String parsedField6 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 来源
-            if (!arr[1].trim().isEmpty()) {
-              from = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 备注
-            if (!arr[2].trim().isEmpty()) {
-              name = arr[2].trim();
-            }
-
-            // 解析 标题
-            if (!arr[3].trim().isEmpty()) {
-              title = arr[3].trim();
-            }
-
-            // 解析 标题资源ID
-            if (!arr[4].trim().isEmpty()) {
-              titleRes = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 资源id
-            if (!arr[5].trim().isEmpty()) {
-              headId = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 描述话语
-            if (!arr[6].trim().isEmpty()) {
-              word = arr[6].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("from"), fileName + ":行" + lineNumber + ":字段 from");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("title"), fileName + ":行" + lineNumber + ":字段 title");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("titleRes"), fileName + ":行" + lineNumber + ":字段 titleRes");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("headId"), fileName + ":行" + lineNumber + ":字段 headId");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("word"), fileName + ":行" + lineNumber + ":字段 word");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          SaitamaRewardConfig config = new SaitamaRewardConfig(id, from, name, title, titleRes, headId, word);
-          config.afterLoad();
+          SaitamaRewardConfig config = new SaitamaRewardConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (SaitamaRewardConfig config : configList) config.afterLoad();
+      new SaitamaRewardConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -126,38 +91,6 @@ public class SaitamaRewardConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<SaitamaRewardConfig> getConfigList() {
@@ -170,7 +103,7 @@ public class SaitamaRewardConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "saitamaReward.txt";
+      return "saitamaReward.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

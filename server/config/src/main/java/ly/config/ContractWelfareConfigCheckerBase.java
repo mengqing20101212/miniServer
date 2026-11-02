@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class ContractWelfareConfigCheckerBase extends AbstractConfigChecker<ContractWelfareConfig> {
   @Override
   public String getConfigFileName() {
-    return "contractWelfare.txt";
+    return "contractWelfare.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "welfareNum", "INT"),
-        new ConfigColumnMeta(2, "welfareDropId", "INT"),
-        new ConfigColumnMeta(3, "welfareShow", "LIST<INT>"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "welfareNum", "int"),
+        new ConfigColumnMeta(2, "welfareDropId", "int"),
+        new ConfigColumnMeta(3, "welfareShow", "list<int>"));
   }
 }

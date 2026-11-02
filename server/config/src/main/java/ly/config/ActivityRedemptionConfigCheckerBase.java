@@ -8,20 +8,20 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityRedemptionConfigCheckerBase extends AbstractConfigChecker<ActivityRedemptionConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityRedemption.txt";
+    return "activityRedemption.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "questType", "INT"),
-        new ConfigColumnMeta(3, "scheDuling", "INT"),
-        new ConfigColumnMeta(4, "exchangeNum", "STRING"),
-        new ConfigColumnMeta(5, "drop", "INT"),
-        new ConfigColumnMeta(6, "dropShow", "INT"),
-        new ConfigColumnMeta(7, "finishMax", "INT"),
-        new ConfigColumnMeta(8, "reset", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "questType", "int"),
+        new ConfigColumnMeta(3, "scheDuling", "int"),
+        new ConfigColumnMeta(4, "exchangeNum", "string"),
+        new ConfigColumnMeta(5, "drop", "int"),
+        new ConfigColumnMeta(6, "dropShow", "int"),
+        new ConfigColumnMeta(7, "finishMax", "int"),
+        new ConfigColumnMeta(8, "reset", "int"));
   }
 }

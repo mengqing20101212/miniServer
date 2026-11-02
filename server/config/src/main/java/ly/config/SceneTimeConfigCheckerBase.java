@@ -8,21 +8,21 @@ import ly.ConfigColumnMeta;
 public abstract class SceneTimeConfigCheckerBase extends AbstractConfigChecker<SceneTimeConfig> {
   @Override
   public String getConfigFileName() {
-    return "sceneTime.txt";
+    return "sceneTime.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "des", "STRING"),
-        new ConfigColumnMeta(2, "reConnectTime", "INT"),
-        new ConfigColumnMeta(3, "offLineTime", "INT"),
-        new ConfigColumnMeta(4, "turnTime", "INT"),
-        new ConfigColumnMeta(5, "playerLoadingTime", "INT"),
-        new ConfigColumnMeta(6, "reConnectTimeMult", "INT"),
-        new ConfigColumnMeta(7, "offLineTimeMult", "INT"),
-        new ConfigColumnMeta(8, "turnTimeMult", "INT"),
-        new ConfigColumnMeta(9, "playerLoadingTimeMult", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "des", "string"),
+        new ConfigColumnMeta(2, "reConnectTime", "int"),
+        new ConfigColumnMeta(3, "offLineTime", "int"),
+        new ConfigColumnMeta(4, "turnTime", "int"),
+        new ConfigColumnMeta(5, "playerLoadingTime", "int"),
+        new ConfigColumnMeta(6, "reConnectTimeMult", "int"),
+        new ConfigColumnMeta(7, "offLineTimeMult", "int"),
+        new ConfigColumnMeta(8, "turnTimeMult", "int"),
+        new ConfigColumnMeta(9, "playerLoadingTimeMult", "int"));
   }
 }

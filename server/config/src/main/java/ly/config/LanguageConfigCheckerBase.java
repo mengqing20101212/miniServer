@@ -8,13 +8,13 @@ import ly.ConfigColumnMeta;
 public abstract class LanguageConfigCheckerBase extends AbstractConfigChecker<LanguageConfig> {
   @Override
   public String getConfigFileName() {
-    return "language.txt";
+    return "language.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "STRING"),
-        new ConfigColumnMeta(1, "chinese", "STRING"));
+        new ConfigColumnMeta(0, "id", "string"),
+        new ConfigColumnMeta(1, "chinese", "string"));
   }
 }

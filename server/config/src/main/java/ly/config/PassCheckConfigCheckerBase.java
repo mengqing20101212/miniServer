@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class PassCheckConfigCheckerBase extends AbstractConfigChecker<PassCheckConfig> {
   @Override
   public String getConfigFileName() {
-    return "passCheck.txt";
+    return "passCheck.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "level", "INT"),
-        new ConfigColumnMeta(2, "cost", "INT"),
-        new ConfigColumnMeta(3, "reward", "STRING"),
-        new ConfigColumnMeta(4, "seniorReward", "STRING"),
-        new ConfigColumnMeta(5, "key", "INT"),
-        new ConfigColumnMeta(6, "levelPrice", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "level", "int"),
+        new ConfigColumnMeta(2, "cost", "int"),
+        new ConfigColumnMeta(3, "reward", "string"),
+        new ConfigColumnMeta(4, "seniorReward", "string"),
+        new ConfigColumnMeta(5, "key", "int"),
+        new ConfigColumnMeta(6, "levelPrice", "int"));
   }
 }

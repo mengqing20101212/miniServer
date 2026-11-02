@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class Lua_id_define1ConfigCheckerBase extends AbstractConfigChecker<Lua_id_define1Config> {
   @Override
   public String getConfigFileName() {
-    return "lua_id_define1.txt";
+    return "lua_id_define1.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "STRING"),
-        new ConfigColumnMeta(1, "desc", "STRING"),
-        new ConfigColumnMeta(2, "resid", "INT"));
+        new ConfigColumnMeta(0, "id", "string"),
+        new ConfigColumnMeta(1, "desc", "string"),
+        new ConfigColumnMeta(2, "resid", "int"));
   }
 }

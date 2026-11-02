@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class ResRecoveryConfigCheckerBase extends AbstractConfigChecker<ResRecoveryConfig> {
   @Override
   public String getConfigFileName() {
-    return "resRecovery.txt";
+    return "resRecovery.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "progress", "INT"),
-        new ConfigColumnMeta(3, "eachReward", "STRING"),
-        new ConfigColumnMeta(4, "attenuationRate", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "progress", "int"),
+        new ConfigColumnMeta(3, "eachReward", "string"),
+        new ConfigColumnMeta(4, "attenuationRate", "int"));
   }
 }

@@ -27,7 +27,7 @@ public class ActivitypassawardConfigManager implements InterfaceConfigManagerPro
   public AbstractConfigManger createTable() { return new ActivitypassawardConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "activitypassaward.txt"; }
+  public String getConfigFileName() { return "activitypassaward.xml"; }
 
   public static class ActivitypassawardConfigManagerImpl extends AbstractConfigManger {
     private List<ActivitypassawardConfig> configList = List.of();
@@ -39,108 +39,61 @@ public class ActivitypassawardConfigManager implements InterfaceConfigManagerPro
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ActivitypassawardConfigChecker checker = new ActivitypassawardConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ActivitypassawardConfig> newList = new ArrayList<>();
       Map<Integer, ActivitypassawardConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 11) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int scheDuling = 0;
-          int level = 0;
-          int payLevel = 0;
-          int rechargeShopId = 0;
-          int score = 0;
-          int freeGift = 0;
-          int freeGiftShow = 0;
-          int payGift = 0;
-          int payGiftShow = 0;
-          int redirectionId = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
           try {
-            // 解析 索引ID
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 活动排期
-            if (!arr[1].trim().isEmpty()) {
-              scheDuling = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 等级
-            if (!arr[2].trim().isEmpty()) {
-              level = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 购买等级所需彩钻
-            if (!arr[3].trim().isEmpty()) {
-              payLevel = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 商品ID
-            if (!arr[4].trim().isEmpty()) {
-              rechargeShopId = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 需要积分
-            if (!arr[5].trim().isEmpty()) {
-              score = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 免费奖励掉落
-            if (!arr[6].trim().isEmpty()) {
-              freeGift = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 免费奖励展示
-            if (!arr[7].trim().isEmpty()) {
-              freeGiftShow = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 付费奖励掉落
-            if (!arr[8].trim().isEmpty()) {
-              payGift = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 付费奖励展示
-            if (!arr[9].trim().isEmpty()) {
-              payGiftShow = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 奖励是否突出显示
-            if (!arr[10].trim().isEmpty()) {
-              redirectionId = Integer.parseInt(arr[10].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("scheDuling"), fileName + ":行" + lineNumber + ":字段 scheDuling");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("level"), fileName + ":行" + lineNumber + ":字段 level");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("payLevel"), fileName + ":行" + lineNumber + ":字段 payLevel");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("rechargeShopId"), fileName + ":行" + lineNumber + ":字段 rechargeShopId");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("score"), fileName + ":行" + lineNumber + ":字段 score");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("freeGift"), fileName + ":行" + lineNumber + ":字段 freeGift");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("freeGiftShow"), fileName + ":行" + lineNumber + ":字段 freeGiftShow");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("payGift"), fileName + ":行" + lineNumber + ":字段 payGift");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("payGiftShow"), fileName + ":行" + lineNumber + ":字段 payGiftShow");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("redirectionId"), fileName + ":行" + lineNumber + ":字段 redirectionId");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ActivitypassawardConfig config = new ActivitypassawardConfig(id, scheDuling, level, payLevel, rechargeShopId, score, freeGift, freeGiftShow, payGift, payGiftShow, redirectionId);
-          config.afterLoad();
+          ActivitypassawardConfig config = new ActivitypassawardConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ActivitypassawardConfig config : configList) config.afterLoad();
+      new ActivitypassawardConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -150,38 +103,6 @@ public class ActivitypassawardConfigManager implements InterfaceConfigManagerPro
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ActivitypassawardConfig> getConfigList() {
@@ -194,7 +115,7 @@ public class ActivitypassawardConfigManager implements InterfaceConfigManagerPro
 
     @Override
     public String getConfigFileName() {
-      return "activitypassaward.txt";
+      return "activitypassaward.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

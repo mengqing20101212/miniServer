@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class CircuitAttrPoolConfigCheckerBase extends AbstractConfigChecker<CircuitAttrPoolConfig> {
   @Override
   public String getConfigFileName() {
-    return "circuitAttrPool.txt";
+    return "circuitAttrPool.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "des", "STRING"),
-        new ConfigColumnMeta(2, "attrList", "STRING"),
-        new ConfigColumnMeta(3, "attrPro", "STRING"),
-        new ConfigColumnMeta(4, "attrRelativePro", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "des", "string"),
+        new ConfigColumnMeta(2, "attrList", "string"),
+        new ConfigColumnMeta(3, "attrPro", "string"),
+        new ConfigColumnMeta(4, "attrRelativePro", "string"));
   }
 }

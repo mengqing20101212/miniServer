@@ -27,7 +27,7 @@ public class ItemConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new ItemConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "item.txt"; }
+  public String getConfigFileName() { return "item.xml"; }
 
   public static class ItemConfigManagerImpl extends AbstractConfigManger {
     private List<ItemConfig> configList = List.of();
@@ -39,192 +39,103 @@ public class ItemConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type24 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ItemConfigChecker checker = new ItemConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ItemConfig> newList = new ArrayList<>();
       Map<Integer, ItemConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 25) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          String description = null;
-          String index = null;
-          int icon = 0;
-          int subIcon = 0;
-          int quality = 0;
-          int type = 0;
-          int bagTag = 0;
-          int school = 0;
-          int grade = 0;
-          int sequence = 0;
-          int stack = 0;
-          int existType = 0;
-          int existTime = 0;
-          int canSell = 0;
-          String sellItem = null;
-          int onlyServer = 0;
-          int knapsackType = 0;
-          String accessWay = null;
-          int useType = 0;
-          int turnId = 0;
-          int newTips = 0;
-          String func = null;
-          int level = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          int parsedField15 = 0;
+          String parsedField16 = null;
+          int parsedField17 = 0;
+          int parsedField18 = 0;
+          String parsedField19 = null;
+          int parsedField20 = 0;
+          int parsedField21 = 0;
+          int parsedField22 = 0;
+          String parsedField23 = null;
+          int parsedField24 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 物品名称
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 物品描述
-            if (!arr[2].trim().isEmpty()) {
-              description = arr[2].trim();
-            }
-
-            // 解析 索引名
-            if (!arr[3].trim().isEmpty()) {
-              index = arr[3].trim();
-            }
-
-            // 解析 物品图标
-            if (!arr[4].trim().isEmpty()) {
-              icon = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 主源核辅助图标
-            if (!arr[5].trim().isEmpty()) {
-              subIcon = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 品质
-            if (!arr[6].trim().isEmpty()) {
-              quality = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 类型
-            if (!arr[7].trim().isEmpty()) {
-              type = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 类型标签
-            if (!arr[8].trim().isEmpty()) {
-              bagTag = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 一级分类
-            if (!arr[9].trim().isEmpty()) {
-              school = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 二级分类
-            if (!arr[10].trim().isEmpty()) {
-              grade = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 三级分类
-            if (!arr[11].trim().isEmpty()) {
-              sequence = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 堆叠数量
-            if (!arr[12].trim().isEmpty()) {
-              stack = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 存在时间类型
-            if (!arr[13].trim().isEmpty()) {
-              existType = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 存在时间
-            if (!arr[14].trim().isEmpty()) {
-              existTime = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 是否能出售
-            if (!arr[15].trim().isEmpty()) {
-              canSell = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 出售获得物品
-            if (!arr[16].trim().isEmpty()) {
-              sellItem = arr[16].trim();
-            }
-
-            // 解析 是否获得后在服务器使用
-            if (!arr[17].trim().isEmpty()) {
-              onlyServer = Integer.parseInt(arr[17].trim());
-            }
-
-            // 解析 在背包中分类
-            if (!arr[18].trim().isEmpty()) {
-              knapsackType = Integer.parseInt(arr[18].trim());
-            }
-
-            // 解析 获取途径
-            if (!arr[19].trim().isEmpty()) {
-              accessWay = arr[19].trim();
-            }
-
-            // 解析 是否可以使用
-            if (!arr[20].trim().isEmpty()) {
-              useType = Integer.parseInt(arr[20].trim());
-            }
-
-            // 解析 使用跳转
-            if (!arr[21].trim().isEmpty()) {
-              turnId = Integer.parseInt(arr[21].trim());
-            }
-
-            // 解析 新物品提示
-            if (!arr[22].trim().isEmpty()) {
-              newTips = Integer.parseInt(arr[22].trim());
-            }
-
-            // 解析 使用触发函数
-            if (!arr[23].trim().isEmpty()) {
-              func = arr[23].trim();
-            }
-
-            // 解析 级别
-            if (!arr[24].trim().isEmpty()) {
-              level = Integer.parseInt(arr[24].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("description"), fileName + ":行" + lineNumber + ":字段 description");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("index"), fileName + ":行" + lineNumber + ":字段 index");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("icon"), fileName + ":行" + lineNumber + ":字段 icon");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("subIcon"), fileName + ":行" + lineNumber + ":字段 subIcon");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("quality"), fileName + ":行" + lineNumber + ":字段 quality");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("type"), fileName + ":行" + lineNumber + ":字段 type");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("bagTag"), fileName + ":行" + lineNumber + ":字段 bagTag");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("school"), fileName + ":行" + lineNumber + ":字段 school");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("grade"), fileName + ":行" + lineNumber + ":字段 grade");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("sequence"), fileName + ":行" + lineNumber + ":字段 sequence");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("stack"), fileName + ":行" + lineNumber + ":字段 stack");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("existType"), fileName + ":行" + lineNumber + ":字段 existType");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("existTime"), fileName + ":行" + lineNumber + ":字段 existTime");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("canSell"), fileName + ":行" + lineNumber + ":字段 canSell");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("sellItem"), fileName + ":行" + lineNumber + ":字段 sellItem");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("onlyServer"), fileName + ":行" + lineNumber + ":字段 onlyServer");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("knapsackType"), fileName + ":行" + lineNumber + ":字段 knapsackType");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("accessWay"), fileName + ":行" + lineNumber + ":字段 accessWay");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("useType"), fileName + ":行" + lineNumber + ":字段 useType");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("turnId"), fileName + ":行" + lineNumber + ":字段 turnId");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("newTips"), fileName + ":行" + lineNumber + ":字段 newTips");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("func"), fileName + ":行" + lineNumber + ":字段 func");
+            parsedField24 = ly.ConfigValues.read(type24, values.get("level"), fileName + ":行" + lineNumber + ":字段 level");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ItemConfig config = new ItemConfig(id, name, description, index, icon, subIcon, quality, type, bagTag, school, grade, sequence, stack, existType, existTime, canSell, sellItem, onlyServer, knapsackType, accessWay, useType, turnId, newTips, func, level);
-          config.afterLoad();
+          ItemConfig config = new ItemConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ItemConfig config : configList) config.afterLoad();
+      new ItemConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -234,38 +145,6 @@ public class ItemConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ItemConfig> getConfigList() {
@@ -278,7 +157,7 @@ public class ItemConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "item.txt";
+      return "item.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

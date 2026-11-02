@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class PeakCompetitionWeeklyTimeConfigCheckerBase extends AbstractConfigChecker<PeakCompetitionWeeklyTimeConfig> {
   @Override
   public String getConfigFileName() {
-    return "peakCompetitionWeeklyTime.txt";
+    return "peakCompetitionWeeklyTime.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "phase", "INT"),
-        new ConfigColumnMeta(2, "weekStartTime", "STRING"),
-        new ConfigColumnMeta(3, "weekEndingTime", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "phase", "int"),
+        new ConfigColumnMeta(2, "weekStartTime", "string"),
+        new ConfigColumnMeta(3, "weekEndingTime", "string"));
   }
 }

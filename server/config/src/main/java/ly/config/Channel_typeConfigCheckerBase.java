@@ -8,25 +8,25 @@ import ly.ConfigColumnMeta;
 public abstract class Channel_typeConfigCheckerBase extends AbstractConfigChecker<Channel_typeConfig> {
   @Override
   public String getConfigFileName() {
-    return "channel_type.txt";
+    return "channel_type.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "spname", "STRING"),
-        new ConfigColumnMeta(2, "spid", "INT"),
-        new ConfigColumnMeta(3, "spcode", "STRING"),
-        new ConfigColumnMeta(4, "spdownloadurl", "STRING"),
-        new ConfigColumnMeta(5, "checkserverip", "STRING"),
-        new ConfigColumnMeta(6, "checkserverport", "INT"),
-        new ConfigColumnMeta(7, "groupid", "INT"),
-        new ConfigColumnMeta(8, "check_login_test_url", "STRING"),
-        new ConfigColumnMeta(9, "check_login_url", "STRING"),
-        new ConfigColumnMeta(10, "login_interface", "STRING"),
-        new ConfigColumnMeta(11, "appid", "STRING"),
-        new ConfigColumnMeta(12, "appsec", "STRING"),
-        new ConfigColumnMeta(13, "isExteral", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "spname", "string"),
+        new ConfigColumnMeta(2, "spid", "int"),
+        new ConfigColumnMeta(3, "spcode", "string"),
+        new ConfigColumnMeta(4, "spdownloadurl", "string"),
+        new ConfigColumnMeta(5, "checkserverip", "string"),
+        new ConfigColumnMeta(6, "checkserverport", "int"),
+        new ConfigColumnMeta(7, "groupid", "int"),
+        new ConfigColumnMeta(8, "check_login_test_url", "string"),
+        new ConfigColumnMeta(9, "check_login_url", "string"),
+        new ConfigColumnMeta(10, "login_interface", "string"),
+        new ConfigColumnMeta(11, "appid", "string"),
+        new ConfigColumnMeta(12, "appsec", "string"),
+        new ConfigColumnMeta(13, "isExteral", "int"));
   }
 }

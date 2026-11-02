@@ -27,7 +27,7 @@ public class PeakCompetitionWeeklyTimeConfigManager implements InterfaceConfigMa
   public AbstractConfigManger createTable() { return new PeakCompetitionWeeklyTimeConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "peakCompetitionWeeklyTime.txt"; }
+  public String getConfigFileName() { return "peakCompetitionWeeklyTime.xml"; }
 
   public static class PeakCompetitionWeeklyTimeConfigManagerImpl extends AbstractConfigManger {
     private List<PeakCompetitionWeeklyTimeConfig> configList = List.of();
@@ -39,66 +39,40 @@ public class PeakCompetitionWeeklyTimeConfigManager implements InterfaceConfigMa
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       PeakCompetitionWeeklyTimeConfigChecker checker = new PeakCompetitionWeeklyTimeConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<PeakCompetitionWeeklyTimeConfig> newList = new ArrayList<>();
       Map<Integer, PeakCompetitionWeeklyTimeConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 4) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int phase = 0;
-          String weekStartTime = null;
-          String weekEndingTime = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          String parsedField3 = null;
           try {
-            // 解析 序号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 期数
-            if (!arr[1].trim().isEmpty()) {
-              phase = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 单周开始时间
-            if (!arr[2].trim().isEmpty()) {
-              weekStartTime = arr[2].trim();
-            }
-
-            // 解析 单周结算时间
-            if (!arr[3].trim().isEmpty()) {
-              weekEndingTime = arr[3].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("phase"), fileName + ":行" + lineNumber + ":字段 phase");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("weekStartTime"), fileName + ":行" + lineNumber + ":字段 weekStartTime");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("weekEndingTime"), fileName + ":行" + lineNumber + ":字段 weekEndingTime");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          PeakCompetitionWeeklyTimeConfig config = new PeakCompetitionWeeklyTimeConfig(id, phase, weekStartTime, weekEndingTime);
-          config.afterLoad();
+          PeakCompetitionWeeklyTimeConfig config = new PeakCompetitionWeeklyTimeConfig(parsedField0, parsedField1, parsedField2, parsedField3);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (PeakCompetitionWeeklyTimeConfig config : configList) config.afterLoad();
+      new PeakCompetitionWeeklyTimeConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -108,38 +82,6 @@ public class PeakCompetitionWeeklyTimeConfigManager implements InterfaceConfigMa
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<PeakCompetitionWeeklyTimeConfig> getConfigList() {
@@ -152,7 +94,7 @@ public class PeakCompetitionWeeklyTimeConfigManager implements InterfaceConfigMa
 
     @Override
     public String getConfigFileName() {
-      return "peakCompetitionWeeklyTime.txt";
+      return "peakCompetitionWeeklyTime.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

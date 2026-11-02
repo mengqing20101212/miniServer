@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class AdvancedTypeConfigCheckerBase extends AbstractConfigChecker<AdvancedTypeConfig> {
   @Override
   public String getConfigFileName() {
-    return "advancedType.txt";
+    return "advancedType.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "stageTypeList", "LIST<INT>"),
-        new ConfigColumnMeta(2, "activityId", "INT"),
-        new ConfigColumnMeta(3, "nameList", "LIST"),
-        new ConfigColumnMeta(4, "iconList", "LIST<INT>"),
-        new ConfigColumnMeta(5, "outlineList", "LIST<INT>"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "stageTypeList", "list<int>"),
+        new ConfigColumnMeta(2, "activityId", "int"),
+        new ConfigColumnMeta(3, "nameList", "string"),
+        new ConfigColumnMeta(4, "iconList", "list<int>"),
+        new ConfigColumnMeta(5, "outlineList", "list<int>"));
   }
 }

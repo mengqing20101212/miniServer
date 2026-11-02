@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class PatrolEventConfigCheckerBase extends AbstractConfigChecker<PatrolEventConfig> {
   @Override
   public String getConfigFileName() {
-    return "patrolEvent.txt";
+    return "patrolEvent.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "itemGroupId", "INT"),
-        new ConfigColumnMeta(2, "eventResult", "INT"),
-        new ConfigColumnMeta(3, "param", "INT"),
-        new ConfigColumnMeta(4, "desc", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "itemGroupId", "int"),
+        new ConfigColumnMeta(2, "eventResult", "int"),
+        new ConfigColumnMeta(3, "param", "int"),
+        new ConfigColumnMeta(4, "desc", "string"));
   }
 }

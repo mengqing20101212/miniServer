@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class ManualLevelConfigCheckerBase extends AbstractConfigChecker<ManualLevelConfig> {
   @Override
   public String getConfigFileName() {
-    return "manualLevel.txt";
+    return "manualLevel.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "nextLv", "INT"),
-        new ConfigColumnMeta(2, "dropShow", "STRING"),
-        new ConfigColumnMeta(3, "drop", "INT"),
-        new ConfigColumnMeta(4, "sign", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "nextLv", "int"),
+        new ConfigColumnMeta(2, "dropShow", "string"),
+        new ConfigColumnMeta(3, "drop", "int"),
+        new ConfigColumnMeta(4, "sign", "int"));
   }
 }

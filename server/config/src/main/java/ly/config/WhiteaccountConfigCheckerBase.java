@@ -8,7 +8,7 @@ import ly.ConfigColumnMeta;
 public abstract class WhiteaccountConfigCheckerBase extends AbstractConfigChecker<WhiteaccountConfig> {
   @Override
   public String getConfigFileName() {
-    return "whiteaccount.txt";
+    return "whiteaccount.xml";
   }
 
   @Override

@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class SupportTeamInfoConfigCheckerBase extends AbstractConfigChecker<SupportTeamInfoConfig> {
   @Override
   public String getConfigFileName() {
-    return "supportTeamInfo.txt";
+    return "supportTeamInfo.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "teamName", "STRING"),
-        new ConfigColumnMeta(2, "teamSkill", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "teamName", "string"),
+        new ConfigColumnMeta(2, "teamSkill", "string"));
   }
 }

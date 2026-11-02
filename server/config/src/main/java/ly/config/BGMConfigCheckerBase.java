@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class BGMConfigCheckerBase extends AbstractConfigChecker<BGMConfig> {
   @Override
   public String getConfigFileName() {
-    return "BGM.txt";
+    return "BGM.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "description", "STRING"),
-        new ConfigColumnMeta(2, "BGMID", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "description", "string"),
+        new ConfigColumnMeta(2, "BGMID", "int"));
   }
 }

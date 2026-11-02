@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class SceneStarConfigCheckerBase extends AbstractConfigChecker<SceneStarConfig> {
   @Override
   public String getConfigFileName() {
-    return "sceneStar.txt";
+    return "sceneStar.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "parax", "INT"),
-        new ConfigColumnMeta(3, "paray", "INT"),
-        new ConfigColumnMeta(4, "description", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "parax", "int"),
+        new ConfigColumnMeta(3, "paray", "int"),
+        new ConfigColumnMeta(4, "description", "string"));
   }
 }

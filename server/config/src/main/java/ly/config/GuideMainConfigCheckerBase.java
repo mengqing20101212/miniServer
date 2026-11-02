@@ -8,25 +8,25 @@ import ly.ConfigColumnMeta;
 public abstract class GuideMainConfigCheckerBase extends AbstractConfigChecker<GuideMainConfig> {
   @Override
   public String getConfigFileName() {
-    return "guideMain.txt";
+    return "guideMain.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "beizhu", "STRING"),
-        new ConfigColumnMeta(2, "checkNext", "INT"),
-        new ConfigColumnMeta(3, "guideCond", "LIST<INT>"),
-        new ConfigColumnMeta(4, "guidePara1", "STRING"),
-        new ConfigColumnMeta(5, "isMask", "INT"),
-        new ConfigColumnMeta(6, "stepList", "LIST<INT>"),
-        new ConfigColumnMeta(7, "keyStep", "INT"),
-        new ConfigColumnMeta(8, "vanishType", "INT"),
-        new ConfigColumnMeta(9, "vanishPara", "LIST<INT>"),
-        new ConfigColumnMeta(10, "canSkip", "INT"),
-        new ConfigColumnMeta(11, "weight", "INT"),
-        new ConfigColumnMeta(12, "isLocal", "INT"),
-        new ConfigColumnMeta(13, "autoTrigger", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "beizhu", "string"),
+        new ConfigColumnMeta(2, "checkNext", "int"),
+        new ConfigColumnMeta(3, "guideCond", "list<int>"),
+        new ConfigColumnMeta(4, "guidePara1", "string"),
+        new ConfigColumnMeta(5, "isMask", "int"),
+        new ConfigColumnMeta(6, "stepList", "list<int>"),
+        new ConfigColumnMeta(7, "keyStep", "int"),
+        new ConfigColumnMeta(8, "vanishType", "int"),
+        new ConfigColumnMeta(9, "vanishPara", "list<int>"),
+        new ConfigColumnMeta(10, "canSkip", "int"),
+        new ConfigColumnMeta(11, "weight", "int"),
+        new ConfigColumnMeta(12, "isLocal", "int"),
+        new ConfigColumnMeta(13, "autoTrigger", "int"));
   }
 }

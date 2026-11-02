@@ -8,24 +8,24 @@ import ly.ConfigColumnMeta;
 public abstract class GuideNoteConfigCheckerBase extends AbstractConfigChecker<GuideNoteConfig> {
   @Override
   public String getConfigFileName() {
-    return "guideNote.txt";
+    return "guideNote.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "guideCond", "LIST<INT>"),
-        new ConfigColumnMeta(2, "guidePara1", "STRING"),
-        new ConfigColumnMeta(3, "linkPart", "STRING"),
-        new ConfigColumnMeta(4, "linkParam", "INT"),
-        new ConfigColumnMeta(5, "uiType", "INT"),
-        new ConfigColumnMeta(6, "linkShift", "STRING"),
-        new ConfigColumnMeta(7, "noticeType", "INT"),
-        new ConfigColumnMeta(8, "word", "STRING"),
-        new ConfigColumnMeta(9, "endType", "LIST<INT>"),
-        new ConfigColumnMeta(10, "endPara", "STRING"),
-        new ConfigColumnMeta(11, "turnId", "INT"),
-        new ConfigColumnMeta(12, "beizhu", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "guideCond", "list<int>"),
+        new ConfigColumnMeta(2, "guidePara1", "string"),
+        new ConfigColumnMeta(3, "linkPart", "string"),
+        new ConfigColumnMeta(4, "linkParam", "int"),
+        new ConfigColumnMeta(5, "uiType", "int"),
+        new ConfigColumnMeta(6, "linkShift", "string"),
+        new ConfigColumnMeta(7, "noticeType", "int"),
+        new ConfigColumnMeta(8, "word", "string"),
+        new ConfigColumnMeta(9, "endType", "list<int>"),
+        new ConfigColumnMeta(10, "endPara", "string"),
+        new ConfigColumnMeta(11, "turnId", "int"),
+        new ConfigColumnMeta(12, "beizhu", "string"));
   }
 }

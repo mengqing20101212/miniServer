@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class DropSelectionConfigCheckerBase extends AbstractConfigChecker<DropSelectionConfig> {
   @Override
   public String getConfigFileName() {
-    return "dropSelection.txt";
+    return "dropSelection.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "nameList", "LIST"),
-        new ConfigColumnMeta(2, "iconList", "LIST"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "nameList", "string"),
+        new ConfigColumnMeta(2, "iconList", "string"));
   }
 }

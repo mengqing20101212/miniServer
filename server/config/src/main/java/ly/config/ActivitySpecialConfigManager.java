@@ -27,7 +27,7 @@ public class ActivitySpecialConfigManager implements InterfaceConfigManagerProxy
   public AbstractConfigManger createTable() { return new ActivitySpecialConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "activitySpecial.txt"; }
+  public String getConfigFileName() { return "activitySpecial.xml"; }
 
   public static class ActivitySpecialConfigManagerImpl extends AbstractConfigManger {
     private List<ActivitySpecialConfig> configList = List.of();
@@ -39,108 +39,61 @@ public class ActivitySpecialConfigManager implements InterfaceConfigManagerProxy
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ActivitySpecialConfigChecker checker = new ActivitySpecialConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ActivitySpecialConfig> newList = new ArrayList<>();
       Map<Integer, ActivitySpecialConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 11) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int scheDuling = 0;
-          String name = null;
-          int heroShowStyleType = 0;
-          int rolePic = 0;
-          String rolePicPosOffset = null;
-          String rolePicScaleOffset = null;
-          int titleResID = 0;
-          int bgPic = 0;
-          int holographic = 0;
-          int trueActivityId = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 活动排期
-            if (!arr[1].trim().isEmpty()) {
-              scheDuling = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 活动说明
-            if (!arr[2].trim().isEmpty()) {
-              name = arr[2].trim();
-            }
-
-            // 解析 英雄显示样式模板
-            if (!arr[3].trim().isEmpty()) {
-              heroShowStyleType = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 角色立绘
-            if (!arr[4].trim().isEmpty()) {
-              rolePic = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 角色立绘坐标偏移
-            if (!arr[5].trim().isEmpty()) {
-              rolePicPosOffset = arr[5].trim();
-            }
-
-            // 解析 角色立绘缩放偏移
-            if (!arr[6].trim().isEmpty()) {
-              rolePicScaleOffset = arr[6].trim();
-            }
-
-            // 解析 活动标题
-            if (!arr[7].trim().isEmpty()) {
-              titleResID = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 背景图
-            if (!arr[8].trim().isEmpty()) {
-              bgPic = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 全息标记
-            if (!arr[9].trim().isEmpty()) {
-              holographic = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 对应的活动id
-            if (!arr[10].trim().isEmpty()) {
-              trueActivityId = Integer.parseInt(arr[10].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("scheDuling"), fileName + ":行" + lineNumber + ":字段 scheDuling");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("heroShowStyleType"), fileName + ":行" + lineNumber + ":字段 heroShowStyleType");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("rolePic"), fileName + ":行" + lineNumber + ":字段 rolePic");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("rolePicPosOffset"), fileName + ":行" + lineNumber + ":字段 rolePicPosOffset");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("rolePicScaleOffset"), fileName + ":行" + lineNumber + ":字段 rolePicScaleOffset");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("titleResID"), fileName + ":行" + lineNumber + ":字段 titleResID");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("bgPic"), fileName + ":行" + lineNumber + ":字段 bgPic");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("holographic"), fileName + ":行" + lineNumber + ":字段 holographic");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("trueActivityId"), fileName + ":行" + lineNumber + ":字段 trueActivityId");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ActivitySpecialConfig config = new ActivitySpecialConfig(id, scheDuling, name, heroShowStyleType, rolePic, rolePicPosOffset, rolePicScaleOffset, titleResID, bgPic, holographic, trueActivityId);
-          config.afterLoad();
+          ActivitySpecialConfig config = new ActivitySpecialConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ActivitySpecialConfig config : configList) config.afterLoad();
+      new ActivitySpecialConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -150,38 +103,6 @@ public class ActivitySpecialConfigManager implements InterfaceConfigManagerProxy
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ActivitySpecialConfig> getConfigList() {
@@ -194,7 +115,7 @@ public class ActivitySpecialConfigManager implements InterfaceConfigManagerProxy
 
     @Override
     public String getConfigFileName() {
-      return "activitySpecial.txt";
+      return "activitySpecial.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

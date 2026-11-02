@@ -27,7 +27,7 @@ public class ManualMain1ConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new ManualMain1ConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "manualMain1.txt"; }
+  public String getConfigFileName() { return "manualMain1.xml"; }
 
   public static class ManualMain1ConfigManagerImpl extends AbstractConfigManger {
     private List<ManualMain1Config> configList = List.of();
@@ -39,156 +39,85 @@ public class ManualMain1ConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ManualMain1ConfigChecker checker = new ManualMain1ConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ManualMain1Config> newList = new ArrayList<>();
       Map<Integer, ManualMain1Config> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 19) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String dailyNum = null;
-          int page = 0;
-          String beizhu = null;
-          String showNum = null;
-          int priority = 0;
-          int questType = 0;
-          int condition = 0;
-          int weight = 0;
-          String rewardShow = null;
-          int drop = 0;
-          int redirectionId = 0;
-          String dailyNum2 = null;
-          String nameIcon = null;
-          String dailyIcon = null;
-          int typeIcon = 0;
-          String lvIndex = null;
-          int lvShow = 0;
-          int chanelId = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          String parsedField9 = null;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          String parsedField12 = null;
+          String parsedField13 = null;
+          String parsedField14 = null;
+          int parsedField15 = 0;
+          String parsedField16 = null;
+          int parsedField17 = 0;
+          int parsedField18 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 任务名称
-            if (!arr[1].trim().isEmpty()) {
-              dailyNum = arr[1].trim();
-            }
-
-            // 解析 所属页签
-            if (!arr[2].trim().isEmpty()) {
-              page = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 备注
-            if (!arr[3].trim().isEmpty()) {
-              beizhu = arr[3].trim();
-            }
-
-            // 解析 任务展示编号
-            if (!arr[4].trim().isEmpty()) {
-              showNum = arr[4].trim();
-            }
-
-            // 解析 展示优先级
-            if (!arr[5].trim().isEmpty()) {
-              priority = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 任务类型
-            if (!arr[6].trim().isEmpty()) {
-              questType = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 内容类型
-            if (!arr[7].trim().isEmpty()) {
-              condition = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 权重
-            if (!arr[8].trim().isEmpty()) {
-              weight = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 奖励展示
-            if (!arr[9].trim().isEmpty()) {
-              rewardShow = arr[9].trim();
-            }
-
-            // 解析 实际掉落
-            if (!arr[10].trim().isEmpty()) {
-              drop = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 跳转
-            if (!arr[11].trim().isEmpty()) {
-              redirectionId = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 主界面显示文本
-            if (!arr[12].trim().isEmpty()) {
-              dailyNum2 = arr[12].trim();
-            }
-
-            // 解析 图标显示名
-            if (!arr[13].trim().isEmpty()) {
-              nameIcon = arr[13].trim();
-            }
-
-            // 解析 功能图标
-            if (!arr[14].trim().isEmpty()) {
-              dailyIcon = arr[14].trim();
-            }
-
-            // 解析 任务是否随机
-            if (!arr[15].trim().isEmpty()) {
-              typeIcon = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 等级索引
-            if (!arr[16].trim().isEmpty()) {
-              lvIndex = arr[16].trim();
-            }
-
-            // 解析 显示等级
-            if (!arr[17].trim().isEmpty()) {
-              lvShow = Integer.parseInt(arr[17].trim());
-            }
-
-            // 解析 渠道ID
-            if (!arr[18].trim().isEmpty()) {
-              chanelId = Integer.parseInt(arr[18].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("dailyNum"), fileName + ":行" + lineNumber + ":字段 dailyNum");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("page"), fileName + ":行" + lineNumber + ":字段 page");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("beizhu"), fileName + ":行" + lineNumber + ":字段 beizhu");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("showNum"), fileName + ":行" + lineNumber + ":字段 showNum");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("priority"), fileName + ":行" + lineNumber + ":字段 priority");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("questType"), fileName + ":行" + lineNumber + ":字段 questType");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("condition"), fileName + ":行" + lineNumber + ":字段 condition");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("weight"), fileName + ":行" + lineNumber + ":字段 weight");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("rewardShow"), fileName + ":行" + lineNumber + ":字段 rewardShow");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("drop"), fileName + ":行" + lineNumber + ":字段 drop");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("redirectionId"), fileName + ":行" + lineNumber + ":字段 redirectionId");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("dailyNum2"), fileName + ":行" + lineNumber + ":字段 dailyNum2");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("nameIcon"), fileName + ":行" + lineNumber + ":字段 nameIcon");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("dailyIcon"), fileName + ":行" + lineNumber + ":字段 dailyIcon");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("typeIcon"), fileName + ":行" + lineNumber + ":字段 typeIcon");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("lvIndex"), fileName + ":行" + lineNumber + ":字段 lvIndex");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("lvShow"), fileName + ":行" + lineNumber + ":字段 lvShow");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("chanelId"), fileName + ":行" + lineNumber + ":字段 chanelId");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ManualMain1Config config = new ManualMain1Config(id, dailyNum, page, beizhu, showNum, priority, questType, condition, weight, rewardShow, drop, redirectionId, dailyNum2, nameIcon, dailyIcon, typeIcon, lvIndex, lvShow, chanelId);
-          config.afterLoad();
+          ManualMain1Config config = new ManualMain1Config(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ManualMain1Config config : configList) config.afterLoad();
+      new ManualMain1ConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -198,38 +127,6 @@ public class ManualMain1ConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ManualMain1Config> getConfigList() {
@@ -242,7 +139,7 @@ public class ManualMain1ConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "manualMain1.txt";
+      return "manualMain1.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -29,7 +29,7 @@ public final class ConfigBundle {
     }
 
     public static void validateName(String name) {
-        if (name == null || !name.matches("[A-Za-z0-9_.-]+\\.txt") || name.contains(".."))
+        if (name == null || !name.matches("[A-Za-z0-9_.-]+\\.xml") || name.contains(".."))
             throw new IllegalArgumentException("非法配置文件名: " + name);
     }
 
@@ -37,7 +37,7 @@ public final class ConfigBundle {
         Map<String, String> files = new TreeMap<>();
         try (var paths = Files.list(directory)) {
             for (Path path : paths.toList())
-                if (Files.isRegularFile(path) && path.toString().endsWith(".txt"))
+                if (Files.isRegularFile(path) && path.toString().endsWith(".xml"))
                     files.put(
                             path.getFileName().toString(),
                             Files.readString(path, StandardCharsets.UTF_8));

@@ -8,12 +8,12 @@ import ly.ConfigColumnMeta;
 public abstract class Filter_wordsConfigCheckerBase extends AbstractConfigChecker<Filter_wordsConfig> {
   @Override
   public String getConfigFileName() {
-    return "filter_words.txt";
+    return "filter_words.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "flag", "INT"));
+        new ConfigColumnMeta(0, "flag", "int"));
   }
 }

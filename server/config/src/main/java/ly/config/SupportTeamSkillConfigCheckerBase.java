@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class SupportTeamSkillConfigCheckerBase extends AbstractConfigChecker<SupportTeamSkillConfig> {
   @Override
   public String getConfigFileName() {
-    return "supportTeamSkill.txt";
+    return "supportTeamSkill.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "teamSkillGroup", "INT"),
-        new ConfigColumnMeta(2, "nextId", "INT"),
-        new ConfigColumnMeta(3, "teamSkillLevel", "INT"),
-        new ConfigColumnMeta(4, "teamSkillId", "INT"),
-        new ConfigColumnMeta(5, "teamItem", "INT"),
-        new ConfigColumnMeta(6, "teamItemNum", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "teamSkillGroup", "int"),
+        new ConfigColumnMeta(2, "nextId", "int"),
+        new ConfigColumnMeta(3, "teamSkillLevel", "int"),
+        new ConfigColumnMeta(4, "teamSkillId", "int"),
+        new ConfigColumnMeta(5, "teamItem", "int"),
+        new ConfigColumnMeta(6, "teamItemNum", "int"));
   }
 }

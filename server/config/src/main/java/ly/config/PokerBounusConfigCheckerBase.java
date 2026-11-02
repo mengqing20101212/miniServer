@@ -8,20 +8,20 @@ import ly.ConfigColumnMeta;
 public abstract class PokerBounusConfigCheckerBase extends AbstractConfigChecker<PokerBounusConfig> {
   @Override
   public String getConfigFileName() {
-    return "pokerBounus.txt";
+    return "pokerBounus.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "type", "INT"),
-        new ConfigColumnMeta(3, "member", "STRING"),
-        new ConfigColumnMeta(4, "para", "INT"),
-        new ConfigColumnMeta(5, "firstClass", "INT"),
-        new ConfigColumnMeta(6, "classRank", "INT"),
-        new ConfigColumnMeta(7, "score", "INT"),
-        new ConfigColumnMeta(8, "hintType", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "type", "int"),
+        new ConfigColumnMeta(3, "member", "string"),
+        new ConfigColumnMeta(4, "para", "int"),
+        new ConfigColumnMeta(5, "firstClass", "int"),
+        new ConfigColumnMeta(6, "classRank", "int"),
+        new ConfigColumnMeta(7, "score", "int"),
+        new ConfigColumnMeta(8, "hintType", "int"));
   }
 }

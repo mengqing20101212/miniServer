@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class ShardExchangeConfigCheckerBase extends AbstractConfigChecker<ShardExchangeConfig> {
   @Override
   public String getConfigFileName() {
-    return "shardExchange.txt";
+    return "shardExchange.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "reward", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "reward", "string"));
   }
 }

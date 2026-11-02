@@ -8,13 +8,13 @@ import ly.ConfigColumnMeta;
 public abstract class Random_headFrameConfigCheckerBase extends AbstractConfigChecker<Random_headFrameConfig> {
   @Override
   public String getConfigFileName() {
-    return "random_headFrame.txt";
+    return "random_headFrame.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "value", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "value", "string"));
   }
 }

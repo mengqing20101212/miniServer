@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class DropInclinationConfigCheckerBase extends AbstractConfigChecker<DropInclinationConfig> {
   @Override
   public String getConfigFileName() {
-    return "dropInclination.txt";
+    return "dropInclination.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "changeId", "INT"),
-        new ConfigColumnMeta(2, "inclination", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "changeId", "int"),
+        new ConfigColumnMeta(2, "inclination", "int"));
   }
 }

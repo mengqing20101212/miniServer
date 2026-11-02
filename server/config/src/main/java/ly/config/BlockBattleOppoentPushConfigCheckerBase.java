@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class BlockBattleOppoentPushConfigCheckerBase extends AbstractConfigChecker<BlockBattleOppoentPushConfig> {
   @Override
   public String getConfigFileName() {
-    return "blockBattleOppoentPush.txt";
+    return "blockBattleOppoentPush.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "grade", "STRING"),
-        new ConfigColumnMeta(2, "levelOpponent", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "grade", "string"),
+        new ConfigColumnMeta(2, "levelOpponent", "int"));
   }
 }

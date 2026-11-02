@@ -27,7 +27,7 @@ public class HeroCharacteristicConfigManager implements InterfaceConfigManagerPr
   public AbstractConfigManger createTable() { return new HeroCharacteristicConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "heroCharacteristic.txt"; }
+  public String getConfigFileName() { return "heroCharacteristic.xml"; }
 
   public static class HeroCharacteristicConfigManagerImpl extends AbstractConfigManger {
     private List<HeroCharacteristicConfig> configList = List.of();
@@ -39,126 +39,70 @@ public class HeroCharacteristicConfigManager implements InterfaceConfigManagerPr
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("list<int>");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       HeroCharacteristicConfigChecker checker = new HeroCharacteristicConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<HeroCharacteristicConfig> newList = new ArrayList<>();
       Map<Integer, HeroCharacteristicConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 14) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String beizhu = null;
-          int heroId = 0;
-          int skillGroup = 0;
-          String heroFetters = null;
-          int advanced = 0;
-          String quality = null;
-          String qualityNum = null;
-          String heroType = null;
-          String heroTypeNum = null;
-          int characterType = 0;
-          int characterNum = 0;
-          String activationDes = null;
-          String des = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          java.util.List<Integer> parsedField4 = null;
+          int parsedField5 = 0;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          String parsedField12 = null;
+          String parsedField13 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 备注
-            if (!arr[1].trim().isEmpty()) {
-              beizhu = arr[1].trim();
-            }
-
-            // 解析 角色ID
-            if (!arr[2].trim().isEmpty()) {
-              heroId = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 技能组
-            if (!arr[3].trim().isEmpty()) {
-              skillGroup = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 羁绊角色
-            if (!arr[4].trim().isEmpty()) {
-              heroFetters = arr[4].trim();
-            }
-
-            // 解析 星级
-            if (!arr[5].trim().isEmpty()) {
-              advanced = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 品质
-            if (!arr[6].trim().isEmpty()) {
-              quality = arr[6].trim();
-            }
-
-            // 解析 数量
-            if (!arr[7].trim().isEmpty()) {
-              qualityNum = arr[7].trim();
-            }
-
-            // 解析 类型
-            if (!arr[8].trim().isEmpty()) {
-              heroType = arr[8].trim();
-            }
-
-            // 解析 数量
-            if (!arr[9].trim().isEmpty()) {
-              heroTypeNum = arr[9].trim();
-            }
-
-            // 解析 角色类别
-            if (!arr[10].trim().isEmpty()) {
-              characterType = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 角色类别数量
-            if (!arr[11].trim().isEmpty()) {
-              characterNum = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 激活需求
-            if (!arr[12].trim().isEmpty()) {
-              activationDes = arr[12].trim();
-            }
-
-            // 解析 技能描述
-            if (!arr[13].trim().isEmpty()) {
-              des = arr[13].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("beizhu"), fileName + ":行" + lineNumber + ":字段 beizhu");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("heroId"), fileName + ":行" + lineNumber + ":字段 heroId");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("skillGroup"), fileName + ":行" + lineNumber + ":字段 skillGroup");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("heroFetters"), fileName + ":行" + lineNumber + ":字段 heroFetters");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("advanced"), fileName + ":行" + lineNumber + ":字段 advanced");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("quality"), fileName + ":行" + lineNumber + ":字段 quality");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("qualityNum"), fileName + ":行" + lineNumber + ":字段 qualityNum");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("heroType"), fileName + ":行" + lineNumber + ":字段 heroType");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("heroTypeNum"), fileName + ":行" + lineNumber + ":字段 heroTypeNum");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("characterType"), fileName + ":行" + lineNumber + ":字段 characterType");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("characterNum"), fileName + ":行" + lineNumber + ":字段 characterNum");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("activationDes"), fileName + ":行" + lineNumber + ":字段 activationDes");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("des"), fileName + ":行" + lineNumber + ":字段 des");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          HeroCharacteristicConfig config = new HeroCharacteristicConfig(id, beizhu, heroId, skillGroup, heroFetters, advanced, quality, qualityNum, heroType, heroTypeNum, characterType, characterNum, activationDes, des);
-          config.afterLoad();
+          HeroCharacteristicConfig config = new HeroCharacteristicConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (HeroCharacteristicConfig config : configList) config.afterLoad();
+      new HeroCharacteristicConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -168,38 +112,6 @@ public class HeroCharacteristicConfigManager implements InterfaceConfigManagerPr
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<HeroCharacteristicConfig> getConfigList() {
@@ -212,7 +124,7 @@ public class HeroCharacteristicConfigManager implements InterfaceConfigManagerPr
 
     @Override
     public String getConfigFileName() {
-      return "heroCharacteristic.txt";
+      return "heroCharacteristic.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

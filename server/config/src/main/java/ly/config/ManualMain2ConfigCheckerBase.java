@@ -8,27 +8,27 @@ import ly.ConfigColumnMeta;
 public abstract class ManualMain2ConfigCheckerBase extends AbstractConfigChecker<ManualMain2Config> {
   @Override
   public String getConfigFileName() {
-    return "manualMain2.txt";
+    return "manualMain2.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "dailyNum", "STRING"),
-        new ConfigColumnMeta(2, "page", "INT"),
-        new ConfigColumnMeta(3, "showNum", "STRING"),
-        new ConfigColumnMeta(4, "priority", "INT"),
-        new ConfigColumnMeta(5, "questType", "INT"),
-        new ConfigColumnMeta(6, "condition", "INT"),
-        new ConfigColumnMeta(7, "weight", "INT"),
-        new ConfigColumnMeta(8, "rewardShow", "STRING"),
-        new ConfigColumnMeta(9, "drop", "INT"),
-        new ConfigColumnMeta(10, "redirectionId", "INT"),
-        new ConfigColumnMeta(11, "dailyNum2", "STRING"),
-        new ConfigColumnMeta(12, "nameIcon", "STRING"),
-        new ConfigColumnMeta(13, "dailyIcon", "STRING"),
-        new ConfigColumnMeta(14, "typeIcon", "INT"),
-        new ConfigColumnMeta(15, "lvShow", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "dailyNum", "string"),
+        new ConfigColumnMeta(2, "page", "int"),
+        new ConfigColumnMeta(3, "showNum", "string"),
+        new ConfigColumnMeta(4, "priority", "int"),
+        new ConfigColumnMeta(5, "questType", "int"),
+        new ConfigColumnMeta(6, "condition", "int"),
+        new ConfigColumnMeta(7, "weight", "int"),
+        new ConfigColumnMeta(8, "rewardShow", "string"),
+        new ConfigColumnMeta(9, "drop", "int"),
+        new ConfigColumnMeta(10, "redirectionId", "int"),
+        new ConfigColumnMeta(11, "dailyNum2", "string"),
+        new ConfigColumnMeta(12, "nameIcon", "string"),
+        new ConfigColumnMeta(13, "dailyIcon", "string"),
+        new ConfigColumnMeta(14, "typeIcon", "int"),
+        new ConfigColumnMeta(15, "lvShow", "int"));
   }
 }

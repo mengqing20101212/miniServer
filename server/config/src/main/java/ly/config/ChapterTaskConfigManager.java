@@ -27,7 +27,7 @@ public class ChapterTaskConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new ChapterTaskConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "chapterTask.txt"; }
+  public String getConfigFileName() { return "chapterTask.xml"; }
 
   public static class ChapterTaskConfigManagerImpl extends AbstractConfigManger {
     private List<ChapterTaskConfig> configList = List.of();
@@ -39,120 +39,67 @@ public class ChapterTaskConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ChapterTaskConfigChecker checker = new ChapterTaskConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ChapterTaskConfig> newList = new ArrayList<>();
       Map<Integer, ChapterTaskConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 13) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int chapterMainId = 0;
-          int missionId1 = 0;
-          String des1 = null;
-          int redirectionId1 = 0;
-          int missionId2 = 0;
-          String des2 = null;
-          int redirectionId2 = 0;
-          int missionId3 = 0;
-          String des3 = null;
-          int redirectionId3 = 0;
-          int drop = 0;
-          int dropShow = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          String parsedField3 = null;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          String parsedField6 = null;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          String parsedField9 = null;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 章节ID
-            if (!arr[1].trim().isEmpty()) {
-              chapterMainId = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 任务ID
-            if (!arr[2].trim().isEmpty()) {
-              missionId1 = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 描述1
-            if (!arr[3].trim().isEmpty()) {
-              des1 = arr[3].trim();
-            }
-
-            // 解析 跳转
-            if (!arr[4].trim().isEmpty()) {
-              redirectionId1 = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 任务ID
-            if (!arr[5].trim().isEmpty()) {
-              missionId2 = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 描述2
-            if (!arr[6].trim().isEmpty()) {
-              des2 = arr[6].trim();
-            }
-
-            // 解析 跳转
-            if (!arr[7].trim().isEmpty()) {
-              redirectionId2 = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 任务ID
-            if (!arr[8].trim().isEmpty()) {
-              missionId3 = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 描述2
-            if (!arr[9].trim().isEmpty()) {
-              des3 = arr[9].trim();
-            }
-
-            // 解析 跳转
-            if (!arr[10].trim().isEmpty()) {
-              redirectionId3 = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 奖励
-            if (!arr[11].trim().isEmpty()) {
-              drop = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 奖励预览
-            if (!arr[12].trim().isEmpty()) {
-              dropShow = Integer.parseInt(arr[12].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("chapterMainId"), fileName + ":行" + lineNumber + ":字段 chapterMainId");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("missionId1"), fileName + ":行" + lineNumber + ":字段 missionId1");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("des1"), fileName + ":行" + lineNumber + ":字段 des1");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("redirectionId1"), fileName + ":行" + lineNumber + ":字段 redirectionId1");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("missionId2"), fileName + ":行" + lineNumber + ":字段 missionId2");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("des2"), fileName + ":行" + lineNumber + ":字段 des2");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("redirectionId2"), fileName + ":行" + lineNumber + ":字段 redirectionId2");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("missionId3"), fileName + ":行" + lineNumber + ":字段 missionId3");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("des3"), fileName + ":行" + lineNumber + ":字段 des3");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("redirectionId3"), fileName + ":行" + lineNumber + ":字段 redirectionId3");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("drop"), fileName + ":行" + lineNumber + ":字段 drop");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("dropShow"), fileName + ":行" + lineNumber + ":字段 dropShow");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ChapterTaskConfig config = new ChapterTaskConfig(id, chapterMainId, missionId1, des1, redirectionId1, missionId2, des2, redirectionId2, missionId3, des3, redirectionId3, drop, dropShow);
-          config.afterLoad();
+          ChapterTaskConfig config = new ChapterTaskConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ChapterTaskConfig config : configList) config.afterLoad();
+      new ChapterTaskConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -162,38 +109,6 @@ public class ChapterTaskConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ChapterTaskConfig> getConfigList() {
@@ -206,7 +121,7 @@ public class ChapterTaskConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "chapterTask.txt";
+      return "chapterTask.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

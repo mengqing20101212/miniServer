@@ -8,20 +8,20 @@ import ly.ConfigColumnMeta;
 public abstract class ActivitylimitedConfigCheckerBase extends AbstractConfigChecker<ActivitylimitedConfig> {
   @Override
   public String getConfigFileName() {
-    return "activitylimited.txt";
+    return "activitylimited.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "sidebar", "STRING"),
-        new ConfigColumnMeta(2, "presetsId", "INT"),
-        new ConfigColumnMeta(3, "picture1", "STRING"),
-        new ConfigColumnMeta(4, "picture2", "STRING"),
-        new ConfigColumnMeta(5, "mustBuy1", "STRING"),
-        new ConfigColumnMeta(6, "mustBuy2", "STRING"),
-        new ConfigColumnMeta(7, "discountResID", "STRING"),
-        new ConfigColumnMeta(8, "titleResID", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "sidebar", "string"),
+        new ConfigColumnMeta(2, "presetsId", "int"),
+        new ConfigColumnMeta(3, "picture1", "string"),
+        new ConfigColumnMeta(4, "picture2", "string"),
+        new ConfigColumnMeta(5, "mustBuy1", "string"),
+        new ConfigColumnMeta(6, "mustBuy2", "string"),
+        new ConfigColumnMeta(7, "discountResID", "string"),
+        new ConfigColumnMeta(8, "titleResID", "int"));
   }
 }

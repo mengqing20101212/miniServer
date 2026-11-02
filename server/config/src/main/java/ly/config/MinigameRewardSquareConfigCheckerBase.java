@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class MinigameRewardSquareConfigCheckerBase extends AbstractConfigChecker<MinigameRewardSquareConfig> {
   @Override
   public String getConfigFileName() {
-    return "minigameRewardSquare.txt";
+    return "minigameRewardSquare.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "rankShow", "STRING"),
-        new ConfigColumnMeta(2, "hpScore", "STRING"),
-        new ConfigColumnMeta(3, "timeScore", "STRING"),
-        new ConfigColumnMeta(4, "dropId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "rankShow", "string"),
+        new ConfigColumnMeta(2, "hpScore", "string"),
+        new ConfigColumnMeta(3, "timeScore", "string"),
+        new ConfigColumnMeta(4, "dropId", "int"));
   }
 }

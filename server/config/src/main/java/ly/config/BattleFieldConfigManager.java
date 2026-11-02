@@ -27,7 +27,7 @@ public class BattleFieldConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new BattleFieldConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "battleField.txt"; }
+  public String getConfigFileName() { return "battleField.xml"; }
 
   public static class BattleFieldConfigManagerImpl extends AbstractConfigManger {
     private List<BattleFieldConfig> configList = List.of();
@@ -39,138 +39,76 @@ public class BattleFieldConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       BattleFieldConfigChecker checker = new BattleFieldConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<BattleFieldConfig> newList = new ArrayList<>();
       Map<Integer, BattleFieldConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 16) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String posListRed = null;
-          String posListBlue = null;
-          String frontAllRed = null;
-          String frontAllBlue = null;
-          String BFCenterRed = null;
-          String BFCenterBlue = null;
-          String BFCenter = null;
-          String cameraListRed = null;
-          String cameraListBlue = null;
-          String posListRedSummon = null;
-          String posListBlueSummon = null;
-          String sceneConfig = null;
-          String sceneConfigEnemy = null;
-          int lineupType = 0;
-          int lineupTypeEnemy = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          String parsedField12 = null;
+          String parsedField13 = null;
+          int parsedField14 = 0;
+          int parsedField15 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 我方点位List
-            if (!arr[1].trim().isEmpty()) {
-              posListRed = arr[1].trim();
-            }
-
-            // 解析 敌方点位List
-            if (!arr[2].trim().isEmpty()) {
-              posListBlue = arr[2].trim();
-            }
-
-            // 解析 我方全体前
-            if (!arr[3].trim().isEmpty()) {
-              frontAllRed = arr[3].trim();
-            }
-
-            // 解析 敌方全体前
-            if (!arr[4].trim().isEmpty()) {
-              frontAllBlue = arr[4].trim();
-            }
-
-            // 解析 我方战场中心
-            if (!arr[5].trim().isEmpty()) {
-              BFCenterRed = arr[5].trim();
-            }
-
-            // 解析 敌方战场中心
-            if (!arr[6].trim().isEmpty()) {
-              BFCenterBlue = arr[6].trim();
-            }
-
-            // 解析 战场中心
-            if (!arr[7].trim().isEmpty()) {
-              BFCenter = arr[7].trim();
-            }
-
-            // 解析 选择目标镜头list我方
-            if (!arr[8].trim().isEmpty()) {
-              cameraListRed = arr[8].trim();
-            }
-
-            // 解析 选择目标镜头list敌方
-            if (!arr[9].trim().isEmpty()) {
-              cameraListBlue = arr[9].trim();
-            }
-
-            // 解析 我方点位List
-            if (!arr[10].trim().isEmpty()) {
-              posListRedSummon = arr[10].trim();
-            }
-
-            // 解析 敌方点位List
-            if (!arr[11].trim().isEmpty()) {
-              posListBlueSummon = arr[11].trim();
-            }
-
-            // 解析 场景镜头配置
-            if (!arr[12].trim().isEmpty()) {
-              sceneConfig = arr[12].trim();
-            }
-
-            // 解析 场景配置敌方
-            if (!arr[13].trim().isEmpty()) {
-              sceneConfigEnemy = arr[13].trim();
-            }
-
-            // 解析 我方站位连线类型
-            if (!arr[14].trim().isEmpty()) {
-              lineupType = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 敌方站位连线类型
-            if (!arr[15].trim().isEmpty()) {
-              lineupTypeEnemy = Integer.parseInt(arr[15].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("posListRed"), fileName + ":行" + lineNumber + ":字段 posListRed");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("posListBlue"), fileName + ":行" + lineNumber + ":字段 posListBlue");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("frontAllRed"), fileName + ":行" + lineNumber + ":字段 frontAllRed");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("frontAllBlue"), fileName + ":行" + lineNumber + ":字段 frontAllBlue");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("BFCenterRed"), fileName + ":行" + lineNumber + ":字段 BFCenterRed");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("BFCenterBlue"), fileName + ":行" + lineNumber + ":字段 BFCenterBlue");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("BFCenter"), fileName + ":行" + lineNumber + ":字段 BFCenter");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("cameraListRed"), fileName + ":行" + lineNumber + ":字段 cameraListRed");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("cameraListBlue"), fileName + ":行" + lineNumber + ":字段 cameraListBlue");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("posListRedSummon"), fileName + ":行" + lineNumber + ":字段 posListRedSummon");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("posListBlueSummon"), fileName + ":行" + lineNumber + ":字段 posListBlueSummon");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("sceneConfig"), fileName + ":行" + lineNumber + ":字段 sceneConfig");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("sceneConfigEnemy"), fileName + ":行" + lineNumber + ":字段 sceneConfigEnemy");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("lineupType"), fileName + ":行" + lineNumber + ":字段 lineupType");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("lineupTypeEnemy"), fileName + ":行" + lineNumber + ":字段 lineupTypeEnemy");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          BattleFieldConfig config = new BattleFieldConfig(id, posListRed, posListBlue, frontAllRed, frontAllBlue, BFCenterRed, BFCenterBlue, BFCenter, cameraListRed, cameraListBlue, posListRedSummon, posListBlueSummon, sceneConfig, sceneConfigEnemy, lineupType, lineupTypeEnemy);
-          config.afterLoad();
+          BattleFieldConfig config = new BattleFieldConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (BattleFieldConfig config : configList) config.afterLoad();
+      new BattleFieldConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -180,38 +118,6 @@ public class BattleFieldConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<BattleFieldConfig> getConfigList() {
@@ -224,7 +130,7 @@ public class BattleFieldConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "battleField.txt";
+      return "battleField.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

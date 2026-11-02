@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class SaitameWordConfigCheckerBase extends AbstractConfigChecker<SaitameWordConfig> {
   @Override
   public String getConfigFileName() {
-    return "saitameWord.txt";
+    return "saitameWord.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "group", "INT"),
-        new ConfigColumnMeta(2, "talker", "INT"),
-        new ConfigColumnMeta(3, "word", "STRING"),
-        new ConfigColumnMeta(4, "coordinate", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "group", "int"),
+        new ConfigColumnMeta(2, "talker", "int"),
+        new ConfigColumnMeta(3, "word", "string"),
+        new ConfigColumnMeta(4, "coordinate", "string"));
   }
 }

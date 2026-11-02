@@ -8,23 +8,23 @@ import ly.ConfigColumnMeta;
 public abstract class HeroStarConfigCheckerBase extends AbstractConfigChecker<HeroStarConfig> {
   @Override
   public String getConfigFileName() {
-    return "heroStar.txt";
+    return "heroStar.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "star", "INT"),
-        new ConfigColumnMeta(1, "modelId", "INT"),
-        new ConfigColumnMeta(2, "maxLevel", "INT"),
-        new ConfigColumnMeta(3, "awakenLevel", "INT"),
-        new ConfigColumnMeta(4, "starItem", "STRING"),
-        new ConfigColumnMeta(5, "starItem2", "STRING"),
-        new ConfigColumnMeta(6, "retainItem", "STRING"),
-        new ConfigColumnMeta(7, "currencyType", "INT"),
-        new ConfigColumnMeta(8, "currencyNum", "STRING"),
-        new ConfigColumnMeta(9, "item", "STRING"),
-        new ConfigColumnMeta(10, "circuitSlot", "STRING"),
-        new ConfigColumnMeta(11, "followAwaken", "INT"));
+        new ConfigColumnMeta(0, "star", "int"),
+        new ConfigColumnMeta(1, "modelId", "int"),
+        new ConfigColumnMeta(2, "maxLevel", "int"),
+        new ConfigColumnMeta(3, "awakenLevel", "int"),
+        new ConfigColumnMeta(4, "starItem", "string"),
+        new ConfigColumnMeta(5, "starItem2", "string"),
+        new ConfigColumnMeta(6, "retainItem", "string"),
+        new ConfigColumnMeta(7, "currencyType", "int"),
+        new ConfigColumnMeta(8, "currencyNum", "string"),
+        new ConfigColumnMeta(9, "item", "string"),
+        new ConfigColumnMeta(10, "circuitSlot", "string"),
+        new ConfigColumnMeta(11, "followAwaken", "int"));
   }
 }

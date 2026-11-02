@@ -27,7 +27,7 @@ public class CircuitUpgradeExpConfigManager implements InterfaceConfigManagerPro
   public AbstractConfigManger createTable() { return new CircuitUpgradeExpConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "circuitUpgradeExp.txt"; }
+  public String getConfigFileName() { return "circuitUpgradeExp.xml"; }
 
   public static class CircuitUpgradeExpConfigManagerImpl extends AbstractConfigManger {
     private List<CircuitUpgradeExpConfig> configList = List.of();
@@ -37,81 +37,46 @@ public class CircuitUpgradeExpConfigManager implements InterfaceConfigManagerPro
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       CircuitUpgradeExpConfigChecker checker = new CircuitUpgradeExpConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<CircuitUpgradeExpConfig> newList = new ArrayList<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 7) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int upgradeType = 0;
-          int level = 0;
-          int exp = 0;
-          int eatExp = 0;
-          int consumeGold = 0;
-          int newSubAttrProb = 0;
-          int upgrageGold = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
           try {
-            // 解析 模板种类
-            if (!arr[0].trim().isEmpty()) {
-              upgradeType = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 等级
-            if (!arr[1].trim().isEmpty()) {
-              level = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 经验
-            if (!arr[2].trim().isEmpty()) {
-              exp = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 吞吃经验
-            if (!arr[3].trim().isEmpty()) {
-              eatExp = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 吞吃消耗钞票
-            if (!arr[4].trim().isEmpty()) {
-              consumeGold = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 新副属性概率
-            if (!arr[5].trim().isEmpty()) {
-              newSubAttrProb = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 升级消耗钞票
-            if (!arr[6].trim().isEmpty()) {
-              upgrageGold = Integer.parseInt(arr[6].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("upgradeType"), fileName + ":行" + lineNumber + ":字段 upgradeType");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("level"), fileName + ":行" + lineNumber + ":字段 level");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("exp"), fileName + ":行" + lineNumber + ":字段 exp");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("eatExp"), fileName + ":行" + lineNumber + ":字段 eatExp");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("consumeGold"), fileName + ":行" + lineNumber + ":字段 consumeGold");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("newSubAttrProb"), fileName + ":行" + lineNumber + ":字段 newSubAttrProb");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("upgrageGold"), fileName + ":行" + lineNumber + ":字段 upgrageGold");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          CircuitUpgradeExpConfig config = new CircuitUpgradeExpConfig(upgradeType, level, exp, eatExp, consumeGold, newSubAttrProb, upgrageGold);
-          config.afterLoad();
+          CircuitUpgradeExpConfig config = new CircuitUpgradeExpConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6);
           newList.add(config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+      });
+      configList = List.copyOf(newList);
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (CircuitUpgradeExpConfig config : configList) config.afterLoad();
+      new CircuitUpgradeExpConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -122,45 +87,13 @@ public class CircuitUpgradeExpConfigManager implements InterfaceConfigManagerPro
       // @@@@@自定义clear方法结束区@@@@@
     }
 
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
-    }
-
     public List<CircuitUpgradeExpConfig> getConfigList() {
       return configList;
     }
 
     @Override
     public String getConfigFileName() {
-      return "circuitUpgradeExp.txt";
+      return "circuitUpgradeExp.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

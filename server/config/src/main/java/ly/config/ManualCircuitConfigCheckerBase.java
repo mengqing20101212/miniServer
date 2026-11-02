@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class ManualCircuitConfigCheckerBase extends AbstractConfigChecker<ManualCircuitConfig> {
   @Override
   public String getConfigFileName() {
-    return "manualCircuit.txt";
+    return "manualCircuit.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "taskId", "INT"),
-        new ConfigColumnMeta(2, "front", "STRING"),
-        new ConfigColumnMeta(3, "oriPos", "LIST<INT>"),
-        new ConfigColumnMeta(4, "type", "LIST<INT>"),
-        new ConfigColumnMeta(5, "redirectionIdDes", "STRING"),
-        new ConfigColumnMeta(6, "redirectionId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "taskId", "int"),
+        new ConfigColumnMeta(2, "front", "string"),
+        new ConfigColumnMeta(3, "oriPos", "list<int>"),
+        new ConfigColumnMeta(4, "type", "list<int>"),
+        new ConfigColumnMeta(5, "redirectionIdDes", "string"),
+        new ConfigColumnMeta(6, "redirectionId", "int"));
   }
 }

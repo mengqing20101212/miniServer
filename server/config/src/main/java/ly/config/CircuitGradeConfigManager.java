@@ -27,7 +27,7 @@ public class CircuitGradeConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new CircuitGradeConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "circuitGrade.txt"; }
+  public String getConfigFileName() { return "circuitGrade.xml"; }
 
   public static class CircuitGradeConfigManagerImpl extends AbstractConfigManger {
     private List<CircuitGradeConfig> configList = List.of();
@@ -39,150 +39,82 @@ public class CircuitGradeConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       CircuitGradeConfigChecker checker = new CircuitGradeConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<CircuitGradeConfig> newList = new ArrayList<>();
       Map<Integer, CircuitGradeConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 18) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String description = null;
-          int quality = 0;
-          int lv1 = 0;
-          int lv2 = 0;
-          int lv3 = 0;
-          int lv4 = 0;
-          int lv5 = 0;
-          int lv6 = 0;
-          int lv7 = 0;
-          int lv8 = 0;
-          int lv9 = 0;
-          int lv10 = 0;
-          int lv11 = 0;
-          int lv12 = 0;
-          int lv13 = 0;
-          int lv14 = 0;
-          int lv15 = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          int parsedField15 = 0;
+          int parsedField16 = 0;
+          int parsedField17 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 回路描述
-            if (!arr[1].trim().isEmpty()) {
-              description = arr[1].trim();
-            }
-
-            // 解析 品质
-            if (!arr[2].trim().isEmpty()) {
-              quality = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 等级1评分
-            if (!arr[3].trim().isEmpty()) {
-              lv1 = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 等级2评分
-            if (!arr[4].trim().isEmpty()) {
-              lv2 = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 等级3评分
-            if (!arr[5].trim().isEmpty()) {
-              lv3 = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 等级4评分
-            if (!arr[6].trim().isEmpty()) {
-              lv4 = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 等级5评分
-            if (!arr[7].trim().isEmpty()) {
-              lv5 = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 等级6评分
-            if (!arr[8].trim().isEmpty()) {
-              lv6 = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 等级7评分
-            if (!arr[9].trim().isEmpty()) {
-              lv7 = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 等级8评分
-            if (!arr[10].trim().isEmpty()) {
-              lv8 = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 等级9评分
-            if (!arr[11].trim().isEmpty()) {
-              lv9 = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 等级10评分
-            if (!arr[12].trim().isEmpty()) {
-              lv10 = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 等级11评分
-            if (!arr[13].trim().isEmpty()) {
-              lv11 = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 等级12评分
-            if (!arr[14].trim().isEmpty()) {
-              lv12 = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 等级13评分
-            if (!arr[15].trim().isEmpty()) {
-              lv13 = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 等级14评分
-            if (!arr[16].trim().isEmpty()) {
-              lv14 = Integer.parseInt(arr[16].trim());
-            }
-
-            // 解析 等级15评分
-            if (!arr[17].trim().isEmpty()) {
-              lv15 = Integer.parseInt(arr[17].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("description"), fileName + ":行" + lineNumber + ":字段 description");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("quality"), fileName + ":行" + lineNumber + ":字段 quality");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("lv1"), fileName + ":行" + lineNumber + ":字段 lv1");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("lv2"), fileName + ":行" + lineNumber + ":字段 lv2");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("lv3"), fileName + ":行" + lineNumber + ":字段 lv3");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("lv4"), fileName + ":行" + lineNumber + ":字段 lv4");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("lv5"), fileName + ":行" + lineNumber + ":字段 lv5");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("lv6"), fileName + ":行" + lineNumber + ":字段 lv6");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("lv7"), fileName + ":行" + lineNumber + ":字段 lv7");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("lv8"), fileName + ":行" + lineNumber + ":字段 lv8");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("lv9"), fileName + ":行" + lineNumber + ":字段 lv9");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("lv10"), fileName + ":行" + lineNumber + ":字段 lv10");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("lv11"), fileName + ":行" + lineNumber + ":字段 lv11");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("lv12"), fileName + ":行" + lineNumber + ":字段 lv12");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("lv13"), fileName + ":行" + lineNumber + ":字段 lv13");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("lv14"), fileName + ":行" + lineNumber + ":字段 lv14");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("lv15"), fileName + ":行" + lineNumber + ":字段 lv15");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          CircuitGradeConfig config = new CircuitGradeConfig(id, description, quality, lv1, lv2, lv3, lv4, lv5, lv6, lv7, lv8, lv9, lv10, lv11, lv12, lv13, lv14, lv15);
-          config.afterLoad();
+          CircuitGradeConfig config = new CircuitGradeConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (CircuitGradeConfig config : configList) config.afterLoad();
+      new CircuitGradeConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -192,38 +124,6 @@ public class CircuitGradeConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<CircuitGradeConfig> getConfigList() {
@@ -236,7 +136,7 @@ public class CircuitGradeConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "circuitGrade.txt";
+      return "circuitGrade.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

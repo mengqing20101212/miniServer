@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class ShardActivityControlConfigCheckerBase extends AbstractConfigChecker<ShardActivityControlConfig> {
   @Override
   public String getConfigFileName() {
-    return "shardActivityControl.txt";
+    return "shardActivityControl.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "scene", "INT"),
-        new ConfigColumnMeta(2, "url", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "scene", "int"),
+        new ConfigColumnMeta(2, "url", "string"));
   }
 }

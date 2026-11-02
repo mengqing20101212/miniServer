@@ -27,7 +27,7 @@ public class SaitamaLevelConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new SaitamaLevelConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "saitamaLevel.txt"; }
+  public String getConfigFileName() { return "saitamaLevel.xml"; }
 
   public static class SaitamaLevelConfigManagerImpl extends AbstractConfigManger {
     private List<SaitamaLevelConfig> configList = List.of();
@@ -39,150 +39,82 @@ public class SaitamaLevelConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       SaitamaLevelConfigChecker checker = new SaitamaLevelConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<SaitamaLevelConfig> newList = new ArrayList<>();
       Map<Integer, SaitamaLevelConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 18) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int nextLv = 0;
-          int dailyGift = 0;
-          int dailyGiftShow = 0;
-          int giftTimes = 0;
-          int summonLevel = 0;
-          int exdropLevel = 0;
-          int cookStar = 0;
-          int cookmixPara = 0;
-          int cookCritical = 0;
-          int cookSlot = 0;
-          int overflowMax = 0;
-          int conversionRate = 0;
-          int eggRewardTimes = 0;
-          int trianningRewardLv = 0;
-          String infoList = null;
-          String upgradeInfo = null;
-          int headIcon = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          String parsedField15 = null;
+          String parsedField16 = null;
+          int parsedField17 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 到下一级经验
-            if (!arr[1].trim().isEmpty()) {
-              nextLv = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 每日好感度礼包
-            if (!arr[2].trim().isEmpty()) {
-              dailyGift = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 每日好感度礼包展示
-            if (!arr[3].trim().isEmpty()) {
-              dailyGiftShow = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 每日好感度礼包领取次数
-            if (!arr[4].trim().isEmpty()) {
-              giftTimes = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 埼玉卡片等级
-            if (!arr[5].trim().isEmpty()) {
-              summonLevel = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 加成id
-            if (!arr[6].trim().isEmpty()) {
-              exdropLevel = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 料理星级
-            if (!arr[7].trim().isEmpty()) {
-              cookStar = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 料理合成加成系数
-            if (!arr[8].trim().isEmpty()) {
-              cookmixPara = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 料理暴击概率（%）
-            if (!arr[9].trim().isEmpty()) {
-              cookCritical = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 料理解锁栏位数
-            if (!arr[10].trim().isEmpty()) {
-              cookSlot = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 体力储存池上限
-            if (!arr[11].trim().isEmpty()) {
-              overflowMax = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 体力溢出转换率(%)
-            if (!arr[12].trim().isEmpty()) {
-              conversionRate = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 每日彩蛋领取奖励最大次数
-            if (!arr[13].trim().isEmpty()) {
-              eggRewardTimes = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 锻炼奖励等级
-            if (!arr[14].trim().isEmpty()) {
-              trianningRewardLv = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 信息列表
-            if (!arr[15].trim().isEmpty()) {
-              infoList = arr[15].trim();
-            }
-
-            // 解析 升级信息预告列表
-            if (!arr[16].trim().isEmpty()) {
-              upgradeInfo = arr[16].trim();
-            }
-
-            // 解析 好感度入口头像
-            if (!arr[17].trim().isEmpty()) {
-              headIcon = Integer.parseInt(arr[17].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("nextLv"), fileName + ":行" + lineNumber + ":字段 nextLv");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("dailyGift"), fileName + ":行" + lineNumber + ":字段 dailyGift");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("dailyGiftShow"), fileName + ":行" + lineNumber + ":字段 dailyGiftShow");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("giftTimes"), fileName + ":行" + lineNumber + ":字段 giftTimes");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("summonLevel"), fileName + ":行" + lineNumber + ":字段 summonLevel");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("exdropLevel"), fileName + ":行" + lineNumber + ":字段 exdropLevel");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("cookStar"), fileName + ":行" + lineNumber + ":字段 cookStar");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("cookmixPara"), fileName + ":行" + lineNumber + ":字段 cookmixPara");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("cookCritical"), fileName + ":行" + lineNumber + ":字段 cookCritical");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("cookSlot"), fileName + ":行" + lineNumber + ":字段 cookSlot");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("overflowMax"), fileName + ":行" + lineNumber + ":字段 overflowMax");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("conversionRate"), fileName + ":行" + lineNumber + ":字段 conversionRate");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("eggRewardTimes"), fileName + ":行" + lineNumber + ":字段 eggRewardTimes");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("trianningRewardLv"), fileName + ":行" + lineNumber + ":字段 trianningRewardLv");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("infoList"), fileName + ":行" + lineNumber + ":字段 infoList");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("upgradeInfo"), fileName + ":行" + lineNumber + ":字段 upgradeInfo");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("headIcon"), fileName + ":行" + lineNumber + ":字段 headIcon");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          SaitamaLevelConfig config = new SaitamaLevelConfig(id, nextLv, dailyGift, dailyGiftShow, giftTimes, summonLevel, exdropLevel, cookStar, cookmixPara, cookCritical, cookSlot, overflowMax, conversionRate, eggRewardTimes, trianningRewardLv, infoList, upgradeInfo, headIcon);
-          config.afterLoad();
+          SaitamaLevelConfig config = new SaitamaLevelConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (SaitamaLevelConfig config : configList) config.afterLoad();
+      new SaitamaLevelConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -192,38 +124,6 @@ public class SaitamaLevelConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<SaitamaLevelConfig> getConfigList() {
@@ -236,7 +136,7 @@ public class SaitamaLevelConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "saitamaLevel.txt";
+      return "saitamaLevel.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

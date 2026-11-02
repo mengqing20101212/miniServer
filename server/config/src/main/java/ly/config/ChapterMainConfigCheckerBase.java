@@ -8,25 +8,25 @@ import ly.ConfigColumnMeta;
 public abstract class ChapterMainConfigCheckerBase extends AbstractConfigChecker<ChapterMainConfig> {
   @Override
   public String getConfigFileName() {
-    return "chapterMain.txt";
+    return "chapterMain.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "patterntype", "INT"),
-        new ConfigColumnMeta(2, "storyName", "STRING"),
-        new ConfigColumnMeta(3, "chapterShow", "STRING"),
-        new ConfigColumnMeta(4, "unlockLv", "INT"),
-        new ConfigColumnMeta(5, "storyId", "INT"),
-        new ConfigColumnMeta(6, "nextChapter", "INT"),
-        new ConfigColumnMeta(7, "lastChapter", "INT"),
-        new ConfigColumnMeta(8, "chapterStage", "STRING"),
-        new ConfigColumnMeta(9, "starReward", "STRING"),
-        new ConfigColumnMeta(10, "rewardShow", "STRING"),
-        new ConfigColumnMeta(11, "unlockWord", "STRING"),
-        new ConfigColumnMeta(12, "background", "INT"),
-        new ConfigColumnMeta(13, "introduce", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "patterntype", "int"),
+        new ConfigColumnMeta(2, "storyName", "string"),
+        new ConfigColumnMeta(3, "chapterShow", "string"),
+        new ConfigColumnMeta(4, "unlockLv", "int"),
+        new ConfigColumnMeta(5, "storyId", "int"),
+        new ConfigColumnMeta(6, "nextChapter", "int"),
+        new ConfigColumnMeta(7, "lastChapter", "int"),
+        new ConfigColumnMeta(8, "chapterStage", "string"),
+        new ConfigColumnMeta(9, "starReward", "string"),
+        new ConfigColumnMeta(10, "rewardShow", "string"),
+        new ConfigColumnMeta(11, "unlockWord", "string"),
+        new ConfigColumnMeta(12, "background", "int"),
+        new ConfigColumnMeta(13, "introduce", "string"));
   }
 }

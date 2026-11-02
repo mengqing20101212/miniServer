@@ -27,7 +27,7 @@ public class AdvancedStageConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new AdvancedStageConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "advancedStage.txt"; }
+  public String getConfigFileName() { return "advancedStage.xml"; }
 
   public static class AdvancedStageConfigManagerImpl extends AbstractConfigManger {
     private List<AdvancedStageConfig> configList = List.of();
@@ -39,342 +39,178 @@ public class AdvancedStageConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type24 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type25 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type26 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type27 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type28 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type29 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type30 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type31 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type32 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type33 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type34 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type35 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type36 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type37 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type38 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type39 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type40 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type41 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type42 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type43 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type44 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type45 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type46 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type47 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type48 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type49 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       AdvancedStageConfigChecker checker = new AdvancedStageConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<AdvancedStageConfig> newList = new ArrayList<>();
       Map<Integer, AdvancedStageConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 50) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int stageType = 0;
-          int floor = 0;
-          int cost = 0;
-          int advance = 0;
-          int sceneId = 0;
-          int dropSelection = 0;
-          String dropList = null;
-          String upIcon = null;
-          String dropGroup = null;
-          String name = null;
-          String lockTips = null;
-          int preStage = 0;
-          int nextStage = 0;
-          int needLv = 0;
-          int bossHead = 0;
-          String model = null;
-          String action = null;
-          String word = null;
-          String decorate1 = null;
-          String decorate2 = null;
-          String decorate3 = null;
-          String bossId = null;
-          String scaling = null;
-          String offset = null;
-          String offsetX = null;
-          String offsetAngle = null;
-          String showType = null;
-          String selectionDis = null;
-          String trigger = null;
-          int spineModelResId = 0;
-          int spineScale = 0;
-          String spinePosOffset = null;
-          String spineAnimation = null;
-          String dropExpect = null;
-          int recommendLv = 0;
-          int recommendtype = 0;
-          String recommendhero = null;
-          String battleTipText = null;
-          int selectionType = 0;
-          int rankType = 0;
-          int activityControlId = 0;
-          String webDes = null;
-          String dropExpectAdd = null;
-          int recommendHero1 = 0;
-          int recommendHero2 = 0;
-          int iconType = 0;
-          int noticeIcon = 0;
-          int firstDropExpect = 0;
-          int decorate2Background = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          String parsedField7 = null;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          int parsedField15 = 0;
+          String parsedField16 = null;
+          String parsedField17 = null;
+          String parsedField18 = null;
+          String parsedField19 = null;
+          String parsedField20 = null;
+          String parsedField21 = null;
+          String parsedField22 = null;
+          String parsedField23 = null;
+          String parsedField24 = null;
+          String parsedField25 = null;
+          String parsedField26 = null;
+          String parsedField27 = null;
+          String parsedField28 = null;
+          String parsedField29 = null;
+          int parsedField30 = 0;
+          int parsedField31 = 0;
+          String parsedField32 = null;
+          String parsedField33 = null;
+          String parsedField34 = null;
+          int parsedField35 = 0;
+          int parsedField36 = 0;
+          String parsedField37 = null;
+          String parsedField38 = null;
+          int parsedField39 = 0;
+          int parsedField40 = 0;
+          int parsedField41 = 0;
+          String parsedField42 = null;
+          String parsedField43 = null;
+          int parsedField44 = 0;
+          int parsedField45 = 0;
+          int parsedField46 = 0;
+          int parsedField47 = 0;
+          int parsedField48 = 0;
+          int parsedField49 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 关卡类型
-            if (!arr[1].trim().isEmpty()) {
-              stageType = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 层数
-            if (!arr[2].trim().isEmpty()) {
-              floor = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 体力消耗
-            if (!arr[3].trim().isEmpty()) {
-              cost = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 预支体力消耗
-            if (!arr[4].trim().isEmpty()) {
-              advance = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 关卡id
-            if (!arr[5].trim().isEmpty()) {
-              sceneId = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 倾向选择
-            if (!arr[6].trim().isEmpty()) {
-              dropSelection = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 掉落预览
-            if (!arr[7].trim().isEmpty()) {
-              dropList = arr[7].trim();
-            }
-
-            // 解析 是否有up图标
-            if (!arr[8].trim().isEmpty()) {
-              upIcon = arr[8].trim();
-            }
-
-            // 解析 关卡掉落
-            if (!arr[9].trim().isEmpty()) {
-              dropGroup = arr[9].trim();
-            }
-
-            // 解析 名称
-            if (!arr[10].trim().isEmpty()) {
-              name = arr[10].trim();
-            }
-
-            // 解析 解锁提示
-            if (!arr[11].trim().isEmpty()) {
-              lockTips = arr[11].trim();
-            }
-
-            // 解析 前置章节
-            if (!arr[12].trim().isEmpty()) {
-              preStage = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 后置章节
-            if (!arr[13].trim().isEmpty()) {
-              nextStage = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 解锁等级
-            if (!arr[14].trim().isEmpty()) {
-              needLv = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 boss头像
-            if (!arr[15].trim().isEmpty()) {
-              bossHead = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 形象人物模型
-            if (!arr[16].trim().isEmpty()) {
-              model = arr[16].trim();
-            }
-
-            // 解析 形象人物动作
-            if (!arr[17].trim().isEmpty()) {
-              action = arr[17].trim();
-            }
-
-            // 解析 形象人物对话
-            if (!arr[18].trim().isEmpty()) {
-              word = arr[18].trim();
-            }
-
-            // 解析 中心装饰参数1
-            if (!arr[19].trim().isEmpty()) {
-              decorate1 = arr[19].trim();
-            }
-
-            // 解析 中心装饰参数2
-            if (!arr[20].trim().isEmpty()) {
-              decorate2 = arr[20].trim();
-            }
-
-            // 解析 中心装饰参数3
-            if (!arr[21].trim().isEmpty()) {
-              decorate3 = arr[21].trim();
-            }
-
-            // 解析 bossID
-            if (!arr[22].trim().isEmpty()) {
-              bossId = arr[22].trim();
-            }
-
-            // 解析 缩放比例
-            if (!arr[23].trim().isEmpty()) {
-              scaling = arr[23].trim();
-            }
-
-            // 解析 Y轴偏移位置
-            if (!arr[24].trim().isEmpty()) {
-              offset = arr[24].trim();
-            }
-
-            // 解析 X轴偏移位置
-            if (!arr[25].trim().isEmpty()) {
-              offsetX = arr[25].trim();
-            }
-
-            // 解析 偏移角度
-            if (!arr[26].trim().isEmpty()) {
-              offsetAngle = arr[26].trim();
-            }
-
-            // 解析 是否特殊展示动作
-            if (!arr[27].trim().isEmpty()) {
-              showType = arr[27].trim();
-            }
-
-            // 解析 掉落倾向描述
-            if (!arr[28].trim().isEmpty()) {
-              selectionDis = arr[28].trim();
-            }
-
-            // 解析 突发事件触发概率
-            if (!arr[29].trim().isEmpty()) {
-              trigger = arr[29].trim();
-            }
-
-            // 解析 spine显示模型预设资源Id
-            if (!arr[30].trim().isEmpty()) {
-              spineModelResId = Integer.parseInt(arr[30].trim());
-            }
-
-            // 解析 缩放比例
-            if (!arr[31].trim().isEmpty()) {
-              spineScale = Integer.parseInt(arr[31].trim());
-            }
-
-            // 解析 位置偏移(x,y)
-            if (!arr[32].trim().isEmpty()) {
-              spinePosOffset = arr[32].trim();
-            }
-
-            // 解析 spine动画
-            if (!arr[33].trim().isEmpty()) {
-              spineAnimation = arr[33].trim();
-            }
-
-            // 解析 期望掉落数量
-            if (!arr[34].trim().isEmpty()) {
-              dropExpect = arr[34].trim();
-            }
-
-            // 解析 推荐等级
-            if (!arr[35].trim().isEmpty()) {
-              recommendLv = Integer.parseInt(arr[35].trim());
-            }
-
-            // 解析 推荐类型
-            if (!arr[36].trim().isEmpty()) {
-              recommendtype = Integer.parseInt(arr[36].trim());
-            }
-
-            // 解析 推荐英雄
-            if (!arr[37].trim().isEmpty()) {
-              recommendhero = arr[37].trim();
-            }
-
-            // 解析 战斗提示
-            if (!arr[38].trim().isEmpty()) {
-              battleTipText = arr[38].trim();
-            }
-
-            // 解析 倾向类型
-            if (!arr[39].trim().isEmpty()) {
-              selectionType = Integer.parseInt(arr[39].trim());
-            }
-
-            // 解析 排行榜枚举
-            if (!arr[40].trim().isEmpty()) {
-              rankType = Integer.parseInt(arr[40].trim());
-            }
-
-            // 解析 对应功能ID
-            if (!arr[41].trim().isEmpty()) {
-              activityControlId = Integer.parseInt(arr[41].trim());
-            }
-
-            // 解析 GM平台描述
-            if (!arr[42].trim().isEmpty()) {
-              webDes = arr[42].trim();
-            }
-
-            // 解析 期望掉落效率提升值
-            if (!arr[43].trim().isEmpty()) {
-              dropExpectAdd = arr[43].trim();
-            }
-
-            // 解析 推荐英雄1
-            if (!arr[44].trim().isEmpty()) {
-              recommendHero1 = Integer.parseInt(arr[44].trim());
-            }
-
-            // 解析 推荐英雄2
-            if (!arr[45].trim().isEmpty()) {
-              recommendHero2 = Integer.parseInt(arr[45].trim());
-            }
-
-            // 解析 图标类型
-            if (!arr[46].trim().isEmpty()) {
-              iconType = Integer.parseInt(arr[46].trim());
-            }
-
-            // 解析 获取提示图标
-            if (!arr[47].trim().isEmpty()) {
-              noticeIcon = Integer.parseInt(arr[47].trim());
-            }
-
-            // 解析 首通期望掉落数量
-            if (!arr[48].trim().isEmpty()) {
-              firstDropExpect = Integer.parseInt(arr[48].trim());
-            }
-
-            // 解析 英雄试炼角色背景
-            if (!arr[49].trim().isEmpty()) {
-              decorate2Background = Integer.parseInt(arr[49].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("stageType"), fileName + ":行" + lineNumber + ":字段 stageType");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("floor"), fileName + ":行" + lineNumber + ":字段 floor");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("cost"), fileName + ":行" + lineNumber + ":字段 cost");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("advance"), fileName + ":行" + lineNumber + ":字段 advance");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("sceneId"), fileName + ":行" + lineNumber + ":字段 sceneId");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("dropSelection"), fileName + ":行" + lineNumber + ":字段 dropSelection");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("dropList"), fileName + ":行" + lineNumber + ":字段 dropList");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("upIcon"), fileName + ":行" + lineNumber + ":字段 upIcon");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("dropGroup"), fileName + ":行" + lineNumber + ":字段 dropGroup");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("lockTips"), fileName + ":行" + lineNumber + ":字段 lockTips");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("preStage"), fileName + ":行" + lineNumber + ":字段 preStage");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("nextStage"), fileName + ":行" + lineNumber + ":字段 nextStage");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("needLv"), fileName + ":行" + lineNumber + ":字段 needLv");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("bossHead"), fileName + ":行" + lineNumber + ":字段 bossHead");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("model"), fileName + ":行" + lineNumber + ":字段 model");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("action"), fileName + ":行" + lineNumber + ":字段 action");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("word"), fileName + ":行" + lineNumber + ":字段 word");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("decorate1"), fileName + ":行" + lineNumber + ":字段 decorate1");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("decorate2"), fileName + ":行" + lineNumber + ":字段 decorate2");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("decorate3"), fileName + ":行" + lineNumber + ":字段 decorate3");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("bossId"), fileName + ":行" + lineNumber + ":字段 bossId");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("scaling"), fileName + ":行" + lineNumber + ":字段 scaling");
+            parsedField24 = ly.ConfigValues.read(type24, values.get("offset"), fileName + ":行" + lineNumber + ":字段 offset");
+            parsedField25 = ly.ConfigValues.read(type25, values.get("offsetX"), fileName + ":行" + lineNumber + ":字段 offsetX");
+            parsedField26 = ly.ConfigValues.read(type26, values.get("offsetAngle"), fileName + ":行" + lineNumber + ":字段 offsetAngle");
+            parsedField27 = ly.ConfigValues.read(type27, values.get("showType"), fileName + ":行" + lineNumber + ":字段 showType");
+            parsedField28 = ly.ConfigValues.read(type28, values.get("selectionDis"), fileName + ":行" + lineNumber + ":字段 selectionDis");
+            parsedField29 = ly.ConfigValues.read(type29, values.get("trigger"), fileName + ":行" + lineNumber + ":字段 trigger");
+            parsedField30 = ly.ConfigValues.read(type30, values.get("spineModelResId"), fileName + ":行" + lineNumber + ":字段 spineModelResId");
+            parsedField31 = ly.ConfigValues.read(type31, values.get("spineScale"), fileName + ":行" + lineNumber + ":字段 spineScale");
+            parsedField32 = ly.ConfigValues.read(type32, values.get("spinePosOffset"), fileName + ":行" + lineNumber + ":字段 spinePosOffset");
+            parsedField33 = ly.ConfigValues.read(type33, values.get("spineAnimation"), fileName + ":行" + lineNumber + ":字段 spineAnimation");
+            parsedField34 = ly.ConfigValues.read(type34, values.get("dropExpect"), fileName + ":行" + lineNumber + ":字段 dropExpect");
+            parsedField35 = ly.ConfigValues.read(type35, values.get("recommendLv"), fileName + ":行" + lineNumber + ":字段 recommendLv");
+            parsedField36 = ly.ConfigValues.read(type36, values.get("recommendtype"), fileName + ":行" + lineNumber + ":字段 recommendtype");
+            parsedField37 = ly.ConfigValues.read(type37, values.get("recommendhero"), fileName + ":行" + lineNumber + ":字段 recommendhero");
+            parsedField38 = ly.ConfigValues.read(type38, values.get("battleTipText"), fileName + ":行" + lineNumber + ":字段 battleTipText");
+            parsedField39 = ly.ConfigValues.read(type39, values.get("selectionType"), fileName + ":行" + lineNumber + ":字段 selectionType");
+            parsedField40 = ly.ConfigValues.read(type40, values.get("rankType"), fileName + ":行" + lineNumber + ":字段 rankType");
+            parsedField41 = ly.ConfigValues.read(type41, values.get("activityControlId"), fileName + ":行" + lineNumber + ":字段 activityControlId");
+            parsedField42 = ly.ConfigValues.read(type42, values.get("webDes"), fileName + ":行" + lineNumber + ":字段 webDes");
+            parsedField43 = ly.ConfigValues.read(type43, values.get("dropExpectAdd"), fileName + ":行" + lineNumber + ":字段 dropExpectAdd");
+            parsedField44 = ly.ConfigValues.read(type44, values.get("recommendHero1"), fileName + ":行" + lineNumber + ":字段 recommendHero1");
+            parsedField45 = ly.ConfigValues.read(type45, values.get("recommendHero2"), fileName + ":行" + lineNumber + ":字段 recommendHero2");
+            parsedField46 = ly.ConfigValues.read(type46, values.get("iconType"), fileName + ":行" + lineNumber + ":字段 iconType");
+            parsedField47 = ly.ConfigValues.read(type47, values.get("noticeIcon"), fileName + ":行" + lineNumber + ":字段 noticeIcon");
+            parsedField48 = ly.ConfigValues.read(type48, values.get("firstDropExpect"), fileName + ":行" + lineNumber + ":字段 firstDropExpect");
+            parsedField49 = ly.ConfigValues.read(type49, values.get("decorate2Background"), fileName + ":行" + lineNumber + ":字段 decorate2Background");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          AdvancedStageConfig config = new AdvancedStageConfig(id, stageType, floor, cost, advance, sceneId, dropSelection, dropList, upIcon, dropGroup, name, lockTips, preStage, nextStage, needLv, bossHead, model, action, word, decorate1, decorate2, decorate3, bossId, scaling, offset, offsetX, offsetAngle, showType, selectionDis, trigger, spineModelResId, spineScale, spinePosOffset, spineAnimation, dropExpect, recommendLv, recommendtype, recommendhero, battleTipText, selectionType, rankType, activityControlId, webDes, dropExpectAdd, recommendHero1, recommendHero2, iconType, noticeIcon, firstDropExpect, decorate2Background);
-          config.afterLoad();
+          AdvancedStageConfig config = new AdvancedStageConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24, parsedField25, parsedField26, parsedField27, parsedField28, parsedField29, parsedField30, parsedField31, parsedField32, parsedField33, parsedField34, parsedField35, parsedField36, parsedField37, parsedField38, parsedField39, parsedField40, parsedField41, parsedField42, parsedField43, parsedField44, parsedField45, parsedField46, parsedField47, parsedField48, parsedField49);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (AdvancedStageConfig config : configList) config.afterLoad();
+      new AdvancedStageConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -384,38 +220,6 @@ public class AdvancedStageConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<AdvancedStageConfig> getConfigList() {
@@ -428,7 +232,7 @@ public class AdvancedStageConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "advancedStage.txt";
+      return "advancedStage.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -8,20 +8,20 @@ import ly.ConfigColumnMeta;
 public abstract class Battle_typeConfigCheckerBase extends AbstractConfigChecker<Battle_typeConfig> {
   @Override
   public String getConfigFileName() {
-    return "battle_type.txt";
+    return "battle_type.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "name", "STRING"),
-        new ConfigColumnMeta(1, "ms", "INT"),
-        new ConfigColumnMeta(2, "timeout", "INT"),
-        new ConfigColumnMeta(3, "battle_time", "INT"),
-        new ConfigColumnMeta(4, "battle_type", "INT"),
-        new ConfigColumnMeta(5, "sceneid", "INT"),
-        new ConfigColumnMeta(6, "preparetimeout", "INT"),
-        new ConfigColumnMeta(7, "checktimeoutinterval", "INT"),
-        new ConfigColumnMeta(8, "accounttimeout", "INT"));
+        new ConfigColumnMeta(0, "name", "string"),
+        new ConfigColumnMeta(1, "ms", "int"),
+        new ConfigColumnMeta(2, "timeout", "int"),
+        new ConfigColumnMeta(3, "battle_time", "int"),
+        new ConfigColumnMeta(4, "battle_type", "int"),
+        new ConfigColumnMeta(5, "sceneid", "int"),
+        new ConfigColumnMeta(6, "preparetimeout", "int"),
+        new ConfigColumnMeta(7, "checktimeoutinterval", "int"),
+        new ConfigColumnMeta(8, "accounttimeout", "int"));
   }
 }

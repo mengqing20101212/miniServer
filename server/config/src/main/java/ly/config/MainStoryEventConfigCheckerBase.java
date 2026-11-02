@@ -8,20 +8,20 @@ import ly.ConfigColumnMeta;
 public abstract class MainStoryEventConfigCheckerBase extends AbstractConfigChecker<MainStoryEventConfig> {
   @Override
   public String getConfigFileName() {
-    return "mainStoryEvent.txt";
+    return "mainStoryEvent.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "type", "INT"),
-        new ConfigColumnMeta(3, "values", "STRING"),
-        new ConfigColumnMeta(4, "group", "INT"),
-        new ConfigColumnMeta(5, "sceneResource", "STRING"),
-        new ConfigColumnMeta(6, "loseContinue", "INT"),
-        new ConfigColumnMeta(7, "transitionType", "INT"),
-        new ConfigColumnMeta(8, "isPreload", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "type", "int"),
+        new ConfigColumnMeta(3, "values", "string"),
+        new ConfigColumnMeta(4, "group", "int"),
+        new ConfigColumnMeta(5, "sceneResource", "string"),
+        new ConfigColumnMeta(6, "loseContinue", "int"),
+        new ConfigColumnMeta(7, "transitionType", "int"),
+        new ConfigColumnMeta(8, "isPreload", "int"));
   }
 }

@@ -14,7 +14,7 @@ public class ConfigPublicationTest {
         state.command.version = "V1";
         state.command.sequence = 1;
         state.command.publishId = "V1";
-        state.command.digest = ConfigBundle.digest(Map.of("item.txt", "item"));
+        state.command.digest = ConfigBundle.digest(Map.of("item.xml", "item"));
         state.command.targets = Map.of("game1", "boot1", "scene1", "boot2");
         return state;
     }
@@ -60,12 +60,12 @@ public class ConfigPublicationTest {
     @Test
     public void bundleDigestIgnoresMapOrderAndRejectsPathTraversal() {
         assertEquals(
-                ConfigBundle.digest(Map.of("a.txt", "a", "b.txt", "b")),
-                ConfigBundle.digest(new TreeMap<>(Map.of("b.txt", "b", "a.txt", "a"))));
+                ConfigBundle.digest(Map.of("a.xml", "a", "b.xml", "b")),
+                ConfigBundle.digest(new TreeMap<>(Map.of("b.xml", "b", "a.xml", "a"))));
         assertNotEquals(
-                ConfigBundle.digest(Map.of("a.txt", "a")),
-                ConfigBundle.digest(Map.of("a.txt", "b")));
+                ConfigBundle.digest(Map.of("a.xml", "a")),
+                ConfigBundle.digest(Map.of("a.xml", "b")));
         assertThrows(
-                IllegalArgumentException.class, () -> ConfigBundle.digest(Map.of("../a.txt", "a")));
+                IllegalArgumentException.class, () -> ConfigBundle.digest(Map.of("../a.xml", "a")));
     }
 }

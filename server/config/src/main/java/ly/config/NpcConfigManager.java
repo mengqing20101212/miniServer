@@ -27,7 +27,7 @@ public class NpcConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new NpcConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "npc.txt"; }
+  public String getConfigFileName() { return "npc.xml"; }
 
   public static class NpcConfigManagerImpl extends AbstractConfigManger {
     private List<NpcConfig> configList = List.of();
@@ -39,288 +39,151 @@ public class NpcConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type24 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type25 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type26 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type27 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type28 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type29 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type30 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type31 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type32 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type33 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type34 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type35 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type36 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type37 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type38 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type39 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type40 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       NpcConfigChecker checker = new NpcConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<NpcConfig> newList = new ArrayList<>();
       Map<Integer, NpcConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 41) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String beizhu = null;
-          String name = null;
-          int level = 0;
-          int star = 0;
-          int maxHP = 0;
-          int attack = 0;
-          int defence = 0;
-          int speed = 0;
-          int crit = 0;
-          int critRatio = 0;
-          int effectHit = 0;
-          int effectDodge = 0;
-          int spCoe = 0;
-          int skill_1 = 0;
-          int skill_2 = 0;
-          int skill_3 = 0;
-          int skill_s1 = 0;
-          int skill_s2 = 0;
-          String aiName = null;
-          int modelId = 0;
-          int headResource_3 = 0;
-          int headResource_4 = 0;
-          String sSkillCutUp = null;
-          int isBoss = 0;
-          String canRun = null;
-          int relateId = 0;
-          String extraSkillInfo = null;
-          int forcedAICD = 0;
-          String skills = null;
-          String sSkills = null;
-          int npcType = 0;
-          int entityTags = 0;
-          String sSkipCutUp = null;
-          String changeColorInfo = null;
-          int colorType = 0;
-          String ShaderFresnel = null;
-          int heroType = 0;
-          int quality = 0;
-          int characterType = 0;
-          int awakenLv = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          int parsedField15 = 0;
+          int parsedField16 = 0;
+          int parsedField17 = 0;
+          int parsedField18 = 0;
+          String parsedField19 = null;
+          int parsedField20 = 0;
+          int parsedField21 = 0;
+          int parsedField22 = 0;
+          String parsedField23 = null;
+          int parsedField24 = 0;
+          boolean parsedField25 = false;
+          int parsedField26 = 0;
+          String parsedField27 = null;
+          int parsedField28 = 0;
+          String parsedField29 = null;
+          String parsedField30 = null;
+          int parsedField31 = 0;
+          int parsedField32 = 0;
+          String parsedField33 = null;
+          String parsedField34 = null;
+          int parsedField35 = 0;
+          String parsedField36 = null;
+          int parsedField37 = 0;
+          int parsedField38 = 0;
+          int parsedField39 = 0;
+          int parsedField40 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 名字
-            if (!arr[1].trim().isEmpty()) {
-              beizhu = arr[1].trim();
-            }
-
-            // 解析 名字
-            if (!arr[2].trim().isEmpty()) {
-              name = arr[2].trim();
-            }
-
-            // 解析 等级
-            if (!arr[3].trim().isEmpty()) {
-              level = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 星级
-            if (!arr[4].trim().isEmpty()) {
-              star = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 生命上限
-            if (!arr[5].trim().isEmpty()) {
-              maxHP = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 攻击
-            if (!arr[6].trim().isEmpty()) {
-              attack = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 防御
-            if (!arr[7].trim().isEmpty()) {
-              defence = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 速度
-            if (!arr[8].trim().isEmpty()) {
-              speed = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 暴击
-            if (!arr[9].trim().isEmpty()) {
-              crit = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 暴击伤害
-            if (!arr[10].trim().isEmpty()) {
-              critRatio = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 效果命中
-            if (!arr[11].trim().isEmpty()) {
-              effectHit = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 效果抵抗
-            if (!arr[12].trim().isEmpty()) {
-              effectDodge = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 回能
-            if (!arr[13].trim().isEmpty()) {
-              spCoe = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 常规技能
-            if (!arr[14].trim().isEmpty()) {
-              skill_1 = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析   null
-            if (!arr[15].trim().isEmpty()) {
-              skill_2 = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析   null
-            if (!arr[16].trim().isEmpty()) {
-              skill_3 = Integer.parseInt(arr[16].trim());
-            }
-
-            // 解析 超级技能
-            if (!arr[17].trim().isEmpty()) {
-              skill_s1 = Integer.parseInt(arr[17].trim());
-            }
-
-            // 解析 超级技能
-            if (!arr[18].trim().isEmpty()) {
-              skill_s2 = Integer.parseInt(arr[18].trim());
-            }
-
-            // 解析 AI模板
-            if (!arr[19].trim().isEmpty()) {
-              aiName = arr[19].trim();
-            }
-
-            // 解析 模型id
-            if (!arr[20].trim().isEmpty()) {
-              modelId = Integer.parseInt(arr[20].trim());
-            }
-
-            // 解析 右侧头像
-            if (!arr[21].trim().isEmpty()) {
-              headResource_3 = Integer.parseInt(arr[21].trim());
-            }
-
-            // 解析 立绘头像
-            if (!arr[22].trim().isEmpty()) {
-              headResource_4 = Integer.parseInt(arr[22].trim());
-            }
-
-            // 解析 s技能立绘切割坐标
-            if (!arr[23].trim().isEmpty()) {
-              sSkillCutUp = arr[23].trim();
-            }
-
-            // 解析 是否boss
-            if (!arr[24].trim().isEmpty()) {
-              isBoss = Integer.parseInt(arr[24].trim());
-            }
-
-            // 解析 能否逃跑
-            if (!arr[25].trim().isEmpty()) {
-              canRun = arr[25].trim();
-            }
-
-            // 解析 关联hero
-            if (!arr[26].trim().isEmpty()) {
-              relateId = Integer.parseInt(arr[26].trim());
-            }
-
-            // 解析 AI技能CD
-            if (!arr[27].trim().isEmpty()) {
-              extraSkillInfo = arr[27].trim();
-            }
-
-            // 解析 是否强制使用AI技能CD
-            if (!arr[28].trim().isEmpty()) {
-              forcedAICD = Integer.parseInt(arr[28].trim());
-            }
-
-            // 解析 技能列表
-            if (!arr[29].trim().isEmpty()) {
-              skills = arr[29].trim();
-            }
-
-            // 解析 S技能列表
-            if (!arr[30].trim().isEmpty()) {
-              sSkills = arr[30].trim();
-            }
-
-            // 解析 NPC类别
-            if (!arr[31].trim().isEmpty()) {
-              npcType = Integer.parseInt(arr[31].trim());
-            }
-
-            // 解析 NPC标记
-            if (!arr[32].trim().isEmpty()) {
-              entityTags = Integer.parseInt(arr[32].trim());
-            }
-
-            // 解析 s技能跳过立绘切割坐标
-            if (!arr[33].trim().isEmpty()) {
-              sSkipCutUp = arr[33].trim();
-            }
-
-            // 解析 变色类别
-            if (!arr[34].trim().isEmpty()) {
-              changeColorInfo = arr[34].trim();
-            }
-
-            // 解析 颜色类型
-            if (!arr[35].trim().isEmpty()) {
-              colorType = Integer.parseInt(arr[35].trim());
-            }
-
-            // 解析 菲尼尔颜色
-            if (!arr[36].trim().isEmpty()) {
-              ShaderFresnel = arr[36].trim();
-            }
-
-            // 解析 英雄类型
-            if (!arr[37].trim().isEmpty()) {
-              heroType = Integer.parseInt(arr[37].trim());
-            }
-
-            // 解析 品质
-            if (!arr[38].trim().isEmpty()) {
-              quality = Integer.parseInt(arr[38].trim());
-            }
-
-            // 解析 角色类别
-            if (!arr[39].trim().isEmpty()) {
-              characterType = Integer.parseInt(arr[39].trim());
-            }
-
-            // 解析 觉醒等级
-            if (!arr[40].trim().isEmpty()) {
-              awakenLv = Integer.parseInt(arr[40].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("beizhu"), fileName + ":行" + lineNumber + ":字段 beizhu");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("level"), fileName + ":行" + lineNumber + ":字段 level");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("star"), fileName + ":行" + lineNumber + ":字段 star");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("maxHP"), fileName + ":行" + lineNumber + ":字段 maxHP");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("attack"), fileName + ":行" + lineNumber + ":字段 attack");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("defence"), fileName + ":行" + lineNumber + ":字段 defence");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("speed"), fileName + ":行" + lineNumber + ":字段 speed");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("crit"), fileName + ":行" + lineNumber + ":字段 crit");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("critRatio"), fileName + ":行" + lineNumber + ":字段 critRatio");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("effectHit"), fileName + ":行" + lineNumber + ":字段 effectHit");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("effectDodge"), fileName + ":行" + lineNumber + ":字段 effectDodge");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("spCoe"), fileName + ":行" + lineNumber + ":字段 spCoe");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("skill_1"), fileName + ":行" + lineNumber + ":字段 skill_1");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("skill_2"), fileName + ":行" + lineNumber + ":字段 skill_2");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("skill_3"), fileName + ":行" + lineNumber + ":字段 skill_3");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("skill_s1"), fileName + ":行" + lineNumber + ":字段 skill_s1");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("skill_s2"), fileName + ":行" + lineNumber + ":字段 skill_s2");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("aiName"), fileName + ":行" + lineNumber + ":字段 aiName");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("modelId"), fileName + ":行" + lineNumber + ":字段 modelId");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("headResource_3"), fileName + ":行" + lineNumber + ":字段 headResource_3");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("headResource_4"), fileName + ":行" + lineNumber + ":字段 headResource_4");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("sSkillCutUp"), fileName + ":行" + lineNumber + ":字段 sSkillCutUp");
+            parsedField24 = ly.ConfigValues.read(type24, values.get("isBoss"), fileName + ":行" + lineNumber + ":字段 isBoss");
+            parsedField25 = ly.ConfigValues.read(type25, values.get("canRun"), fileName + ":行" + lineNumber + ":字段 canRun");
+            parsedField26 = ly.ConfigValues.read(type26, values.get("relateId"), fileName + ":行" + lineNumber + ":字段 relateId");
+            parsedField27 = ly.ConfigValues.read(type27, values.get("extraSkillInfo"), fileName + ":行" + lineNumber + ":字段 extraSkillInfo");
+            parsedField28 = ly.ConfigValues.read(type28, values.get("forcedAICD"), fileName + ":行" + lineNumber + ":字段 forcedAICD");
+            parsedField29 = ly.ConfigValues.read(type29, values.get("skills"), fileName + ":行" + lineNumber + ":字段 skills");
+            parsedField30 = ly.ConfigValues.read(type30, values.get("sSkills"), fileName + ":行" + lineNumber + ":字段 sSkills");
+            parsedField31 = ly.ConfigValues.read(type31, values.get("npcType"), fileName + ":行" + lineNumber + ":字段 npcType");
+            parsedField32 = ly.ConfigValues.read(type32, values.get("entityTags"), fileName + ":行" + lineNumber + ":字段 entityTags");
+            parsedField33 = ly.ConfigValues.read(type33, values.get("sSkipCutUp"), fileName + ":行" + lineNumber + ":字段 sSkipCutUp");
+            parsedField34 = ly.ConfigValues.read(type34, values.get("changeColorInfo"), fileName + ":行" + lineNumber + ":字段 changeColorInfo");
+            parsedField35 = ly.ConfigValues.read(type35, values.get("colorType"), fileName + ":行" + lineNumber + ":字段 colorType");
+            parsedField36 = ly.ConfigValues.read(type36, values.get("ShaderFresnel"), fileName + ":行" + lineNumber + ":字段 ShaderFresnel");
+            parsedField37 = ly.ConfigValues.read(type37, values.get("heroType"), fileName + ":行" + lineNumber + ":字段 heroType");
+            parsedField38 = ly.ConfigValues.read(type38, values.get("quality"), fileName + ":行" + lineNumber + ":字段 quality");
+            parsedField39 = ly.ConfigValues.read(type39, values.get("characterType"), fileName + ":行" + lineNumber + ":字段 characterType");
+            parsedField40 = ly.ConfigValues.read(type40, values.get("awakenLv"), fileName + ":行" + lineNumber + ":字段 awakenLv");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          NpcConfig config = new NpcConfig(id, beizhu, name, level, star, maxHP, attack, defence, speed, crit, critRatio, effectHit, effectDodge, spCoe, skill_1, skill_2, skill_3, skill_s1, skill_s2, aiName, modelId, headResource_3, headResource_4, sSkillCutUp, isBoss, canRun, relateId, extraSkillInfo, forcedAICD, skills, sSkills, npcType, entityTags, sSkipCutUp, changeColorInfo, colorType, ShaderFresnel, heroType, quality, characterType, awakenLv);
-          config.afterLoad();
+          NpcConfig config = new NpcConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24, parsedField25, parsedField26, parsedField27, parsedField28, parsedField29, parsedField30, parsedField31, parsedField32, parsedField33, parsedField34, parsedField35, parsedField36, parsedField37, parsedField38, parsedField39, parsedField40);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (NpcConfig config : configList) config.afterLoad();
+      new NpcConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -330,38 +193,6 @@ public class NpcConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<NpcConfig> getConfigList() {
@@ -374,7 +205,7 @@ public class NpcConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "npc.txt";
+      return "npc.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

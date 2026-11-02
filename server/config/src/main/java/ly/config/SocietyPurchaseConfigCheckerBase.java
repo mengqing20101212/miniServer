@@ -8,23 +8,23 @@ import ly.ConfigColumnMeta;
 public abstract class SocietyPurchaseConfigCheckerBase extends AbstractConfigChecker<SocietyPurchaseConfig> {
   @Override
   public String getConfigFileName() {
-    return "societyPurchase.txt";
+    return "societyPurchase.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "phase", "INT"),
-        new ConfigColumnMeta(2, "sequence", "INT"),
-        new ConfigColumnMeta(3, "minLevel", "INT"),
-        new ConfigColumnMeta(4, "maxLevel", "INT"),
-        new ConfigColumnMeta(5, "isRare", "INT"),
-        new ConfigColumnMeta(6, "demandProps", "INT"),
-        new ConfigColumnMeta(7, "beizhu1", "STRING"),
-        new ConfigColumnMeta(8, "demandNum", "INT"),
-        new ConfigColumnMeta(9, "eachReward", "STRING"),
-        new ConfigColumnMeta(10, "additionalReward", "STRING"),
-        new ConfigColumnMeta(11, "weights", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "phase", "int"),
+        new ConfigColumnMeta(2, "sequence", "int"),
+        new ConfigColumnMeta(3, "minLevel", "int"),
+        new ConfigColumnMeta(4, "maxLevel", "int"),
+        new ConfigColumnMeta(5, "isRare", "int"),
+        new ConfigColumnMeta(6, "demandProps", "int"),
+        new ConfigColumnMeta(7, "beizhu1", "string"),
+        new ConfigColumnMeta(8, "demandNum", "int"),
+        new ConfigColumnMeta(9, "eachReward", "string"),
+        new ConfigColumnMeta(10, "additionalReward", "string"),
+        new ConfigColumnMeta(11, "weights", "int"));
   }
 }

@@ -27,7 +27,7 @@ public class CookMaterialConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new CookMaterialConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "cookMaterial.txt"; }
+  public String getConfigFileName() { return "cookMaterial.xml"; }
 
   public static class CookMaterialConfigManagerImpl extends AbstractConfigManger {
     private List<CookMaterialConfig> configList = List.of();
@@ -39,150 +39,82 @@ public class CookMaterialConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       CookMaterialConfigChecker checker = new CookMaterialConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<CookMaterialConfig> newList = new ArrayList<>();
       Map<Integer, CookMaterialConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 18) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          int type = 0;
-          int classify = 0;
-          int para = 0;
-          int star = 0;
-          int showId = 0;
-          int price = 0;
-          String note = null;
-          int rewardId = 0;
-          int rewardNum = 0;
-          int friendNum = 0;
-          int critRewardNum = 0;
-          int critFriendNum = 0;
-          int exRewardNum = 0;
-          int exFriendNum = 0;
-          String qteRewardNum = null;
-          String qteFriendNum = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          String parsedField8 = null;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          int parsedField15 = 0;
+          String parsedField16 = null;
+          String parsedField17 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 名称
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 类型
-            if (!arr[2].trim().isEmpty()) {
-              type = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 种类
-            if (!arr[3].trim().isEmpty()) {
-              classify = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 参数
-            if (!arr[4].trim().isEmpty()) {
-              para = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 星级
-            if (!arr[5].trim().isEmpty()) {
-              star = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 展示顺序
-            if (!arr[6].trim().isEmpty()) {
-              showId = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 价值量
-            if (!arr[7].trim().isEmpty()) {
-              price = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 作用描述
-            if (!arr[8].trim().isEmpty()) {
-              note = arr[8].trim();
-            }
-
-            // 解析 奖励id
-            if (!arr[9].trim().isEmpty()) {
-              rewardId = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 奖励数量
-            if (!arr[10].trim().isEmpty()) {
-              rewardNum = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 好感度值
-            if (!arr[11].trim().isEmpty()) {
-              friendNum = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 暴击增加奖励数量
-            if (!arr[12].trim().isEmpty()) {
-              critRewardNum = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 暴击好感度增加值
-            if (!arr[13].trim().isEmpty()) {
-              critFriendNum = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 口味奖励数量
-            if (!arr[14].trim().isEmpty()) {
-              exRewardNum = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 口味奖励好感度
-            if (!arr[15].trim().isEmpty()) {
-              exFriendNum = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 qte奖励数量
-            if (!arr[16].trim().isEmpty()) {
-              qteRewardNum = arr[16].trim();
-            }
-
-            // 解析 qte奖励好感度
-            if (!arr[17].trim().isEmpty()) {
-              qteFriendNum = arr[17].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("type"), fileName + ":行" + lineNumber + ":字段 type");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("classify"), fileName + ":行" + lineNumber + ":字段 classify");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("para"), fileName + ":行" + lineNumber + ":字段 para");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("star"), fileName + ":行" + lineNumber + ":字段 star");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("showId"), fileName + ":行" + lineNumber + ":字段 showId");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("price"), fileName + ":行" + lineNumber + ":字段 price");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("note"), fileName + ":行" + lineNumber + ":字段 note");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("rewardId"), fileName + ":行" + lineNumber + ":字段 rewardId");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("rewardNum"), fileName + ":行" + lineNumber + ":字段 rewardNum");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("friendNum"), fileName + ":行" + lineNumber + ":字段 friendNum");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("critRewardNum"), fileName + ":行" + lineNumber + ":字段 critRewardNum");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("critFriendNum"), fileName + ":行" + lineNumber + ":字段 critFriendNum");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("exRewardNum"), fileName + ":行" + lineNumber + ":字段 exRewardNum");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("exFriendNum"), fileName + ":行" + lineNumber + ":字段 exFriendNum");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("qteRewardNum"), fileName + ":行" + lineNumber + ":字段 qteRewardNum");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("qteFriendNum"), fileName + ":行" + lineNumber + ":字段 qteFriendNum");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          CookMaterialConfig config = new CookMaterialConfig(id, name, type, classify, para, star, showId, price, note, rewardId, rewardNum, friendNum, critRewardNum, critFriendNum, exRewardNum, exFriendNum, qteRewardNum, qteFriendNum);
-          config.afterLoad();
+          CookMaterialConfig config = new CookMaterialConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (CookMaterialConfig config : configList) config.afterLoad();
+      new CookMaterialConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -192,38 +124,6 @@ public class CookMaterialConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<CookMaterialConfig> getConfigList() {
@@ -236,7 +136,7 @@ public class CookMaterialConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "cookMaterial.txt";
+      return "cookMaterial.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

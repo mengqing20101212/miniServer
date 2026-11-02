@@ -27,7 +27,7 @@ public class PatrolHeroConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new PatrolHeroConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "patrolHero.txt"; }
+  public String getConfigFileName() { return "patrolHero.xml"; }
 
   public static class PatrolHeroConfigManagerImpl extends AbstractConfigManger {
     private List<PatrolHeroConfig> configList = List.of();
@@ -39,90 +39,52 @@ public class PatrolHeroConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       PatrolHeroConfigChecker checker = new PatrolHeroConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<PatrolHeroConfig> newList = new ArrayList<>();
       Map<Integer, PatrolHeroConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 8) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          String workSentiment = null;
-          String workDay = null;
-          String workDayDesc = null;
-          int heroFetter = 0;
-          int baseAdd = 0;
-          int extraAdd = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
           try {
-            // 解析 id
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 名字
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 工作感言
-            if (!arr[2].trim().isEmpty()) {
-              workSentiment = arr[2].trim();
-            }
-
-            // 解析 工作日期
-            if (!arr[3].trim().isEmpty()) {
-              workDay = arr[3].trim();
-            }
-
-            // 解析 工作日期描述
-            if (!arr[4].trim().isEmpty()) {
-              workDayDesc = arr[4].trim();
-            }
-
-            // 解析 羁绊英雄
-            if (!arr[5].trim().isEmpty()) {
-              heroFetter = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 基础掉落加成
-            if (!arr[6].trim().isEmpty()) {
-              baseAdd = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 额外掉落触发几率提升
-            if (!arr[7].trim().isEmpty()) {
-              extraAdd = Integer.parseInt(arr[7].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("workSentiment"), fileName + ":行" + lineNumber + ":字段 workSentiment");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("workDay"), fileName + ":行" + lineNumber + ":字段 workDay");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("workDayDesc"), fileName + ":行" + lineNumber + ":字段 workDayDesc");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("heroFetter"), fileName + ":行" + lineNumber + ":字段 heroFetter");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("baseAdd"), fileName + ":行" + lineNumber + ":字段 baseAdd");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("extraAdd"), fileName + ":行" + lineNumber + ":字段 extraAdd");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          PatrolHeroConfig config = new PatrolHeroConfig(id, name, workSentiment, workDay, workDayDesc, heroFetter, baseAdd, extraAdd);
-          config.afterLoad();
+          PatrolHeroConfig config = new PatrolHeroConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (PatrolHeroConfig config : configList) config.afterLoad();
+      new PatrolHeroConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -132,38 +94,6 @@ public class PatrolHeroConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<PatrolHeroConfig> getConfigList() {
@@ -176,7 +106,7 @@ public class PatrolHeroConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "patrolHero.txt";
+      return "patrolHero.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

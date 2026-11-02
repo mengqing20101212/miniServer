@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class TestCircuitInfoConfigCheckerBase extends AbstractConfigChecker<TestCircuitInfoConfig> {
   @Override
   public String getConfigFileName() {
-    return "testCircuitInfo.txt";
+    return "testCircuitInfo.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "beizhu", "STRING"),
-        new ConfigColumnMeta(2, "skill", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "beizhu", "string"),
+        new ConfigColumnMeta(2, "skill", "string"));
   }
 }

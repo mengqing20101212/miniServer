@@ -27,7 +27,7 @@ public class HeroInfoConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new HeroInfoConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "heroInfo.txt"; }
+  public String getConfigFileName() { return "heroInfo.xml"; }
 
   public static class HeroInfoConfigManagerImpl extends AbstractConfigManger {
     private List<HeroInfoConfig> configList = List.of();
@@ -39,402 +39,208 @@ public class HeroInfoConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type24 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type25 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type26 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type27 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type28 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type29 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type30 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type31 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type32 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type33 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type34 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type35 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type36 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type37 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type38 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type39 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type40 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type41 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type42 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type43 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type44 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type45 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type46 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type47 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type48 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type49 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type50 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type51 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type52 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type53 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type54 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type55 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type56 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type57 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type58 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type59 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       HeroInfoConfigChecker checker = new HeroInfoConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<HeroInfoConfig> newList = new ArrayList<>();
       Map<Integer, HeroInfoConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 60) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          int heroType = 0;
-          int heroSex = 0;
-          int modelResource = 0;
-          String modelResourceScale = null;
-          int battleResource = 0;
-          int showResource = 0;
-          String showResourceScale = null;
-          int headResource = 0;
-          int headResource_2 = 0;
-          int headResource_3 = 0;
-          int headResource_4 = 0;
-          String heropinyin = null;
-          String heroPerformance = null;
-          String heroCutUp = null;
-          String sSkillCutUp = null;
-          String sSkipCutUp = null;
-          int isSP = 0;
-          int quality = 0;
-          int skill_1 = 0;
-          int skill_2 = 0;
-          int skill_3 = 0;
-          int skill_s1 = 0;
-          int skill_s2 = 0;
-          int moreAwakenSkill1 = 0;
-          int moreAwakenSkill2 = 0;
-          int moreAwakenSkill3 = 0;
-          String endPerformance = null;
-          int heroDebris = 0;
-          int herogachadoc = 0;
-          int heroStateData = 0;
-          int heroAwakenData = 0;
-          int expModelId = 0;
-          int starModelId = 0;
-          int circuitId = 0;
-          int perloadId = 0;
-          int heroListPreloadId = 0;
-          String pvpCamera = null;
-          String teamCamera = null;
-          String aiName = null;
-          int attrRankId = 0;
-          int getPpos = 0;
-          int speicalBg = 0;
-          int unlockBg = 0;
-          int qualityIcon = 0;
-          int activityNpcId = 0;
-          int background = 0;
-          int cardBust = 0;
-          String supportTeamAttr = null;
-          int supportItem = 0;
-          int exchangeItem = 0;
-          int backgroundId = 0;
-          int timeType = 0;
-          String startTime = null;
-          String specialEndTime = null;
-          int heroshare = 0;
-          int herogroup = 0;
-          int OpenServiceActivity = 0;
-          int characterType = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          String parsedField5 = null;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          String parsedField8 = null;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          String parsedField13 = null;
+          String parsedField14 = null;
+          String parsedField15 = null;
+          String parsedField16 = null;
+          String parsedField17 = null;
+          int parsedField18 = 0;
+          int parsedField19 = 0;
+          int parsedField20 = 0;
+          int parsedField21 = 0;
+          int parsedField22 = 0;
+          int parsedField23 = 0;
+          int parsedField24 = 0;
+          int parsedField25 = 0;
+          int parsedField26 = 0;
+          int parsedField27 = 0;
+          String parsedField28 = null;
+          int parsedField29 = 0;
+          int parsedField30 = 0;
+          int parsedField31 = 0;
+          int parsedField32 = 0;
+          int parsedField33 = 0;
+          int parsedField34 = 0;
+          int parsedField35 = 0;
+          int parsedField36 = 0;
+          int parsedField37 = 0;
+          String parsedField38 = null;
+          String parsedField39 = null;
+          String parsedField40 = null;
+          int parsedField41 = 0;
+          int parsedField42 = 0;
+          int parsedField43 = 0;
+          int parsedField44 = 0;
+          int parsedField45 = 0;
+          int parsedField46 = 0;
+          int parsedField47 = 0;
+          int parsedField48 = 0;
+          String parsedField49 = null;
+          int parsedField50 = 0;
+          int parsedField51 = 0;
+          int parsedField52 = 0;
+          int parsedField53 = 0;
+          String parsedField54 = null;
+          String parsedField55 = null;
+          int parsedField56 = 0;
+          int parsedField57 = 0;
+          int parsedField58 = 0;
+          int parsedField59 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 名字
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 英雄描述
-            if (!arr[2].trim().isEmpty()) {
-              heroType = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 英雄介绍
-            if (!arr[3].trim().isEmpty()) {
-              heroSex = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 英雄类型
-            if (!arr[4].trim().isEmpty()) {
-              modelResource = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 英雄性别
-            if (!arr[5].trim().isEmpty()) {
-              modelResourceScale = arr[5].trim();
-            }
-
-            // 解析 战斗模型
-            if (!arr[6].trim().isEmpty()) {
-              battleResource = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 战斗模型缩放
-            if (!arr[7].trim().isEmpty()) {
-              showResource = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 布阵模型
-            if (!arr[8].trim().isEmpty()) {
-              showResourceScale = arr[8].trim();
-            }
-
-            // 解析 展示模型
-            if (!arr[9].trim().isEmpty()) {
-              headResource = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 展示模型缩放
-            if (!arr[10].trim().isEmpty()) {
-              headResource_2 = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 行动序列头像
-            if (!arr[11].trim().isEmpty()) {
-              headResource_3 = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 右侧头像
-            if (!arr[12].trim().isEmpty()) {
-              headResource_4 = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 立绘头像
-            if (!arr[13].trim().isEmpty()) {
-              heropinyin = arr[13].trim();
-            }
-
-            // 解析 全身立绘
-            if (!arr[14].trim().isEmpty()) {
-              heroPerformance = arr[14].trim();
-            }
-
-            // 解析 英雄辅助列
-            if (!arr[15].trim().isEmpty()) {
-              heroCutUp = arr[15].trim();
-            }
-
-            // 解析 英雄表演
-            if (!arr[16].trim().isEmpty()) {
-              sSkillCutUp = arr[16].trim();
-            }
-
-            // 解析 英雄列表未获得立绘切割坐标
-            if (!arr[17].trim().isEmpty()) {
-              sSkipCutUp = arr[17].trim();
-            }
-
-            // 解析 s技能立绘切割坐标
-            if (!arr[18].trim().isEmpty()) {
-              isSP = Integer.parseInt(arr[18].trim());
-            }
-
-            // 解析 s技能跳过立绘切割坐标
-            if (!arr[19].trim().isEmpty()) {
-              quality = Integer.parseInt(arr[19].trim());
-            }
-
-            // 解析 SP英雄
-            if (!arr[20].trim().isEmpty()) {
-              skill_1 = Integer.parseInt(arr[20].trim());
-            }
-
-            // 解析 品质
-            if (!arr[21].trim().isEmpty()) {
-              skill_2 = Integer.parseInt(arr[21].trim());
-            }
-
-            // 解析 常规技能
-            if (!arr[22].trim().isEmpty()) {
-              skill_3 = Integer.parseInt(arr[22].trim());
-            }
-
-            // 解析   null
-            if (!arr[23].trim().isEmpty()) {
-              skill_s1 = Integer.parseInt(arr[23].trim());
-            }
-
-            // 解析   null
-            if (!arr[24].trim().isEmpty()) {
-              skill_s2 = Integer.parseInt(arr[24].trim());
-            }
-
-            // 解析 超级技能
-            if (!arr[25].trim().isEmpty()) {
-              moreAwakenSkill1 = Integer.parseInt(arr[25].trim());
-            }
-
-            // 解析 超级技能
-            if (!arr[26].trim().isEmpty()) {
-              moreAwakenSkill2 = Integer.parseInt(arr[26].trim());
-            }
-
-            // 解析 多段觉醒技能
-            if (!arr[27].trim().isEmpty()) {
-              moreAwakenSkill3 = Integer.parseInt(arr[27].trim());
-            }
-
-            // 解析 多段觉醒技能
-            if (!arr[28].trim().isEmpty()) {
-              endPerformance = arr[28].trim();
-            }
-
-            // 解析 多段觉醒技能
-            if (!arr[29].trim().isEmpty()) {
-              heroDebris = Integer.parseInt(arr[29].trim());
-            }
-
-            // 解析 结束镜头
-            if (!arr[30].trim().isEmpty()) {
-              herogachadoc = Integer.parseInt(arr[30].trim());
-            }
-
-            // 解析 英雄情报
-            if (!arr[31].trim().isEmpty()) {
-              heroStateData = Integer.parseInt(arr[31].trim());
-            }
-
-            // 解析 英雄抽卡台词
-            if (!arr[32].trim().isEmpty()) {
-              heroAwakenData = Integer.parseInt(arr[32].trim());
-            }
-
-            // 解析 英雄升级升星模板
-            if (!arr[33].trim().isEmpty()) {
-              expModelId = Integer.parseInt(arr[33].trim());
-            }
-
-            // 解析 英雄觉醒模板
-            if (!arr[34].trim().isEmpty()) {
-              starModelId = Integer.parseInt(arr[34].trim());
-            }
-
-            // 解析 升级经验模板id
-            if (!arr[35].trim().isEmpty()) {
-              circuitId = Integer.parseInt(arr[35].trim());
-            }
-
-            // 解析 升星经验模板id
-            if (!arr[36].trim().isEmpty()) {
-              perloadId = Integer.parseInt(arr[36].trim());
-            }
-
-            // 解析 回路id
-            if (!arr[37].trim().isEmpty()) {
-              heroListPreloadId = Integer.parseInt(arr[37].trim());
-            }
-
-            // 解析 预加载ID
-            if (!arr[38].trim().isEmpty()) {
-              pvpCamera = arr[38].trim();
-            }
-
-            // 解析 英雄列表预加载ID
-            if (!arr[39].trim().isEmpty()) {
-              teamCamera = arr[39].trim();
-            }
-
-            // 解析 pvp摄像机参数
-            if (!arr[40].trim().isEmpty()) {
-              aiName = arr[40].trim();
-            }
-
-            // 解析 组队摄像机参数
-            if (!arr[41].trim().isEmpty()) {
-              attrRankId = Integer.parseInt(arr[41].trim());
-            }
-
-            // 解析 AI类型
-            if (!arr[42].trim().isEmpty()) {
-              getPpos = Integer.parseInt(arr[42].trim());
-            }
-
-            // 解析 属性评级id
-            if (!arr[43].trim().isEmpty()) {
-              speicalBg = Integer.parseInt(arr[43].trim());
-            }
-
-            // 解析 获取后自动上阵位置
-            if (!arr[44].trim().isEmpty()) {
-              unlockBg = Integer.parseInt(arr[44].trim());
-            }
-
-            // 解析 角色特殊背景板
-            if (!arr[45].trim().isEmpty()) {
-              qualityIcon = Integer.parseInt(arr[45].trim());
-            }
-
-            // 解析 未获得时背景板
-            if (!arr[46].trim().isEmpty()) {
-              activityNpcId = Integer.parseInt(arr[46].trim());
-            }
-
-            // 解析 品质图标
-            if (!arr[47].trim().isEmpty()) {
-              background = Integer.parseInt(arr[47].trim());
-            }
-
-            // 解析 角色的功能NPC_ID
-            if (!arr[48].trim().isEmpty()) {
-              cardBust = Integer.parseInt(arr[48].trim());
-            }
-
-            // 解析 英雄模型背景图
-            if (!arr[49].trim().isEmpty()) {
-              supportTeamAttr = arr[49].trim();
-            }
-
-            // 解析 512尺寸半身像
-            if (!arr[50].trim().isEmpty()) {
-              supportItem = Integer.parseInt(arr[50].trim());
-            }
-
-            // 解析 表彰加成(supportTeamHeroAttr表的attrClass)
-            if (!arr[51].trim().isEmpty()) {
-              exchangeItem = Integer.parseInt(arr[51].trim());
-            }
-
-            // 解析 表彰使用货币
-            if (!arr[52].trim().isEmpty()) {
-              backgroundId = Integer.parseInt(arr[52].trim());
-            }
-
-            // 解析 情报兑换
-            if (!arr[53].trim().isEmpty()) {
-              timeType = Integer.parseInt(arr[53].trim());
-            }
-
-            // 解析 英雄模型背景预设
-            if (!arr[54].trim().isEmpty()) {
-              startTime = arr[54].trim();
-            }
-
-            // 解析 时间类型
-            if (!arr[55].trim().isEmpty()) {
-              specialEndTime = arr[55].trim();
-            }
-
-            // 解析 开始时间
-            if (!arr[56].trim().isEmpty()) {
-              heroshare = Integer.parseInt(arr[56].trim());
-            }
-
-            // 解析 特殊时间
-            if (!arr[57].trim().isEmpty()) {
-              herogroup = Integer.parseInt(arr[57].trim());
-            }
-
-            // 解析 是否分享
-            if (!arr[58].trim().isEmpty()) {
-              OpenServiceActivity = Integer.parseInt(arr[58].trim());
-            }
-
-            // 解析 相同英雄组
-            if (!arr[59].trim().isEmpty()) {
-              characterType = Integer.parseInt(arr[59].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("heroType"), fileName + ":行" + lineNumber + ":字段 heroType");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("heroSex"), fileName + ":行" + lineNumber + ":字段 heroSex");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("modelResource"), fileName + ":行" + lineNumber + ":字段 modelResource");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("modelResourceScale"), fileName + ":行" + lineNumber + ":字段 modelResourceScale");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("battleResource"), fileName + ":行" + lineNumber + ":字段 battleResource");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("showResource"), fileName + ":行" + lineNumber + ":字段 showResource");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("showResourceScale"), fileName + ":行" + lineNumber + ":字段 showResourceScale");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("headResource"), fileName + ":行" + lineNumber + ":字段 headResource");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("headResource_2"), fileName + ":行" + lineNumber + ":字段 headResource_2");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("headResource_3"), fileName + ":行" + lineNumber + ":字段 headResource_3");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("headResource_4"), fileName + ":行" + lineNumber + ":字段 headResource_4");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("heropinyin"), fileName + ":行" + lineNumber + ":字段 heropinyin");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("heroPerformance"), fileName + ":行" + lineNumber + ":字段 heroPerformance");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("heroCutUp"), fileName + ":行" + lineNumber + ":字段 heroCutUp");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("sSkillCutUp"), fileName + ":行" + lineNumber + ":字段 sSkillCutUp");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("sSkipCutUp"), fileName + ":行" + lineNumber + ":字段 sSkipCutUp");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("isSP"), fileName + ":行" + lineNumber + ":字段 isSP");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("quality"), fileName + ":行" + lineNumber + ":字段 quality");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("skill_1"), fileName + ":行" + lineNumber + ":字段 skill_1");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("skill_2"), fileName + ":行" + lineNumber + ":字段 skill_2");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("skill_3"), fileName + ":行" + lineNumber + ":字段 skill_3");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("skill_s1"), fileName + ":行" + lineNumber + ":字段 skill_s1");
+            parsedField24 = ly.ConfigValues.read(type24, values.get("skill_s2"), fileName + ":行" + lineNumber + ":字段 skill_s2");
+            parsedField25 = ly.ConfigValues.read(type25, values.get("moreAwakenSkill1"), fileName + ":行" + lineNumber + ":字段 moreAwakenSkill1");
+            parsedField26 = ly.ConfigValues.read(type26, values.get("moreAwakenSkill2"), fileName + ":行" + lineNumber + ":字段 moreAwakenSkill2");
+            parsedField27 = ly.ConfigValues.read(type27, values.get("moreAwakenSkill3"), fileName + ":行" + lineNumber + ":字段 moreAwakenSkill3");
+            parsedField28 = ly.ConfigValues.read(type28, values.get("endPerformance"), fileName + ":行" + lineNumber + ":字段 endPerformance");
+            parsedField29 = ly.ConfigValues.read(type29, values.get("heroDebris"), fileName + ":行" + lineNumber + ":字段 heroDebris");
+            parsedField30 = ly.ConfigValues.read(type30, values.get("herogachadoc"), fileName + ":行" + lineNumber + ":字段 herogachadoc");
+            parsedField31 = ly.ConfigValues.read(type31, values.get("heroStateData"), fileName + ":行" + lineNumber + ":字段 heroStateData");
+            parsedField32 = ly.ConfigValues.read(type32, values.get("heroAwakenData"), fileName + ":行" + lineNumber + ":字段 heroAwakenData");
+            parsedField33 = ly.ConfigValues.read(type33, values.get("expModelId"), fileName + ":行" + lineNumber + ":字段 expModelId");
+            parsedField34 = ly.ConfigValues.read(type34, values.get("starModelId"), fileName + ":行" + lineNumber + ":字段 starModelId");
+            parsedField35 = ly.ConfigValues.read(type35, values.get("circuitId"), fileName + ":行" + lineNumber + ":字段 circuitId");
+            parsedField36 = ly.ConfigValues.read(type36, values.get("perloadId"), fileName + ":行" + lineNumber + ":字段 perloadId");
+            parsedField37 = ly.ConfigValues.read(type37, values.get("heroListPreloadId"), fileName + ":行" + lineNumber + ":字段 heroListPreloadId");
+            parsedField38 = ly.ConfigValues.read(type38, values.get("pvpCamera"), fileName + ":行" + lineNumber + ":字段 pvpCamera");
+            parsedField39 = ly.ConfigValues.read(type39, values.get("teamCamera"), fileName + ":行" + lineNumber + ":字段 teamCamera");
+            parsedField40 = ly.ConfigValues.read(type40, values.get("aiName"), fileName + ":行" + lineNumber + ":字段 aiName");
+            parsedField41 = ly.ConfigValues.read(type41, values.get("attrRankId"), fileName + ":行" + lineNumber + ":字段 attrRankId");
+            parsedField42 = ly.ConfigValues.read(type42, values.get("getPpos"), fileName + ":行" + lineNumber + ":字段 getPpos");
+            parsedField43 = ly.ConfigValues.read(type43, values.get("speicalBg"), fileName + ":行" + lineNumber + ":字段 speicalBg");
+            parsedField44 = ly.ConfigValues.read(type44, values.get("unlockBg"), fileName + ":行" + lineNumber + ":字段 unlockBg");
+            parsedField45 = ly.ConfigValues.read(type45, values.get("qualityIcon"), fileName + ":行" + lineNumber + ":字段 qualityIcon");
+            parsedField46 = ly.ConfigValues.read(type46, values.get("activityNpcId"), fileName + ":行" + lineNumber + ":字段 activityNpcId");
+            parsedField47 = ly.ConfigValues.read(type47, values.get("background"), fileName + ":行" + lineNumber + ":字段 background");
+            parsedField48 = ly.ConfigValues.read(type48, values.get("cardBust"), fileName + ":行" + lineNumber + ":字段 cardBust");
+            parsedField49 = ly.ConfigValues.read(type49, values.get("supportTeamAttr"), fileName + ":行" + lineNumber + ":字段 supportTeamAttr");
+            parsedField50 = ly.ConfigValues.read(type50, values.get("supportItem"), fileName + ":行" + lineNumber + ":字段 supportItem");
+            parsedField51 = ly.ConfigValues.read(type51, values.get("exchangeItem"), fileName + ":行" + lineNumber + ":字段 exchangeItem");
+            parsedField52 = ly.ConfigValues.read(type52, values.get("backgroundId"), fileName + ":行" + lineNumber + ":字段 backgroundId");
+            parsedField53 = ly.ConfigValues.read(type53, values.get("timeType"), fileName + ":行" + lineNumber + ":字段 timeType");
+            parsedField54 = ly.ConfigValues.read(type54, values.get("startTime"), fileName + ":行" + lineNumber + ":字段 startTime");
+            parsedField55 = ly.ConfigValues.read(type55, values.get("specialEndTime"), fileName + ":行" + lineNumber + ":字段 specialEndTime");
+            parsedField56 = ly.ConfigValues.read(type56, values.get("heroshare"), fileName + ":行" + lineNumber + ":字段 heroshare");
+            parsedField57 = ly.ConfigValues.read(type57, values.get("herogroup"), fileName + ":行" + lineNumber + ":字段 herogroup");
+            parsedField58 = ly.ConfigValues.read(type58, values.get("OpenServiceActivity"), fileName + ":行" + lineNumber + ":字段 OpenServiceActivity");
+            parsedField59 = ly.ConfigValues.read(type59, values.get("characterType"), fileName + ":行" + lineNumber + ":字段 characterType");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          HeroInfoConfig config = new HeroInfoConfig(id, name, heroType, heroSex, modelResource, modelResourceScale, battleResource, showResource, showResourceScale, headResource, headResource_2, headResource_3, headResource_4, heropinyin, heroPerformance, heroCutUp, sSkillCutUp, sSkipCutUp, isSP, quality, skill_1, skill_2, skill_3, skill_s1, skill_s2, moreAwakenSkill1, moreAwakenSkill2, moreAwakenSkill3, endPerformance, heroDebris, herogachadoc, heroStateData, heroAwakenData, expModelId, starModelId, circuitId, perloadId, heroListPreloadId, pvpCamera, teamCamera, aiName, attrRankId, getPpos, speicalBg, unlockBg, qualityIcon, activityNpcId, background, cardBust, supportTeamAttr, supportItem, exchangeItem, backgroundId, timeType, startTime, specialEndTime, heroshare, herogroup, OpenServiceActivity, characterType);
-          config.afterLoad();
+          HeroInfoConfig config = new HeroInfoConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24, parsedField25, parsedField26, parsedField27, parsedField28, parsedField29, parsedField30, parsedField31, parsedField32, parsedField33, parsedField34, parsedField35, parsedField36, parsedField37, parsedField38, parsedField39, parsedField40, parsedField41, parsedField42, parsedField43, parsedField44, parsedField45, parsedField46, parsedField47, parsedField48, parsedField49, parsedField50, parsedField51, parsedField52, parsedField53, parsedField54, parsedField55, parsedField56, parsedField57, parsedField58, parsedField59);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (HeroInfoConfig config : configList) config.afterLoad();
+      new HeroInfoConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -444,38 +250,6 @@ public class HeroInfoConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<HeroInfoConfig> getConfigList() {
@@ -488,7 +262,7 @@ public class HeroInfoConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "heroInfo.txt";
+      return "heroInfo.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

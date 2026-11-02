@@ -267,13 +267,27 @@ public class ConfigService {
             tables.put(table.getClass(), table);
         }
         ConfigSnapshot snapshot = new ConfigSnapshot(version, tables);
-        // afterLoad 的跨表读取也固定在待加载快照，不能引用当前线上表。
-        // 先解析全部表，再执行跨表 afterLoad，避免依赖并行加载顺序。
+        loadTables(logger, configDir, tables.values());
+        // ThreadLocal 不跨加载线程传递；跨表处理统一在完整的候选快照内执行。
         try (ConfigScope ignored = ConfigScope.use(snapshot)) {
-            for (AbstractConfigManger table : tables.values()) table.reload(logger, configDir);
+            for (AbstractConfigManger table : tables.values()) table.finishLoad(logger);
             for (AbstractConfigManger table : tables.values()) table.afterLoad();
         }
         return snapshot;
+    }
+
+    private void loadTables(Logger logger, String configDir,
+                            java.util.Collection<AbstractConfigManger> tables) {
+        int threads = Math.max(1, Math.min(tables.size(), Runtime.getRuntime().availableProcessors()));
+        try (java.util.concurrent.ExecutorService executor = Executors.newFixedThreadPool(threads)) {
+            java.util.concurrent.CompletableFuture<?>[] loads = tables.stream()
+                    .map(table -> java.util.concurrent.CompletableFuture.runAsync(
+                            () -> table.reload(logger, configDir), executor))
+                    .toArray(java.util.concurrent.CompletableFuture[]::new);
+            java.util.concurrent.CompletableFuture.allOf(loads).join();
+        } catch (java.util.concurrent.CompletionException error) {
+            throw new ConfigLoadException("配置加载失败: " + error.getCause().getMessage());
+        }
     }
 
     public synchronized void loadAllConfigToStandby(

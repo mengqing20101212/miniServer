@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class DungeonRoomConfigCheckerBase extends AbstractConfigChecker<DungeonRoomConfig> {
   @Override
   public String getConfigFileName() {
-    return "dungeonRoom.txt";
+    return "dungeonRoom.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "mainId", "INT"),
-        new ConfigColumnMeta(2, "levelId", "INT"),
-        new ConfigColumnMeta(3, "lineId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "mainId", "int"),
+        new ConfigColumnMeta(2, "levelId", "int"),
+        new ConfigColumnMeta(3, "lineId", "int"));
   }
 }

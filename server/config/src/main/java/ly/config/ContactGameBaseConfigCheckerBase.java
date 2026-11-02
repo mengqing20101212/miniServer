@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class ContactGameBaseConfigCheckerBase extends AbstractConfigChecker<ContactGameBaseConfig> {
   @Override
   public String getConfigFileName() {
-    return "contactGameBase.txt";
+    return "contactGameBase.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "resource", "INT"),
-        new ConfigColumnMeta(3, "tag", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "resource", "int"),
+        new ConfigColumnMeta(3, "tag", "string"));
   }
 }

@@ -8,30 +8,30 @@ import ly.ConfigColumnMeta;
 public abstract class ManualMain1ConfigCheckerBase extends AbstractConfigChecker<ManualMain1Config> {
   @Override
   public String getConfigFileName() {
-    return "manualMain1.txt";
+    return "manualMain1.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "dailyNum", "STRING"),
-        new ConfigColumnMeta(2, "page", "INT"),
-        new ConfigColumnMeta(3, "beizhu", "STRING"),
-        new ConfigColumnMeta(4, "showNum", "STRING"),
-        new ConfigColumnMeta(5, "priority", "INT"),
-        new ConfigColumnMeta(6, "questType", "INT"),
-        new ConfigColumnMeta(7, "condition", "INT"),
-        new ConfigColumnMeta(8, "weight", "INT"),
-        new ConfigColumnMeta(9, "rewardShow", "STRING"),
-        new ConfigColumnMeta(10, "drop", "INT"),
-        new ConfigColumnMeta(11, "redirectionId", "INT"),
-        new ConfigColumnMeta(12, "dailyNum2", "STRING"),
-        new ConfigColumnMeta(13, "nameIcon", "STRING"),
-        new ConfigColumnMeta(14, "dailyIcon", "STRING"),
-        new ConfigColumnMeta(15, "typeIcon", "INT"),
-        new ConfigColumnMeta(16, "lvIndex", "STRING"),
-        new ConfigColumnMeta(17, "lvShow", "INT"),
-        new ConfigColumnMeta(18, "chanelId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "dailyNum", "string"),
+        new ConfigColumnMeta(2, "page", "int"),
+        new ConfigColumnMeta(3, "beizhu", "string"),
+        new ConfigColumnMeta(4, "showNum", "string"),
+        new ConfigColumnMeta(5, "priority", "int"),
+        new ConfigColumnMeta(6, "questType", "int"),
+        new ConfigColumnMeta(7, "condition", "int"),
+        new ConfigColumnMeta(8, "weight", "int"),
+        new ConfigColumnMeta(9, "rewardShow", "string"),
+        new ConfigColumnMeta(10, "drop", "int"),
+        new ConfigColumnMeta(11, "redirectionId", "int"),
+        new ConfigColumnMeta(12, "dailyNum2", "string"),
+        new ConfigColumnMeta(13, "nameIcon", "string"),
+        new ConfigColumnMeta(14, "dailyIcon", "string"),
+        new ConfigColumnMeta(15, "typeIcon", "int"),
+        new ConfigColumnMeta(16, "lvIndex", "string"),
+        new ConfigColumnMeta(17, "lvShow", "int"),
+        new ConfigColumnMeta(18, "chanelId", "int"));
   }
 }

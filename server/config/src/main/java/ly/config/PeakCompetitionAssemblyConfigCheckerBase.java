@@ -8,22 +8,22 @@ import ly.ConfigColumnMeta;
 public abstract class PeakCompetitionAssemblyConfigCheckerBase extends AbstractConfigChecker<PeakCompetitionAssemblyConfig> {
   @Override
   public String getConfigFileName() {
-    return "peakCompetitionAssembly.txt";
+    return "peakCompetitionAssembly.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "type", "INT"),
-        new ConfigColumnMeta(3, "skillID", "INT"),
-        new ConfigColumnMeta(4, "attrType", "INT"),
-        new ConfigColumnMeta(5, "attrNum", "INT"),
-        new ConfigColumnMeta(6, "heroAdvance", "INT"),
-        new ConfigColumnMeta(7, "skillLv", "INT"),
-        new ConfigColumnMeta(8, "quality", "STRING"),
-        new ConfigColumnMeta(9, "limit", "INT"),
-        new ConfigColumnMeta(10, "description", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "type", "int"),
+        new ConfigColumnMeta(3, "skillID", "int"),
+        new ConfigColumnMeta(4, "attrType", "int"),
+        new ConfigColumnMeta(5, "attrNum", "int"),
+        new ConfigColumnMeta(6, "heroAdvance", "int"),
+        new ConfigColumnMeta(7, "skillLv", "int"),
+        new ConfigColumnMeta(8, "quality", "string"),
+        new ConfigColumnMeta(9, "limit", "int"),
+        new ConfigColumnMeta(10, "description", "string"));
   }
 }

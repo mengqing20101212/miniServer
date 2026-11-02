@@ -8,31 +8,31 @@ import ly.ConfigColumnMeta;
 public abstract class JusticeStageConfigCheckerBase extends AbstractConfigChecker<JusticeStageConfig> {
   @Override
   public String getConfigFileName() {
-    return "justiceStage.txt";
+    return "justiceStage.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "level", "INT"),
-        new ConfigColumnMeta(2, "enemyInfo", "STRING"),
-        new ConfigColumnMeta(3, "enemyCircuitInfo", "STRING"),
-        new ConfigColumnMeta(4, "enemyPara", "STRING"),
-        new ConfigColumnMeta(5, "sceneId", "STRING"),
-        new ConfigColumnMeta(6, "dropId", "INT"),
-        new ConfigColumnMeta(7, "firstDrop", "INT"),
-        new ConfigColumnMeta(8, "dropShow", "STRING"),
-        new ConfigColumnMeta(9, "hint", "STRING"),
-        new ConfigColumnMeta(10, "tipPic", "INT"),
-        new ConfigColumnMeta(11, "background", "INT"),
-        new ConfigColumnMeta(12, "backgroundIn", "INT"),
-        new ConfigColumnMeta(13, "heroPicId", "INT"),
-        new ConfigColumnMeta(14, "recommendHeroIds", "STRING"),
-        new ConfigColumnMeta(15, "recommendTypes", "STRING"),
-        new ConfigColumnMeta(16, "avgLineupLevel", "INT"),
-        new ConfigColumnMeta(17, "dropDay", "INT"),
-        new ConfigColumnMeta(18, "dropDayShow", "INT"),
-        new ConfigColumnMeta(19, "targetLevel", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "level", "int"),
+        new ConfigColumnMeta(2, "enemyInfo", "string"),
+        new ConfigColumnMeta(3, "enemyCircuitInfo", "string"),
+        new ConfigColumnMeta(4, "enemyPara", "string"),
+        new ConfigColumnMeta(5, "sceneId", "string"),
+        new ConfigColumnMeta(6, "dropId", "int"),
+        new ConfigColumnMeta(7, "firstDrop", "int"),
+        new ConfigColumnMeta(8, "dropShow", "string"),
+        new ConfigColumnMeta(9, "hint", "string"),
+        new ConfigColumnMeta(10, "tipPic", "int"),
+        new ConfigColumnMeta(11, "background", "int"),
+        new ConfigColumnMeta(12, "backgroundIn", "int"),
+        new ConfigColumnMeta(13, "heroPicId", "int"),
+        new ConfigColumnMeta(14, "recommendHeroIds", "string"),
+        new ConfigColumnMeta(15, "recommendTypes", "string"),
+        new ConfigColumnMeta(16, "avgLineupLevel", "int"),
+        new ConfigColumnMeta(17, "dropDay", "int"),
+        new ConfigColumnMeta(18, "dropDayShow", "int"),
+        new ConfigColumnMeta(19, "targetLevel", "int"));
   }
 }

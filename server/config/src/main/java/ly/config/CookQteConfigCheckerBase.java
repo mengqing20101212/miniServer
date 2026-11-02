@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class CookQteConfigCheckerBase extends AbstractConfigChecker<CookQteConfig> {
   @Override
   public String getConfigFileName() {
-    return "cookQte.txt";
+    return "cookQte.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "qtePara", "STRING"),
-        new ConfigColumnMeta(3, "bonusList", "STRING"),
-        new ConfigColumnMeta(4, "pointList", "STRING"),
-        new ConfigColumnMeta(5, "turn", "INT"),
-        new ConfigColumnMeta(6, "time", "STRING"),
-        new ConfigColumnMeta(7, "setList", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "qtePara", "string"),
+        new ConfigColumnMeta(3, "bonusList", "string"),
+        new ConfigColumnMeta(4, "pointList", "string"),
+        new ConfigColumnMeta(5, "turn", "int"),
+        new ConfigColumnMeta(6, "time", "string"),
+        new ConfigColumnMeta(7, "setList", "string"));
   }
 }

@@ -8,22 +8,22 @@ import ly.ConfigColumnMeta;
 public abstract class AssociationTestConfigCheckerBase extends AbstractConfigChecker<AssociationTestConfig> {
   @Override
   public String getConfigFileName() {
-    return "associationTest.txt";
+    return "associationTest.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "week", "INT"),
-        new ConfigColumnMeta(2, "day", "INT"),
-        new ConfigColumnMeta(3, "heroID", "STRING"),
-        new ConfigColumnMeta(4, "beizhu", "STRING"),
-        new ConfigColumnMeta(5, "dropSuccess", "STRING"),
-        new ConfigColumnMeta(6, "dropFail", "STRING"),
-        new ConfigColumnMeta(7, "dropShow", "STRING"),
-        new ConfigColumnMeta(8, "testTimes", "INT"),
-        new ConfigColumnMeta(9, "stamina", "INT"),
-        new ConfigColumnMeta(10, "questionPool", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "week", "int"),
+        new ConfigColumnMeta(2, "day", "int"),
+        new ConfigColumnMeta(3, "heroID", "string"),
+        new ConfigColumnMeta(4, "beizhu", "string"),
+        new ConfigColumnMeta(5, "dropSuccess", "string"),
+        new ConfigColumnMeta(6, "dropFail", "string"),
+        new ConfigColumnMeta(7, "dropShow", "string"),
+        new ConfigColumnMeta(8, "testTimes", "int"),
+        new ConfigColumnMeta(9, "stamina", "int"),
+        new ConfigColumnMeta(10, "questionPool", "string"));
   }
 }

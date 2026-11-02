@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class PlayerHeadConfigCheckerBase extends AbstractConfigChecker<PlayerHeadConfig> {
   @Override
   public String getConfigFileName() {
-    return "playerHead.txt";
+    return "playerHead.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "des", "STRING"),
-        new ConfigColumnMeta(3, "icon", "INT"),
-        new ConfigColumnMeta(4, "unlockType", "INT"),
-        new ConfigColumnMeta(5, "unlockPara", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "des", "string"),
+        new ConfigColumnMeta(3, "icon", "int"),
+        new ConfigColumnMeta(4, "unlockType", "int"),
+        new ConfigColumnMeta(5, "unlockPara", "string"));
   }
 }

@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class GuildBossLevelRewardConfigCheckerBase extends AbstractConfigChecker<GuildBossLevelRewardConfig> {
   @Override
   public String getConfigFileName() {
-    return "guildBossLevelReward.txt";
+    return "guildBossLevelReward.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "level", "INT"),
-        new ConfigColumnMeta(2, "levelReward", "INT"),
-        new ConfigColumnMeta(3, "disPlayLevelReward", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "level", "int"),
+        new ConfigColumnMeta(2, "levelReward", "int"),
+        new ConfigColumnMeta(3, "disPlayLevelReward", "string"));
   }
 }

@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class AtlasConfigCheckerBase extends AbstractConfigChecker<AtlasConfig> {
   @Override
   public String getConfigFileName() {
-    return "atlas.txt";
+    return "atlas.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "sprite", "STRING"),
-        new ConfigColumnMeta(2, "atlas", "INT"),
-        new ConfigColumnMeta(3, "des", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "sprite", "string"),
+        new ConfigColumnMeta(2, "atlas", "int"),
+        new ConfigColumnMeta(3, "des", "string"));
   }
 }

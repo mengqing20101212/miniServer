@@ -8,13 +8,13 @@ import ly.ConfigColumnMeta;
 public abstract class CurveConfigCheckerBase extends AbstractConfigChecker<CurveConfig> {
   @Override
   public String getConfigFileName() {
-    return "curve.txt";
+    return "curve.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "curve_resname", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "curve_resname", "string"));
   }
 }

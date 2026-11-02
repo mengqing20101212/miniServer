@@ -8,26 +8,26 @@ import ly.ConfigColumnMeta;
 public abstract class AchievementMainConfigCheckerBase extends AbstractConfigChecker<AchievementMainConfig> {
   @Override
   public String getConfigFileName() {
-    return "achievementMain.txt";
+    return "achievementMain.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "group", "INT"),
-        new ConfigColumnMeta(2, "groupServer", "INT"),
-        new ConfigColumnMeta(3, "isIfGroup", "INT"),
-        new ConfigColumnMeta(4, "groupLv", "INT"),
-        new ConfigColumnMeta(5, "priority", "INT"),
-        new ConfigColumnMeta(6, "firstType", "INT"),
-        new ConfigColumnMeta(7, "secondType", "INT"),
-        new ConfigColumnMeta(8, "name", "STRING"),
-        new ConfigColumnMeta(9, "des", "STRING"),
-        new ConfigColumnMeta(10, "missionId", "INT"),
-        new ConfigColumnMeta(11, "point", "INT"),
-        new ConfigColumnMeta(12, "rewardShow", "STRING"),
-        new ConfigColumnMeta(13, "dropId", "INT"),
-        new ConfigColumnMeta(14, "index", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "group", "int"),
+        new ConfigColumnMeta(2, "groupServer", "int"),
+        new ConfigColumnMeta(3, "isIfGroup", "int"),
+        new ConfigColumnMeta(4, "groupLv", "int"),
+        new ConfigColumnMeta(5, "priority", "int"),
+        new ConfigColumnMeta(6, "firstType", "int"),
+        new ConfigColumnMeta(7, "secondType", "int"),
+        new ConfigColumnMeta(8, "name", "string"),
+        new ConfigColumnMeta(9, "des", "string"),
+        new ConfigColumnMeta(10, "missionId", "int"),
+        new ConfigColumnMeta(11, "point", "int"),
+        new ConfigColumnMeta(12, "rewardShow", "string"),
+        new ConfigColumnMeta(13, "dropId", "int"),
+        new ConfigColumnMeta(14, "index", "int"));
   }
 }

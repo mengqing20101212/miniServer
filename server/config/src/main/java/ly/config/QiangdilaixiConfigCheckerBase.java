@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class QiangdilaixiConfigCheckerBase extends AbstractConfigChecker<QiangdilaixiConfig> {
   @Override
   public String getConfigFileName() {
-    return "qiangdilaixi.txt";
+    return "qiangdilaixi.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "config_name", "STRING"),
-        new ConfigColumnMeta(2, "name", "STRING"),
-        new ConfigColumnMeta(3, "detail", "STRING"),
-        new ConfigColumnMeta(4, "timeline", "STRING"),
-        new ConfigColumnMeta(5, "UIResource", "INT"),
-        new ConfigColumnMeta(6, "ScalePosOffset", "STRING"),
-        new ConfigColumnMeta(7, "stopAt", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "config_name", "string"),
+        new ConfigColumnMeta(2, "name", "string"),
+        new ConfigColumnMeta(3, "detail", "string"),
+        new ConfigColumnMeta(4, "timeline", "string"),
+        new ConfigColumnMeta(5, "UIResource", "int"),
+        new ConfigColumnMeta(6, "ScalePosOffset", "string"),
+        new ConfigColumnMeta(7, "stopAt", "string"));
   }
 }

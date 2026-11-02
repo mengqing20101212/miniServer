@@ -27,7 +27,7 @@ public class ActivityNpcGroupConfigManager implements InterfaceConfigManagerProx
   public AbstractConfigManger createTable() { return new ActivityNpcGroupConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "activityNpcGroup.txt"; }
+  public String getConfigFileName() { return "activityNpcGroup.xml"; }
 
   public static class ActivityNpcGroupConfigManagerImpl extends AbstractConfigManger {
     private List<ActivityNpcGroupConfig> configList = List.of();
@@ -39,102 +39,58 @@ public class ActivityNpcGroupConfigManager implements InterfaceConfigManagerProx
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ActivityNpcGroupConfigChecker checker = new ActivityNpcGroupConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ActivityNpcGroupConfig> newList = new ArrayList<>();
       Map<Integer, ActivityNpcGroupConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 10) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String defaultAni = null;
-          String p1 = null;
-          String groupName = null;
-          String clickAniList = null;
-          String moveDistance = null;
-          String cameraHight = null;
-          String cameraDistance = null;
-          String npcDistance = null;
-          String textPrefabType = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          String parsedField8 = null;
+          String parsedField9 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 默认动作
-            if (!arr[1].trim().isEmpty()) {
-              defaultAni = arr[1].trim();
-            }
-
-            // 解析 辅助列
-            if (!arr[2].trim().isEmpty()) {
-              p1 = arr[2].trim();
-            }
-
-            // 解析 备注是谁
-            if (!arr[3].trim().isEmpty()) {
-              groupName = arr[3].trim();
-            }
-
-            // 解析 点击反馈动作组
-            if (!arr[4].trim().isEmpty()) {
-              clickAniList = arr[4].trim();
-            }
-
-            // 解析 推镜的镜头左右偏移（正是左负是右,左右是角度，上下是距离）
-            if (!arr[5].trim().isEmpty()) {
-              moveDistance = arr[5].trim();
-            }
-
-            // 解析 注视点高度
-            if (!arr[6].trim().isEmpty()) {
-              cameraHight = arr[6].trim();
-            }
-
-            // 解析 推镜的距离配置
-            if (!arr[7].trim().isEmpty()) {
-              cameraDistance = arr[7].trim();
-            }
-
-            // 解析 角色距离
-            if (!arr[8].trim().isEmpty()) {
-              npcDistance = arr[8].trim();
-            }
-
-            // 解析 文本框的效果类型
-            if (!arr[9].trim().isEmpty()) {
-              textPrefabType = arr[9].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("defaultAni"), fileName + ":行" + lineNumber + ":字段 defaultAni");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("p1"), fileName + ":行" + lineNumber + ":字段 p1");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("groupName"), fileName + ":行" + lineNumber + ":字段 groupName");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("clickAniList"), fileName + ":行" + lineNumber + ":字段 clickAniList");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("moveDistance"), fileName + ":行" + lineNumber + ":字段 moveDistance");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("cameraHight"), fileName + ":行" + lineNumber + ":字段 cameraHight");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("cameraDistance"), fileName + ":行" + lineNumber + ":字段 cameraDistance");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("npcDistance"), fileName + ":行" + lineNumber + ":字段 npcDistance");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("textPrefabType"), fileName + ":行" + lineNumber + ":字段 textPrefabType");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ActivityNpcGroupConfig config = new ActivityNpcGroupConfig(id, defaultAni, p1, groupName, clickAniList, moveDistance, cameraHight, cameraDistance, npcDistance, textPrefabType);
-          config.afterLoad();
+          ActivityNpcGroupConfig config = new ActivityNpcGroupConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ActivityNpcGroupConfig config : configList) config.afterLoad();
+      new ActivityNpcGroupConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -144,38 +100,6 @@ public class ActivityNpcGroupConfigManager implements InterfaceConfigManagerProx
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ActivityNpcGroupConfig> getConfigList() {
@@ -188,7 +112,7 @@ public class ActivityNpcGroupConfigManager implements InterfaceConfigManagerProx
 
     @Override
     public String getConfigFileName() {
-      return "activityNpcGroup.txt";
+      return "activityNpcGroup.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

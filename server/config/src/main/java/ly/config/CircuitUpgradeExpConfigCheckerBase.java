@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class CircuitUpgradeExpConfigCheckerBase extends AbstractConfigChecker<CircuitUpgradeExpConfig> {
   @Override
   public String getConfigFileName() {
-    return "circuitUpgradeExp.txt";
+    return "circuitUpgradeExp.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "upgradeType", "INT"),
-        new ConfigColumnMeta(1, "level", "INT"),
-        new ConfigColumnMeta(2, "exp", "INT"),
-        new ConfigColumnMeta(3, "eatExp", "INT"),
-        new ConfigColumnMeta(4, "consumeGold", "INT"),
-        new ConfigColumnMeta(5, "newSubAttrProb", "INT"),
-        new ConfigColumnMeta(6, "upgrageGold", "INT"));
+        new ConfigColumnMeta(0, "upgradeType", "int"),
+        new ConfigColumnMeta(1, "level", "int"),
+        new ConfigColumnMeta(2, "exp", "int"),
+        new ConfigColumnMeta(3, "eatExp", "int"),
+        new ConfigColumnMeta(4, "consumeGold", "int"),
+        new ConfigColumnMeta(5, "newSubAttrProb", "int"),
+        new ConfigColumnMeta(6, "upgrageGold", "int"));
   }
 }

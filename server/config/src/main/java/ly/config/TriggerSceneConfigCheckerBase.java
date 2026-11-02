@@ -8,29 +8,29 @@ import ly.ConfigColumnMeta;
 public abstract class TriggerSceneConfigCheckerBase extends AbstractConfigChecker<TriggerSceneConfig> {
   @Override
   public String getConfigFileName() {
-    return "triggerScene.txt";
+    return "triggerScene.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "sceneId", "INT"),
-        new ConfigColumnMeta(2, "group", "INT"),
-        new ConfigColumnMeta(3, "type", "INT"),
-        new ConfigColumnMeta(4, "stageName", "STRING"),
-        new ConfigColumnMeta(5, "stageName2", "STRING"),
-        new ConfigColumnMeta(6, "stageName3", "STRING"),
-        new ConfigColumnMeta(7, "preCost", "INT"),
-        new ConfigColumnMeta(8, "cost", "INT"),
-        new ConfigColumnMeta(9, "weight", "INT"),
-        new ConfigColumnMeta(10, "time", "INT"),
-        new ConfigColumnMeta(11, "bossId", "INT"),
-        new ConfigColumnMeta(12, "sceneAvatar", "INT"),
-        new ConfigColumnMeta(13, "dropPro", "STRING"),
-        new ConfigColumnMeta(14, "bossDes", "STRING"),
-        new ConfigColumnMeta(15, "scenePic", "INT"),
-        new ConfigColumnMeta(16, "posOffset", "STRING"),
-        new ConfigColumnMeta(17, "scale", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "sceneId", "int"),
+        new ConfigColumnMeta(2, "group", "int"),
+        new ConfigColumnMeta(3, "type", "int"),
+        new ConfigColumnMeta(4, "stageName", "string"),
+        new ConfigColumnMeta(5, "stageName2", "string"),
+        new ConfigColumnMeta(6, "stageName3", "string"),
+        new ConfigColumnMeta(7, "preCost", "int"),
+        new ConfigColumnMeta(8, "cost", "int"),
+        new ConfigColumnMeta(9, "weight", "int"),
+        new ConfigColumnMeta(10, "time", "int"),
+        new ConfigColumnMeta(11, "bossId", "int"),
+        new ConfigColumnMeta(12, "sceneAvatar", "int"),
+        new ConfigColumnMeta(13, "dropPro", "string"),
+        new ConfigColumnMeta(14, "bossDes", "string"),
+        new ConfigColumnMeta(15, "scenePic", "int"),
+        new ConfigColumnMeta(16, "posOffset", "string"),
+        new ConfigColumnMeta(17, "scale", "string"));
   }
 }

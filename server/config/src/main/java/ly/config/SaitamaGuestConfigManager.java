@@ -27,7 +27,7 @@ public class SaitamaGuestConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new SaitamaGuestConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "saitamaGuest.txt"; }
+  public String getConfigFileName() { return "saitamaGuest.xml"; }
 
   public static class SaitamaGuestConfigManagerImpl extends AbstractConfigManger {
     private List<SaitamaGuestConfig> configList = List.of();
@@ -39,78 +39,46 @@ public class SaitamaGuestConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       SaitamaGuestConfigChecker checker = new SaitamaGuestConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<SaitamaGuestConfig> newList = new ArrayList<>();
       Map<Integer, SaitamaGuestConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 6) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int probability = 0;
-          int weight = 0;
-          int dropId = 0;
-          String name = null;
-          String model = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          String parsedField4 = null;
+          String parsedField5 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 出现概率（百分比）
-            if (!arr[1].trim().isEmpty()) {
-              probability = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 随机权重（废弃）
-            if (!arr[2].trim().isEmpty()) {
-              weight = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 奖励id
-            if (!arr[3].trim().isEmpty()) {
-              dropId = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 名称
-            if (!arr[4].trim().isEmpty()) {
-              name = arr[4].trim();
-            }
-
-            // 解析 模型
-            if (!arr[5].trim().isEmpty()) {
-              model = arr[5].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("probability"), fileName + ":行" + lineNumber + ":字段 probability");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("weight"), fileName + ":行" + lineNumber + ":字段 weight");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("dropId"), fileName + ":行" + lineNumber + ":字段 dropId");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("model"), fileName + ":行" + lineNumber + ":字段 model");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          SaitamaGuestConfig config = new SaitamaGuestConfig(id, probability, weight, dropId, name, model);
-          config.afterLoad();
+          SaitamaGuestConfig config = new SaitamaGuestConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (SaitamaGuestConfig config : configList) config.afterLoad();
+      new SaitamaGuestConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -120,38 +88,6 @@ public class SaitamaGuestConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<SaitamaGuestConfig> getConfigList() {
@@ -164,7 +100,7 @@ public class SaitamaGuestConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "saitamaGuest.txt";
+      return "saitamaGuest.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

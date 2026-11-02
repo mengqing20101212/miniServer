@@ -8,13 +8,13 @@ import ly.ConfigColumnMeta;
 public abstract class UiInfoConfigCheckerBase extends AbstractConfigChecker<UiInfoConfig> {
   @Override
   public String getConfigFileName() {
-    return "uiInfo.txt";
+    return "uiInfo.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "BGM", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "BGM", "int"));
   }
 }

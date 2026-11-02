@@ -8,25 +8,25 @@ import ly.ConfigColumnMeta;
 public abstract class HeroCharacteristicConfigCheckerBase extends AbstractConfigChecker<HeroCharacteristicConfig> {
   @Override
   public String getConfigFileName() {
-    return "heroCharacteristic.txt";
+    return "heroCharacteristic.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "beizhu", "STRING"),
-        new ConfigColumnMeta(2, "heroId", "INT"),
-        new ConfigColumnMeta(3, "skillGroup", "INT"),
-        new ConfigColumnMeta(4, "heroFetters", "LIST<INT>"),
-        new ConfigColumnMeta(5, "advanced", "INT"),
-        new ConfigColumnMeta(6, "quality", "STRING"),
-        new ConfigColumnMeta(7, "qualityNum", "STRING"),
-        new ConfigColumnMeta(8, "heroType", "STRING"),
-        new ConfigColumnMeta(9, "heroTypeNum", "STRING"),
-        new ConfigColumnMeta(10, "characterType", "INT"),
-        new ConfigColumnMeta(11, "characterNum", "INT"),
-        new ConfigColumnMeta(12, "activationDes", "STRING"),
-        new ConfigColumnMeta(13, "des", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "beizhu", "string"),
+        new ConfigColumnMeta(2, "heroId", "int"),
+        new ConfigColumnMeta(3, "skillGroup", "int"),
+        new ConfigColumnMeta(4, "heroFetters", "list<int>"),
+        new ConfigColumnMeta(5, "advanced", "int"),
+        new ConfigColumnMeta(6, "quality", "string"),
+        new ConfigColumnMeta(7, "qualityNum", "string"),
+        new ConfigColumnMeta(8, "heroType", "string"),
+        new ConfigColumnMeta(9, "heroTypeNum", "string"),
+        new ConfigColumnMeta(10, "characterType", "int"),
+        new ConfigColumnMeta(11, "characterNum", "int"),
+        new ConfigColumnMeta(12, "activationDes", "string"),
+        new ConfigColumnMeta(13, "des", "string"));
   }
 }

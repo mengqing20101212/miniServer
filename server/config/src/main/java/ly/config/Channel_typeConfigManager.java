@@ -27,7 +27,7 @@ public class Channel_typeConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new Channel_typeConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "channel_type.txt"; }
+  public String getConfigFileName() { return "channel_type.xml"; }
 
   public static class Channel_typeConfigManagerImpl extends AbstractConfigManger {
     private List<Channel_typeConfig> configList = List.of();
@@ -39,126 +39,70 @@ public class Channel_typeConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       Channel_typeConfigChecker checker = new Channel_typeConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<Channel_typeConfig> newList = new ArrayList<>();
       Map<Integer, Channel_typeConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 14) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String spname = null;
-          int spid = 0;
-          String spcode = null;
-          String spdownloadurl = null;
-          String checkserverip = null;
-          int checkserverport = 0;
-          int groupid = 0;
-          String check_login_test_url = null;
-          String check_login_url = null;
-          String login_interface = null;
-          String appid = null;
-          String appsec = null;
-          int isExteral = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          String parsedField5 = null;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          String parsedField12 = null;
+          int parsedField13 = 0;
           try {
-            // 解析 渠道id
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 渠道名
-            if (!arr[1].trim().isEmpty()) {
-              spname = arr[1].trim();
-            }
-
-            // 解析 渠道编号
-            if (!arr[2].trim().isEmpty()) {
-              spid = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 渠道号
-            if (!arr[3].trim().isEmpty()) {
-              spcode = arr[3].trim();
-            }
-
-            // 解析 更新下载url
-            if (!arr[4].trim().isEmpty()) {
-              spdownloadurl = arr[4].trim();
-            }
-
-            // 解析 审核服ip
-            if (!arr[5].trim().isEmpty()) {
-              checkserverip = arr[5].trim();
-            }
-
-            // 解析 审核服端口
-            if (!arr[6].trim().isEmpty()) {
-              checkserverport = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 渠道分组id
-            if (!arr[7].trim().isEmpty()) {
-              groupid = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 登录校验测试环境
-            if (!arr[8].trim().isEmpty()) {
-              check_login_test_url = arr[8].trim();
-            }
-
-            // 解析 登录校验正式环境
-            if (!arr[9].trim().isEmpty()) {
-              check_login_url = arr[9].trim();
-            }
-
-            // 解析 登录接口
-            if (!arr[10].trim().isEmpty()) {
-              login_interface = arr[10].trim();
-            }
-
-            // 解析 appid
-            if (!arr[11].trim().isEmpty()) {
-              appid = arr[11].trim();
-            }
-
-            // 解析 sdk服务器秘钥
-            if (!arr[12].trim().isEmpty()) {
-              appsec = arr[12].trim();
-            }
-
-            // 解析 外发渠道
-            if (!arr[13].trim().isEmpty()) {
-              isExteral = Integer.parseInt(arr[13].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("spname"), fileName + ":行" + lineNumber + ":字段 spname");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("spid"), fileName + ":行" + lineNumber + ":字段 spid");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("spcode"), fileName + ":行" + lineNumber + ":字段 spcode");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("spdownloadurl"), fileName + ":行" + lineNumber + ":字段 spdownloadurl");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("checkserverip"), fileName + ":行" + lineNumber + ":字段 checkserverip");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("checkserverport"), fileName + ":行" + lineNumber + ":字段 checkserverport");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("groupid"), fileName + ":行" + lineNumber + ":字段 groupid");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("check_login_test_url"), fileName + ":行" + lineNumber + ":字段 check_login_test_url");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("check_login_url"), fileName + ":行" + lineNumber + ":字段 check_login_url");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("login_interface"), fileName + ":行" + lineNumber + ":字段 login_interface");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("appid"), fileName + ":行" + lineNumber + ":字段 appid");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("appsec"), fileName + ":行" + lineNumber + ":字段 appsec");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("isExteral"), fileName + ":行" + lineNumber + ":字段 isExteral");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          Channel_typeConfig config = new Channel_typeConfig(id, spname, spid, spcode, spdownloadurl, checkserverip, checkserverport, groupid, check_login_test_url, check_login_url, login_interface, appid, appsec, isExteral);
-          config.afterLoad();
+          Channel_typeConfig config = new Channel_typeConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (Channel_typeConfig config : configList) config.afterLoad();
+      new Channel_typeConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -168,38 +112,6 @@ public class Channel_typeConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<Channel_typeConfig> getConfigList() {
@@ -212,7 +124,7 @@ public class Channel_typeConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "channel_type.txt";
+      return "channel_type.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

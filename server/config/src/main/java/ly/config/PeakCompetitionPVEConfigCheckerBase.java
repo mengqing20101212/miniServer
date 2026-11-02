@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class PeakCompetitionPVEConfigCheckerBase extends AbstractConfigChecker<PeakCompetitionPVEConfig> {
   @Override
   public String getConfigFileName() {
-    return "peakCompetitionPVE.txt";
+    return "peakCompetitionPVE.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "baseName", "STRING"),
-        new ConfigColumnMeta(2, "unlockLv", "INT"),
-        new ConfigColumnMeta(3, "baseStage", "STRING"),
-        new ConfigColumnMeta(4, "icon", "INT"),
-        new ConfigColumnMeta(5, "stageDec", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "baseName", "string"),
+        new ConfigColumnMeta(2, "unlockLv", "int"),
+        new ConfigColumnMeta(3, "baseStage", "string"),
+        new ConfigColumnMeta(4, "icon", "int"),
+        new ConfigColumnMeta(5, "stageDec", "string"));
   }
 }

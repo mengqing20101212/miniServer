@@ -27,7 +27,7 @@ public class SupportTeamAttrTypeConfigManager implements InterfaceConfigManagerP
   public AbstractConfigManger createTable() { return new SupportTeamAttrTypeConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "supportTeamAttrType.txt"; }
+  public String getConfigFileName() { return "supportTeamAttrType.xml"; }
 
   public static class SupportTeamAttrTypeConfigManagerImpl extends AbstractConfigManger {
     private List<SupportTeamAttrTypeConfig> configList = List.of();
@@ -37,69 +37,40 @@ public class SupportTeamAttrTypeConfigManager implements InterfaceConfigManagerP
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       SupportTeamAttrTypeConfigChecker checker = new SupportTeamAttrTypeConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<SupportTeamAttrTypeConfig> newList = new ArrayList<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 5) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int attrType = 0;
-          String function = null;
-          String des = null;
-          int icon = 0;
-          int isPercent = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
           try {
-            // 解析 属性类型
-            if (!arr[0].trim().isEmpty()) {
-              attrType = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 属性功能
-            if (!arr[1].trim().isEmpty()) {
-              function = arr[1].trim();
-            }
-
-            // 解析 显示
-            if (!arr[2].trim().isEmpty()) {
-              des = arr[2].trim();
-            }
-
-            // 解析 图标id
-            if (!arr[3].trim().isEmpty()) {
-              icon = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 是否百分比
-            if (!arr[4].trim().isEmpty()) {
-              isPercent = Integer.parseInt(arr[4].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("attrType"), fileName + ":行" + lineNumber + ":字段 attrType");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("function"), fileName + ":行" + lineNumber + ":字段 function");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("des"), fileName + ":行" + lineNumber + ":字段 des");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("icon"), fileName + ":行" + lineNumber + ":字段 icon");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("isPercent"), fileName + ":行" + lineNumber + ":字段 isPercent");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          SupportTeamAttrTypeConfig config = new SupportTeamAttrTypeConfig(attrType, function, des, icon, isPercent);
-          config.afterLoad();
+          SupportTeamAttrTypeConfig config = new SupportTeamAttrTypeConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4);
           newList.add(config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+      });
+      configList = List.copyOf(newList);
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (SupportTeamAttrTypeConfig config : configList) config.afterLoad();
+      new SupportTeamAttrTypeConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -110,45 +81,13 @@ public class SupportTeamAttrTypeConfigManager implements InterfaceConfigManagerP
       // @@@@@自定义clear方法结束区@@@@@
     }
 
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
-    }
-
     public List<SupportTeamAttrTypeConfig> getConfigList() {
       return configList;
     }
 
     @Override
     public String getConfigFileName() {
-      return "supportTeamAttrType.txt";
+      return "supportTeamAttrType.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

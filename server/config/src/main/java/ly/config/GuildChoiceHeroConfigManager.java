@@ -27,7 +27,7 @@ public class GuildChoiceHeroConfigManager implements InterfaceConfigManagerProxy
   public AbstractConfigManger createTable() { return new GuildChoiceHeroConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "guildChoiceHero.txt"; }
+  public String getConfigFileName() { return "guildChoiceHero.xml"; }
 
   public static class GuildChoiceHeroConfigManagerImpl extends AbstractConfigManger {
     private List<GuildChoiceHeroConfig> configList = List.of();
@@ -39,108 +39,61 @@ public class GuildChoiceHeroConfigManager implements InterfaceConfigManagerProxy
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("list<int>");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       GuildChoiceHeroConfigChecker checker = new GuildChoiceHeroConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<GuildChoiceHeroConfig> newList = new ArrayList<>();
       Map<Integer, GuildChoiceHeroConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 11) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int unlcokLevel = 0;
-          int npcid = 0;
-          int playerLv = 0;
-          int sceneId = 0;
-          int priority = 0;
-          int reward1 = 0;
-          String reward2 = null;
-          String bossSkill = null;
-          int dropShow = 0;
-          int bossDamageStatisticsType = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          String parsedField7 = null;
+          java.util.List<Integer> parsedField8 = null;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
           try {
-            // 解析 状态编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 解锁等级
-            if (!arr[1].trim().isEmpty()) {
-              unlcokLevel = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 英雄ID
-            if (!arr[2].trim().isEmpty()) {
-              npcid = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 玩家等级
-            if (!arr[3].trim().isEmpty()) {
-              playerLv = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 关卡ID
-            if (!arr[4].trim().isEmpty()) {
-              sceneId = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 优先级
-            if (!arr[5].trim().isEmpty()) {
-              priority = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 参与奖励
-            if (!arr[6].trim().isEmpty()) {
-              reward1 = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 伤害奖励
-            if (!arr[7].trim().isEmpty()) {
-              reward2 = arr[7].trim();
-            }
-
-            // 解析 boss技能
-            if (!arr[8].trim().isEmpty()) {
-              bossSkill = arr[8].trim();
-            }
-
-            // 解析 掉落显示
-            if (!arr[9].trim().isEmpty()) {
-              dropShow = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 BOSS伤害计算
-            if (!arr[10].trim().isEmpty()) {
-              bossDamageStatisticsType = Integer.parseInt(arr[10].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("unlcokLevel"), fileName + ":行" + lineNumber + ":字段 unlcokLevel");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("npcid"), fileName + ":行" + lineNumber + ":字段 npcid");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("playerLv"), fileName + ":行" + lineNumber + ":字段 playerLv");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("sceneId"), fileName + ":行" + lineNumber + ":字段 sceneId");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("priority"), fileName + ":行" + lineNumber + ":字段 priority");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("reward1"), fileName + ":行" + lineNumber + ":字段 reward1");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("reward2"), fileName + ":行" + lineNumber + ":字段 reward2");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("bossSkill"), fileName + ":行" + lineNumber + ":字段 bossSkill");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("dropShow"), fileName + ":行" + lineNumber + ":字段 dropShow");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("bossDamageStatisticsType"), fileName + ":行" + lineNumber + ":字段 bossDamageStatisticsType");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          GuildChoiceHeroConfig config = new GuildChoiceHeroConfig(id, unlcokLevel, npcid, playerLv, sceneId, priority, reward1, reward2, bossSkill, dropShow, bossDamageStatisticsType);
-          config.afterLoad();
+          GuildChoiceHeroConfig config = new GuildChoiceHeroConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (GuildChoiceHeroConfig config : configList) config.afterLoad();
+      new GuildChoiceHeroConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -150,38 +103,6 @@ public class GuildChoiceHeroConfigManager implements InterfaceConfigManagerProxy
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<GuildChoiceHeroConfig> getConfigList() {
@@ -194,7 +115,7 @@ public class GuildChoiceHeroConfigManager implements InterfaceConfigManagerProxy
 
     @Override
     public String getConfigFileName() {
-      return "guildChoiceHero.txt";
+      return "guildChoiceHero.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

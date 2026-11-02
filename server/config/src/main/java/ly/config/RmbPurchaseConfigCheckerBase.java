@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class RmbPurchaseConfigCheckerBase extends AbstractConfigChecker<RmbPurchaseConfig> {
   @Override
   public String getConfigFileName() {
-    return "rmbPurchase.txt";
+    return "rmbPurchase.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "price", "INT"),
-        new ConfigColumnMeta(2, "name", "STRING"),
-        new ConfigColumnMeta(3, "des", "STRING"),
-        new ConfigColumnMeta(4, "itemId", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "price", "int"),
+        new ConfigColumnMeta(2, "name", "string"),
+        new ConfigColumnMeta(3, "des", "string"),
+        new ConfigColumnMeta(4, "itemId", "string"));
   }
 }

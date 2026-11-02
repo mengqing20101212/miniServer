@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class SaitamaExchangeConfigCheckerBase extends AbstractConfigChecker<SaitamaExchangeConfig> {
   @Override
   public String getConfigFileName() {
-    return "saitamaExchange.txt";
+    return "saitamaExchange.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "ratio", "INT"),
-        new ConfigColumnMeta(2, "changeList", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "ratio", "int"),
+        new ConfigColumnMeta(2, "changeList", "string"));
   }
 }

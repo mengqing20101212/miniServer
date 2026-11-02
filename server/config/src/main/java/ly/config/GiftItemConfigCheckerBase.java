@@ -8,22 +8,22 @@ import ly.ConfigColumnMeta;
 public abstract class GiftItemConfigCheckerBase extends AbstractConfigChecker<GiftItemConfig> {
   @Override
   public String getConfigFileName() {
-    return "giftItem.txt";
+    return "giftItem.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "description", "STRING"),
-        new ConfigColumnMeta(2, "type", "INT"),
-        new ConfigColumnMeta(3, "school", "INT"),
-        new ConfigColumnMeta(4, "grade", "INT"),
-        new ConfigColumnMeta(5, "sequence", "INT"),
-        new ConfigColumnMeta(6, "dropGroup", "INT"),
-        new ConfigColumnMeta(7, "selectDropGroup", "STRING"),
-        new ConfigColumnMeta(8, "dropSelectShow", "STRING"),
-        new ConfigColumnMeta(9, "giftTypeShow", "STRING"),
-        new ConfigColumnMeta(10, "typeJudge", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "description", "string"),
+        new ConfigColumnMeta(2, "type", "int"),
+        new ConfigColumnMeta(3, "school", "int"),
+        new ConfigColumnMeta(4, "grade", "int"),
+        new ConfigColumnMeta(5, "sequence", "int"),
+        new ConfigColumnMeta(6, "dropGroup", "int"),
+        new ConfigColumnMeta(7, "selectDropGroup", "string"),
+        new ConfigColumnMeta(8, "dropSelectShow", "string"),
+        new ConfigColumnMeta(9, "giftTypeShow", "string"),
+        new ConfigColumnMeta(10, "typeJudge", "int"));
   }
 }

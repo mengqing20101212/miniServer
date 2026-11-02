@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class FirstStoryEventConfigCheckerBase extends AbstractConfigChecker<FirstStoryEventConfig> {
   @Override
   public String getConfigFileName() {
-    return "firstStoryEvent.txt";
+    return "firstStoryEvent.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "type", "INT"),
-        new ConfigColumnMeta(3, "values", "STRING"),
-        new ConfigColumnMeta(4, "flag", "INT"),
-        new ConfigColumnMeta(5, "transitionType", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "type", "int"),
+        new ConfigColumnMeta(3, "values", "string"),
+        new ConfigColumnMeta(4, "flag", "int"),
+        new ConfigColumnMeta(5, "transitionType", "int"));
   }
 }

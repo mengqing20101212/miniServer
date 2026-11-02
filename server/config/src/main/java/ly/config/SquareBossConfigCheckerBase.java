@@ -8,20 +8,20 @@ import ly.ConfigColumnMeta;
 public abstract class SquareBossConfigCheckerBase extends AbstractConfigChecker<SquareBossConfig> {
   @Override
   public String getConfigFileName() {
-    return "squareBoss.txt";
+    return "squareBoss.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "weight", "INT"),
-        new ConfigColumnMeta(3, "bossHp", "INT"),
-        new ConfigColumnMeta(4, "skillTime", "STRING"),
-        new ConfigColumnMeta(5, "chargeTime", "INT"),
-        new ConfigColumnMeta(6, "chargeShowTime", "STRING"),
-        new ConfigColumnMeta(7, "shield", "STRING"),
-        new ConfigColumnMeta(8, "skillPara", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "weight", "int"),
+        new ConfigColumnMeta(3, "bossHp", "int"),
+        new ConfigColumnMeta(4, "skillTime", "string"),
+        new ConfigColumnMeta(5, "chargeTime", "int"),
+        new ConfigColumnMeta(6, "chargeShowTime", "string"),
+        new ConfigColumnMeta(7, "shield", "string"),
+        new ConfigColumnMeta(8, "skillPara", "string"));
   }
 }

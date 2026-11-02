@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class ExtraSkillConfigCheckerBase extends AbstractConfigChecker<ExtraSkillConfig> {
   @Override
   public String getConfigFileName() {
-    return "extraSkill.txt";
+    return "extraSkill.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "exDropId", "INT"),
-        new ConfigColumnMeta(2, "des", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "exDropId", "int"),
+        new ConfigColumnMeta(2, "des", "string"));
   }
 }

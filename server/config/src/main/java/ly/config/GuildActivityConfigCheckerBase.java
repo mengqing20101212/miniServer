@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class GuildActivityConfigCheckerBase extends AbstractConfigChecker<GuildActivityConfig> {
   @Override
   public String getConfigFileName() {
-    return "guildActivity.txt";
+    return "guildActivity.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "desc", "STRING"),
-        new ConfigColumnMeta(3, "icon", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "desc", "string"),
+        new ConfigColumnMeta(3, "icon", "int"));
   }
 }

@@ -8,28 +8,28 @@ import ly.ConfigColumnMeta;
 public abstract class ActivitypasscompensateConfigCheckerBase extends AbstractConfigChecker<ActivitypasscompensateConfig> {
   @Override
   public String getConfigFileName() {
-    return "activitypasscompensate.txt";
+    return "activitypasscompensate.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "scheDuling", "INT"),
-        new ConfigColumnMeta(2, "score", "INT"),
-        new ConfigColumnMeta(3, "closeReward", "INT"),
-        new ConfigColumnMeta(4, "closeRewardShow", "INT"),
-        new ConfigColumnMeta(5, "inherit1", "STRING"),
-        new ConfigColumnMeta(6, "inherit2", "STRING"),
-        new ConfigColumnMeta(7, "inherit3", "STRING"),
-        new ConfigColumnMeta(8, "mail", "INT"),
-        new ConfigColumnMeta(9, "describe1", "STRING"),
-        new ConfigColumnMeta(10, "describe2", "STRING"),
-        new ConfigColumnMeta(11, "item", "INT"),
-        new ConfigColumnMeta(12, "picture", "INT"),
-        new ConfigColumnMeta(13, "pictureOffset", "STRING"),
-        new ConfigColumnMeta(14, "pictureOffset2", "STRING"),
-        new ConfigColumnMeta(15, "passaWard1", "INT"),
-        new ConfigColumnMeta(16, "passaWard2", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "scheDuling", "int"),
+        new ConfigColumnMeta(2, "score", "int"),
+        new ConfigColumnMeta(3, "closeReward", "int"),
+        new ConfigColumnMeta(4, "closeRewardShow", "int"),
+        new ConfigColumnMeta(5, "inherit1", "string"),
+        new ConfigColumnMeta(6, "inherit2", "string"),
+        new ConfigColumnMeta(7, "inherit3", "string"),
+        new ConfigColumnMeta(8, "mail", "int"),
+        new ConfigColumnMeta(9, "describe1", "string"),
+        new ConfigColumnMeta(10, "describe2", "string"),
+        new ConfigColumnMeta(11, "item", "int"),
+        new ConfigColumnMeta(12, "picture", "int"),
+        new ConfigColumnMeta(13, "pictureOffset", "string"),
+        new ConfigColumnMeta(14, "pictureOffset2", "string"),
+        new ConfigColumnMeta(15, "passaWard1", "int"),
+        new ConfigColumnMeta(16, "passaWard2", "int"));
   }
 }

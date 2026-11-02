@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class FixedBonusConfigCheckerBase extends AbstractConfigChecker<FixedBonusConfig> {
   @Override
   public String getConfigFileName() {
-    return "fixedBonus.txt";
+    return "fixedBonus.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "fixedGroup", "INT"),
-        new ConfigColumnMeta(2, "bonusId", "INT"),
-        new ConfigColumnMeta(3, "turn", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "fixedGroup", "int"),
+        new ConfigColumnMeta(2, "bonusId", "int"),
+        new ConfigColumnMeta(3, "turn", "int"));
   }
 }

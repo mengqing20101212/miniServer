@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class ScoreControlConfigCheckerBase extends AbstractConfigChecker<ScoreControlConfig> {
   @Override
   public String getConfigFileName() {
-    return "scoreControl.txt";
+    return "scoreControl.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "level", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "level", "int"));
   }
 }

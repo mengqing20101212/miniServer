@@ -27,7 +27,7 @@ public class ShopType2ConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new ShopType2ConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "shopType2.txt"; }
+  public String getConfigFileName() { return "shopType2.xml"; }
 
   public static class ShopType2ConfigManagerImpl extends AbstractConfigManger {
     private List<ShopType2Config> configList = List.of();
@@ -39,96 +39,55 @@ public class ShopType2ConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ShopType2ConfigChecker checker = new ShopType2ConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ShopType2Config> newList = new ArrayList<>();
       Map<Integer, ShopType2Config> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 9) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          int type = 0;
-          String subShopList = null;
-          int openType = 0;
-          int openPara1 = 0;
-          int openPara2 = 0;
-          int isShow = 0;
-          int showSort = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          String parsedField3 = null;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
           try {
-            // 解析 ID
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 商店名称
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 商店类别
-            if (!arr[2].trim().isEmpty()) {
-              type = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 子商店列表
-            if (!arr[3].trim().isEmpty()) {
-              subShopList = arr[3].trim();
-            }
-
-            // 解析 商店开启条件类型
-            if (!arr[4].trim().isEmpty()) {
-              openType = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 开启参数1
-            if (!arr[5].trim().isEmpty()) {
-              openPara1 = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 开启参数2
-            if (!arr[6].trim().isEmpty()) {
-              openPara2 = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 是否出现在商店里
-            if (!arr[7].trim().isEmpty()) {
-              isShow = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 显示排序
-            if (!arr[8].trim().isEmpty()) {
-              showSort = Integer.parseInt(arr[8].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("type"), fileName + ":行" + lineNumber + ":字段 type");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("subShopList"), fileName + ":行" + lineNumber + ":字段 subShopList");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("openType"), fileName + ":行" + lineNumber + ":字段 openType");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("openPara1"), fileName + ":行" + lineNumber + ":字段 openPara1");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("openPara2"), fileName + ":行" + lineNumber + ":字段 openPara2");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("isShow"), fileName + ":行" + lineNumber + ":字段 isShow");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("showSort"), fileName + ":行" + lineNumber + ":字段 showSort");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ShopType2Config config = new ShopType2Config(id, name, type, subShopList, openType, openPara1, openPara2, isShow, showSort);
-          config.afterLoad();
+          ShopType2Config config = new ShopType2Config(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ShopType2Config config : configList) config.afterLoad();
+      new ShopType2ConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -138,38 +97,6 @@ public class ShopType2ConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ShopType2Config> getConfigList() {
@@ -182,7 +109,7 @@ public class ShopType2ConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "shopType2.txt";
+      return "shopType2.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

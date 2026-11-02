@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class AwakenDecomposeConfigCheckerBase extends AbstractConfigChecker<AwakenDecomposeConfig> {
   @Override
   public String getConfigFileName() {
-    return "awakenDecompose.txt";
+    return "awakenDecompose.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "itemId", "INT"),
-        new ConfigColumnMeta(2, "name", "STRING"),
-        new ConfigColumnMeta(3, "decomposeItemId", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "itemId", "int"),
+        new ConfigColumnMeta(2, "name", "string"),
+        new ConfigColumnMeta(3, "decomposeItemId", "string"));
   }
 }

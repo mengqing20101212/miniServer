@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class CoordinationConfigCheckerBase extends AbstractConfigChecker<CoordinationConfig> {
   @Override
   public String getConfigFileName() {
-    return "coordination.txt";
+    return "coordination.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "position", "INT"),
-        new ConfigColumnMeta(1, "levelUnlock", "INT"),
-        new ConfigColumnMeta(2, "coordinationUnlock", "INT"));
+        new ConfigColumnMeta(0, "position", "int"),
+        new ConfigColumnMeta(1, "levelUnlock", "int"),
+        new ConfigColumnMeta(2, "coordinationUnlock", "int"));
   }
 }

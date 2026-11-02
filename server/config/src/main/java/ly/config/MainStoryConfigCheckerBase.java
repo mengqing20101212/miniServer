@@ -8,28 +8,28 @@ import ly.ConfigColumnMeta;
 public abstract class MainStoryConfigCheckerBase extends AbstractConfigChecker<MainStoryConfig> {
   @Override
   public String getConfigFileName() {
-    return "mainStory.txt";
+    return "mainStory.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "titile", "STRING"),
-        new ConfigColumnMeta(3, "target", "STRING"),
-        new ConfigColumnMeta(4, "eventIds", "STRING"),
-        new ConfigColumnMeta(5, "chapterRes", "INT"),
-        new ConfigColumnMeta(6, "chapterNum", "INT"),
-        new ConfigColumnMeta(7, "chapterId", "INT"),
-        new ConfigColumnMeta(8, "requireLv", "INT"),
-        new ConfigColumnMeta(9, "preIds", "INT"),
-        new ConfigColumnMeta(10, "followID", "INT"),
-        new ConfigColumnMeta(11, "dropGroupId", "INT"),
-        new ConfigColumnMeta(12, "dropshow", "STRING"),
-        new ConfigColumnMeta(13, "lockWord", "STRING"),
-        new ConfigColumnMeta(14, "pic", "INT"),
-        new ConfigColumnMeta(15, "showId", "INT"),
-        new ConfigColumnMeta(16, "pic2", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "titile", "string"),
+        new ConfigColumnMeta(3, "target", "string"),
+        new ConfigColumnMeta(4, "eventIds", "string"),
+        new ConfigColumnMeta(5, "chapterRes", "int"),
+        new ConfigColumnMeta(6, "chapterNum", "int"),
+        new ConfigColumnMeta(7, "chapterId", "int"),
+        new ConfigColumnMeta(8, "requireLv", "int"),
+        new ConfigColumnMeta(9, "preIds", "int"),
+        new ConfigColumnMeta(10, "followID", "int"),
+        new ConfigColumnMeta(11, "dropGroupId", "int"),
+        new ConfigColumnMeta(12, "dropshow", "string"),
+        new ConfigColumnMeta(13, "lockWord", "string"),
+        new ConfigColumnMeta(14, "pic", "int"),
+        new ConfigColumnMeta(15, "showId", "int"),
+        new ConfigColumnMeta(16, "pic2", "int"));
   }
 }

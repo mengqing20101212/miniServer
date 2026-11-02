@@ -41,21 +41,41 @@ server/config/src/main/java/ly/config/Hero*Config*.java  ← 生成 Java
 |-----------|------|
 | Row 0 | 服务端表头（字段名） |
 | Row 1 | 客户端表头（客户端专用） |
-| Row 2 | 类型定义（INT / STRING / INT1 / INT2 / STRING2 / LONG / FLOAT / DOUBLE） |
+| Row 2 | 类型定义（基础类型、`list<T>`、`map<K,V>`） |
 | Row 3 | 注释/描述 |
 | Row 4 | 空行 |
 | Row 5+ | 数据行（第1列标记 `#` 才被导出） |
 
 ### 类型映射
 
-| Excel 类型 | Java 类型 | 示例 |
+类型仍直接写在 Excel Row 2，不需要额外的类型定义文件。类型名称不区分大小写。
+
+| Excel 类型 | Java 类型 | 单元格示例 |
 |-----------|-----------|------|
-| INT | `int` | `Integer.parseInt(arr[i])` |
-| LONG | `long` | `Long.parseLong(arr[i])` |
-| STRING | `String` | `arr[i].trim()` |
-| INT1 | `List<Integer>` | `parseIntList(arr[i])` — 逗号分隔 |
-| INT2 | `List<KV<Integer,Integer>>` | `parseIntKVList(arr[i])` — `key:value,key:value` |
-| STRING2 | `List<KV<String,String>>` | `parseStringKVList(arr[i])` |
+| `byte` / `short` / `int` / `long` | 对应整数类型 | `100` |
+| `float` / `double` | 对应浮点类型 | `1.25` |
+| `bool` / `boolean` | `boolean` | `true`、`false`、`1`、`0` |
+| `string`（别名 `str`、`text`） | `String` | `1001;2|1002;3` |
+| `list<int>` | `List<Integer>` | `[1,2,3]` |
+| `list<string>` | `List<String>` | `["普通","稀有"]` |
+| `map<int,long>` | `Map<Integer,Long>` | `{"1001":200,"1002":300}` |
+| `map<string,list<double>>` | `Map<String,List<Double>>` | `{"bonus":[1.5,2.5]}` |
+| `list<map<int,bool>>` | `List<Map<Integer,Boolean>>` | `[{"1":true},{"2":false}]` |
+
+集合单元格使用 JSON；Map 也支持 `[[1001,200],[1002,300]]` 的键值对数组写法。
+Map 的键支持整数、布尔和字符串，值支持基础类型或嵌套集合。重复键保留最后一个值。
+空单元格对应数值 `0`、布尔 `false`、字符串 `""`、空 List 或空 Map。集合不支持 `null` 元素。
+字符串不按通用类型系统解析业务结构：掉落、奖励、消耗仍用字符串，由业务代码封装解析，例如
+`Award.create(text)`、`Consume.create(text)`。本轮不支持结构体、枚举或配置引用。
+
+转表入口和运行时加载入口共用类型解析规则，错误包含文件、行、字段及集合中的位置。开发阶段类型错误只记录日志并跳过该行，其余数据继续加载。
+数值和公式导出保留小数；超出 Excel 数值精度的大整数请使用文本单元格。
+本轮采用新集合格式，不保留 `INT1` / `INT2` / `STRING2` 的旧分隔符语法；现有表按需调整后重新生成。
+不要手改 Config、Manager、CheckerBase 等生成文件。`buildConfigData` 仅生成数据，修改类型后需要
+执行 `parserExcelConfig` 同步生成 Java，并重新构建工具和服务。
+
+当前输出是UTF-8 XML，热更继续整套配置快照替换。
+启动时通过固定线程池并行解析各表；全部表加载完成后，依次执行记录级 afterLoad、Checker 和表级 afterLoad，再发布整套快照。热更复用同一加载流程，仍整套替换。
 
 ### 重新生成配置（当 Excel 修改后）
 
@@ -65,10 +85,10 @@ cd /mnt/d/WORK/me/miniServer/server
 cmd.exe /c "mvnw.cmd -DskipTests install -pl tool -am"
 
 # 2. 运行生成器
-cmd.exe /c "D:\Soft\env\Java\jdk-25\bin\java.exe -cp target\tool-1.0-SNAPSHOT.jar ly.ParserExcelConfig"
+cmd.exe /c "D:\Soft\env\Java\jdk-25\bin\java.exe -jar tool\target\tool-1.0-SNAPSHOT.jar parserExcelConfig ..\excel"
 ```
 
-**警告：** 重新生成会覆盖 `config` 模块的 Java 代码，并重写 `excel/serverConfig/*.txt` 文件。如果 HeroController 等业务代码引用了旧字段名，需要同步更新。
+**警告：** 重新生成会覆盖 `config` 模块的 Java 代码，并重写 `excel/serverConfig/*.xml` 文件。如果 HeroController 等业务代码引用了旧字段名，需要同步更新。
 
 ### 自动生成代码的特征
 
@@ -358,3 +378,14 @@ cmd.exe /c "netstat -ano | findstr :8889 && netstat -ano | findstr :9001 && nets
 9. ❌ **生成器模板的 `isSwitched()` 自动取反** — 生成后必须改为 `return switched.get()`
 10. ❌ **重新生成后不检查自定义区** — `@@@@@自定义方法开始区@@@@@` 的代码引用了旧字段名，需要手动更新
 11. ❌ **`ConfigService.init()` 类扫描依赖环境** — 在 Windows 测试环境中可能找不到 Manager 的 .class 文件
+
+### XML 运行时格式
+
+```xml
+<Root>
+  <Data id="1" name="普通英雄" costs='{"1001":200}' tags='["普通","近战"]'/>
+</Root>
+```
+
+加载器按属性名取值，字段顺序无关。集合仍用 JSON 单元格表达；XML 转义由转表器处理。
+GM 上传、配置完整包和热更摘要均使用 `.xml`。类型以 Excel 表头声明为准，不根据单元格内容推断。

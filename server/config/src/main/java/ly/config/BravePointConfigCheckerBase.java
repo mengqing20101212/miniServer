@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class BravePointConfigCheckerBase extends AbstractConfigChecker<BravePointConfig> {
   @Override
   public String getConfigFileName() {
-    return "bravePoint.txt";
+    return "bravePoint.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "para", "INT"),
-        new ConfigColumnMeta(3, "addCount", "INT"),
-        new ConfigColumnMeta(4, "beizhu", "STRING"),
-        new ConfigColumnMeta(5, "triggerReason", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "para", "int"),
+        new ConfigColumnMeta(3, "addCount", "int"),
+        new ConfigColumnMeta(4, "beizhu", "string"),
+        new ConfigColumnMeta(5, "triggerReason", "int"));
   }
 }

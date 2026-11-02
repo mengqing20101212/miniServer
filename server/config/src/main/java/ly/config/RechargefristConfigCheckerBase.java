@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class RechargefristConfigCheckerBase extends AbstractConfigChecker<RechargefristConfig> {
   @Override
   public String getConfigFileName() {
-    return "Rechargefrist.txt";
+    return "Rechargefrist.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "dropShow", "INT"),
-        new ConfigColumnMeta(2, "drop", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "dropShow", "int"),
+        new ConfigColumnMeta(2, "drop", "int"));
   }
 }

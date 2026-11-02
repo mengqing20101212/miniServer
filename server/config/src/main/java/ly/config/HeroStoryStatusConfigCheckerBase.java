@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class HeroStoryStatusConfigCheckerBase extends AbstractConfigChecker<HeroStoryStatusConfig> {
   @Override
   public String getConfigFileName() {
-    return "heroStoryStatus.txt";
+    return "heroStoryStatus.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "statusType", "INT"),
-        new ConfigColumnMeta(2, "effectWord", "STRING"),
-        new ConfigColumnMeta(3, "paraType", "INT"),
-        new ConfigColumnMeta(4, "para", "INT"),
-        new ConfigColumnMeta(5, "statusShow", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "statusType", "int"),
+        new ConfigColumnMeta(2, "effectWord", "string"),
+        new ConfigColumnMeta(3, "paraType", "int"),
+        new ConfigColumnMeta(4, "para", "int"),
+        new ConfigColumnMeta(5, "statusShow", "int"));
   }
 }

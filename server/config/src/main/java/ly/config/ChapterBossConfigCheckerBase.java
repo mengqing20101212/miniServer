@@ -8,22 +8,22 @@ import ly.ConfigColumnMeta;
 public abstract class ChapterBossConfigCheckerBase extends AbstractConfigChecker<ChapterBossConfig> {
   @Override
   public String getConfigFileName() {
-    return "chapterBoss.txt";
+    return "chapterBoss.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "starNum", "INT"),
-        new ConfigColumnMeta(2, "type", "INT"),
-        new ConfigColumnMeta(3, "dropShow", "STRING"),
-        new ConfigColumnMeta(4, "drop", "INT"),
-        new ConfigColumnMeta(5, "sceneId", "INT"),
-        new ConfigColumnMeta(6, "npcId", "STRING"),
-        new ConfigColumnMeta(7, "modelId", "INT"),
-        new ConfigColumnMeta(8, "resourceNpc", "INT"),
-        new ConfigColumnMeta(9, "resourceIcon", "INT"),
-        new ConfigColumnMeta(10, "iconNum", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "starNum", "int"),
+        new ConfigColumnMeta(2, "type", "int"),
+        new ConfigColumnMeta(3, "dropShow", "string"),
+        new ConfigColumnMeta(4, "drop", "int"),
+        new ConfigColumnMeta(5, "sceneId", "int"),
+        new ConfigColumnMeta(6, "npcId", "string"),
+        new ConfigColumnMeta(7, "modelId", "int"),
+        new ConfigColumnMeta(8, "resourceNpc", "int"),
+        new ConfigColumnMeta(9, "resourceIcon", "int"),
+        new ConfigColumnMeta(10, "iconNum", "int"));
   }
 }

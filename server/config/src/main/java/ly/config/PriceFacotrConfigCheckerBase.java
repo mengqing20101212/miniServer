@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class PriceFacotrConfigCheckerBase extends AbstractConfigChecker<PriceFacotrConfig> {
   @Override
   public String getConfigFileName() {
-    return "priceFacotr.txt";
+    return "priceFacotr.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "level", "STRING"),
-        new ConfigColumnMeta(2, "itemId", "INT"),
-        new ConfigColumnMeta(3, "price", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "level", "string"),
+        new ConfigColumnMeta(2, "itemId", "int"),
+        new ConfigColumnMeta(3, "price", "int"));
   }
 }

@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class SaitamaActionTimeConfigCheckerBase extends AbstractConfigChecker<SaitamaActionTimeConfig> {
   @Override
   public String getConfigFileName() {
-    return "saitamaActionTime.txt";
+    return "saitamaActionTime.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "group", "INT"),
-        new ConfigColumnMeta(2, "actionPool1", "STRING"),
-        new ConfigColumnMeta(3, "actionPool2", "STRING"),
-        new ConfigColumnMeta(4, "time", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "group", "int"),
+        new ConfigColumnMeta(2, "actionPool1", "string"),
+        new ConfigColumnMeta(3, "actionPool2", "string"),
+        new ConfigColumnMeta(4, "time", "string"));
   }
 }

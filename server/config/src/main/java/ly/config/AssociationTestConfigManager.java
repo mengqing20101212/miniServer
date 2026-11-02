@@ -27,7 +27,7 @@ public class AssociationTestConfigManager implements InterfaceConfigManagerProxy
   public AbstractConfigManger createTable() { return new AssociationTestConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "associationTest.txt"; }
+  public String getConfigFileName() { return "associationTest.xml"; }
 
   public static class AssociationTestConfigManagerImpl extends AbstractConfigManger {
     private List<AssociationTestConfig> configList = List.of();
@@ -39,108 +39,61 @@ public class AssociationTestConfigManager implements InterfaceConfigManagerProxy
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       AssociationTestConfigChecker checker = new AssociationTestConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<AssociationTestConfig> newList = new ArrayList<>();
       Map<Integer, AssociationTestConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 11) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int week = 0;
-          int day = 0;
-          String heroID = null;
-          String beizhu = null;
-          String dropSuccess = null;
-          String dropFail = null;
-          String dropShow = null;
-          int testTimes = 0;
-          int stamina = 0;
-          String questionPool = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          String parsedField10 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 周
-            if (!arr[1].trim().isEmpty()) {
-              week = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 日
-            if (!arr[2].trim().isEmpty()) {
-              day = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 英雄ID
-            if (!arr[3].trim().isEmpty()) {
-              heroID = arr[3].trim();
-            }
-
-            // 解析 备注
-            if (!arr[4].trim().isEmpty()) {
-              beizhu = arr[4].trim();
-            }
-
-            // 解析 成功奖励
-            if (!arr[5].trim().isEmpty()) {
-              dropSuccess = arr[5].trim();
-            }
-
-            // 解析 失败奖励
-            if (!arr[6].trim().isEmpty()) {
-              dropFail = arr[6].trim();
-            }
-
-            // 解析 奖励预览
-            if (!arr[7].trim().isEmpty()) {
-              dropShow = arr[7].trim();
-            }
-
-            // 解析 测试次数
-            if (!arr[8].trim().isEmpty()) {
-              testTimes = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 每次消耗体力
-            if (!arr[9].trim().isEmpty()) {
-              stamina = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 题目池
-            if (!arr[10].trim().isEmpty()) {
-              questionPool = arr[10].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("week"), fileName + ":行" + lineNumber + ":字段 week");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("day"), fileName + ":行" + lineNumber + ":字段 day");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("heroID"), fileName + ":行" + lineNumber + ":字段 heroID");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("beizhu"), fileName + ":行" + lineNumber + ":字段 beizhu");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("dropSuccess"), fileName + ":行" + lineNumber + ":字段 dropSuccess");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("dropFail"), fileName + ":行" + lineNumber + ":字段 dropFail");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("dropShow"), fileName + ":行" + lineNumber + ":字段 dropShow");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("testTimes"), fileName + ":行" + lineNumber + ":字段 testTimes");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("stamina"), fileName + ":行" + lineNumber + ":字段 stamina");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("questionPool"), fileName + ":行" + lineNumber + ":字段 questionPool");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          AssociationTestConfig config = new AssociationTestConfig(id, week, day, heroID, beizhu, dropSuccess, dropFail, dropShow, testTimes, stamina, questionPool);
-          config.afterLoad();
+          AssociationTestConfig config = new AssociationTestConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (AssociationTestConfig config : configList) config.afterLoad();
+      new AssociationTestConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -150,38 +103,6 @@ public class AssociationTestConfigManager implements InterfaceConfigManagerProxy
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<AssociationTestConfig> getConfigList() {
@@ -194,7 +115,7 @@ public class AssociationTestConfigManager implements InterfaceConfigManagerProxy
 
     @Override
     public String getConfigFileName() {
-      return "associationTest.txt";
+      return "associationTest.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

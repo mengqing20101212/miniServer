@@ -27,7 +27,7 @@ public class MissionMain1ConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new MissionMain1ConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "missionMain1.txt"; }
+  public String getConfigFileName() { return "missionMain1.xml"; }
 
   public static class MissionMain1ConfigManagerImpl extends AbstractConfigManger {
     private List<MissionMain1Config> configList = List.of();
@@ -39,84 +39,49 @@ public class MissionMain1ConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       MissionMain1ConfigChecker checker = new MissionMain1ConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<MissionMain1Config> newList = new ArrayList<>();
       Map<Integer, MissionMain1Config> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 7) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String beizhu = null;
-          int condition = 0;
-          int para = 0;
-          int para2 = 0;
-          int targetValue = 0;
-          int change_methods = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 备注
-            if (!arr[1].trim().isEmpty()) {
-              beizhu = arr[1].trim();
-            }
-
-            // 解析 内容类型
-            if (!arr[2].trim().isEmpty()) {
-              condition = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 参数
-            if (!arr[3].trim().isEmpty()) {
-              para = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 参数2
-            if (!arr[4].trim().isEmpty()) {
-              para2 = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 目标值
-            if (!arr[5].trim().isEmpty()) {
-              targetValue = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 数据统计方式
-            if (!arr[6].trim().isEmpty()) {
-              change_methods = Integer.parseInt(arr[6].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("beizhu"), fileName + ":行" + lineNumber + ":字段 beizhu");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("condition"), fileName + ":行" + lineNumber + ":字段 condition");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("para"), fileName + ":行" + lineNumber + ":字段 para");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("para2"), fileName + ":行" + lineNumber + ":字段 para2");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("targetValue"), fileName + ":行" + lineNumber + ":字段 targetValue");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("change_methods"), fileName + ":行" + lineNumber + ":字段 change_methods");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          MissionMain1Config config = new MissionMain1Config(id, beizhu, condition, para, para2, targetValue, change_methods);
-          config.afterLoad();
+          MissionMain1Config config = new MissionMain1Config(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (MissionMain1Config config : configList) config.afterLoad();
+      new MissionMain1ConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -126,38 +91,6 @@ public class MissionMain1ConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<MissionMain1Config> getConfigList() {
@@ -170,7 +103,7 @@ public class MissionMain1ConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "missionMain1.txt";
+      return "missionMain1.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

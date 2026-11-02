@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class SaitamaRewardConfigCheckerBase extends AbstractConfigChecker<SaitamaRewardConfig> {
   @Override
   public String getConfigFileName() {
-    return "saitamaReward.txt";
+    return "saitamaReward.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "from", "INT"),
-        new ConfigColumnMeta(2, "name", "STRING"),
-        new ConfigColumnMeta(3, "title", "STRING"),
-        new ConfigColumnMeta(4, "titleRes", "INT"),
-        new ConfigColumnMeta(5, "headId", "INT"),
-        new ConfigColumnMeta(6, "word", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "from", "int"),
+        new ConfigColumnMeta(2, "name", "string"),
+        new ConfigColumnMeta(3, "title", "string"),
+        new ConfigColumnMeta(4, "titleRes", "int"),
+        new ConfigColumnMeta(5, "headId", "int"),
+        new ConfigColumnMeta(6, "word", "string"));
   }
 }

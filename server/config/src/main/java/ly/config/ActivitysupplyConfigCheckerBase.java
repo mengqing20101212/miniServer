@@ -8,24 +8,24 @@ import ly.ConfigColumnMeta;
 public abstract class ActivitysupplyConfigCheckerBase extends AbstractConfigChecker<ActivitysupplyConfig> {
   @Override
   public String getConfigFileName() {
-    return "activitysupply.txt";
+    return "activitysupply.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "openType", "INT"),
-        new ConfigColumnMeta(2, "scheDuling", "INT"),
-        new ConfigColumnMeta(3, "shopId", "INT"),
-        new ConfigColumnMeta(4, "drop", "INT"),
-        new ConfigColumnMeta(5, "rechargShow", "INT"),
-        new ConfigColumnMeta(6, "sloganName", "STRING"),
-        new ConfigColumnMeta(7, "sloganBg", "INT"),
-        new ConfigColumnMeta(8, "limitPara", "INT"),
-        new ConfigColumnMeta(9, "rechargeShopId", "INT"),
-        new ConfigColumnMeta(10, "refreshTime", "INT"),
-        new ConfigColumnMeta(11, "moneyType", "INT"),
-        new ConfigColumnMeta(12, "quantity", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "openType", "int"),
+        new ConfigColumnMeta(2, "scheDuling", "int"),
+        new ConfigColumnMeta(3, "shopId", "int"),
+        new ConfigColumnMeta(4, "drop", "int"),
+        new ConfigColumnMeta(5, "rechargShow", "int"),
+        new ConfigColumnMeta(6, "sloganName", "string"),
+        new ConfigColumnMeta(7, "sloganBg", "int"),
+        new ConfigColumnMeta(8, "limitPara", "int"),
+        new ConfigColumnMeta(9, "rechargeShopId", "int"),
+        new ConfigColumnMeta(10, "refreshTime", "int"),
+        new ConfigColumnMeta(11, "moneyType", "int"),
+        new ConfigColumnMeta(12, "quantity", "int"));
   }
 }

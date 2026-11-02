@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class DocConfigCheckerBase extends AbstractConfigChecker<DocConfig> {
   @Override
   public String getConfigFileName() {
-    return "doc.txt";
+    return "doc.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "Nouse", "INT"),
-        new ConfigColumnMeta(1, "id", "INT"),
-        new ConfigColumnMeta(2, "value", "STRING"));
+        new ConfigColumnMeta(0, "Nouse", "int"),
+        new ConfigColumnMeta(1, "id", "int"),
+        new ConfigColumnMeta(2, "value", "string"));
   }
 }

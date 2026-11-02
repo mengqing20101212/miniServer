@@ -8,21 +8,21 @@ import ly.ConfigColumnMeta;
 public abstract class ContactEventConfigCheckerBase extends AbstractConfigChecker<ContactEventConfig> {
   @Override
   public String getConfigFileName() {
-    return "contactEvent.txt";
+    return "contactEvent.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "beizhu", "STRING"),
-        new ConfigColumnMeta(3, "para", "INT"),
-        new ConfigColumnMeta(4, "startDialog", "STRING"),
-        new ConfigColumnMeta(5, "rightDialog", "STRING"),
-        new ConfigColumnMeta(6, "wrongDialog", "STRING"),
-        new ConfigColumnMeta(7, "dropSuccess", "INT"),
-        new ConfigColumnMeta(8, "dropFail", "INT"),
-        new ConfigColumnMeta(9, "basicMail", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "beizhu", "string"),
+        new ConfigColumnMeta(3, "para", "int"),
+        new ConfigColumnMeta(4, "startDialog", "string"),
+        new ConfigColumnMeta(5, "rightDialog", "string"),
+        new ConfigColumnMeta(6, "wrongDialog", "string"),
+        new ConfigColumnMeta(7, "dropSuccess", "int"),
+        new ConfigColumnMeta(8, "dropFail", "int"),
+        new ConfigColumnMeta(9, "basicMail", "int"));
   }
 }

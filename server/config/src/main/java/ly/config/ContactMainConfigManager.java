@@ -27,7 +27,7 @@ public class ContactMainConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new ContactMainConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "contactMain.txt"; }
+  public String getConfigFileName() { return "contactMain.xml"; }
 
   public static class ContactMainConfigManagerImpl extends AbstractConfigManger {
     private List<ContactMainConfig> configList = List.of();
@@ -39,120 +39,67 @@ public class ContactMainConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ContactMainConfigChecker checker = new ContactMainConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ContactMainConfig> newList = new ArrayList<>();
       Map<Integer, ContactMainConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 13) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          String englishName = null;
-          String missionList = null;
-          int resource = 0;
-          int headIcon = 0;
-          String missionShow = null;
-          String rewardShow = null;
-          int challengeTimes = 0;
-          String weekend = null;
-          int weekendChallenge = 0;
-          int stamina = 0;
-          String eventPool = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          int parsedField8 = 0;
+          String parsedField9 = null;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          String parsedField12 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 名称
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 英文名字
-            if (!arr[2].trim().isEmpty()) {
-              englishName = arr[2].trim();
-            }
-
-            // 解析 解锁类型
-            if (!arr[3].trim().isEmpty()) {
-              missionList = arr[3].trim();
-            }
-
-            // 解析 立绘
-            if (!arr[4].trim().isEmpty()) {
-              resource = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 头像
-            if (!arr[5].trim().isEmpty()) {
-              headIcon = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 解锁条件展示
-            if (!arr[6].trim().isEmpty()) {
-              missionShow = arr[6].trim();
-            }
-
-            // 解析 奖励预览展示
-            if (!arr[7].trim().isEmpty()) {
-              rewardShow = arr[7].trim();
-            }
-
-            // 解析 每日挑战次数
-            if (!arr[8].trim().isEmpty()) {
-              challengeTimes = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 休息日
-            if (!arr[9].trim().isEmpty()) {
-              weekend = arr[9].trim();
-            }
-
-            // 解析 休息挑战次数
-            if (!arr[10].trim().isEmpty()) {
-              weekendChallenge = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 每次消耗体力
-            if (!arr[11].trim().isEmpty()) {
-              stamina = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 事件池
-            if (!arr[12].trim().isEmpty()) {
-              eventPool = arr[12].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("englishName"), fileName + ":行" + lineNumber + ":字段 englishName");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("missionList"), fileName + ":行" + lineNumber + ":字段 missionList");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("resource"), fileName + ":行" + lineNumber + ":字段 resource");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("headIcon"), fileName + ":行" + lineNumber + ":字段 headIcon");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("missionShow"), fileName + ":行" + lineNumber + ":字段 missionShow");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("rewardShow"), fileName + ":行" + lineNumber + ":字段 rewardShow");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("challengeTimes"), fileName + ":行" + lineNumber + ":字段 challengeTimes");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("weekend"), fileName + ":行" + lineNumber + ":字段 weekend");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("weekendChallenge"), fileName + ":行" + lineNumber + ":字段 weekendChallenge");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("stamina"), fileName + ":行" + lineNumber + ":字段 stamina");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("eventPool"), fileName + ":行" + lineNumber + ":字段 eventPool");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ContactMainConfig config = new ContactMainConfig(id, name, englishName, missionList, resource, headIcon, missionShow, rewardShow, challengeTimes, weekend, weekendChallenge, stamina, eventPool);
-          config.afterLoad();
+          ContactMainConfig config = new ContactMainConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ContactMainConfig config : configList) config.afterLoad();
+      new ContactMainConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -162,38 +109,6 @@ public class ContactMainConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ContactMainConfig> getConfigList() {
@@ -206,7 +121,7 @@ public class ContactMainConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "contactMain.txt";
+      return "contactMain.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

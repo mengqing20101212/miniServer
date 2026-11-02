@@ -8,27 +8,27 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityTaskConfigCheckerBase extends AbstractConfigChecker<ActivityTaskConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityTask.txt";
+    return "activityTask.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "title", "STRING"),
-        new ConfigColumnMeta(2, "name", "STRING"),
-        new ConfigColumnMeta(3, "questType", "INT"),
-        new ConfigColumnMeta(4, "scheDuling", "INT"),
-        new ConfigColumnMeta(5, "page", "INT"),
-        new ConfigColumnMeta(6, "condition", "INT"),
-        new ConfigColumnMeta(7, "rewardShow", "STRING"),
-        new ConfigColumnMeta(8, "drop", "INT"),
-        new ConfigColumnMeta(9, "redirectionId", "INT"),
-        new ConfigColumnMeta(10, "priority", "INT"),
-        new ConfigColumnMeta(11, "pointType", "INT"),
-        new ConfigColumnMeta(12, "point", "INT"),
-        new ConfigColumnMeta(13, "startTime", "STRING"),
-        new ConfigColumnMeta(14, "endTime", "STRING"),
-        new ConfigColumnMeta(15, "titlePicId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "title", "string"),
+        new ConfigColumnMeta(2, "name", "string"),
+        new ConfigColumnMeta(3, "questType", "int"),
+        new ConfigColumnMeta(4, "scheDuling", "int"),
+        new ConfigColumnMeta(5, "page", "int"),
+        new ConfigColumnMeta(6, "condition", "int"),
+        new ConfigColumnMeta(7, "rewardShow", "string"),
+        new ConfigColumnMeta(8, "drop", "int"),
+        new ConfigColumnMeta(9, "redirectionId", "int"),
+        new ConfigColumnMeta(10, "priority", "int"),
+        new ConfigColumnMeta(11, "pointType", "int"),
+        new ConfigColumnMeta(12, "point", "int"),
+        new ConfigColumnMeta(13, "startTime", "string"),
+        new ConfigColumnMeta(14, "endTime", "string"),
+        new ConfigColumnMeta(15, "titlePicId", "int"));
   }
 }

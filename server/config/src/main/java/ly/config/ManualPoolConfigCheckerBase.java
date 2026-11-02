@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class ManualPoolConfigCheckerBase extends AbstractConfigChecker<ManualPoolConfig> {
   @Override
   public String getConfigFileName() {
-    return "manualPool.txt";
+    return "manualPool.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "level", "STRING"),
-        new ConfigColumnMeta(2, "regularPoolDaily", "STRING"),
-        new ConfigColumnMeta(3, "randomNumDaily", "STRING"),
-        new ConfigColumnMeta(4, "poolGroupDaily", "STRING"),
-        new ConfigColumnMeta(5, "regularPoolWeek", "STRING"),
-        new ConfigColumnMeta(6, "randomNumWeek", "STRING"),
-        new ConfigColumnMeta(7, "poolGroupWeek", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "level", "string"),
+        new ConfigColumnMeta(2, "regularPoolDaily", "string"),
+        new ConfigColumnMeta(3, "randomNumDaily", "string"),
+        new ConfigColumnMeta(4, "poolGroupDaily", "string"),
+        new ConfigColumnMeta(5, "regularPoolWeek", "string"),
+        new ConfigColumnMeta(6, "randomNumWeek", "string"),
+        new ConfigColumnMeta(7, "poolGroupWeek", "string"));
   }
 }

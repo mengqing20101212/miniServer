@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class OppoentPushConfigCheckerBase extends AbstractConfigChecker<OppoentPushConfig> {
   @Override
   public String getConfigFileName() {
-    return "oppoentPush.txt";
+    return "oppoentPush.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "rounds", "INT"),
-        new ConfigColumnMeta(2, "levelMy", "INT"),
-        new ConfigColumnMeta(3, "levelOpponent", "INT"),
-        new ConfigColumnMeta(4, "difficultNum", "INT"),
-        new ConfigColumnMeta(5, "normalNum", "INT"),
-        new ConfigColumnMeta(6, "easyNum", "INT"),
-        new ConfigColumnMeta(7, "robotNum", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "rounds", "int"),
+        new ConfigColumnMeta(2, "levelMy", "int"),
+        new ConfigColumnMeta(3, "levelOpponent", "int"),
+        new ConfigColumnMeta(4, "difficultNum", "int"),
+        new ConfigColumnMeta(5, "normalNum", "int"),
+        new ConfigColumnMeta(6, "easyNum", "int"),
+        new ConfigColumnMeta(7, "robotNum", "int"));
   }
 }

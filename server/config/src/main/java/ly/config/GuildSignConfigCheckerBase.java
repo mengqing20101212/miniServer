@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class GuildSignConfigCheckerBase extends AbstractConfigChecker<GuildSignConfig> {
   @Override
   public String getConfigFileName() {
-    return "guildSign.txt";
+    return "guildSign.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "icon", "INT"),
-        new ConfigColumnMeta(2, "iconBg", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "icon", "int"),
+        new ConfigColumnMeta(2, "iconBg", "int"));
   }
 }

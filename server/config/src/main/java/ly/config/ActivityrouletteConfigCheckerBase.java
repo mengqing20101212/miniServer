@@ -8,27 +8,27 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityrouletteConfigCheckerBase extends AbstractConfigChecker<ActivityrouletteConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityroulette.txt";
+    return "activityroulette.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "scheDuling", "INT"),
-        new ConfigColumnMeta(2, "prizeId", "INT"),
-        new ConfigColumnMeta(3, "luckyPrize", "INT"),
-        new ConfigColumnMeta(4, "rafflePoints", "INT"),
-        new ConfigColumnMeta(5, "minimumPoints", "INT"),
-        new ConfigColumnMeta(6, "consumableProps", "INT"),
-        new ConfigColumnMeta(7, "consumptionQuantity", "INT"),
-        new ConfigColumnMeta(8, "luckValueCap", "INT"),
-        new ConfigColumnMeta(9, "resetLuck", "INT"),
-        new ConfigColumnMeta(10, "getLucky", "INT"),
-        new ConfigColumnMeta(11, "lotteryGuarantee", "INT"),
-        new ConfigColumnMeta(12, "rewardShow", "STRING"),
-        new ConfigColumnMeta(13, "drop", "INT"),
-        new ConfigColumnMeta(14, "numberAwards", "INT"),
-        new ConfigColumnMeta(15, "picture", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "scheDuling", "int"),
+        new ConfigColumnMeta(2, "prizeId", "int"),
+        new ConfigColumnMeta(3, "luckyPrize", "int"),
+        new ConfigColumnMeta(4, "rafflePoints", "int"),
+        new ConfigColumnMeta(5, "minimumPoints", "int"),
+        new ConfigColumnMeta(6, "consumableProps", "int"),
+        new ConfigColumnMeta(7, "consumptionQuantity", "int"),
+        new ConfigColumnMeta(8, "luckValueCap", "int"),
+        new ConfigColumnMeta(9, "resetLuck", "int"),
+        new ConfigColumnMeta(10, "getLucky", "int"),
+        new ConfigColumnMeta(11, "lotteryGuarantee", "int"),
+        new ConfigColumnMeta(12, "rewardShow", "string"),
+        new ConfigColumnMeta(13, "drop", "int"),
+        new ConfigColumnMeta(14, "numberAwards", "int"),
+        new ConfigColumnMeta(15, "picture", "string"));
   }
 }

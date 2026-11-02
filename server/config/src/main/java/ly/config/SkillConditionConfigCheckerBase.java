@@ -8,27 +8,27 @@ import ly.ConfigColumnMeta;
 public abstract class SkillConditionConfigCheckerBase extends AbstractConfigChecker<SkillConditionConfig> {
   @Override
   public String getConfigFileName() {
-    return "skillCondition.txt";
+    return "skillCondition.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "des", "STRING"),
-        new ConfigColumnMeta(3, "param_1", "STRING"),
-        new ConfigColumnMeta(4, "param_2", "STRING"),
-        new ConfigColumnMeta(5, "param_3", "STRING"),
-        new ConfigColumnMeta(6, "param_4", "STRING"),
-        new ConfigColumnMeta(7, "param_5", "STRING"),
-        new ConfigColumnMeta(8, "param_6", "STRING"),
-        new ConfigColumnMeta(9, "param_7", "STRING"),
-        new ConfigColumnMeta(10, "param_8", "STRING"),
-        new ConfigColumnMeta(11, "param_9", "STRING"),
-        new ConfigColumnMeta(12, "param_10", "STRING"),
-        new ConfigColumnMeta(13, "heroId", "INT"),
-        new ConfigColumnMeta(14, "skillSequence", "INT"),
-        new ConfigColumnMeta(15, "effectSequence", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "des", "string"),
+        new ConfigColumnMeta(3, "param_1", "string"),
+        new ConfigColumnMeta(4, "param_2", "string"),
+        new ConfigColumnMeta(5, "param_3", "string"),
+        new ConfigColumnMeta(6, "param_4", "string"),
+        new ConfigColumnMeta(7, "param_5", "string"),
+        new ConfigColumnMeta(8, "param_6", "string"),
+        new ConfigColumnMeta(9, "param_7", "string"),
+        new ConfigColumnMeta(10, "param_8", "string"),
+        new ConfigColumnMeta(11, "param_9", "string"),
+        new ConfigColumnMeta(12, "param_10", "string"),
+        new ConfigColumnMeta(13, "heroId", "int"),
+        new ConfigColumnMeta(14, "skillSequence", "int"),
+        new ConfigColumnMeta(15, "effectSequence", "int"));
   }
 }

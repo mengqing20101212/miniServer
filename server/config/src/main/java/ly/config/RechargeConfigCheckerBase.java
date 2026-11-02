@@ -8,13 +8,13 @@ import ly.ConfigColumnMeta;
 public abstract class RechargeConfigCheckerBase extends AbstractConfigChecker<RechargeConfig> {
   @Override
   public String getConfigFileName() {
-    return "Recharge.txt";
+    return "Recharge.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"));
   }
 }

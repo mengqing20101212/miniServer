@@ -27,7 +27,7 @@ public class SubtitleConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new SubtitleConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "subtitle.txt"; }
+  public String getConfigFileName() { return "subtitle.xml"; }
 
   public static class SubtitleConfigManagerImpl extends AbstractConfigManger {
     private List<SubtitleConfig> configList = List.of();
@@ -37,75 +37,43 @@ public class SubtitleConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("list<int>");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("float");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("float");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       SubtitleConfigChecker checker = new SubtitleConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<SubtitleConfig> newList = new ArrayList<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 6) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          String name = null;
-          int index = 0;
-          String style = null;
-          float start_time = 0F;
-          float end_time = 0F;
-          String content = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          String parsedField0 = null;
+          int parsedField1 = 0;
+          java.util.List<Integer> parsedField2 = null;
+          float parsedField3 = 0F;
+          float parsedField4 = 0F;
+          String parsedField5 = null;
           try {
-            // 解析 视频名称
-            if (!arr[0].trim().isEmpty()) {
-              name = arr[0].trim();
-            }
-
-            // 解析 对话序列
-            if (!arr[1].trim().isEmpty()) {
-              index = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 [样式,效果][1,1]
-            if (!arr[2].trim().isEmpty()) {
-              style = arr[2].trim();
-            }
-
-            // 解析 对话开始时间
-            if (!arr[3].trim().isEmpty()) {
-              start_time = Float.parseFloat(arr[3].trim());
-            }
-
-            // 解析 对话结束时间
-            if (!arr[4].trim().isEmpty()) {
-              end_time = Float.parseFloat(arr[4].trim());
-            }
-
-            // 解析 字幕内容
-            if (!arr[5].trim().isEmpty()) {
-              content = arr[5].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("index"), fileName + ":行" + lineNumber + ":字段 index");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("style"), fileName + ":行" + lineNumber + ":字段 style");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("start_time"), fileName + ":行" + lineNumber + ":字段 start_time");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("end_time"), fileName + ":行" + lineNumber + ":字段 end_time");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("content"), fileName + ":行" + lineNumber + ":字段 content");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          SubtitleConfig config = new SubtitleConfig(name, index, style, start_time, end_time, content);
-          config.afterLoad();
+          SubtitleConfig config = new SubtitleConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5);
           newList.add(config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+      });
+      configList = List.copyOf(newList);
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (SubtitleConfig config : configList) config.afterLoad();
+      new SubtitleConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -116,45 +84,13 @@ public class SubtitleConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法结束区@@@@@
     }
 
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
-    }
-
     public List<SubtitleConfig> getConfigList() {
       return configList;
     }
 
     @Override
     public String getConfigFileName() {
-      return "subtitle.txt";
+      return "subtitle.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class SkillFlagConfigCheckerBase extends AbstractConfigChecker<SkillFlagConfig> {
   @Override
   public String getConfigFileName() {
-    return "skillFlag.txt";
+    return "skillFlag.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "des", "STRING"),
-        new ConfigColumnMeta(2, "name", "STRING"),
-        new ConfigColumnMeta(3, "Bgcolor", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "des", "string"),
+        new ConfigColumnMeta(2, "name", "string"),
+        new ConfigColumnMeta(3, "Bgcolor", "string"));
   }
 }

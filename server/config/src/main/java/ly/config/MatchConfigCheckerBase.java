@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class MatchConfigCheckerBase extends AbstractConfigChecker<MatchConfig> {
   @Override
   public String getConfigFileName() {
-    return "match.txt";
+    return "match.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "controlID", "INT"),
-        new ConfigColumnMeta(2, "isGlobal", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "controlID", "int"),
+        new ConfigColumnMeta(2, "isGlobal", "int"));
   }
 }

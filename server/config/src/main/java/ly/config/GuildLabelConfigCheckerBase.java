@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class GuildLabelConfigCheckerBase extends AbstractConfigChecker<GuildLabelConfig> {
   @Override
   public String getConfigFileName() {
-    return "guildLabel.txt";
+    return "guildLabel.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "degree", "INT"),
-        new ConfigColumnMeta(3, "content", "STRING"),
-        new ConfigColumnMeta(4, "color", "STRING"),
-        new ConfigColumnMeta(5, "color2", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "degree", "int"),
+        new ConfigColumnMeta(3, "content", "string"),
+        new ConfigColumnMeta(4, "color", "string"),
+        new ConfigColumnMeta(5, "color2", "string"));
   }
 }

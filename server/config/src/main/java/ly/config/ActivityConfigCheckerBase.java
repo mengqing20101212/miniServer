@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityConfigCheckerBase extends AbstractConfigChecker<ActivityConfig> {
   @Override
   public String getConfigFileName() {
-    return "activity.txt";
+    return "activity.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "activityList", "STRING"),
-        new ConfigColumnMeta(3, "icon", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "activityList", "string"),
+        new ConfigColumnMeta(3, "icon", "string"));
   }
 }

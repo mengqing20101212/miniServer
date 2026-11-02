@@ -8,21 +8,21 @@ import ly.ConfigColumnMeta;
 public abstract class CreditConfigCheckerBase extends AbstractConfigChecker<CreditConfig> {
   @Override
   public String getConfigFileName() {
-    return "credit.txt";
+    return "credit.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "activityList", "INT"),
-        new ConfigColumnMeta(2, "sceneId", "STRING"),
-        new ConfigColumnMeta(3, "grouoId", "INT"),
-        new ConfigColumnMeta(4, "ScoreMin", "INT"),
-        new ConfigColumnMeta(5, "ScoreMax", "INT"),
-        new ConfigColumnMeta(6, "lable", "STRING"),
-        new ConfigColumnMeta(7, "lableMin", "INT"),
-        new ConfigColumnMeta(8, "lableMax", "INT"),
-        new ConfigColumnMeta(9, "dec", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "activityList", "int"),
+        new ConfigColumnMeta(2, "sceneId", "string"),
+        new ConfigColumnMeta(3, "grouoId", "int"),
+        new ConfigColumnMeta(4, "ScoreMin", "int"),
+        new ConfigColumnMeta(5, "ScoreMax", "int"),
+        new ConfigColumnMeta(6, "lable", "string"),
+        new ConfigColumnMeta(7, "lableMin", "int"),
+        new ConfigColumnMeta(8, "lableMax", "int"),
+        new ConfigColumnMeta(9, "dec", "string"));
   }
 }

@@ -60,9 +60,9 @@ public class ConfigHotUpdateService {
         List<Map<String, Object>> results = new ArrayList<>();
         for (MultipartFile file : files) {
             String fileName = Path.of(file.getOriginalFilename()).getFileName().toString();
-            if (!fileName.endsWith(".txt")) {
+            if (!fileName.endsWith(".xml")) {
                 results.add(
-                        Map.of("fileName", fileName, "success", false, "message", "只允许上传 txt 配表"));
+                        Map.of("fileName", fileName, "success", false, "message", "只允许上传 xml 配表"));
                 continue;
             }
             String content = new String(file.getBytes(), StandardCharsets.UTF_8);

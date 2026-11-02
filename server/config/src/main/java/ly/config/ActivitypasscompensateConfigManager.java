@@ -27,7 +27,7 @@ public class ActivitypasscompensateConfigManager implements InterfaceConfigManag
   public AbstractConfigManger createTable() { return new ActivitypasscompensateConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "activitypasscompensate.txt"; }
+  public String getConfigFileName() { return "activitypasscompensate.xml"; }
 
   public static class ActivitypasscompensateConfigManagerImpl extends AbstractConfigManger {
     private List<ActivitypasscompensateConfig> configList = List.of();
@@ -39,144 +39,79 @@ public class ActivitypasscompensateConfigManager implements InterfaceConfigManag
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ActivitypasscompensateConfigChecker checker = new ActivitypasscompensateConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ActivitypasscompensateConfig> newList = new ArrayList<>();
       Map<Integer, ActivitypasscompensateConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 17) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int scheDuling = 0;
-          int score = 0;
-          int closeReward = 0;
-          int closeRewardShow = 0;
-          String inherit1 = null;
-          String inherit2 = null;
-          String inherit3 = null;
-          int mail = 0;
-          String describe1 = null;
-          String describe2 = null;
-          int item = 0;
-          int picture = 0;
-          String pictureOffset = null;
-          String pictureOffset2 = null;
-          int passaWard1 = 0;
-          int passaWard2 = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          int parsedField8 = 0;
+          String parsedField9 = null;
+          String parsedField10 = null;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          String parsedField13 = null;
+          String parsedField14 = null;
+          int parsedField15 = 0;
+          int parsedField16 = 0;
           try {
-            // 解析 索引ID
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 活动排期
-            if (!arr[1].trim().isEmpty()) {
-              scheDuling = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 需要积分
-            if (!arr[2].trim().isEmpty()) {
-              score = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 结算奖励掉落
-            if (!arr[3].trim().isEmpty()) {
-              closeReward = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 结算奖励展示
-            if (!arr[4].trim().isEmpty()) {
-              closeRewardShow = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 积分继承比例
-            if (!arr[5].trim().isEmpty()) {
-              inherit1 = arr[5].trim();
-            }
-
-            // 解析 积分继承比例
-            if (!arr[6].trim().isEmpty()) {
-              inherit2 = arr[6].trim();
-            }
-
-            // 解析 积分继承比例
-            if (!arr[7].trim().isEmpty()) {
-              inherit3 = arr[7].trim();
-            }
-
-            // 解析 邮件
-            if (!arr[8].trim().isEmpty()) {
-              mail = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 进阶购买描述
-            if (!arr[9].trim().isEmpty()) {
-              describe1 = arr[9].trim();
-            }
-
-            // 解析 直升购买描述
-            if (!arr[10].trim().isEmpty()) {
-              describe2 = arr[10].trim();
-            }
-
-            // 解析 积分宝箱
-            if (!arr[11].trim().isEmpty()) {
-              item = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 立绘
-            if (!arr[12].trim().isEmpty()) {
-              picture = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 角色立绘坐标偏移缩放
-            if (!arr[13].trim().isEmpty()) {
-              pictureOffset = arr[13].trim();
-            }
-
-            // 解析 购买进阶计划角色立绘坐标偏移缩放
-            if (!arr[14].trim().isEmpty()) {
-              pictureOffset2 = arr[14].trim();
-            }
-
-            // 解析 进阶计划奖励展示
-            if (!arr[15].trim().isEmpty()) {
-              passaWard1 = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 直升计划奖励展示
-            if (!arr[16].trim().isEmpty()) {
-              passaWard2 = Integer.parseInt(arr[16].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("scheDuling"), fileName + ":行" + lineNumber + ":字段 scheDuling");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("score"), fileName + ":行" + lineNumber + ":字段 score");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("closeReward"), fileName + ":行" + lineNumber + ":字段 closeReward");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("closeRewardShow"), fileName + ":行" + lineNumber + ":字段 closeRewardShow");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("inherit1"), fileName + ":行" + lineNumber + ":字段 inherit1");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("inherit2"), fileName + ":行" + lineNumber + ":字段 inherit2");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("inherit3"), fileName + ":行" + lineNumber + ":字段 inherit3");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("mail"), fileName + ":行" + lineNumber + ":字段 mail");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("describe1"), fileName + ":行" + lineNumber + ":字段 describe1");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("describe2"), fileName + ":行" + lineNumber + ":字段 describe2");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("item"), fileName + ":行" + lineNumber + ":字段 item");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("picture"), fileName + ":行" + lineNumber + ":字段 picture");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("pictureOffset"), fileName + ":行" + lineNumber + ":字段 pictureOffset");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("pictureOffset2"), fileName + ":行" + lineNumber + ":字段 pictureOffset2");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("passaWard1"), fileName + ":行" + lineNumber + ":字段 passaWard1");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("passaWard2"), fileName + ":行" + lineNumber + ":字段 passaWard2");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ActivitypasscompensateConfig config = new ActivitypasscompensateConfig(id, scheDuling, score, closeReward, closeRewardShow, inherit1, inherit2, inherit3, mail, describe1, describe2, item, picture, pictureOffset, pictureOffset2, passaWard1, passaWard2);
-          config.afterLoad();
+          ActivitypasscompensateConfig config = new ActivitypasscompensateConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ActivitypasscompensateConfig config : configList) config.afterLoad();
+      new ActivitypasscompensateConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -186,38 +121,6 @@ public class ActivitypasscompensateConfigManager implements InterfaceConfigManag
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ActivitypasscompensateConfig> getConfigList() {
@@ -230,7 +133,7 @@ public class ActivitypasscompensateConfigManager implements InterfaceConfigManag
 
     @Override
     public String getConfigFileName() {
-      return "activitypasscompensate.txt";
+      return "activitypasscompensate.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

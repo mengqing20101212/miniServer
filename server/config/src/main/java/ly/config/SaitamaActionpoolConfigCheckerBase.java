@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class SaitamaActionpoolConfigCheckerBase extends AbstractConfigChecker<SaitamaActionpoolConfig> {
   @Override
   public String getConfigFileName() {
-    return "saitamaActionpool.txt";
+    return "saitamaActionpool.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "isEffect", "INT"),
-        new ConfigColumnMeta(2, "weight", "INT"),
-        new ConfigColumnMeta(3, "flavor", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "isEffect", "int"),
+        new ConfigColumnMeta(2, "weight", "int"),
+        new ConfigColumnMeta(3, "flavor", "int"));
   }
 }

@@ -49,7 +49,7 @@ public class ConfigHotUpdateRecoveryTest {
         ObjectMapper json = new ObjectMapper();
         byte[] response =
                 json.writeValueAsBytes(
-                        Map.of("data", List.of(Map.of("fileName", "numbers.txt", "content", "2"))));
+                        Map.of("data", List.of(Map.of("fileName", "numbers.xml", "content", "2"))));
         java.util.concurrent.atomic.AtomicBoolean downloadAvailable =
                 new java.util.concurrent.atomic.AtomicBoolean(true);
         http.createContext(
@@ -85,7 +85,7 @@ public class ConfigHotUpdateRecoveryTest {
                         }
 
                         public String getConfigFileName() {
-                            return "numbers.txt";
+                            return "numbers.xml";
                         }
                     });
             System.setProperty("miniserver.config.statePath", root.resolve("state").toString());
@@ -94,14 +94,14 @@ public class ConfigHotUpdateRecoveryTest {
             ServerContext.SERVER_ID = "game1";
             ServerContext.ENV = "test";
             ServerContext.serverType = ServerTypeEnum.GAME;
-            Files.writeString(root.resolve("numbers.txt"), "1");
+            Files.writeString(root.resolve("numbers.xml"), "1");
             service.loadAllConfig(null, root.toString());
             ConfigHotUpdateCommand command = new ConfigHotUpdateCommand();
             command.commandType = "PREPARE";
             command.publishId = "V2";
             command.version = "V2";
             command.sequence = 2;
-            command.digest = ConfigBundle.digest(Map.of("numbers.txt", "2"));
+            command.digest = ConfigBundle.digest(Map.of("numbers.xml", "2"));
             command.targets = Map.of("game1", ConfigHotUpdateRuntime.BOOT_ID);
             command.downloadUrl = "http://127.0.0.1:" + http.getAddress().getPort() + "/download";
             command.reportUrl = "http://127.0.0.1:" + http.getAddress().getPort() + "/report";
@@ -142,7 +142,7 @@ public class ConfigHotUpdateRecoveryTest {
             }
             assertEquals("V2", service.getActiveVersion());
             assertEquals(2, service.table(ConfigSnapshotTest.NumberTable.class).value);
-            assertEquals("1", Files.readString(root.resolve("numbers.txt"))); // 原目录从未被提前覆盖。
+            assertEquals("1", Files.readString(root.resolve("numbers.xml"))); // 原目录从未被提前覆盖。
         } finally {
             http.stop(0);
             resetRuntime();

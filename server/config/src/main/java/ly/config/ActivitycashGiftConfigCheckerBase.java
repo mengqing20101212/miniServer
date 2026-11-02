@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class ActivitycashGiftConfigCheckerBase extends AbstractConfigChecker<ActivitycashGiftConfig> {
   @Override
   public String getConfigFileName() {
-    return "activitycashGift.txt";
+    return "activitycashGift.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "RecommendedPackage", "STRING"),
-        new ConfigColumnMeta(2, "GradeInterval", "STRING"),
-        new ConfigColumnMeta(3, "IsTopGift", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "RecommendedPackage", "string"),
+        new ConfigColumnMeta(2, "GradeInterval", "string"),
+        new ConfigColumnMeta(3, "IsTopGift", "int"));
   }
 }

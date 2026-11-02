@@ -27,7 +27,7 @@ public class DictsConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new DictsConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "dicts.txt"; }
+  public String getConfigFileName() { return "dicts.xml"; }
 
   public static class DictsConfigManagerImpl extends AbstractConfigManger {
     private List<DictsConfig> configList = List.of();
@@ -39,72 +39,43 @@ public class DictsConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       DictsConfigChecker checker = new DictsConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<DictsConfig> newList = new ArrayList<>();
       Map<Integer, DictsConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 5) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String desc = null;
-          String name_cn = null;
-          String name_en = null;
-          String desc_en = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
           try {
-            // 解析 id
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 备注
-            if (!arr[1].trim().isEmpty()) {
-              desc = arr[1].trim();
-            }
-
-            // 解析 中文文本
-            if (!arr[2].trim().isEmpty()) {
-              name_cn = arr[2].trim();
-            }
-
-            // 解析 英文文本
-            if (!arr[3].trim().isEmpty()) {
-              name_en = arr[3].trim();
-            }
-
-            // 解析 备注英文文本
-            if (!arr[4].trim().isEmpty()) {
-              desc_en = arr[4].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("desc"), fileName + ":行" + lineNumber + ":字段 desc");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("name_cn"), fileName + ":行" + lineNumber + ":字段 name_cn");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("name_en"), fileName + ":行" + lineNumber + ":字段 name_en");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("desc_en"), fileName + ":行" + lineNumber + ":字段 desc_en");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          DictsConfig config = new DictsConfig(id, desc, name_cn, name_en, desc_en);
-          config.afterLoad();
+          DictsConfig config = new DictsConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (DictsConfig config : configList) config.afterLoad();
+      new DictsConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -114,38 +85,6 @@ public class DictsConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<DictsConfig> getConfigList() {
@@ -158,7 +97,7 @@ public class DictsConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "dicts.txt";
+      return "dicts.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

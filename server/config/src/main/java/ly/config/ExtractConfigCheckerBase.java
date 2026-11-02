@@ -8,35 +8,35 @@ import ly.ConfigColumnMeta;
 public abstract class ExtractConfigCheckerBase extends AbstractConfigChecker<ExtractConfig> {
   @Override
   public String getConfigFileName() {
-    return "extract.txt";
+    return "extract.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "level", "INT"),
-        new ConfigColumnMeta(3, "ranking", "STRING"),
-        new ConfigColumnMeta(4, "rankNum", "INT"),
-        new ConfigColumnMeta(5, "city", "STRING"),
-        new ConfigColumnMeta(6, "lines", "STRING"),
-        new ConfigColumnMeta(7, "random", "INT"),
-        new ConfigColumnMeta(8, "bodyPic", "INT"),
-        new ConfigColumnMeta(9, "features", "STRING"),
-        new ConfigColumnMeta(10, "timeline", "STRING"),
-        new ConfigColumnMeta(11, "bg", "INT"),
-        new ConfigColumnMeta(12, "englishName", "STRING"),
-        new ConfigColumnMeta(13, "smallPicResId", "INT"),
-        new ConfigColumnMeta(14, "smallPicPosOffset", "STRING"),
-        new ConfigColumnMeta(15, "smallPicRotationOffset", "STRING"),
-        new ConfigColumnMeta(16, "smallPicScale", "STRING"),
-        new ConfigColumnMeta(17, "bodyQualityBgResId", "INT"),
-        new ConfigColumnMeta(18, "nameQualityBgResId", "INT"),
-        new ConfigColumnMeta(19, "isRepeatPlay", "INT"),
-        new ConfigColumnMeta(20, "backgroundId", "INT"),
-        new ConfigColumnMeta(21, "shareAnimation", "INT"),
-        new ConfigColumnMeta(22, "sharePicScale", "STRING"),
-        new ConfigColumnMeta(23, "sharePicPosOffset", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "level", "int"),
+        new ConfigColumnMeta(3, "ranking", "string"),
+        new ConfigColumnMeta(4, "rankNum", "int"),
+        new ConfigColumnMeta(5, "city", "string"),
+        new ConfigColumnMeta(6, "lines", "string"),
+        new ConfigColumnMeta(7, "random", "int"),
+        new ConfigColumnMeta(8, "bodyPic", "int"),
+        new ConfigColumnMeta(9, "features", "string"),
+        new ConfigColumnMeta(10, "timeline", "string"),
+        new ConfigColumnMeta(11, "bg", "int"),
+        new ConfigColumnMeta(12, "englishName", "string"),
+        new ConfigColumnMeta(13, "smallPicResId", "int"),
+        new ConfigColumnMeta(14, "smallPicPosOffset", "string"),
+        new ConfigColumnMeta(15, "smallPicRotationOffset", "string"),
+        new ConfigColumnMeta(16, "smallPicScale", "string"),
+        new ConfigColumnMeta(17, "bodyQualityBgResId", "int"),
+        new ConfigColumnMeta(18, "nameQualityBgResId", "int"),
+        new ConfigColumnMeta(19, "isRepeatPlay", "int"),
+        new ConfigColumnMeta(20, "backgroundId", "int"),
+        new ConfigColumnMeta(21, "shareAnimation", "int"),
+        new ConfigColumnMeta(22, "sharePicScale", "string"),
+        new ConfigColumnMeta(23, "sharePicPosOffset", "string"));
   }
 }

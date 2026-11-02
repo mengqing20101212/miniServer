@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class RobotConfigCheckerBase extends AbstractConfigChecker<RobotConfig> {
   @Override
   public String getConfigFileName() {
-    return "robot.txt";
+    return "robot.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "enemyInfo", "STRING"),
-        new ConfigColumnMeta(2, "enemyCircuitInfo", "STRING"),
-        new ConfigColumnMeta(3, "enemyPara", "STRING"),
-        new ConfigColumnMeta(4, "npcId", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "enemyInfo", "string"),
+        new ConfigColumnMeta(2, "enemyCircuitInfo", "string"),
+        new ConfigColumnMeta(3, "enemyPara", "string"),
+        new ConfigColumnMeta(4, "npcId", "string"));
   }
 }

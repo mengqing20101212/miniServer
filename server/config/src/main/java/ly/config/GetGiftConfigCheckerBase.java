@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class GetGiftConfigCheckerBase extends AbstractConfigChecker<GetGiftConfig> {
   @Override
   public String getConfigFileName() {
-    return "getGift.txt";
+    return "getGift.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "itemName", "STRING"),
-        new ConfigColumnMeta(2, "giftList", "LIST<INT>"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "itemName", "string"),
+        new ConfigColumnMeta(2, "giftList", "list<int>"));
   }
 }

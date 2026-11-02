@@ -27,7 +27,7 @@ public class BonusEffectConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new BonusEffectConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "bonusEffect.txt"; }
+  public String getConfigFileName() { return "bonusEffect.xml"; }
 
   public static class BonusEffectConfigManagerImpl extends AbstractConfigManger {
     private List<BonusEffectConfig> configList = List.of();
@@ -39,102 +39,58 @@ public class BonusEffectConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       BonusEffectConfigChecker checker = new BonusEffectConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<BonusEffectConfig> newList = new ArrayList<>();
       Map<Integer, BonusEffectConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 10) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String description = null;
-          int icon = 0;
-          int bonusEffect = 0;
-          String isBonusBuff = null;
-          String bonusType = null;
-          String param_1 = null;
-          String isVanish = null;
-          int group = 0;
-          int level = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          boolean parsedField4 = false;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 描述
-            if (!arr[1].trim().isEmpty()) {
-              description = arr[1].trim();
-            }
-
-            // 解析 图标
-            if (!arr[2].trim().isEmpty()) {
-              icon = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 效果
-            if (!arr[3].trim().isEmpty()) {
-              bonusEffect = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 是否为BuffId
-            if (!arr[4].trim().isEmpty()) {
-              isBonusBuff = arr[4].trim();
-            }
-
-            // 解析 效果类型
-            if (!arr[5].trim().isEmpty()) {
-              bonusType = arr[5].trim();
-            }
-
-            // 解析 被吃掉的效果
-            if (!arr[6].trim().isEmpty()) {
-              param_1 = arr[6].trim();
-            }
-
-            // 解析 是否立刻消失
-            if (!arr[7].trim().isEmpty()) {
-              isVanish = arr[7].trim();
-            }
-
-            // 解析 分组
-            if (!arr[8].trim().isEmpty()) {
-              group = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 组内等级
-            if (!arr[9].trim().isEmpty()) {
-              level = Integer.parseInt(arr[9].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("description"), fileName + ":行" + lineNumber + ":字段 description");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("icon"), fileName + ":行" + lineNumber + ":字段 icon");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("bonusEffect"), fileName + ":行" + lineNumber + ":字段 bonusEffect");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("isBonusBuff"), fileName + ":行" + lineNumber + ":字段 isBonusBuff");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("bonusType"), fileName + ":行" + lineNumber + ":字段 bonusType");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("param_1"), fileName + ":行" + lineNumber + ":字段 param_1");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("isVanish"), fileName + ":行" + lineNumber + ":字段 isVanish");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("group"), fileName + ":行" + lineNumber + ":字段 group");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("level"), fileName + ":行" + lineNumber + ":字段 level");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          BonusEffectConfig config = new BonusEffectConfig(id, description, icon, bonusEffect, isBonusBuff, bonusType, param_1, isVanish, group, level);
-          config.afterLoad();
+          BonusEffectConfig config = new BonusEffectConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (BonusEffectConfig config : configList) config.afterLoad();
+      new BonusEffectConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -144,38 +100,6 @@ public class BonusEffectConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<BonusEffectConfig> getConfigList() {
@@ -188,7 +112,7 @@ public class BonusEffectConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "bonusEffect.txt";
+      return "bonusEffect.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

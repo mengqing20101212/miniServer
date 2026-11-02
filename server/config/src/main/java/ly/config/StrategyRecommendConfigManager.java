@@ -27,7 +27,7 @@ public class StrategyRecommendConfigManager implements InterfaceConfigManagerPro
   public AbstractConfigManger createTable() { return new StrategyRecommendConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "strategyRecommend.txt"; }
+  public String getConfigFileName() { return "strategyRecommend.xml"; }
 
   public static class StrategyRecommendConfigManagerImpl extends AbstractConfigManger {
     private List<StrategyRecommendConfig> configList = List.of();
@@ -39,90 +39,52 @@ public class StrategyRecommendConfigManager implements InterfaceConfigManagerPro
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       StrategyRecommendConfigChecker checker = new StrategyRecommendConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<StrategyRecommendConfig> newList = new ArrayList<>();
       Map<Integer, StrategyRecommendConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 8) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String lineupGroupIds = null;
-          String keySourceIds = null;
-          String keyThinkingDetail = null;
-          String recommendSourceIds = null;
-          String heroPlayDetail = null;
-          String skillDetail = null;
-          String heroName = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          String parsedField7 = null;
           try {
-            // 解析 id(这里也当做角色Id)
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 推荐阵容（,）
-            if (!arr[1].trim().isEmpty()) {
-              lineupGroupIds = arr[1].trim();
-            }
-
-            // 解析 关键思路原核（,）
-            if (!arr[2].trim().isEmpty()) {
-              keySourceIds = arr[2].trim();
-            }
-
-            // 解析 关键思路的描述
-            if (!arr[3].trim().isEmpty()) {
-              keyThinkingDetail = arr[3].trim();
-            }
-
-            // 解析 推荐原核（,）
-            if (!arr[4].trim().isEmpty()) {
-              recommendSourceIds = arr[4].trim();
-            }
-
-            // 解析 角色玩法详情描述
-            if (!arr[5].trim().isEmpty()) {
-              heroPlayDetail = arr[5].trim();
-            }
-
-            // 解析 关键技能1描述（包括技能名称）
-            if (!arr[6].trim().isEmpty()) {
-              skillDetail = arr[6].trim();
-            }
-
-            // 解析 角色名字
-            if (!arr[7].trim().isEmpty()) {
-              heroName = arr[7].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("lineupGroupIds"), fileName + ":行" + lineNumber + ":字段 lineupGroupIds");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("keySourceIds"), fileName + ":行" + lineNumber + ":字段 keySourceIds");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("keyThinkingDetail"), fileName + ":行" + lineNumber + ":字段 keyThinkingDetail");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("recommendSourceIds"), fileName + ":行" + lineNumber + ":字段 recommendSourceIds");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("heroPlayDetail"), fileName + ":行" + lineNumber + ":字段 heroPlayDetail");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("skillDetail"), fileName + ":行" + lineNumber + ":字段 skillDetail");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("heroName"), fileName + ":行" + lineNumber + ":字段 heroName");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          StrategyRecommendConfig config = new StrategyRecommendConfig(id, lineupGroupIds, keySourceIds, keyThinkingDetail, recommendSourceIds, heroPlayDetail, skillDetail, heroName);
-          config.afterLoad();
+          StrategyRecommendConfig config = new StrategyRecommendConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (StrategyRecommendConfig config : configList) config.afterLoad();
+      new StrategyRecommendConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -132,38 +94,6 @@ public class StrategyRecommendConfigManager implements InterfaceConfigManagerPro
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<StrategyRecommendConfig> getConfigList() {
@@ -176,7 +106,7 @@ public class StrategyRecommendConfigManager implements InterfaceConfigManagerPro
 
     @Override
     public String getConfigFileName() {
-      return "strategyRecommend.txt";
+      return "strategyRecommend.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -8,21 +8,21 @@ import ly.ConfigColumnMeta;
 public abstract class BattleControlConfigCheckerBase extends AbstractConfigChecker<BattleControlConfig> {
   @Override
   public String getConfigFileName() {
-    return "battleControl.txt";
+    return "battleControl.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "lineupId", "INT"),
-        new ConfigColumnMeta(3, "isOnlineBattle", "INT"),
-        new ConfigColumnMeta(4, "loadingTime", "INT"),
-        new ConfigColumnMeta(5, "readyTime", "INT"),
-        new ConfigColumnMeta(6, "changeHeroTime", "INT"),
-        new ConfigColumnMeta(7, "isShare", "INT"),
-        new ConfigColumnMeta(8, "chaoiceWaitTime", "INT"),
-        new ConfigColumnMeta(9, "isSaveDate", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "lineupId", "int"),
+        new ConfigColumnMeta(3, "isOnlineBattle", "int"),
+        new ConfigColumnMeta(4, "loadingTime", "int"),
+        new ConfigColumnMeta(5, "readyTime", "int"),
+        new ConfigColumnMeta(6, "changeHeroTime", "int"),
+        new ConfigColumnMeta(7, "isShare", "int"),
+        new ConfigColumnMeta(8, "chaoiceWaitTime", "int"),
+        new ConfigColumnMeta(9, "isSaveDate", "int"));
   }
 }

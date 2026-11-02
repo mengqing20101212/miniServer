@@ -27,7 +27,7 @@ public class RechargeShopConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new RechargeShopConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "RechargeShop.txt"; }
+  public String getConfigFileName() { return "RechargeShop.xml"; }
 
   public static class RechargeShopConfigManagerImpl extends AbstractConfigManger {
     private List<RechargeShopConfig> configList = List.of();
@@ -39,210 +39,112 @@ public class RechargeShopConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type24 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type25 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type26 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type27 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       RechargeShopConfigChecker checker = new RechargeShopConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<RechargeShopConfig> newList = new ArrayList<>();
       Map<Integer, RechargeShopConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 28) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          String bugFDesc = null;
-          String bugDesc = null;
-          int bugType = 0;
-          int levelUpperLimit = 0;
-          int drop = 0;
-          int dropShow = 0;
-          int reward = 0;
-          String give = null;
-          int priceType = 0;
-          int price = 0;
-          int priceShow = 0;
-          int PrePriceShow = 0;
-          String page = null;
-          int page1 = 0;
-          int priority = 0;
-          int missionID = 0;
-          int cardPower = 0;
-          int limtType = 0;
-          int limt = 0;
-          String icon = null;
-          int duration = 0;
-          String closeTime = null;
-          int giveCloseTime = 0;
-          int mail = 0;
-          int activityId = 0;
-          int buySupermarket = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          String parsedField9 = null;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
+          String parsedField14 = null;
+          int parsedField15 = 0;
+          int parsedField16 = 0;
+          int parsedField17 = 0;
+          int parsedField18 = 0;
+          int parsedField19 = 0;
+          int parsedField20 = 0;
+          String parsedField21 = null;
+          int parsedField22 = 0;
+          String parsedField23 = null;
+          int parsedField24 = 0;
+          int parsedField25 = 0;
+          int parsedField26 = 0;
+          int parsedField27 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 商品名称名称
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 购买说明
-            if (!arr[2].trim().isEmpty()) {
-              bugFDesc = arr[2].trim();
-            }
-
-            // 解析 正常购买说明
-            if (!arr[3].trim().isEmpty()) {
-              bugDesc = arr[3].trim();
-            }
-
-            // 解析 购买物品类型
-            if (!arr[4].trim().isEmpty()) {
-              bugType = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 显示等级
-            if (!arr[5].trim().isEmpty()) {
-              levelUpperLimit = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 礼包后端
-            if (!arr[6].trim().isEmpty()) {
-              drop = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 礼包前端
-            if (!arr[7].trim().isEmpty()) {
-              dropShow = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 购买获得彩钻
-            if (!arr[8].trim().isEmpty()) {
-              reward = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 购买赠送
-            if (!arr[9].trim().isEmpty()) {
-              give = arr[9].trim();
-            }
-
-            // 解析 价格类型
-            if (!arr[10].trim().isEmpty()) {
-              priceType = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 价格1
-            if (!arr[11].trim().isEmpty()) {
-              price = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 显示价格
-            if (!arr[12].trim().isEmpty()) {
-              priceShow = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 原价
-            if (!arr[13].trim().isEmpty()) {
-              PrePriceShow = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 页签
-            if (!arr[14].trim().isEmpty()) {
-              page = arr[14].trim();
-            }
-
-            // 解析 子页签
-            if (!arr[15].trim().isEmpty()) {
-              page1 = Integer.parseInt(arr[15].trim());
-            }
-
-            // 解析 展示优先级
-            if (!arr[16].trim().isEmpty()) {
-              priority = Integer.parseInt(arr[16].trim());
-            }
-
-            // 解析 触发条件
-            if (!arr[17].trim().isEmpty()) {
-              missionID = Integer.parseInt(arr[17].trim());
-            }
-
-            // 解析 是否月卡权限
-            if (!arr[18].trim().isEmpty()) {
-              cardPower = Integer.parseInt(arr[18].trim());
-            }
-
-            // 解析 限购类型
-            if (!arr[19].trim().isEmpty()) {
-              limtType = Integer.parseInt(arr[19].trim());
-            }
-
-            // 解析 限购数量
-            if (!arr[20].trim().isEmpty()) {
-              limt = Integer.parseInt(arr[20].trim());
-            }
-
-            // 解析 图标
-            if (!arr[21].trim().isEmpty()) {
-              icon = arr[21].trim();
-            }
-
-            // 解析 持续时间
-            if (!arr[22].trim().isEmpty()) {
-              duration = Integer.parseInt(arr[22].trim());
-            }
-
-            // 解析 下架时间
-            if (!arr[23].trim().isEmpty()) {
-              closeTime = arr[23].trim();
-            }
-
-            // 解析 限时礼包过期时间
-            if (!arr[24].trim().isEmpty()) {
-              giveCloseTime = Integer.parseInt(arr[24].trim());
-            }
-
-            // 解析 邮件ID
-            if (!arr[25].trim().isEmpty()) {
-              mail = Integer.parseInt(arr[25].trim());
-            }
-
-            // 解析 活动ID
-            if (!arr[26].trim().isEmpty()) {
-              activityId = Integer.parseInt(arr[26].trim());
-            }
-
-            // 解析 是否超市购买
-            if (!arr[27].trim().isEmpty()) {
-              buySupermarket = Integer.parseInt(arr[27].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("bugFDesc"), fileName + ":行" + lineNumber + ":字段 bugFDesc");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("bugDesc"), fileName + ":行" + lineNumber + ":字段 bugDesc");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("bugType"), fileName + ":行" + lineNumber + ":字段 bugType");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("levelUpperLimit"), fileName + ":行" + lineNumber + ":字段 levelUpperLimit");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("drop"), fileName + ":行" + lineNumber + ":字段 drop");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("dropShow"), fileName + ":行" + lineNumber + ":字段 dropShow");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("reward"), fileName + ":行" + lineNumber + ":字段 reward");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("give"), fileName + ":行" + lineNumber + ":字段 give");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("priceType"), fileName + ":行" + lineNumber + ":字段 priceType");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("price"), fileName + ":行" + lineNumber + ":字段 price");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("priceShow"), fileName + ":行" + lineNumber + ":字段 priceShow");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("PrePriceShow"), fileName + ":行" + lineNumber + ":字段 PrePriceShow");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("page"), fileName + ":行" + lineNumber + ":字段 page");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("page1"), fileName + ":行" + lineNumber + ":字段 page1");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("priority"), fileName + ":行" + lineNumber + ":字段 priority");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("missionID"), fileName + ":行" + lineNumber + ":字段 missionID");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("cardPower"), fileName + ":行" + lineNumber + ":字段 cardPower");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("limtType"), fileName + ":行" + lineNumber + ":字段 limtType");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("limt"), fileName + ":行" + lineNumber + ":字段 limt");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("icon"), fileName + ":行" + lineNumber + ":字段 icon");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("duration"), fileName + ":行" + lineNumber + ":字段 duration");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("closeTime"), fileName + ":行" + lineNumber + ":字段 closeTime");
+            parsedField24 = ly.ConfigValues.read(type24, values.get("giveCloseTime"), fileName + ":行" + lineNumber + ":字段 giveCloseTime");
+            parsedField25 = ly.ConfigValues.read(type25, values.get("mail"), fileName + ":行" + lineNumber + ":字段 mail");
+            parsedField26 = ly.ConfigValues.read(type26, values.get("activityId"), fileName + ":行" + lineNumber + ":字段 activityId");
+            parsedField27 = ly.ConfigValues.read(type27, values.get("buySupermarket"), fileName + ":行" + lineNumber + ":字段 buySupermarket");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          RechargeShopConfig config = new RechargeShopConfig(id, name, bugFDesc, bugDesc, bugType, levelUpperLimit, drop, dropShow, reward, give, priceType, price, priceShow, PrePriceShow, page, page1, priority, missionID, cardPower, limtType, limt, icon, duration, closeTime, giveCloseTime, mail, activityId, buySupermarket);
-          config.afterLoad();
+          RechargeShopConfig config = new RechargeShopConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24, parsedField25, parsedField26, parsedField27);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (RechargeShopConfig config : configList) config.afterLoad();
+      new RechargeShopConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -252,38 +154,6 @@ public class RechargeShopConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<RechargeShopConfig> getConfigList() {
@@ -296,7 +166,7 @@ public class RechargeShopConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "RechargeShop.txt";
+      return "RechargeShop.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

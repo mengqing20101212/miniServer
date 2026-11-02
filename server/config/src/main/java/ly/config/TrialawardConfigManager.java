@@ -27,7 +27,7 @@ public class TrialawardConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new TrialawardConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "trialaward.txt"; }
+  public String getConfigFileName() { return "trialaward.xml"; }
 
   public static class TrialawardConfigManagerImpl extends AbstractConfigManger {
     private List<TrialawardConfig> configList = List.of();
@@ -37,69 +37,40 @@ public class TrialawardConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       TrialawardConfigChecker checker = new TrialawardConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<TrialawardConfig> newList = new ArrayList<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 5) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          String desc = null;
-          int type = 0;
-          int condition = 0;
-          int conditiondesc = 0;
-          int award = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          String parsedField0 = null;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
           try {
-            // 解析 策划用介绍
-            if (!arr[0].trim().isEmpty()) {
-              desc = arr[0].trim();
-            }
-
-            // 解析 试炼类型ID
-            if (!arr[1].trim().isEmpty()) {
-              type = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 条件
-            if (!arr[2].trim().isEmpty()) {
-              condition = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 达成条件描述
-            if (!arr[3].trim().isEmpty()) {
-              conditiondesc = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 掉落集id
-            if (!arr[4].trim().isEmpty()) {
-              award = Integer.parseInt(arr[4].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("desc"), fileName + ":行" + lineNumber + ":字段 desc");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("type"), fileName + ":行" + lineNumber + ":字段 type");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("condition"), fileName + ":行" + lineNumber + ":字段 condition");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("conditiondesc"), fileName + ":行" + lineNumber + ":字段 conditiondesc");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("award"), fileName + ":行" + lineNumber + ":字段 award");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          TrialawardConfig config = new TrialawardConfig(desc, type, condition, conditiondesc, award);
-          config.afterLoad();
+          TrialawardConfig config = new TrialawardConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4);
           newList.add(config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+      });
+      configList = List.copyOf(newList);
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (TrialawardConfig config : configList) config.afterLoad();
+      new TrialawardConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -110,45 +81,13 @@ public class TrialawardConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法结束区@@@@@
     }
 
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
-    }
-
     public List<TrialawardConfig> getConfigList() {
       return configList;
     }
 
     @Override
     public String getConfigFileName() {
-      return "trialaward.txt";
+      return "trialaward.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -27,7 +27,7 @@ public class DeviceConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new DeviceConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "device.txt"; }
+  public String getConfigFileName() { return "device.xml"; }
 
   public static class DeviceConfigManagerImpl extends AbstractConfigManger {
     private List<DeviceConfig> configList = List.of();
@@ -39,78 +39,46 @@ public class DeviceConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("bool");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       DeviceConfigChecker checker = new DeviceConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<DeviceConfig> newList = new ArrayList<>();
       Map<Integer, DeviceConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 6) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String model = null;
-          String desc = null;
-          int qualityLevel = 0;
-          String isNotch = null;
-          int notchHeight = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          int parsedField3 = 0;
+          boolean parsedField4 = false;
+          int parsedField5 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 型号
-            if (!arr[1].trim().isEmpty()) {
-              model = arr[1].trim();
-            }
-
-            // 解析 手机名
-            if (!arr[2].trim().isEmpty()) {
-              desc = arr[2].trim();
-            }
-
-            // 解析 画质等级
-            if (!arr[3].trim().isEmpty()) {
-              qualityLevel = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 刘海屏
-            if (!arr[4].trim().isEmpty()) {
-              isNotch = arr[4].trim();
-            }
-
-            // 解析 刘海高度
-            if (!arr[5].trim().isEmpty()) {
-              notchHeight = Integer.parseInt(arr[5].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("model"), fileName + ":行" + lineNumber + ":字段 model");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("desc"), fileName + ":行" + lineNumber + ":字段 desc");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("qualityLevel"), fileName + ":行" + lineNumber + ":字段 qualityLevel");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("isNotch"), fileName + ":行" + lineNumber + ":字段 isNotch");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("notchHeight"), fileName + ":行" + lineNumber + ":字段 notchHeight");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          DeviceConfig config = new DeviceConfig(id, model, desc, qualityLevel, isNotch, notchHeight);
-          config.afterLoad();
+          DeviceConfig config = new DeviceConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (DeviceConfig config : configList) config.afterLoad();
+      new DeviceConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -120,38 +88,6 @@ public class DeviceConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<DeviceConfig> getConfigList() {
@@ -164,7 +100,7 @@ public class DeviceConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "device.txt";
+      return "device.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

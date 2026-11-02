@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class PubConfigCheckerBase extends AbstractConfigChecker<PubConfig> {
   @Override
   public String getConfigFileName() {
-    return "pub.txt";
+    return "pub.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "time", "STRING"),
-        new ConfigColumnMeta(2, "drop", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "time", "string"),
+        new ConfigColumnMeta(2, "drop", "int"));
   }
 }

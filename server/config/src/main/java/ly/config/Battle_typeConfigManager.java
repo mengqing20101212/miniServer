@@ -27,7 +27,7 @@ public class Battle_typeConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new Battle_typeConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "battle_type.txt"; }
+  public String getConfigFileName() { return "battle_type.xml"; }
 
   public static class Battle_typeConfigManagerImpl extends AbstractConfigManger {
     private List<Battle_typeConfig> configList = List.of();
@@ -37,93 +37,52 @@ public class Battle_typeConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       Battle_typeConfigChecker checker = new Battle_typeConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<Battle_typeConfig> newList = new ArrayList<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 9) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          String name = null;
-          int ms = 0;
-          int timeout = 0;
-          int battle_time = 0;
-          int battle_type = 0;
-          int sceneid = 0;
-          int preparetimeout = 0;
-          int checktimeoutinterval = 0;
-          int accounttimeout = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          String parsedField0 = null;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
           try {
-            // 解析 战斗类型描述
-            if (!arr[0].trim().isEmpty()) {
-              name = arr[0].trim();
-            }
-
-            // 解析 逻辑帧毫秒数
-            if (!arr[1].trim().isEmpty()) {
-              ms = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 心跳掉线时长(秒)
-            if (!arr[2].trim().isEmpty()) {
-              timeout = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 战斗时长(秒)
-            if (!arr[3].trim().isEmpty()) {
-              battle_time = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 战斗大类
-            if (!arr[4].trim().isEmpty()) {
-              battle_type = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 场景id
-            if (!arr[5].trim().isEmpty()) {
-              sceneid = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 准备期总时长秒数
-            if (!arr[6].trim().isEmpty()) {
-              preparetimeout = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 检测超时定时秒数
-            if (!arr[7].trim().isEmpty()) {
-              checktimeoutinterval = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 结算等待秒数
-            if (!arr[8].trim().isEmpty()) {
-              accounttimeout = Integer.parseInt(arr[8].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("ms"), fileName + ":行" + lineNumber + ":字段 ms");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("timeout"), fileName + ":行" + lineNumber + ":字段 timeout");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("battle_time"), fileName + ":行" + lineNumber + ":字段 battle_time");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("battle_type"), fileName + ":行" + lineNumber + ":字段 battle_type");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("sceneid"), fileName + ":行" + lineNumber + ":字段 sceneid");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("preparetimeout"), fileName + ":行" + lineNumber + ":字段 preparetimeout");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("checktimeoutinterval"), fileName + ":行" + lineNumber + ":字段 checktimeoutinterval");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("accounttimeout"), fileName + ":行" + lineNumber + ":字段 accounttimeout");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          Battle_typeConfig config = new Battle_typeConfig(name, ms, timeout, battle_time, battle_type, sceneid, preparetimeout, checktimeoutinterval, accounttimeout);
-          config.afterLoad();
+          Battle_typeConfig config = new Battle_typeConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8);
           newList.add(config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+      });
+      configList = List.copyOf(newList);
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (Battle_typeConfig config : configList) config.afterLoad();
+      new Battle_typeConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -134,45 +93,13 @@ public class Battle_typeConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法结束区@@@@@
     }
 
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
-    }
-
     public List<Battle_typeConfig> getConfigList() {
       return configList;
     }
 
     @Override
     public String getConfigFileName() {
-      return "battle_type.txt";
+      return "battle_type.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

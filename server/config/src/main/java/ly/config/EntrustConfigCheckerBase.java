@@ -8,29 +8,29 @@ import ly.ConfigColumnMeta;
 public abstract class EntrustConfigCheckerBase extends AbstractConfigChecker<EntrustConfig> {
   @Override
   public String getConfigFileName() {
-    return "entrust.txt";
+    return "entrust.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "groupId", "INT"),
-        new ConfigColumnMeta(2, "star", "INT"),
-        new ConfigColumnMeta(3, "unlockType", "INT"),
-        new ConfigColumnMeta(4, "unlockCondition", "INT"),
-        new ConfigColumnMeta(5, "unlockDec", "STRING"),
-        new ConfigColumnMeta(6, "reward", "STRING"),
-        new ConfigColumnMeta(7, "drop", "INT"),
-        new ConfigColumnMeta(8, "dropPercent", "INT"),
-        new ConfigColumnMeta(9, "time", "INT"),
-        new ConfigColumnMeta(10, "type", "INT"),
-        new ConfigColumnMeta(11, "percent", "INT"),
-        new ConfigColumnMeta(12, "heroNum", "INT"),
-        new ConfigColumnMeta(13, "taskName", "STRING"),
-        new ConfigColumnMeta(14, "timeGroup", "STRING"),
-        new ConfigColumnMeta(15, "action", "STRING"),
-        new ConfigColumnMeta(16, "position", "STRING"),
-        new ConfigColumnMeta(17, "iconResId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "groupId", "int"),
+        new ConfigColumnMeta(2, "star", "int"),
+        new ConfigColumnMeta(3, "unlockType", "int"),
+        new ConfigColumnMeta(4, "unlockCondition", "int"),
+        new ConfigColumnMeta(5, "unlockDec", "string"),
+        new ConfigColumnMeta(6, "reward", "string"),
+        new ConfigColumnMeta(7, "drop", "int"),
+        new ConfigColumnMeta(8, "dropPercent", "int"),
+        new ConfigColumnMeta(9, "time", "int"),
+        new ConfigColumnMeta(10, "type", "int"),
+        new ConfigColumnMeta(11, "percent", "int"),
+        new ConfigColumnMeta(12, "heroNum", "int"),
+        new ConfigColumnMeta(13, "taskName", "string"),
+        new ConfigColumnMeta(14, "timeGroup", "string"),
+        new ConfigColumnMeta(15, "action", "string"),
+        new ConfigColumnMeta(16, "position", "string"),
+        new ConfigColumnMeta(17, "iconResId", "int"));
   }
 }

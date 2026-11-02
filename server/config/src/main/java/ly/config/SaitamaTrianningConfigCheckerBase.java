@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class SaitamaTrianningConfigCheckerBase extends AbstractConfigChecker<SaitamaTrianningConfig> {
   @Override
   public String getConfigFileName() {
-    return "saitamaTrianning.txt";
+    return "saitamaTrianning.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "icon", "INT"),
-        new ConfigColumnMeta(3, "openTime", "INT"),
-        new ConfigColumnMeta(4, "reward", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "icon", "int"),
+        new ConfigColumnMeta(3, "openTime", "int"),
+        new ConfigColumnMeta(4, "reward", "string"));
   }
 }

@@ -27,7 +27,7 @@ public class GuideMainConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new GuideMainConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "guideMain.txt"; }
+  public String getConfigFileName() { return "guideMain.xml"; }
 
   public static class GuideMainConfigManagerImpl extends AbstractConfigManger {
     private List<GuideMainConfig> configList = List.of();
@@ -39,126 +39,70 @@ public class GuideMainConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("list<int>");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("list<int>");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("list<int>");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       GuideMainConfigChecker checker = new GuideMainConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<GuideMainConfig> newList = new ArrayList<>();
       Map<Integer, GuideMainConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 14) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String beizhu = null;
-          int checkNext = 0;
-          String guideCond = null;
-          String guidePara1 = null;
-          int isMask = 0;
-          String stepList = null;
-          int keyStep = 0;
-          int vanishType = 0;
-          String vanishPara = null;
-          int canSkip = 0;
-          int weight = 0;
-          int isLocal = 0;
-          int autoTrigger = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          java.util.List<Integer> parsedField3 = null;
+          String parsedField4 = null;
+          int parsedField5 = 0;
+          java.util.List<Integer> parsedField6 = null;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          java.util.List<Integer> parsedField9 = null;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          int parsedField12 = 0;
+          int parsedField13 = 0;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 备注
-            if (!arr[1].trim().isEmpty()) {
-              beizhu = arr[1].trim();
-            }
-
-            // 解析 是否自动触发下一步
-            if (!arr[2].trim().isEmpty()) {
-              checkNext = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 引导触发条件
-            if (!arr[3].trim().isEmpty()) {
-              guideCond = arr[3].trim();
-            }
-
-            // 解析 触发参数1
-            if (!arr[4].trim().isEmpty()) {
-              guidePara1 = arr[4].trim();
-            }
-
-            // 解析 是否有遮罩
-            if (!arr[5].trim().isEmpty()) {
-              isMask = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 步骤列表
-            if (!arr[6].trim().isEmpty()) {
-              stepList = arr[6].trim();
-            }
-
-            // 解析 关键步骤
-            if (!arr[7].trim().isEmpty()) {
-              keyStep = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 提前完成类型
-            if (!arr[8].trim().isEmpty()) {
-              vanishType = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 提前完成参数
-            if (!arr[9].trim().isEmpty()) {
-              vanishPara = arr[9].trim();
-            }
-
-            // 解析 引导是否可以跳过
-            if (!arr[10].trim().isEmpty()) {
-              canSkip = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 引导权重
-            if (!arr[11].trim().isEmpty()) {
-              weight = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 是否是单机
-            if (!arr[12].trim().isEmpty()) {
-              isLocal = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 是否自动触发
-            if (!arr[13].trim().isEmpty()) {
-              autoTrigger = Integer.parseInt(arr[13].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("beizhu"), fileName + ":行" + lineNumber + ":字段 beizhu");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("checkNext"), fileName + ":行" + lineNumber + ":字段 checkNext");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("guideCond"), fileName + ":行" + lineNumber + ":字段 guideCond");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("guidePara1"), fileName + ":行" + lineNumber + ":字段 guidePara1");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("isMask"), fileName + ":行" + lineNumber + ":字段 isMask");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("stepList"), fileName + ":行" + lineNumber + ":字段 stepList");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("keyStep"), fileName + ":行" + lineNumber + ":字段 keyStep");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("vanishType"), fileName + ":行" + lineNumber + ":字段 vanishType");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("vanishPara"), fileName + ":行" + lineNumber + ":字段 vanishPara");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("canSkip"), fileName + ":行" + lineNumber + ":字段 canSkip");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("weight"), fileName + ":行" + lineNumber + ":字段 weight");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("isLocal"), fileName + ":行" + lineNumber + ":字段 isLocal");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("autoTrigger"), fileName + ":行" + lineNumber + ":字段 autoTrigger");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          GuideMainConfig config = new GuideMainConfig(id, beizhu, checkNext, guideCond, guidePara1, isMask, stepList, keyStep, vanishType, vanishPara, canSkip, weight, isLocal, autoTrigger);
-          config.afterLoad();
+          GuideMainConfig config = new GuideMainConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (GuideMainConfig config : configList) config.afterLoad();
+      new GuideMainConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -168,38 +112,6 @@ public class GuideMainConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<GuideMainConfig> getConfigList() {
@@ -212,7 +124,7 @@ public class GuideMainConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "guideMain.txt";
+      return "guideMain.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

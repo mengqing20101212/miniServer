@@ -27,7 +27,7 @@ public class LoadingMainConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new LoadingMainConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "loadingMain.txt"; }
+  public String getConfigFileName() { return "loadingMain.xml"; }
 
   public static class LoadingMainConfigManagerImpl extends AbstractConfigManger {
     private List<LoadingMainConfig> configList = List.of();
@@ -39,84 +39,49 @@ public class LoadingMainConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       LoadingMainConfigChecker checker = new LoadingMainConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<LoadingMainConfig> newList = new ArrayList<>();
       Map<Integer, LoadingMainConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 7) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int type = 0;
-          String name = null;
-          int para = 0;
-          String pool = null;
-          String tipsPool = null;
-          int isPriority = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          int parsedField3 = 0;
+          String parsedField4 = null;
+          String parsedField5 = null;
+          int parsedField6 = 0;
           try {
-            // 解析 id
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 类型
-            if (!arr[1].trim().isEmpty()) {
-              type = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 备注
-            if (!arr[2].trim().isEmpty()) {
-              name = arr[2].trim();
-            }
-
-            // 解析 参数
-            if (!arr[3].trim().isEmpty()) {
-              para = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 随机池子
-            if (!arr[4].trim().isEmpty()) {
-              pool = arr[4].trim();
-            }
-
-            // 解析 tips随机池子
-            if (!arr[5].trim().isEmpty()) {
-              tipsPool = arr[5].trim();
-            }
-
-            // 解析 优先读取
-            if (!arr[6].trim().isEmpty()) {
-              isPriority = Integer.parseInt(arr[6].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("type"), fileName + ":行" + lineNumber + ":字段 type");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("para"), fileName + ":行" + lineNumber + ":字段 para");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("pool"), fileName + ":行" + lineNumber + ":字段 pool");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("tipsPool"), fileName + ":行" + lineNumber + ":字段 tipsPool");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("isPriority"), fileName + ":行" + lineNumber + ":字段 isPriority");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          LoadingMainConfig config = new LoadingMainConfig(id, type, name, para, pool, tipsPool, isPriority);
-          config.afterLoad();
+          LoadingMainConfig config = new LoadingMainConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (LoadingMainConfig config : configList) config.afterLoad();
+      new LoadingMainConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -126,38 +91,6 @@ public class LoadingMainConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<LoadingMainConfig> getConfigList() {
@@ -170,7 +103,7 @@ public class LoadingMainConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "loadingMain.txt";
+      return "loadingMain.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

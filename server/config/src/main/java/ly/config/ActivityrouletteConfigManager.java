@@ -27,7 +27,7 @@ public class ActivityrouletteConfigManager implements InterfaceConfigManagerProx
   public AbstractConfigManger createTable() { return new ActivityrouletteConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "activityroulette.txt"; }
+  public String getConfigFileName() { return "activityroulette.xml"; }
 
   public static class ActivityrouletteConfigManagerImpl extends AbstractConfigManger {
     private List<ActivityrouletteConfig> configList = List.of();
@@ -39,138 +39,76 @@ public class ActivityrouletteConfigManager implements InterfaceConfigManagerProx
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ActivityrouletteConfigChecker checker = new ActivityrouletteConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ActivityrouletteConfig> newList = new ArrayList<>();
       Map<Integer, ActivityrouletteConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 16) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int scheDuling = 0;
-          int prizeId = 0;
-          int luckyPrize = 0;
-          int rafflePoints = 0;
-          int minimumPoints = 0;
-          int consumableProps = 0;
-          int consumptionQuantity = 0;
-          int luckValueCap = 0;
-          int resetLuck = 0;
-          int getLucky = 0;
-          int lotteryGuarantee = 0;
-          String rewardShow = null;
-          int drop = 0;
-          int numberAwards = 0;
-          String picture = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          int parsedField6 = 0;
+          int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          String parsedField12 = null;
+          int parsedField13 = 0;
+          int parsedField14 = 0;
+          String parsedField15 = null;
           try {
-            // 解析 序号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 活动期数
-            if (!arr[1].trim().isEmpty()) {
-              scheDuling = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 奖池id
-            if (!arr[2].trim().isEmpty()) {
-              prizeId = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 幸运值大奖档位
-            if (!arr[3].trim().isEmpty()) {
-              luckyPrize = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 每次抽奖获得积分
-            if (!arr[4].trim().isEmpty()) {
-              rafflePoints = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 触发珍品所需最低积分
-            if (!arr[5].trim().isEmpty()) {
-              minimumPoints = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 单次抽奖消耗道具ID
-            if (!arr[6].trim().isEmpty()) {
-              consumableProps = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 单次抽奖消耗道具数量
-            if (!arr[7].trim().isEmpty()) {
-              consumptionQuantity = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 幸运值上限
-            if (!arr[8].trim().isEmpty()) {
-              luckValueCap = Integer.parseInt(arr[8].trim());
-            }
-
-            // 解析 抽中幸运值大奖后幸运值是否重置
-            if (!arr[9].trim().isEmpty()) {
-              resetLuck = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 每次抽奖获得幸运值
-            if (!arr[10].trim().isEmpty()) {
-              getLucky = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 10连保底
-            if (!arr[11].trim().isEmpty()) {
-              lotteryGuarantee = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 奖励展示
-            if (!arr[12].trim().isEmpty()) {
-              rewardShow = arr[12].trim();
-            }
-
-            // 解析 实际掉落
-            if (!arr[13].trim().isEmpty()) {
-              drop = Integer.parseInt(arr[13].trim());
-            }
-
-            // 解析 幸运值珍品奖励次数
-            if (!arr[14].trim().isEmpty()) {
-              numberAwards = Integer.parseInt(arr[14].trim());
-            }
-
-            // 解析 立绘
-            if (!arr[15].trim().isEmpty()) {
-              picture = arr[15].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("scheDuling"), fileName + ":行" + lineNumber + ":字段 scheDuling");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("prizeId"), fileName + ":行" + lineNumber + ":字段 prizeId");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("luckyPrize"), fileName + ":行" + lineNumber + ":字段 luckyPrize");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("rafflePoints"), fileName + ":行" + lineNumber + ":字段 rafflePoints");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("minimumPoints"), fileName + ":行" + lineNumber + ":字段 minimumPoints");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("consumableProps"), fileName + ":行" + lineNumber + ":字段 consumableProps");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("consumptionQuantity"), fileName + ":行" + lineNumber + ":字段 consumptionQuantity");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("luckValueCap"), fileName + ":行" + lineNumber + ":字段 luckValueCap");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("resetLuck"), fileName + ":行" + lineNumber + ":字段 resetLuck");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("getLucky"), fileName + ":行" + lineNumber + ":字段 getLucky");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("lotteryGuarantee"), fileName + ":行" + lineNumber + ":字段 lotteryGuarantee");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("rewardShow"), fileName + ":行" + lineNumber + ":字段 rewardShow");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("drop"), fileName + ":行" + lineNumber + ":字段 drop");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("numberAwards"), fileName + ":行" + lineNumber + ":字段 numberAwards");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("picture"), fileName + ":行" + lineNumber + ":字段 picture");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ActivityrouletteConfig config = new ActivityrouletteConfig(id, scheDuling, prizeId, luckyPrize, rafflePoints, minimumPoints, consumableProps, consumptionQuantity, luckValueCap, resetLuck, getLucky, lotteryGuarantee, rewardShow, drop, numberAwards, picture);
-          config.afterLoad();
+          ActivityrouletteConfig config = new ActivityrouletteConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ActivityrouletteConfig config : configList) config.afterLoad();
+      new ActivityrouletteConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -180,38 +118,6 @@ public class ActivityrouletteConfigManager implements InterfaceConfigManagerProx
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ActivityrouletteConfig> getConfigList() {
@@ -224,7 +130,7 @@ public class ActivityrouletteConfigManager implements InterfaceConfigManagerProx
 
     @Override
     public String getConfigFileName() {
-      return "activityroulette.txt";
+      return "activityroulette.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

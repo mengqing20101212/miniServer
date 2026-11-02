@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class Resource_index1ConfigCheckerBase extends AbstractConfigChecker<Resource_index1Config> {
   @Override
   public String getConfigFileName() {
-    return "resource_index1.txt";
+    return "resource_index1.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "resname", "STRING"),
-        new ConfigColumnMeta(2, "respath", "STRING"),
-        new ConfigColumnMeta(3, "language", "INT"),
-        new ConfigColumnMeta(4, "restype", "STRING"),
-        new ConfigColumnMeta(5, "resident", "INT"),
-        new ConfigColumnMeta(6, "des", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "resname", "string"),
+        new ConfigColumnMeta(2, "respath", "string"),
+        new ConfigColumnMeta(3, "language", "int"),
+        new ConfigColumnMeta(4, "restype", "string"),
+        new ConfigColumnMeta(5, "resident", "int"),
+        new ConfigColumnMeta(6, "des", "string"));
   }
 }

@@ -8,13 +8,13 @@ import ly.ConfigColumnMeta;
 public abstract class PlayerExpConfigCheckerBase extends AbstractConfigChecker<PlayerExpConfig> {
   @Override
   public String getConfigFileName() {
-    return "playerExp.txt";
+    return "playerExp.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "level", "INT"),
-        new ConfigColumnMeta(1, "exp", "INT"));
+        new ConfigColumnMeta(0, "level", "int"),
+        new ConfigColumnMeta(1, "exp", "int"));
   }
 }

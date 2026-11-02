@@ -8,25 +8,25 @@ import ly.ConfigColumnMeta;
 public abstract class LimitedGitConditionConfigCheckerBase extends AbstractConfigChecker<LimitedGitConditionConfig> {
   @Override
   public String getConfigFileName() {
-    return "limitedGitCondition.txt";
+    return "limitedGitCondition.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "des", "STRING"),
-        new ConfigColumnMeta(2, "missionId", "INT"),
-        new ConfigColumnMeta(3, "missionType", "INT"),
-        new ConfigColumnMeta(4, "levelMin", "INT"),
-        new ConfigColumnMeta(5, "levelMax", "INT"),
-        new ConfigColumnMeta(6, "isRepeat", "INT"),
-        new ConfigColumnMeta(7, "RechargeShopId", "INT"),
-        new ConfigColumnMeta(8, "giveCloseTime", "INT"),
-        new ConfigColumnMeta(9, "cycleTime", "INT"),
-        new ConfigColumnMeta(10, "activateType", "INT"),
-        new ConfigColumnMeta(11, "activateMax", "INT"),
-        new ConfigColumnMeta(12, "herocondition", "INT"),
-        new ConfigColumnMeta(13, "rechargecondition", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "des", "string"),
+        new ConfigColumnMeta(2, "missionId", "int"),
+        new ConfigColumnMeta(3, "missionType", "int"),
+        new ConfigColumnMeta(4, "levelMin", "int"),
+        new ConfigColumnMeta(5, "levelMax", "int"),
+        new ConfigColumnMeta(6, "isRepeat", "int"),
+        new ConfigColumnMeta(7, "RechargeShopId", "int"),
+        new ConfigColumnMeta(8, "giveCloseTime", "int"),
+        new ConfigColumnMeta(9, "cycleTime", "int"),
+        new ConfigColumnMeta(10, "activateType", "int"),
+        new ConfigColumnMeta(11, "activateMax", "int"),
+        new ConfigColumnMeta(12, "herocondition", "int"),
+        new ConfigColumnMeta(13, "rechargecondition", "int"));
   }
 }

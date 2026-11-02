@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class FunctionPushConfigCheckerBase extends AbstractConfigChecker<FunctionPushConfig> {
   @Override
   public String getConfigFileName() {
-    return "functionPush.txt";
+    return "functionPush.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "functionId", "INT"),
-        new ConfigColumnMeta(2, "sort", "INT"),
-        new ConfigColumnMeta(3, "icon", "INT"),
-        new ConfigColumnMeta(4, "turnId", "INT"),
-        new ConfigColumnMeta(5, "des", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "functionId", "int"),
+        new ConfigColumnMeta(2, "sort", "int"),
+        new ConfigColumnMeta(3, "icon", "int"),
+        new ConfigColumnMeta(4, "turnId", "int"),
+        new ConfigColumnMeta(5, "des", "int"));
   }
 }

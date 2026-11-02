@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityfallConfigCheckerBase extends AbstractConfigChecker<ActivityfallConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityfall.txt";
+    return "activityfall.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "questType", "INT"),
-        new ConfigColumnMeta(2, "beizhu", "STRING"),
-        new ConfigColumnMeta(3, "fallitem", "STRING"),
-        new ConfigColumnMeta(4, "item", "STRING"),
-        new ConfigColumnMeta(5, "turn", "INT"),
-        new ConfigColumnMeta(6, "title", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "questType", "int"),
+        new ConfigColumnMeta(2, "beizhu", "string"),
+        new ConfigColumnMeta(3, "fallitem", "string"),
+        new ConfigColumnMeta(4, "item", "string"),
+        new ConfigColumnMeta(5, "turn", "int"),
+        new ConfigColumnMeta(6, "title", "string"));
   }
 }

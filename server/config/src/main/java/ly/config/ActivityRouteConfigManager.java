@@ -27,7 +27,7 @@ public class ActivityRouteConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new ActivityRouteConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "activityRoute.txt"; }
+  public String getConfigFileName() { return "activityRoute.xml"; }
 
   public static class ActivityRouteConfigManagerImpl extends AbstractConfigManger {
     private List<ActivityRouteConfig> configList = List.of();
@@ -39,132 +39,73 @@ public class ActivityRouteConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       ActivityRouteConfigChecker checker = new ActivityRouteConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<ActivityRouteConfig> newList = new ArrayList<>();
       Map<Integer, ActivityRouteConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 15) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          int drop = 0;
-          String rewardShow = null;
-          int score = 0;
-          int array = 0;
-          int row = 0;
-          String front = null;
-          int payGift = 0;
-          String payGiftShow = null;
-          int rechargeId = 0;
-          int isCrossNode = 0;
-          int drop2 = 0;
-          String rewardShow2 = null;
-          String line = null;
-          String circle = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          int parsedField1 = 0;
+          String parsedField2 = null;
+          int parsedField3 = 0;
+          int parsedField4 = 0;
+          int parsedField5 = 0;
+          String parsedField6 = null;
+          int parsedField7 = 0;
+          String parsedField8 = null;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
+          int parsedField11 = 0;
+          String parsedField12 = null;
+          String parsedField13 = null;
+          String parsedField14 = null;
           try {
-            // 解析 编号
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 积分奖励
-            if (!arr[1].trim().isEmpty()) {
-              drop = Integer.parseInt(arr[1].trim());
-            }
-
-            // 解析 积分奖励展示
-            if (!arr[2].trim().isEmpty()) {
-              rewardShow = arr[2].trim();
-            }
-
-            // 解析 消耗积分
-            if (!arr[3].trim().isEmpty()) {
-              score = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 所属位置(列)
-            if (!arr[4].trim().isEmpty()) {
-              array = Integer.parseInt(arr[4].trim());
-            }
-
-            // 解析 所属位置(排)
-            if (!arr[5].trim().isEmpty()) {
-              row = Integer.parseInt(arr[5].trim());
-            }
-
-            // 解析 前置档位
-            if (!arr[6].trim().isEmpty()) {
-              front = arr[6].trim();
-            }
-
-            // 解析 付费奖励
-            if (!arr[7].trim().isEmpty()) {
-              payGift = Integer.parseInt(arr[7].trim());
-            }
-
-            // 解析 付费奖励展示
-            if (!arr[8].trim().isEmpty()) {
-              payGiftShow = arr[8].trim();
-            }
-
-            // 解析 充值ID
-            if (!arr[9].trim().isEmpty()) {
-              rechargeId = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 是否是交叉点
-            if (!arr[10].trim().isEmpty()) {
-              isCrossNode = Integer.parseInt(arr[10].trim());
-            }
-
-            // 解析 付费积分奖励
-            if (!arr[11].trim().isEmpty()) {
-              drop2 = Integer.parseInt(arr[11].trim());
-            }
-
-            // 解析 积分奖励展示
-            if (!arr[12].trim().isEmpty()) {
-              rewardShow2 = arr[12].trim();
-            }
-
-            // 解析 线坐标
-            if (!arr[13].trim().isEmpty()) {
-              line = arr[13].trim();
-            }
-
-            // 解析 圈坐标
-            if (!arr[14].trim().isEmpty()) {
-              circle = arr[14].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("drop"), fileName + ":行" + lineNumber + ":字段 drop");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("rewardShow"), fileName + ":行" + lineNumber + ":字段 rewardShow");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("score"), fileName + ":行" + lineNumber + ":字段 score");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("array"), fileName + ":行" + lineNumber + ":字段 array");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("row"), fileName + ":行" + lineNumber + ":字段 row");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("front"), fileName + ":行" + lineNumber + ":字段 front");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("payGift"), fileName + ":行" + lineNumber + ":字段 payGift");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("payGiftShow"), fileName + ":行" + lineNumber + ":字段 payGiftShow");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("rechargeId"), fileName + ":行" + lineNumber + ":字段 rechargeId");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("isCrossNode"), fileName + ":行" + lineNumber + ":字段 isCrossNode");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("drop2"), fileName + ":行" + lineNumber + ":字段 drop2");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("rewardShow2"), fileName + ":行" + lineNumber + ":字段 rewardShow2");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("line"), fileName + ":行" + lineNumber + ":字段 line");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("circle"), fileName + ":行" + lineNumber + ":字段 circle");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          ActivityRouteConfig config = new ActivityRouteConfig(id, drop, rewardShow, score, array, row, front, payGift, payGiftShow, rechargeId, isCrossNode, drop2, rewardShow2, line, circle);
-          config.afterLoad();
+          ActivityRouteConfig config = new ActivityRouteConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (ActivityRouteConfig config : configList) config.afterLoad();
+      new ActivityRouteConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -174,38 +115,6 @@ public class ActivityRouteConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<ActivityRouteConfig> getConfigList() {
@@ -218,7 +127,7 @@ public class ActivityRouteConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "activityRoute.txt";
+      return "activityRoute.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

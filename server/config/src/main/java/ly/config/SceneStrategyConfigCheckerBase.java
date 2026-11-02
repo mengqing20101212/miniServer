@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class SceneStrategyConfigCheckerBase extends AbstractConfigChecker<SceneStrategyConfig> {
   @Override
   public String getConfigFileName() {
-    return "sceneStrategy.txt";
+    return "sceneStrategy.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "beizhu", "STRING"),
-        new ConfigColumnMeta(2, "npcId", "INT"),
-        new ConfigColumnMeta(3, "strategyDec", "STRING"),
-        new ConfigColumnMeta(4, "heroId", "STRING"),
-        new ConfigColumnMeta(5, "nextId", "INT"),
-        new ConfigColumnMeta(6, "lastId", "INT"),
-        new ConfigColumnMeta(7, "sceneGroup", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "beizhu", "string"),
+        new ConfigColumnMeta(2, "npcId", "int"),
+        new ConfigColumnMeta(3, "strategyDec", "string"),
+        new ConfigColumnMeta(4, "heroId", "string"),
+        new ConfigColumnMeta(5, "nextId", "int"),
+        new ConfigColumnMeta(6, "lastId", "int"),
+        new ConfigColumnMeta(7, "sceneGroup", "int"));
   }
 }

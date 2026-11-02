@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class SpeakTemplateConfigCheckerBase extends AbstractConfigChecker<SpeakTemplateConfig> {
   @Override
   public String getConfigFileName() {
-    return "speakTemplate.txt";
+    return "speakTemplate.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "templateId", "INT"),
-        new ConfigColumnMeta(2, "standId", "INT"),
-        new ConfigColumnMeta(3, "mosterName", "STRING"),
-        new ConfigColumnMeta(4, "content", "STRING"),
-        new ConfigColumnMeta(5, "answer", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "templateId", "int"),
+        new ConfigColumnMeta(2, "standId", "int"),
+        new ConfigColumnMeta(3, "mosterName", "string"),
+        new ConfigColumnMeta(4, "content", "string"),
+        new ConfigColumnMeta(5, "answer", "int"));
   }
 }

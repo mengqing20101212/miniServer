@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class MinigameMainConfigCheckerBase extends AbstractConfigChecker<MinigameMainConfig> {
   @Override
   public String getConfigFileName() {
-    return "minigameMain.txt";
+    return "minigameMain.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "banner", "INT"),
-        new ConfigColumnMeta(3, "ticket", "STRING"),
-        new ConfigColumnMeta(4, "rule", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "banner", "int"),
+        new ConfigColumnMeta(3, "ticket", "string"),
+        new ConfigColumnMeta(4, "rule", "string"));
   }
 }

@@ -27,7 +27,7 @@ public class BattleQuestionConfigManager implements InterfaceConfigManagerProxy 
   public AbstractConfigManger createTable() { return new BattleQuestionConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "battleQuestion.txt"; }
+  public String getConfigFileName() { return "battleQuestion.xml"; }
 
   public static class BattleQuestionConfigManagerImpl extends AbstractConfigManger {
     private List<BattleQuestionConfig> configList = List.of();
@@ -39,138 +39,76 @@ public class BattleQuestionConfigManager implements InterfaceConfigManagerProxy 
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       BattleQuestionConfigChecker checker = new BattleQuestionConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<BattleQuestionConfig> newList = new ArrayList<>();
       Map<Integer, BattleQuestionConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 16) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String questionContent = null;
-          int questionPic = 0;
-          int answer = 0;
-          String answer1 = null;
-          String answerResult1 = null;
-          int answerEffect1 = 0;
-          String answer2 = null;
-          String answerResult2 = null;
-          int answerEffect2 = 0;
-          String answer3 = null;
-          String answerResult3 = null;
-          int answerEffect3 = 0;
-          String answer4 = null;
-          String answerResult4 = null;
-          int answerEffect4 = 0;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          int parsedField2 = 0;
+          int parsedField3 = 0;
+          String parsedField4 = null;
+          String parsedField5 = null;
+          int parsedField6 = 0;
+          String parsedField7 = null;
+          String parsedField8 = null;
+          int parsedField9 = 0;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          int parsedField12 = 0;
+          String parsedField13 = null;
+          String parsedField14 = null;
+          int parsedField15 = 0;
           try {
-            // 解析 ID
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 题干
-            if (!arr[1].trim().isEmpty()) {
-              questionContent = arr[1].trim();
-            }
-
-            // 解析 标题图片
-            if (!arr[2].trim().isEmpty()) {
-              questionPic = Integer.parseInt(arr[2].trim());
-            }
-
-            // 解析 正确答案
-            if (!arr[3].trim().isEmpty()) {
-              answer = Integer.parseInt(arr[3].trim());
-            }
-
-            // 解析 选项1文字
-            if (!arr[4].trim().isEmpty()) {
-              answer1 = arr[4].trim();
-            }
-
-            // 解析 选项1反馈文字
-            if (!arr[5].trim().isEmpty()) {
-              answerResult1 = arr[5].trim();
-            }
-
-            // 解析 选项1效果
-            if (!arr[6].trim().isEmpty()) {
-              answerEffect1 = Integer.parseInt(arr[6].trim());
-            }
-
-            // 解析 选项2文字
-            if (!arr[7].trim().isEmpty()) {
-              answer2 = arr[7].trim();
-            }
-
-            // 解析 选项2反馈文字
-            if (!arr[8].trim().isEmpty()) {
-              answerResult2 = arr[8].trim();
-            }
-
-            // 解析 选项2效果
-            if (!arr[9].trim().isEmpty()) {
-              answerEffect2 = Integer.parseInt(arr[9].trim());
-            }
-
-            // 解析 选项3文字
-            if (!arr[10].trim().isEmpty()) {
-              answer3 = arr[10].trim();
-            }
-
-            // 解析 选项3反馈文字
-            if (!arr[11].trim().isEmpty()) {
-              answerResult3 = arr[11].trim();
-            }
-
-            // 解析 选项3效果
-            if (!arr[12].trim().isEmpty()) {
-              answerEffect3 = Integer.parseInt(arr[12].trim());
-            }
-
-            // 解析 选项4文字
-            if (!arr[13].trim().isEmpty()) {
-              answer4 = arr[13].trim();
-            }
-
-            // 解析 选项4反馈文字
-            if (!arr[14].trim().isEmpty()) {
-              answerResult4 = arr[14].trim();
-            }
-
-            // 解析 选项4效果
-            if (!arr[15].trim().isEmpty()) {
-              answerEffect4 = Integer.parseInt(arr[15].trim());
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("questionContent"), fileName + ":行" + lineNumber + ":字段 questionContent");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("questionPic"), fileName + ":行" + lineNumber + ":字段 questionPic");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("answer"), fileName + ":行" + lineNumber + ":字段 answer");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("answer1"), fileName + ":行" + lineNumber + ":字段 answer1");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("answerResult1"), fileName + ":行" + lineNumber + ":字段 answerResult1");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("answerEffect1"), fileName + ":行" + lineNumber + ":字段 answerEffect1");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("answer2"), fileName + ":行" + lineNumber + ":字段 answer2");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("answerResult2"), fileName + ":行" + lineNumber + ":字段 answerResult2");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("answerEffect2"), fileName + ":行" + lineNumber + ":字段 answerEffect2");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("answer3"), fileName + ":行" + lineNumber + ":字段 answer3");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("answerResult3"), fileName + ":行" + lineNumber + ":字段 answerResult3");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("answerEffect3"), fileName + ":行" + lineNumber + ":字段 answerEffect3");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("answer4"), fileName + ":行" + lineNumber + ":字段 answer4");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("answerResult4"), fileName + ":行" + lineNumber + ":字段 answerResult4");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("answerEffect4"), fileName + ":行" + lineNumber + ":字段 answerEffect4");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          BattleQuestionConfig config = new BattleQuestionConfig(id, questionContent, questionPic, answer, answer1, answerResult1, answerEffect1, answer2, answerResult2, answerEffect2, answer3, answerResult3, answerEffect3, answer4, answerResult4, answerEffect4);
-          config.afterLoad();
+          BattleQuestionConfig config = new BattleQuestionConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (BattleQuestionConfig config : configList) config.afterLoad();
+      new BattleQuestionConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -180,38 +118,6 @@ public class BattleQuestionConfigManager implements InterfaceConfigManagerProxy 
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<BattleQuestionConfig> getConfigList() {
@@ -224,7 +130,7 @@ public class BattleQuestionConfigManager implements InterfaceConfigManagerProxy 
 
     @Override
     public String getConfigFileName() {
-      return "battleQuestion.txt";
+      return "battleQuestion.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

@@ -8,14 +8,14 @@ import ly.ConfigColumnMeta;
 public abstract class BiOutputConfigCheckerBase extends AbstractConfigChecker<BiOutputConfig> {
   @Override
   public String getConfigFileName() {
-    return "biOutput.txt";
+    return "biOutput.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "outPutId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "outPutId", "int"));
   }
 }

@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class ActivitygashaponConfigCheckerBase extends AbstractConfigChecker<ActivitygashaponConfig> {
   @Override
   public String getConfigFileName() {
-    return "activitygashapon.txt";
+    return "activitygashapon.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "scheDuling", "INT"),
-        new ConfigColumnMeta(2, "itemId", "INT"),
-        new ConfigColumnMeta(3, "count", "INT"),
-        new ConfigColumnMeta(4, "gashaponWeights", "STRING"),
-        new ConfigColumnMeta(5, "gachaBox", "STRING"),
-        new ConfigColumnMeta(6, "RewardShow", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "scheDuling", "int"),
+        new ConfigColumnMeta(2, "itemId", "int"),
+        new ConfigColumnMeta(3, "count", "int"),
+        new ConfigColumnMeta(4, "gashaponWeights", "string"),
+        new ConfigColumnMeta(5, "gachaBox", "string"),
+        new ConfigColumnMeta(6, "RewardShow", "int"));
   }
 }

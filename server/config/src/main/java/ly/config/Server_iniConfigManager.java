@@ -27,7 +27,7 @@ public class Server_iniConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new Server_iniConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "server_ini.txt"; }
+  public String getConfigFileName() { return "server_ini.xml"; }
 
   public static class Server_iniConfigManagerImpl extends AbstractConfigManger {
     private List<Server_iniConfig> configList = List.of();
@@ -39,207 +39,112 @@ public class Server_iniConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type13 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type14 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type15 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type16 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type17 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type18 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type19 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type20 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type21 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type22 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type23 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type24 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type25 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type26 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type27 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       Server_iniConfigChecker checker = new Server_iniConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<Server_iniConfig> newList = new ArrayList<>();
       Map<Integer, Server_iniConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 28) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          String des = null;
-          String dev_default = null;
-          String a01_default = null;
-          String b02_default = null;
-          String c03_default = null;
-          String d04_default = null;
-          String e05_default = null;
-          String f06_default = null;
-          String g07_default = null;
-          String h08_default = null;
-          String i09_default = null;
-          String weekly_multinode = null;
-          String korea_dev_default = null;
-          String korea_weekly_default = null;
-          String korea_gray_default = null;
-          String tencent_dev1_default = null;
-          String tencent_dev2_default = null;
-          String tencent_dev3_default = null;
-          String tencent_dev4_default = null;
-          String tencent_dev5_default = null;
-          String tencent_gray_default = null;
-          String tencent_official_default = null;
-          String tencent_ios_cert_default = null;
-          String tencent_release_default = null;
-          String tencent_stress_test_default = null;
-          String tencent_idc_test_default = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          String parsedField12 = null;
+          String parsedField13 = null;
+          String parsedField14 = null;
+          String parsedField15 = null;
+          String parsedField16 = null;
+          String parsedField17 = null;
+          String parsedField18 = null;
+          String parsedField19 = null;
+          String parsedField20 = null;
+          String parsedField21 = null;
+          String parsedField22 = null;
+          String parsedField23 = null;
+          String parsedField24 = null;
+          String parsedField25 = null;
+          String parsedField26 = null;
+          String parsedField27 = null;
           try {
-            // 解析   null
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析   null
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析   null
-            if (!arr[2].trim().isEmpty()) {
-              des = arr[2].trim();
-            }
-
-            // 解析   null
-            if (!arr[3].trim().isEmpty()) {
-              dev_default = arr[3].trim();
-            }
-
-            // 解析   null
-            if (!arr[4].trim().isEmpty()) {
-              a01_default = arr[4].trim();
-            }
-
-            // 解析   null
-            if (!arr[5].trim().isEmpty()) {
-              b02_default = arr[5].trim();
-            }
-
-            // 解析   null
-            if (!arr[6].trim().isEmpty()) {
-              c03_default = arr[6].trim();
-            }
-
-            // 解析   null
-            if (!arr[7].trim().isEmpty()) {
-              d04_default = arr[7].trim();
-            }
-
-            // 解析   null
-            if (!arr[8].trim().isEmpty()) {
-              e05_default = arr[8].trim();
-            }
-
-            // 解析   null
-            if (!arr[9].trim().isEmpty()) {
-              f06_default = arr[9].trim();
-            }
-
-            // 解析   null
-            if (!arr[10].trim().isEmpty()) {
-              g07_default = arr[10].trim();
-            }
-
-            // 解析   null
-            if (!arr[11].trim().isEmpty()) {
-              h08_default = arr[11].trim();
-            }
-
-            // 解析   null
-            if (!arr[12].trim().isEmpty()) {
-              i09_default = arr[12].trim();
-            }
-
-            // 解析   null
-            if (!arr[13].trim().isEmpty()) {
-              weekly_multinode = arr[13].trim();
-            }
-
-            // 解析   null
-            if (!arr[14].trim().isEmpty()) {
-              korea_dev_default = arr[14].trim();
-            }
-
-            // 解析   null
-            if (!arr[15].trim().isEmpty()) {
-              korea_weekly_default = arr[15].trim();
-            }
-
-            // 解析   null
-            if (!arr[16].trim().isEmpty()) {
-              korea_gray_default = arr[16].trim();
-            }
-
-            // 解析   null
-            if (!arr[17].trim().isEmpty()) {
-              tencent_dev1_default = arr[17].trim();
-            }
-
-            // 解析   null
-            if (!arr[18].trim().isEmpty()) {
-              tencent_dev2_default = arr[18].trim();
-            }
-
-            // 解析   null
-            if (!arr[19].trim().isEmpty()) {
-              tencent_dev3_default = arr[19].trim();
-            }
-
-            // 解析   null
-            if (!arr[20].trim().isEmpty()) {
-              tencent_dev4_default = arr[20].trim();
-            }
-
-            // 解析   null
-            if (!arr[21].trim().isEmpty()) {
-              tencent_dev5_default = arr[21].trim();
-            }
-
-            // 解析   null
-            if (!arr[22].trim().isEmpty()) {
-              tencent_gray_default = arr[22].trim();
-            }
-
-            // 解析   null
-            if (!arr[23].trim().isEmpty()) {
-              tencent_official_default = arr[23].trim();
-            }
-
-            // 解析   null
-            if (!arr[24].trim().isEmpty()) {
-              tencent_ios_cert_default = arr[24].trim();
-            }
-
-            if (!arr[25].trim().isEmpty()) {
-              tencent_release_default = arr[25].trim();
-            }
-
-            if (!arr[26].trim().isEmpty()) {
-              tencent_stress_test_default = arr[26].trim();
-            }
-
-            if (!arr[27].trim().isEmpty()) {
-              tencent_idc_test_default = arr[27].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("des"), fileName + ":行" + lineNumber + ":字段 des");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("dev_default"), fileName + ":行" + lineNumber + ":字段 dev_default");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("a01_default"), fileName + ":行" + lineNumber + ":字段 a01_default");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("b02_default"), fileName + ":行" + lineNumber + ":字段 b02_default");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("c03_default"), fileName + ":行" + lineNumber + ":字段 c03_default");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("d04_default"), fileName + ":行" + lineNumber + ":字段 d04_default");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("e05_default"), fileName + ":行" + lineNumber + ":字段 e05_default");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("f06_default"), fileName + ":行" + lineNumber + ":字段 f06_default");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("g07_default"), fileName + ":行" + lineNumber + ":字段 g07_default");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("h08_default"), fileName + ":行" + lineNumber + ":字段 h08_default");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("i09_default"), fileName + ":行" + lineNumber + ":字段 i09_default");
+            parsedField13 = ly.ConfigValues.read(type13, values.get("weekly_multinode"), fileName + ":行" + lineNumber + ":字段 weekly_multinode");
+            parsedField14 = ly.ConfigValues.read(type14, values.get("korea_dev_default"), fileName + ":行" + lineNumber + ":字段 korea_dev_default");
+            parsedField15 = ly.ConfigValues.read(type15, values.get("korea_weekly_default"), fileName + ":行" + lineNumber + ":字段 korea_weekly_default");
+            parsedField16 = ly.ConfigValues.read(type16, values.get("korea_gray_default"), fileName + ":行" + lineNumber + ":字段 korea_gray_default");
+            parsedField17 = ly.ConfigValues.read(type17, values.get("tencent_dev1_default"), fileName + ":行" + lineNumber + ":字段 tencent_dev1_default");
+            parsedField18 = ly.ConfigValues.read(type18, values.get("tencent_dev2_default"), fileName + ":行" + lineNumber + ":字段 tencent_dev2_default");
+            parsedField19 = ly.ConfigValues.read(type19, values.get("tencent_dev3_default"), fileName + ":行" + lineNumber + ":字段 tencent_dev3_default");
+            parsedField20 = ly.ConfigValues.read(type20, values.get("tencent_dev4_default"), fileName + ":行" + lineNumber + ":字段 tencent_dev4_default");
+            parsedField21 = ly.ConfigValues.read(type21, values.get("tencent_dev5_default"), fileName + ":行" + lineNumber + ":字段 tencent_dev5_default");
+            parsedField22 = ly.ConfigValues.read(type22, values.get("tencent_gray_default"), fileName + ":行" + lineNumber + ":字段 tencent_gray_default");
+            parsedField23 = ly.ConfigValues.read(type23, values.get("tencent_official_default"), fileName + ":行" + lineNumber + ":字段 tencent_official_default");
+            parsedField24 = ly.ConfigValues.read(type24, values.get("tencent_ios_cert_default"), fileName + ":行" + lineNumber + ":字段 tencent_ios_cert_default");
+            parsedField25 = ly.ConfigValues.read(type25, values.get("tencent_release_default"), fileName + ":行" + lineNumber + ":字段 tencent_release_default");
+            parsedField26 = ly.ConfigValues.read(type26, values.get("tencent_stress_test_default"), fileName + ":行" + lineNumber + ":字段 tencent_stress_test_default");
+            parsedField27 = ly.ConfigValues.read(type27, values.get("tencent_idc_test_default"), fileName + ":行" + lineNumber + ":字段 tencent_idc_test_default");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          Server_iniConfig config = new Server_iniConfig(id, name, des, dev_default, a01_default, b02_default, c03_default, d04_default, e05_default, f06_default, g07_default, h08_default, i09_default, weekly_multinode, korea_dev_default, korea_weekly_default, korea_gray_default, tencent_dev1_default, tencent_dev2_default, tencent_dev3_default, tencent_dev4_default, tencent_dev5_default, tencent_gray_default, tencent_official_default, tencent_ios_cert_default, tencent_release_default, tencent_stress_test_default, tencent_idc_test_default);
-          config.afterLoad();
+          Server_iniConfig config = new Server_iniConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24, parsedField25, parsedField26, parsedField27);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (Server_iniConfig config : configList) config.afterLoad();
+      new Server_iniConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -249,38 +154,6 @@ public class Server_iniConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<Server_iniConfig> getConfigList() {
@@ -293,7 +166,7 @@ public class Server_iniConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "server_ini.txt";
+      return "server_ini.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

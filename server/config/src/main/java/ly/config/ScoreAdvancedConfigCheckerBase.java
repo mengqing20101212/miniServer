@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class ScoreAdvancedConfigCheckerBase extends AbstractConfigChecker<ScoreAdvancedConfig> {
   @Override
   public String getConfigFileName() {
-    return "scoreAdvanced.txt";
+    return "scoreAdvanced.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "quality", "INT"),
-        new ConfigColumnMeta(2, "advanced", "INT"),
-        new ConfigColumnMeta(3, "score", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "quality", "int"),
+        new ConfigColumnMeta(2, "advanced", "int"),
+        new ConfigColumnMeta(3, "score", "int"));
   }
 }

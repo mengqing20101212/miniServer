@@ -8,27 +8,27 @@ import ly.ConfigColumnMeta;
 public abstract class BattleQuestionConfigCheckerBase extends AbstractConfigChecker<BattleQuestionConfig> {
   @Override
   public String getConfigFileName() {
-    return "battleQuestion.txt";
+    return "battleQuestion.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "questionContent", "STRING"),
-        new ConfigColumnMeta(2, "questionPic", "INT"),
-        new ConfigColumnMeta(3, "answer", "INT"),
-        new ConfigColumnMeta(4, "answer1", "STRING"),
-        new ConfigColumnMeta(5, "answerResult1", "STRING"),
-        new ConfigColumnMeta(6, "answerEffect1", "INT"),
-        new ConfigColumnMeta(7, "answer2", "STRING"),
-        new ConfigColumnMeta(8, "answerResult2", "STRING"),
-        new ConfigColumnMeta(9, "answerEffect2", "INT"),
-        new ConfigColumnMeta(10, "answer3", "STRING"),
-        new ConfigColumnMeta(11, "answerResult3", "STRING"),
-        new ConfigColumnMeta(12, "answerEffect3", "INT"),
-        new ConfigColumnMeta(13, "answer4", "STRING"),
-        new ConfigColumnMeta(14, "answerResult4", "STRING"),
-        new ConfigColumnMeta(15, "answerEffect4", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "questionContent", "string"),
+        new ConfigColumnMeta(2, "questionPic", "int"),
+        new ConfigColumnMeta(3, "answer", "int"),
+        new ConfigColumnMeta(4, "answer1", "string"),
+        new ConfigColumnMeta(5, "answerResult1", "string"),
+        new ConfigColumnMeta(6, "answerEffect1", "int"),
+        new ConfigColumnMeta(7, "answer2", "string"),
+        new ConfigColumnMeta(8, "answerResult2", "string"),
+        new ConfigColumnMeta(9, "answerEffect2", "int"),
+        new ConfigColumnMeta(10, "answer3", "string"),
+        new ConfigColumnMeta(11, "answerResult3", "string"),
+        new ConfigColumnMeta(12, "answerEffect3", "int"),
+        new ConfigColumnMeta(13, "answer4", "string"),
+        new ConfigColumnMeta(14, "answerResult4", "string"),
+        new ConfigColumnMeta(15, "answerEffect4", "int"));
   }
 }

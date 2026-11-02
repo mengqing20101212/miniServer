@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class HeroSkillGainEnergyConfigCheckerBase extends AbstractConfigChecker<HeroSkillGainEnergyConfig> {
   @Override
   public String getConfigFileName() {
-    return "heroSkillGainEnergy.txt";
+    return "heroSkillGainEnergy.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "heroId", "INT"),
-        new ConfigColumnMeta(2, "beizhu", "STRING"),
-        new ConfigColumnMeta(3, "skillPos", "INT"),
-        new ConfigColumnMeta(4, "skillLevel", "INT"),
-        new ConfigColumnMeta(5, "gainEnergy", "INT"),
-        new ConfigColumnMeta(6, "awakeGainEnergy", "INT"),
-        new ConfigColumnMeta(7, "characteristicId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "heroId", "int"),
+        new ConfigColumnMeta(2, "beizhu", "string"),
+        new ConfigColumnMeta(3, "skillPos", "int"),
+        new ConfigColumnMeta(4, "skillLevel", "int"),
+        new ConfigColumnMeta(5, "gainEnergy", "int"),
+        new ConfigColumnMeta(6, "awakeGainEnergy", "int"),
+        new ConfigColumnMeta(7, "characteristicId", "int"));
   }
 }

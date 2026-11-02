@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class BlockBattleChallengeRewardConfigCheckerBase extends AbstractConfigChecker<BlockBattleChallengeRewardConfig> {
   @Override
   public String getConfigFileName() {
-    return "blockBattleChallengeReward.txt";
+    return "blockBattleChallengeReward.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "prestigeNum", "INT"),
-        new ConfigColumnMeta(2, "des", "STRING"),
-        new ConfigColumnMeta(3, "drop", "INT"),
-        new ConfigColumnMeta(4, "dropShow", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "prestigeNum", "int"),
+        new ConfigColumnMeta(2, "des", "string"),
+        new ConfigColumnMeta(3, "drop", "int"),
+        new ConfigColumnMeta(4, "dropShow", "int"));
   }
 }

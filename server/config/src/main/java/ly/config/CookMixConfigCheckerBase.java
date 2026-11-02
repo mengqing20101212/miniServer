@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class CookMixConfigCheckerBase extends AbstractConfigChecker<CookMixConfig> {
   @Override
   public String getConfigFileName() {
-    return "cookMix.txt";
+    return "cookMix.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "minArea", "INT"),
-        new ConfigColumnMeta(2, "maxArea", "INT"),
-        new ConfigColumnMeta(3, "dropId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "minArea", "int"),
+        new ConfigColumnMeta(2, "maxArea", "int"),
+        new ConfigColumnMeta(3, "dropId", "int"));
   }
 }

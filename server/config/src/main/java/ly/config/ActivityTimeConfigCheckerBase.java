@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class ActivityTimeConfigCheckerBase extends AbstractConfigChecker<ActivityTimeConfig> {
   @Override
   public String getConfigFileName() {
-    return "activityTime.txt";
+    return "activityTime.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "name", "STRING"),
-        new ConfigColumnMeta(2, "type", "INT"),
-        new ConfigColumnMeta(3, "time", "STRING"),
-        new ConfigColumnMeta(4, "timeShow", "STRING"),
-        new ConfigColumnMeta(5, "week", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "name", "string"),
+        new ConfigColumnMeta(2, "type", "int"),
+        new ConfigColumnMeta(3, "time", "string"),
+        new ConfigColumnMeta(4, "timeShow", "string"),
+        new ConfigColumnMeta(5, "week", "string"));
   }
 }

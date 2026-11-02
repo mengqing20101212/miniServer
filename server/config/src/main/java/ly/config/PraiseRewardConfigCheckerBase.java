@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class PraiseRewardConfigCheckerBase extends AbstractConfigChecker<PraiseRewardConfig> {
   @Override
   public String getConfigFileName() {
-    return "praiseReward.txt";
+    return "praiseReward.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "rewardShow", "STRING"),
-        new ConfigColumnMeta(3, "drop", "INT"),
-        new ConfigColumnMeta(4, "value", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "rewardShow", "string"),
+        new ConfigColumnMeta(3, "drop", "int"),
+        new ConfigColumnMeta(4, "value", "int"));
   }
 }

@@ -8,15 +8,15 @@ import ly.ConfigColumnMeta;
 public abstract class MopUpConfigCheckerBase extends AbstractConfigChecker<MopUpConfig> {
   @Override
   public String getConfigFileName() {
-    return "mopUp.txt";
+    return "mopUp.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "itemId", "INT"),
-        new ConfigColumnMeta(2, "chapterStage", "INT"),
-        new ConfigColumnMeta(3, "dropExpect", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "itemId", "int"),
+        new ConfigColumnMeta(2, "chapterStage", "int"),
+        new ConfigColumnMeta(3, "dropExpect", "int"));
   }
 }

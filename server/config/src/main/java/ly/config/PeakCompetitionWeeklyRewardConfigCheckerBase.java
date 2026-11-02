@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class PeakCompetitionWeeklyRewardConfigCheckerBase extends AbstractConfigChecker<PeakCompetitionWeeklyRewardConfig> {
   @Override
   public String getConfigFileName() {
-    return "peakCompetitionWeeklyReward.txt";
+    return "peakCompetitionWeeklyReward.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "grade", "STRING"),
-        new ConfigColumnMeta(2, "gradeShow", "STRING"),
-        new ConfigColumnMeta(3, "awardWeek", "STRING"),
-        new ConfigColumnMeta(4, "awardPre", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "grade", "string"),
+        new ConfigColumnMeta(2, "gradeShow", "string"),
+        new ConfigColumnMeta(3, "awardWeek", "string"),
+        new ConfigColumnMeta(4, "awardPre", "string"));
   }
 }

@@ -8,21 +8,21 @@ import ly.ConfigColumnMeta;
 public abstract class SceneEventConfigCheckerBase extends AbstractConfigChecker<SceneEventConfig> {
   @Override
   public String getConfigFileName() {
-    return "sceneEvent.txt";
+    return "sceneEvent.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "description", "STRING"),
-        new ConfigColumnMeta(2, "triggerTypeList", "STRING"),
-        new ConfigColumnMeta(3, "treeName", "STRING"),
-        new ConfigColumnMeta(4, "uitype", "INT"),
-        new ConfigColumnMeta(5, "param_1", "STRING"),
-        new ConfigColumnMeta(6, "param_2", "STRING"),
-        new ConfigColumnMeta(7, "param_3", "STRING"),
-        new ConfigColumnMeta(8, "param_4", "STRING"),
-        new ConfigColumnMeta(9, "loopNum", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "description", "string"),
+        new ConfigColumnMeta(2, "triggerTypeList", "string"),
+        new ConfigColumnMeta(3, "treeName", "string"),
+        new ConfigColumnMeta(4, "uitype", "int"),
+        new ConfigColumnMeta(5, "param_1", "string"),
+        new ConfigColumnMeta(6, "param_2", "string"),
+        new ConfigColumnMeta(7, "param_3", "string"),
+        new ConfigColumnMeta(8, "param_4", "string"),
+        new ConfigColumnMeta(9, "loopNum", "int"));
   }
 }

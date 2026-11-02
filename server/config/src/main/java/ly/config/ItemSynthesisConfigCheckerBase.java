@@ -8,19 +8,19 @@ import ly.ConfigColumnMeta;
 public abstract class ItemSynthesisConfigCheckerBase extends AbstractConfigChecker<ItemSynthesisConfig> {
   @Override
   public String getConfigFileName() {
-    return "itemSynthesis.txt";
+    return "itemSynthesis.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "newName", "STRING"),
-        new ConfigColumnMeta(2, "oldItem", "INT"),
-        new ConfigColumnMeta(3, "oldName", "STRING"),
-        new ConfigColumnMeta(4, "needNum", "INT"),
-        new ConfigColumnMeta(5, "level", "INT"),
-        new ConfigColumnMeta(6, "costItem", "INT"),
-        new ConfigColumnMeta(7, "costNum", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "newName", "string"),
+        new ConfigColumnMeta(2, "oldItem", "int"),
+        new ConfigColumnMeta(3, "oldName", "string"),
+        new ConfigColumnMeta(4, "needNum", "int"),
+        new ConfigColumnMeta(5, "level", "int"),
+        new ConfigColumnMeta(6, "costItem", "int"),
+        new ConfigColumnMeta(7, "costNum", "int"));
   }
 }

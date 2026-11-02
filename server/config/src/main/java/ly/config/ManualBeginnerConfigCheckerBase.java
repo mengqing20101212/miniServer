@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class ManualBeginnerConfigCheckerBase extends AbstractConfigChecker<ManualBeginnerConfig> {
   @Override
   public String getConfigFileName() {
-    return "manualBeginner.txt";
+    return "manualBeginner.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "nextId", "INT"),
-        new ConfigColumnMeta(2, "showWord", "STRING"),
-        new ConfigColumnMeta(3, "frontId", "INT"),
-        new ConfigColumnMeta(4, "fuzhu", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "nextId", "int"),
+        new ConfigColumnMeta(2, "showWord", "string"),
+        new ConfigColumnMeta(3, "frontId", "int"),
+        new ConfigColumnMeta(4, "fuzhu", "string"));
   }
 }

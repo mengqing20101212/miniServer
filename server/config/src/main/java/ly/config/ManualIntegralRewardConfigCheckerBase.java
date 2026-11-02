@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class ManualIntegralRewardConfigCheckerBase extends AbstractConfigChecker<ManualIntegralRewardConfig> {
   @Override
   public String getConfigFileName() {
-    return "manualIntegralReward.txt";
+    return "manualIntegralReward.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "group", "INT"),
-        new ConfigColumnMeta(2, "integral", "INT"),
-        new ConfigColumnMeta(3, "rewardShow", "STRING"),
-        new ConfigColumnMeta(4, "drop", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "group", "int"),
+        new ConfigColumnMeta(2, "integral", "int"),
+        new ConfigColumnMeta(3, "rewardShow", "string"),
+        new ConfigColumnMeta(4, "drop", "int"));
   }
 }

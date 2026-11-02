@@ -7,29 +7,23 @@ import ly.utils.KV;
  * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
  */
 public class DeviceConfig {
-  /**编号*/
   public final int id;
 
-  /**型号*/
   public final String model;
 
-  /**手机名*/
   public final String desc;
 
-  /**画质等级*/
   public final int qualityLevel;
 
-  /**刘海屏*/
-  public final String isNotch;
+  public final boolean isNotch;
 
-  /**刘海高度*/
   public final int notchHeight;
 
   // @@@@@自定义属性开始区@@@@@
 
   // @@@@@自定义属性结束区@@@@@
 
-  public DeviceConfig(int id, String model, String desc, int qualityLevel, String isNotch, int notchHeight) {
+  public DeviceConfig(int id, String model, String desc, int qualityLevel, boolean isNotch, int notchHeight) {
     this.id = id;
     this.model = model;
     this.desc = desc;

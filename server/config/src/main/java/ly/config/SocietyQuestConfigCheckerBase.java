@@ -8,34 +8,34 @@ import ly.ConfigColumnMeta;
 public abstract class SocietyQuestConfigCheckerBase extends AbstractConfigChecker<SocietyQuestConfig> {
   @Override
   public String getConfigFileName() {
-    return "societyQuest.txt";
+    return "societyQuest.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "questId", "INT"),
-        new ConfigColumnMeta(2, "questId2", "INT"),
-        new ConfigColumnMeta(3, "minLevel", "INT"),
-        new ConfigColumnMeta(4, "maxLevel", "INT"),
-        new ConfigColumnMeta(5, "title", "STRING"),
-        new ConfigColumnMeta(6, "name", "STRING"),
-        new ConfigColumnMeta(7, "name2", "STRING"),
-        new ConfigColumnMeta(8, "star", "INT"),
-        new ConfigColumnMeta(9, "rewardType", "INT"),
-        new ConfigColumnMeta(10, "beizhu1", "STRING"),
-        new ConfigColumnMeta(11, "weights", "INT"),
-        new ConfigColumnMeta(12, "isCooperate", "INT"),
-        new ConfigColumnMeta(13, "isRare", "INT"),
-        new ConfigColumnMeta(14, "rewardShow", "STRING"),
-        new ConfigColumnMeta(15, "drop", "INT"),
-        new ConfigColumnMeta(16, "beizhu2", "STRING"),
-        new ConfigColumnMeta(17, "beizhu3", "STRING"),
-        new ConfigColumnMeta(18, "beizhu4", "STRING"),
-        new ConfigColumnMeta(19, "beizhu5", "STRING"),
-        new ConfigColumnMeta(20, "redirectionId", "INT"),
-        new ConfigColumnMeta(21, "redirectionId2", "INT"),
-        new ConfigColumnMeta(22, "goundId", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "questId", "int"),
+        new ConfigColumnMeta(2, "questId2", "int"),
+        new ConfigColumnMeta(3, "minLevel", "int"),
+        new ConfigColumnMeta(4, "maxLevel", "int"),
+        new ConfigColumnMeta(5, "title", "string"),
+        new ConfigColumnMeta(6, "name", "string"),
+        new ConfigColumnMeta(7, "name2", "string"),
+        new ConfigColumnMeta(8, "star", "int"),
+        new ConfigColumnMeta(9, "rewardType", "int"),
+        new ConfigColumnMeta(10, "beizhu1", "string"),
+        new ConfigColumnMeta(11, "weights", "int"),
+        new ConfigColumnMeta(12, "isCooperate", "int"),
+        new ConfigColumnMeta(13, "isRare", "int"),
+        new ConfigColumnMeta(14, "rewardShow", "string"),
+        new ConfigColumnMeta(15, "drop", "int"),
+        new ConfigColumnMeta(16, "beizhu2", "string"),
+        new ConfigColumnMeta(17, "beizhu3", "string"),
+        new ConfigColumnMeta(18, "beizhu4", "string"),
+        new ConfigColumnMeta(19, "beizhu5", "string"),
+        new ConfigColumnMeta(20, "redirectionId", "int"),
+        new ConfigColumnMeta(21, "redirectionId2", "int"),
+        new ConfigColumnMeta(22, "goundId", "int"));
   }
 }

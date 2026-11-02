@@ -8,17 +8,17 @@ import ly.ConfigColumnMeta;
 public abstract class WantedMainConfigCheckerBase extends AbstractConfigChecker<WantedMainConfig> {
   @Override
   public String getConfigFileName() {
-    return "wantedMain.txt";
+    return "wantedMain.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "rank", "STRING"),
-        new ConfigColumnMeta(2, "rankUpNum", "INT"),
-        new ConfigColumnMeta(3, "nextId", "INT"),
-        new ConfigColumnMeta(4, "lastId", "INT"),
-        new ConfigColumnMeta(5, "mission", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "rank", "string"),
+        new ConfigColumnMeta(2, "rankUpNum", "int"),
+        new ConfigColumnMeta(3, "nextId", "int"),
+        new ConfigColumnMeta(4, "lastId", "int"),
+        new ConfigColumnMeta(5, "mission", "string"));
   }
 }

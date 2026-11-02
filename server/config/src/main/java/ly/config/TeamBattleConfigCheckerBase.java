@@ -8,22 +8,22 @@ import ly.ConfigColumnMeta;
 public abstract class TeamBattleConfigCheckerBase extends AbstractConfigChecker<TeamBattleConfig> {
   @Override
   public String getConfigFileName() {
-    return "teamBattle.txt";
+    return "teamBattle.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "type", "INT"),
-        new ConfigColumnMeta(2, "activityId", "INT"),
-        new ConfigColumnMeta(3, "level", "INT"),
-        new ConfigColumnMeta(4, "name", "STRING"),
-        new ConfigColumnMeta(5, "dungeonConfigType", "INT"),
-        new ConfigColumnMeta(6, "dungeonConfigId", "INT"),
-        new ConfigColumnMeta(7, "sceneId", "INT"),
-        new ConfigColumnMeta(8, "isDynamic", "BOOL"),
-        new ConfigColumnMeta(9, "isOut", "INT"),
-        new ConfigColumnMeta(10, "stageType", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "type", "int"),
+        new ConfigColumnMeta(2, "activityId", "int"),
+        new ConfigColumnMeta(3, "level", "int"),
+        new ConfigColumnMeta(4, "name", "string"),
+        new ConfigColumnMeta(5, "dungeonConfigType", "int"),
+        new ConfigColumnMeta(6, "dungeonConfigId", "int"),
+        new ConfigColumnMeta(7, "sceneId", "int"),
+        new ConfigColumnMeta(8, "isDynamic", "bool"),
+        new ConfigColumnMeta(9, "isOut", "int"),
+        new ConfigColumnMeta(10, "stageType", "int"));
   }
 }

@@ -8,16 +8,16 @@ import ly.ConfigColumnMeta;
 public abstract class SupportTeamAttrTypeConfigCheckerBase extends AbstractConfigChecker<SupportTeamAttrTypeConfig> {
   @Override
   public String getConfigFileName() {
-    return "supportTeamAttrType.txt";
+    return "supportTeamAttrType.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "attrType", "INT"),
-        new ConfigColumnMeta(1, "function", "STRING"),
-        new ConfigColumnMeta(2, "des", "STRING"),
-        new ConfigColumnMeta(3, "icon", "INT"),
-        new ConfigColumnMeta(4, "isPercent", "INT"));
+        new ConfigColumnMeta(0, "attrType", "int"),
+        new ConfigColumnMeta(1, "function", "string"),
+        new ConfigColumnMeta(2, "des", "string"),
+        new ConfigColumnMeta(3, "icon", "int"),
+        new ConfigColumnMeta(4, "isPercent", "int"));
   }
 }

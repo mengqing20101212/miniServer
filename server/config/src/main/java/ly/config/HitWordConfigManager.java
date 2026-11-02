@@ -27,7 +27,7 @@ public class HitWordConfigManager implements InterfaceConfigManagerProxy {
   public AbstractConfigManger createTable() { return new HitWordConfigManagerImpl(); }
 
   @Override
-  public String getConfigFileName() { return "hitWord.txt"; }
+  public String getConfigFileName() { return "hitWord.xml"; }
 
   public static class HitWordConfigManagerImpl extends AbstractConfigManger {
     private List<HitWordConfig> configList = List.of();
@@ -39,120 +39,67 @@ public class HitWordConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public void reload(Logger logger, String configDir) throws ConfigLoadException {
+      ly.ConfigValueType type0 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type2 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type3 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type5 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type6 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type7 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type11 = ly.ConfigValueType.parse("string");
+      ly.ConfigValueType type12 = ly.ConfigValueType.parse("string");
       String fileName = configDir + File.separator + getConfigFileName();
-      File file = new File(fileName);
-      if (!file.exists()) {
-        logger.error(fileName + " does not exist");
-        throw new ConfigLoadException("Config file does not exist :" + fileName);
-      }
       HitWordConfigChecker checker = new HitWordConfigChecker();
-      checker.checkHeader(logger, configDir);
       List<HitWordConfig> newList = new ArrayList<>();
       Map<Integer, HitWordConfig> newMap = new HashMap<>();
-      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-        String rowText;
-        br.readLine();
-        br.readLine();
-        while ((rowText = br.readLine()) != null) {
-          if (rowText.isBlank()) { continue; }
-          String[] arr = rowText.split("\\t", -1);
-          if (arr.length < 13) {
-            throw new ConfigLoadException("Config column size mismatch :" + fileName + ", line=" + rowText);
-          }
-          int id = 0;
-          String name = null;
-          String initialOffset = null;
-          String initialScale = null;
-          String initialAlpha = null;
-          String appearScale = null;
-          String appearAlpha = null;
-          String toAppearTime = null;
-          String appearLastTime = null;
-          String disappearScale = null;
-          String disappearAlpha = null;
-          String disappearTime = null;
-          String nextPosOffset = null;
+      ly.ConfigXml.read(java.nio.file.Path.of(fileName), checker.getExpectedColumns(), (lineNumber, values) -> {
+          int parsedField0 = 0;
+          String parsedField1 = null;
+          String parsedField2 = null;
+          String parsedField3 = null;
+          String parsedField4 = null;
+          String parsedField5 = null;
+          String parsedField6 = null;
+          String parsedField7 = null;
+          String parsedField8 = null;
+          String parsedField9 = null;
+          String parsedField10 = null;
+          String parsedField11 = null;
+          String parsedField12 = null;
           try {
-            // 解析 ID
-            if (!arr[0].trim().isEmpty()) {
-              id = Integer.parseInt(arr[0].trim());
-            }
-
-            // 解析 名称
-            if (!arr[1].trim().isEmpty()) {
-              name = arr[1].trim();
-            }
-
-            // 解析 初始位移偏移
-            if (!arr[2].trim().isEmpty()) {
-              initialOffset = arr[2].trim();
-            }
-
-            // 解析 初始大小
-            if (!arr[3].trim().isEmpty()) {
-              initialScale = arr[3].trim();
-            }
-
-            // 解析 初始透明度
-            if (!arr[4].trim().isEmpty()) {
-              initialAlpha = arr[4].trim();
-            }
-
-            // 解析 显现的大小
-            if (!arr[5].trim().isEmpty()) {
-              appearScale = arr[5].trim();
-            }
-
-            // 解析 显现的透明度
-            if (!arr[6].trim().isEmpty()) {
-              appearAlpha = arr[6].trim();
-            }
-
-            // 解析 初始到显现的时间
-            if (!arr[7].trim().isEmpty()) {
-              toAppearTime = arr[7].trim();
-            }
-
-            // 解析 显现持续时间
-            if (!arr[8].trim().isEmpty()) {
-              appearLastTime = arr[8].trim();
-            }
-
-            // 解析 消失时的目标大小
-            if (!arr[9].trim().isEmpty()) {
-              disappearScale = arr[9].trim();
-            }
-
-            // 解析 消失时的透明度大小
-            if (!arr[10].trim().isEmpty()) {
-              disappearAlpha = arr[10].trim();
-            }
-
-            // 解析 消失时间
-            if (!arr[11].trim().isEmpty()) {
-              disappearTime = arr[11].trim();
-            }
-
-            // 解析 下一个点偏移
-            if (!arr[12].trim().isEmpty()) {
-              nextPosOffset = arr[12].trim();
-            }
-
-          } catch (Exception e) {
-            logger.error(String.format("解析配置 %s 表, 字符串:%s 报错，请检查:%s", fileName, rowText, e.getMessage()));
-            throw new ConfigLoadException("Error parsing config file :" + fileName);
+            parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
+            parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
+            parsedField2 = ly.ConfigValues.read(type2, values.get("initialOffset"), fileName + ":行" + lineNumber + ":字段 initialOffset");
+            parsedField3 = ly.ConfigValues.read(type3, values.get("initialScale"), fileName + ":行" + lineNumber + ":字段 initialScale");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("initialAlpha"), fileName + ":行" + lineNumber + ":字段 initialAlpha");
+            parsedField5 = ly.ConfigValues.read(type5, values.get("appearScale"), fileName + ":行" + lineNumber + ":字段 appearScale");
+            parsedField6 = ly.ConfigValues.read(type6, values.get("appearAlpha"), fileName + ":行" + lineNumber + ":字段 appearAlpha");
+            parsedField7 = ly.ConfigValues.read(type7, values.get("toAppearTime"), fileName + ":行" + lineNumber + ":字段 toAppearTime");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("appearLastTime"), fileName + ":行" + lineNumber + ":字段 appearLastTime");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("disappearScale"), fileName + ":行" + lineNumber + ":字段 disappearScale");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("disappearAlpha"), fileName + ":行" + lineNumber + ":字段 disappearAlpha");
+            parsedField11 = ly.ConfigValues.read(type11, values.get("disappearTime"), fileName + ":行" + lineNumber + ":字段 disappearTime");
+            parsedField12 = ly.ConfigValues.read(type12, values.get("nextPosOffset"), fileName + ":行" + lineNumber + ":字段 nextPosOffset");
+          } catch (ConfigLoadException error) {
+            logger.error(error.getMessage());
+            return;
           }
-          HitWordConfig config = new HitWordConfig(id, name, initialOffset, initialScale, initialAlpha, appearScale, appearAlpha, toAppearTime, appearLastTime, disappearScale, disappearAlpha, disappearTime, nextPosOffset);
-          config.afterLoad();
+          HitWordConfig config = new HitWordConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12);
           newList.add(config);
           newMap.put(config.id, config);
-        }
-        checker.checkAfterParse(logger, newList);
-        configList = List.copyOf(newList);
+      });
+      configList = List.copyOf(newList);
         configMap = Map.copyOf(newMap);
-      } catch (IOException e) {
-        throw new ConfigLoadException("Config file could not be read :" + fileName);
-      }
+    }
+
+    @Override
+    protected void finishLoad(Logger logger) {
+      for (HitWordConfig config : configList) config.afterLoad();
+      new HitWordConfigChecker().checkAfterParse(logger, configList);
     }
 
     @Override
@@ -162,38 +109,6 @@ public class HitWordConfigManager implements InterfaceConfigManagerProxy {
       // @@@@@自定义clear方法开始区@@@@@
 
       // @@@@@自定义clear方法结束区@@@@@
-    }
-
-    private List<Integer> parseIntList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      String[] parts = value.split(",");
-      List<Integer> result = new ArrayList<>();
-      for (String part : parts) {
-        if (!part.trim().isEmpty()) { result.add(Integer.parseInt(part.trim())); }
-      }
-      return result;
-    }
-
-    private List<KV<Integer, Integer>> parseIntKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<Integer, Integer>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) {
-          result.add(new KV<>(Integer.parseInt(pair.substring(0, idx).trim()), Integer.parseInt(pair.substring(idx + 1).trim())));
-        }
-      }
-      return result;
-    }
-
-    private List<KV<String, String>> parseStringKVList(String value) {
-      if (value == null || value.trim().isEmpty()) { return new ArrayList<>(); }
-      List<KV<String, String>> result = new ArrayList<>();
-      for (String pair : value.split(",")) {
-        int idx = pair.indexOf(":");
-        if (idx > 0) { result.add(new KV<>(pair.substring(0, idx).trim(), pair.substring(idx + 1).trim())); }
-      }
-      return result;
     }
 
     public List<HitWordConfig> getConfigList() {
@@ -206,7 +121,7 @@ public class HitWordConfigManager implements InterfaceConfigManagerProxy {
 
     @Override
     public String getConfigFileName() {
-      return "hitWord.txt";
+      return "hitWord.xml";
     }
 
     // @@@@@自定义方法开始区@@@@@

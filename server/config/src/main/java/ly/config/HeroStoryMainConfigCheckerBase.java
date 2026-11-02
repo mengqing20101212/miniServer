@@ -8,18 +8,18 @@ import ly.ConfigColumnMeta;
 public abstract class HeroStoryMainConfigCheckerBase extends AbstractConfigChecker<HeroStoryMainConfig> {
   @Override
   public String getConfigFileName() {
-    return "heroStoryMain.txt";
+    return "heroStoryMain.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "storyName", "STRING"),
-        new ConfigColumnMeta(2, "unlockLv", "INT"),
-        new ConfigColumnMeta(3, "show", "INT"),
-        new ConfigColumnMeta(4, "storyStage", "STRING"),
-        new ConfigColumnMeta(5, "isShow", "INT"),
-        new ConfigColumnMeta(6, "stageDec", "STRING"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "storyName", "string"),
+        new ConfigColumnMeta(2, "unlockLv", "int"),
+        new ConfigColumnMeta(3, "show", "int"),
+        new ConfigColumnMeta(4, "storyStage", "string"),
+        new ConfigColumnMeta(5, "isShow", "int"),
+        new ConfigColumnMeta(6, "stageDec", "string"));
   }
 }

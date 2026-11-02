@@ -7,32 +7,25 @@ import ly.utils.KV;
  * 自动生成的代码 请不要改动，如需改动需要在 @@@@@自定义区修改@@@@@
  */
 public class ManualCircuitConfig {
-  /**编号*/
   public final int id;
 
-  /**任务ID*/
   public final int taskId;
 
-  /**前置档位*/
   public final String front;
 
-  /**任务坐标*/
-  public final String oriPos;
+  public final java.util.List<Integer> oriPos;
 
-  /**折点样式*/
-  public final String type;
+  public final java.util.List<Integer> type;
 
-  /**跳转描述*/
   public final String redirectionIdDes;
 
-  /**跳转*/
   public final int redirectionId;
 
   // @@@@@自定义属性开始区@@@@@
 
   // @@@@@自定义属性结束区@@@@@
 
-  public ManualCircuitConfig(int id, int taskId, String front, String oriPos, String type, String redirectionIdDes, int redirectionId) {
+  public ManualCircuitConfig(int id, int taskId, String front, java.util.List<Integer> oriPos, java.util.List<Integer> type, String redirectionIdDes, int redirectionId) {
     this.id = id;
     this.taskId = taskId;
     this.front = front;

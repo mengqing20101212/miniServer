@@ -8,22 +8,22 @@ import ly.ConfigColumnMeta;
 public abstract class ActivitypassmissionConfigCheckerBase extends AbstractConfigChecker<ActivitypassmissionConfig> {
   @Override
   public String getConfigFileName() {
-    return "activitypassmission.txt";
+    return "activitypassmission.xml";
   }
 
   @Override
   public List<ConfigColumnMeta> getExpectedColumns() {
     return List.of(
-        new ConfigColumnMeta(0, "id", "INT"),
-        new ConfigColumnMeta(1, "scheDuling", "INT"),
-        new ConfigColumnMeta(2, "questId", "INT"),
-        new ConfigColumnMeta(3, "missinType", "INT"),
-        new ConfigColumnMeta(4, "minLevel", "INT"),
-        new ConfigColumnMeta(5, "maxLevel", "INT"),
-        new ConfigColumnMeta(6, "name", "STRING"),
-        new ConfigColumnMeta(7, "point", "INT"),
-        new ConfigColumnMeta(8, "redirectionId", "INT"),
-        new ConfigColumnMeta(9, "goundId", "INT"),
-        new ConfigColumnMeta(10, "weights", "INT"));
+        new ConfigColumnMeta(0, "id", "int"),
+        new ConfigColumnMeta(1, "scheDuling", "int"),
+        new ConfigColumnMeta(2, "questId", "int"),
+        new ConfigColumnMeta(3, "missinType", "int"),
+        new ConfigColumnMeta(4, "minLevel", "int"),
+        new ConfigColumnMeta(5, "maxLevel", "int"),
+        new ConfigColumnMeta(6, "name", "string"),
+        new ConfigColumnMeta(7, "point", "int"),
+        new ConfigColumnMeta(8, "redirectionId", "int"),
+        new ConfigColumnMeta(9, "goundId", "int"),
+        new ConfigColumnMeta(10, "weights", "int"));
   }
 }
