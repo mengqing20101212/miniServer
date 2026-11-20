@@ -7,5 +7,6 @@ public enum ChangeReason {
     HERO_AWAKEN,
     QUEST_REWARD,
     GM,
-    OTHER
+    OTHER,
+    HERO_UNLOCK
 }

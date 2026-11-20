@@ -138,6 +138,33 @@ public class HeroControllerTest {
         assertEquals(push, mockGamePlayer.getSentMessage(Cmd.CMD.SC_HeroList_VALUE).message);
     }
 
+    @Test
+    public void duplicateCardsUseOnlyNewHeroSlotsAndMergeWithExplicitFragments() {
+        heroModule.setMaxHeroCount(1);
+        Award.create(3110002, 3).addHero(2).addAward(Award.create().addHero(2, 2))
+                .award(mockPlayer, ChangeReason.QUEST_REWARD);
+        long uid = heroModule.getHeroByTemplate(2).getId();
+        assertEquals(203L, resourceModule.getResource(3110002));
+        assertThrows(IllegalArgumentException.class, () -> Award.create().addHero(2).addHero(3)
+                .award(mockPlayer, ChangeReason.QUEST_REWARD));
+        assertEquals(203L, resourceModule.getResource(3110002));
+        Award.create().addHero(2).award(mockPlayer, ChangeReason.QUEST_REWARD);
+        assertEquals(303L, resourceModule.getResource(3110002));
+        assertEquals(uid, heroModule.getHeroByTemplate(2).getId().longValue());
+    }
+
+    @Test
+    public void fullRosterCannotSpendFragmentsToUnlockAnotherHero() {
+        heroModule.setMaxHeroCount(0);
+        resourceModule.addResource(3110003, 10);
+        heroController.handleHeroUnlock(mockContext, Hero.CS_HeroUnlock.newBuilder().setHeroId(3).build());
+        Hero.SC_HeroUnlock response = (Hero.SC_HeroUnlock)
+                mockGamePlayer.getSentMessage(Cmd.CMD.SC_HeroUnlock_VALUE).message;
+        assertEquals(ErrorMsg.ErrorCode.HERO_SLOT_FULL, response.getResult());
+        assertEquals(10L, resourceModule.getResource(3110003));
+        assertNull(heroModule.getHeroByTemplate(3));
+    }
+
     /** 测试获取英雄列表 */
     @Test
     public void testHandleHeroList() {
@@ -549,6 +576,7 @@ public class HeroControllerTest {
             if (cmd == Cmd.CMD.SC_HeroLevelUp_VALUE) return Hero.SC_HeroLevelUp.parseFrom(data);
             if (cmd == Cmd.CMD.SC_HeroStarUp_VALUE) return Hero.SC_HeroStarUp.parseFrom(data);
             if (cmd == Cmd.CMD.SC_HeroAwaken_VALUE) return Hero.SC_HeroAwaken.parseFrom(data);
+            if (cmd == Cmd.CMD.SC_HeroUnlock_VALUE) return Hero.SC_HeroUnlock.parseFrom(data);
             if (cmd == Cmd.CMD.SC_HeroAdd_VALUE) return Hero.SC_HeroAdd.parseFrom(data);
             return packet;
         } catch (Exception e) {

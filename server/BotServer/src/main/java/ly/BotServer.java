@@ -63,6 +63,15 @@ public class BotServer {
             boolean success = SceneRpcSmokeTestModule.runStandalone(sceneHost, scenePort, requireFakeData);
             System.exit(success ? 0 : 1);
         }
+        if (args != null && args.length == 5 && "--test-hero-fragments".equals(args[0])) {
+            try {
+                new ly.bot.scenario.HeroFragmentsScenario(args[1], Integer.parseInt(args[2]), args[3], args[4]).run();
+            } catch (Exception error) {
+                error.printStackTrace();
+                System.exit(1);
+            }
+            System.exit(0);
+        }
         if (args != null && args.length == 5 && "--test-slg-gameplay".equals(args[0])) {
             ly.bot.session.RobotSession observer = new ly.bot.session.RobotSession(2, args[1],
                     Integer.parseInt(args[2]), args[4] + "_observer", args[3], ignored -> {});

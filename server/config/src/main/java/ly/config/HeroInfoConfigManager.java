@@ -99,6 +99,7 @@ public class HeroInfoConfigManager implements InterfaceConfigManagerProxy {
       ly.ConfigValueType type57 = ly.ConfigValueType.parse("int");
       ly.ConfigValueType type58 = ly.ConfigValueType.parse("int");
       ly.ConfigValueType type59 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type60 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
       HeroInfoConfigChecker checker = new HeroInfoConfigChecker();
       List<HeroInfoConfig> newList = new ArrayList<>();
@@ -164,6 +165,7 @@ public class HeroInfoConfigManager implements InterfaceConfigManagerProxy {
           int parsedField57 = 0;
           int parsedField58 = 0;
           int parsedField59 = 0;
+          int parsedField60 = 0;
           try {
             parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
             parsedField1 = ly.ConfigValues.read(type1, values.get("name"), fileName + ":行" + lineNumber + ":字段 name");
@@ -225,11 +227,12 @@ public class HeroInfoConfigManager implements InterfaceConfigManagerProxy {
             parsedField57 = ly.ConfigValues.read(type57, values.get("herogroup"), fileName + ":行" + lineNumber + ":字段 herogroup");
             parsedField58 = ly.ConfigValues.read(type58, values.get("OpenServiceActivity"), fileName + ":行" + lineNumber + ":字段 OpenServiceActivity");
             parsedField59 = ly.ConfigValues.read(type59, values.get("characterType"), fileName + ":行" + lineNumber + ":字段 characterType");
+            parsedField60 = ly.ConfigValues.read(type60, values.get("unlockFragments"), fileName + ":行" + lineNumber + ":字段 unlockFragments");
           } catch (ConfigLoadException error) {
             logger.error(error.getMessage());
             return;
           }
-          HeroInfoConfig config = new HeroInfoConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24, parsedField25, parsedField26, parsedField27, parsedField28, parsedField29, parsedField30, parsedField31, parsedField32, parsedField33, parsedField34, parsedField35, parsedField36, parsedField37, parsedField38, parsedField39, parsedField40, parsedField41, parsedField42, parsedField43, parsedField44, parsedField45, parsedField46, parsedField47, parsedField48, parsedField49, parsedField50, parsedField51, parsedField52, parsedField53, parsedField54, parsedField55, parsedField56, parsedField57, parsedField58, parsedField59);
+          HeroInfoConfig config = new HeroInfoConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10, parsedField11, parsedField12, parsedField13, parsedField14, parsedField15, parsedField16, parsedField17, parsedField18, parsedField19, parsedField20, parsedField21, parsedField22, parsedField23, parsedField24, parsedField25, parsedField26, parsedField27, parsedField28, parsedField29, parsedField30, parsedField31, parsedField32, parsedField33, parsedField34, parsedField35, parsedField36, parsedField37, parsedField38, parsedField39, parsedField40, parsedField41, parsedField42, parsedField43, parsedField44, parsedField45, parsedField46, parsedField47, parsedField48, parsedField49, parsedField50, parsedField51, parsedField52, parsedField53, parsedField54, parsedField55, parsedField56, parsedField57, parsedField58, parsedField59, parsedField60);
           newList.add(config);
           newMap.put(config.id, config);
       });

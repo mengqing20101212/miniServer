@@ -328,7 +328,8 @@ public class ParserExcelConfig {
                 forEachGeneratedColumn(
                         (title, type, index) -> {
                             String javaType = javaType(type);
-                            String desc = index < descList.size() ? descList.get(index) : "";
+                            int sheetColumn = serverHeadTitleList.indexOf(title);
+                            String desc = sheetColumn < descList.size() ? descList.get(sheetColumn) : "";
                             if (desc != null && !desc.isBlank()) {
                                 fields.append("  /**")
                                         .append(desc.replace("\n", " "))

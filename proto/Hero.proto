@@ -68,3 +68,13 @@ message SC_HeroAdd {
   ErrorCode result = 1;
   repeated HeroInfo hero_list = 2;
 }
+
+// 用专属碎片解锁，已拥有时返回原实例。
+message CS_HeroUnlock {
+  int32 hero_id = 1;
+}
+
+message SC_HeroUnlock {
+  ErrorCode result = 1;
+  HeroInfo hero_info = 2;
+}

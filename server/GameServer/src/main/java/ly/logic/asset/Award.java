@@ -1,6 +1,8 @@
 package ly.logic.asset;
 
 import ly.logic.hero.module.HeroModule;
+import ly.config.HeroInfoConfig;
+import ly.config.HeroInfoConfigManager;
 import ly.db.PersistenceScope;
 import ly.proto.Cmd;
 import ly.logic.player.*;
@@ -10,7 +12,8 @@ import java.util.*;
 /** 奖励组织与发放；资源包含货币和堆叠道具，英雄明确指定，避免不同配置 ID 空间冲突。 */
 public final class Award {
     private final Map<Integer, Long> resources = new LinkedHashMap<>();
-    private final Set<Integer> heroes = new LinkedHashSet<>();
+    private static final long FRAGMENTS_PER_DUPLICATE = 100;
+    private final Map<Integer, Long> heroes = new LinkedHashMap<>();
     private boolean executed;
 
     private Award() {}
@@ -41,8 +44,13 @@ public final class Award {
     }
 
     public Award addHero(int heroId) {
+        return addHero(heroId, 1);
+    }
+
+    public Award addHero(int heroId, long count) {
         requireUnexecuted();
-        if (heroId <= 0 || !heroes.add(heroId)) throw new IllegalArgumentException("英雄奖励无效或重复");
+        if (heroId <= 0 || count <= 0) throw new IllegalArgumentException("英雄 ID 和数量必须为正");
+        heroes.merge(heroId, count, Math::addExact);
         return this;
     }
 
@@ -51,13 +59,12 @@ public final class Award {
         Map<Integer, Long> merged = new LinkedHashMap<>(resources);
         other.resources.forEach(
                 (id, count) -> merged.put(id, Math.addExact(merged.getOrDefault(id, 0L), count)));
-        Set<Integer> mergedHeroes = new LinkedHashSet<>(heroes);
-        for (int id : other.heroes)
-            if (!mergedHeroes.add(id)) throw new IllegalArgumentException("重复英雄奖励");
+        Map<Integer, Long> mergedHeroes = new LinkedHashMap<>(heroes);
+        other.heroes.forEach((id, count) -> mergedHeroes.merge(id, count, Math::addExact));
         resources.clear();
         resources.putAll(merged);
         heroes.clear();
-        heroes.addAll(mergedHeroes);
+        heroes.putAll(mergedHeroes);
         return this;
     }
 
@@ -71,22 +78,18 @@ public final class Award {
         try (ly.db.PersistenceScope scope = ly.db.PersistenceScope.open()) {
             HeroModule module =
                     (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
-            if (!heroes.isEmpty() && !module.canAddHeroes(heroes))
-                throw new IllegalArgumentException("英雄配置、容量或重复校验失败");
-            for (var resource : resources.entrySet())
-                Math.addExact(
-                        Consume.resource(player).getResource(resource.getKey()),
-                        resource.getValue());
-            executed = true; // 防止同一对象再次执行；不替代持久化业务流水幂等。
-            for (int hero : heroes) {
-                if (module.addHero(hero) == null) throw new IllegalStateException("英雄发放失败");
-            }
-            for (var resource : resources.entrySet())
+            Map<Integer, Long> amounts = new LinkedHashMap<>(resources);
+            List<Integer> newHeroes = resolveHeroRewards(module, amounts);
+            for (Map.Entry<Integer, Long> resource : amounts.entrySet())
+                Math.addExact(Consume.resource(player).getResource(resource.getKey()), resource.getValue());
+            executed = true;
+            for (int hero : newHeroes) module.addHero(hero);
+            for (Map.Entry<Integer, Long> resource : amounts.entrySet())
                 Consume.resource(player).addResource(resource.getKey(), resource.getValue());
-            if (!heroes.isEmpty() && player.getGamePlayer() != null) {
+            if (!newHeroes.isEmpty() && player.getGamePlayer() != null) {
                 PersistenceScope.afterFlush(module, () -> player.pushMsg(Cmd.CMD.SC_HeroList, module.ownedHeroList()));
             }
-            Map<Integer, Long> changes = toMap();
+            Map<Integer, Long> changes = amounts;
             ly.db.PersistenceScope.afterFlush(
                     () ->
                             ly.LoggerDef.SystemLogger.info(
@@ -96,6 +99,27 @@ public final class Award {
                                     changes));
         }
         return this;
+    }
+
+    private List<Integer> resolveHeroRewards(HeroModule module, Map<Integer, Long> amounts) {
+        List<Integer> newHeroes = new ArrayList<>();
+        for (Map.Entry<Integer, Long> reward : heroes.entrySet()) {
+            int heroId = reward.getKey();
+            HeroInfoConfig config = HeroInfoConfigManager.getInstance().getConfigMap().get(heroId);
+            if (config == null) throw new IllegalArgumentException("英雄配置不存在: " + heroId);
+            long duplicates = reward.getValue();
+            if (!module.hasHero(heroId)) {
+                newHeroes.add(heroId);
+                duplicates--;
+            }
+            if (duplicates > 0) {
+                if (config.heroDebris <= 0) throw new IllegalArgumentException("缺少英雄专属碎片: " + heroId);
+                amounts.merge(config.heroDebris, Math.multiplyExact(duplicates, FRAGMENTS_PER_DUPLICATE), Math::addExact);
+            }
+        }
+        if (!newHeroes.isEmpty() && module.getHeroList().size() + newHeroes.size() > module.getMaxHeroCount())
+            throw new IllegalArgumentException("英雄槽位已满");
+        return newHeroes;
     }
 
     private void requireUnexecuted() {

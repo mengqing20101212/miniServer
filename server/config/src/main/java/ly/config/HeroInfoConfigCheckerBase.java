@@ -73,6 +73,7 @@ public abstract class HeroInfoConfigCheckerBase extends AbstractConfigChecker<He
         new ConfigColumnMeta(56, "heroshare", "int"),
         new ConfigColumnMeta(57, "herogroup", "int"),
         new ConfigColumnMeta(58, "OpenServiceActivity", "int"),
-        new ConfigColumnMeta(59, "characterType", "int"));
+        new ConfigColumnMeta(59, "characterType", "int"),
+        new ConfigColumnMeta(60, "unlockFragments", "int"));
   }
 }

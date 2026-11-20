@@ -10,6 +10,7 @@ import ly.config.HeroStarConfig;
 import ly.config.HeroStarConfigManager;
 import ly.config.ResourceType;
 import ly.db.entry.PlayerHeroEntry;
+import ly.logic.asset.Award;
 import ly.logic.asset.ChangeReason;
 import ly.logic.asset.Consume;
 import ly.logic.hero.module.HeroModule;
@@ -35,6 +36,7 @@ public class HeroController implements IGameController {
         gameHandlerRegister(Cmd.CMD.CS_HeroLevelUp, this::handleHeroLevelUp);
         gameHandlerRegister(Cmd.CMD.CS_HeroStarUp, this::handleHeroStarUp);
         gameHandlerRegister(Cmd.CMD.CS_HeroAwaken, this::handleHeroAwaken);
+        gameHandlerRegister(Cmd.CMD.CS_HeroUnlock, this::handleHeroUnlock);
         gameHandlerRegister(Cmd.CMD.CS_HeroAdd, this::handleHeroAdd);
     }
 
@@ -218,6 +220,34 @@ public class HeroController implements IGameController {
         builder.setResult(ErrorMsg.ErrorCode.Ok);
         builder.setHeroInfo(heroModule.buildHeroInfo(hero));
         player.sendMsg(Cmd.CMD.SC_HeroAwaken, builder.build());
+    }
+
+    public void handleHeroUnlock(GameHandlerContext context, Hero.CS_HeroUnlock request) {
+        Player player = context.player();
+        HeroModule module = (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
+        int heroId = request.getHeroId();
+        PlayerHeroEntry hero = module.getHeroByTemplate(heroId);
+        Hero.SC_HeroUnlock.Builder response = Hero.SC_HeroUnlock.newBuilder();
+        if (hero == null) {
+            HeroInfoConfig config = HeroInfoConfigManager.getInstance().getConfigMap().get(heroId);
+            ErrorMsg.ErrorCode result = unlockWithFragments(player, module, config);
+            response.setResult(result);
+            if (result == ErrorMsg.ErrorCode.Ok) hero = module.getHeroByTemplate(heroId);
+        }
+        if (hero != null) response.setHeroInfo(module.buildHeroInfo(hero));
+        player.sendMsg(Cmd.CMD.SC_HeroUnlock, response.build());
+    }
+
+    private ErrorMsg.ErrorCode unlockWithFragments(Player player, HeroModule module, HeroInfoConfig config) {
+        if (config == null) return ErrorMsg.ErrorCode.HERO_NOT_FOUND;
+        if (config.heroDebris <= 0 || config.unlockFragments <= 0) return ErrorMsg.ErrorCode.PARAM_ERROR;
+        if (module.getHeroList().size() >= module.getMaxHeroCount()) return ErrorMsg.ErrorCode.HERO_SLOT_FULL;
+        try (ly.db.PersistenceScope scope = ly.db.PersistenceScope.open()) {
+            if (!Consume.create(config.heroDebris, config.unlockFragments).isEnoughAndCost(player, ChangeReason.HERO_UNLOCK))
+                return ErrorMsg.ErrorCode.RESOURCE_NOT_ENOUGH;
+            Award.create().addHero(config.id).award(player, ChangeReason.HERO_UNLOCK);
+        }
+        return ErrorMsg.ErrorCode.Ok;
     }
 
     /** 处理添加英雄（GM命令等） */

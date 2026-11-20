@@ -116,7 +116,13 @@ public class HeroModule extends AbstractModule {
     }
 
     public boolean hasHero(int heroId) {
-        return heroes.stream().anyMatch(entry -> entry.getHeroId() == heroId);
+        return getHeroByTemplate(heroId) != null;
+    }
+
+    public PlayerHeroEntry getHeroByTemplate(int heroId) {
+        for (PlayerHeroEntry entry : heroes)
+            if (entry.getHeroId() == heroId) return entry;
+        return null;
     }
 
     public boolean canAddHeroes(java.util.Collection<Integer> ids) {
