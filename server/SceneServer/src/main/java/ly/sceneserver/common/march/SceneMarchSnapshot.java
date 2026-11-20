@@ -27,7 +27,7 @@ public record SceneMarchSnapshot(
         long rewardAmount,
         long gatherEndAtMillis,
         boolean victory,
-        String gameServerId) {
+        String gameServerId, ly.proto.Battle.BattleSideSnapshot attacker) {
 
     public SceneMarchSnapshot(long marchId, long ownerPlayerId, long allianceId,
             SceneMarchType type, long tagMask, SceneMarchStatus status, ScenePoint origin,
@@ -35,7 +35,7 @@ public record SceneMarchSnapshot(
             long power, long armySnapshotVersion, long departAtMillis, long arrivalAtMillis, int stateVersion) {
         this(marchId, ownerPlayerId, allianceId, type, tagMask, status, origin, target, path,
                 pathIndex, troopCount, power, armySnapshotVersion, departAtMillis, arrivalAtMillis,
-                stateVersion, 0, 0, 0, 0, false, "");
+                stateVersion, 0, 0, 0, 0, false, "", null);
     }
 
     public SceneMarchSnapshot {

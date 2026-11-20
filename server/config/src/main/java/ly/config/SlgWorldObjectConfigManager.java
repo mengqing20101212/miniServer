@@ -43,7 +43,7 @@ public class SlgWorldObjectConfigManager implements InterfaceConfigManagerProxy 
       ly.ConfigValueType type1 = ly.ConfigValueType.parse("string");
       ly.ConfigValueType type2 = ly.ConfigValueType.parse("int");
       ly.ConfigValueType type3 = ly.ConfigValueType.parse("long");
-      ly.ConfigValueType type4 = ly.ConfigValueType.parse("long");
+      ly.ConfigValueType type4 = ly.ConfigValueType.parse("int");
       ly.ConfigValueType type5 = ly.ConfigValueType.parse("long");
       ly.ConfigValueType type6 = ly.ConfigValueType.parse("long");
       ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
@@ -59,7 +59,7 @@ public class SlgWorldObjectConfigManager implements InterfaceConfigManagerProxy 
           String parsedField1 = null;
           int parsedField2 = 0;
           long parsedField3 = 0L;
-          long parsedField4 = 0L;
+          int parsedField4 = 0;
           long parsedField5 = 0L;
           long parsedField6 = 0L;
           int parsedField7 = 0;
@@ -71,7 +71,7 @@ public class SlgWorldObjectConfigManager implements InterfaceConfigManagerProxy 
             parsedField1 = ly.ConfigValues.read(type1, values.get("kind"), fileName + ":行" + lineNumber + ":字段 kind");
             parsedField2 = ly.ConfigValues.read(type2, values.get("resourceId"), fileName + ":行" + lineNumber + ":字段 resourceId");
             parsedField3 = ly.ConfigValues.read(type3, values.get("amount"), fileName + ":行" + lineNumber + ":字段 amount");
-            parsedField4 = ly.ConfigValues.read(type4, values.get("health"), fileName + ":行" + lineNumber + ":字段 health");
+            parsedField4 = ly.ConfigValues.read(type4, values.get("monsterTemplateId"), fileName + ":行" + lineNumber + ":字段 monsterTemplateId");
             parsedField5 = ly.ConfigValues.read(type5, values.get("reward"), fileName + ":行" + lineNumber + ":字段 reward");
             parsedField6 = ly.ConfigValues.read(type6, values.get("gatherMillis"), fileName + ":行" + lineNumber + ":字段 gatherMillis");
             parsedField7 = ly.ConfigValues.read(type7, values.get("countPerRegion"), fileName + ":行" + lineNumber + ":字段 countPerRegion");

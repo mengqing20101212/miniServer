@@ -18,7 +18,7 @@ public abstract class SlgWorldObjectConfigCheckerBase extends AbstractConfigChec
         new ConfigColumnMeta(1, "kind", "string"),
         new ConfigColumnMeta(2, "resourceId", "int"),
         new ConfigColumnMeta(3, "amount", "long"),
-        new ConfigColumnMeta(4, "health", "long"),
+        new ConfigColumnMeta(4, "monsterTemplateId", "int"),
         new ConfigColumnMeta(5, "reward", "long"),
         new ConfigColumnMeta(6, "gatherMillis", "long"),
         new ConfigColumnMeta(7, "countPerRegion", "int"),

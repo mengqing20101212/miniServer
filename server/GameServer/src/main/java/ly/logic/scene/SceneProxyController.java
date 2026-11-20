@@ -4,7 +4,6 @@ import com.google.protobuf.AbstractMessage;
 
 import ly.LoggerDef;
 import ly.ServerContext;
-import ly.db.MysqlService;
 import ly.logic.login.LoginManager;
 import ly.logic.player.ModuleEnum;
 import ly.net.GameConnectSession;
@@ -13,6 +12,8 @@ import ly.net.Server2ServerRpcContext;
 import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
 import ly.logic.player.Player;
+import ly.logic.hero.module.HeroModule;
+import ly.db.entry.PlayerHeroEntry;
 import ly.net.GameHandlerContext;
 import ly.net.IGameController;
 import ly.proto.Cmd;
@@ -74,11 +75,30 @@ public final class SceneProxyController implements IGameController {
     private void handleMarchStart(GameHandlerContext context, Scene.csSceneMarchStart request) {
         Player player = context.player();
         // 部队系统尚未接入，基础验证部队由Game配置冻结，客户端传入的兵量和战力不参与结算。
-        Scene.csSceneMarchStart bound = request.toBuilder().setPlayerId(player.getPlayerId())
-                .setGameServerId(ServerContext.getServerId()).clearOrigin().setMarchId(MysqlService.getInstance().generateEntityId())
+        Scene.csSceneMarchStart.Builder bound = request.toBuilder().clearAttacker().setPlayerId(player.getPlayerId())
+                .setGameServerId(ServerContext.getServerId()).clearOrigin().setMarchId(player.getPlayerData().generateEntityId())
                 .setTroopCount(Integer.getInteger("slg.march.troops", 100))
-                .setPower(Long.getLong("slg.march.power", 100L)).build();
-        Scene.scSceneMarchStart response = call(player, Cmd.CMD.CS_SceneMarchStart, bound,
+                .setPower(Long.getLong("slg.march.power", 100L));
+        if (request.getType() == Scene.SceneMarchType.SCENE_MARCH_ATTACK) {
+            HeroModule heroes = (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
+            PlayerHeroEntry hero = heroes.getHero(request.getHeroUid());
+            if (hero == null) {
+                player.sendMsg(Cmd.CMD.SC_SceneMarchStart, Scene.scSceneMarchStart.newBuilder()
+                        .setSceneId(request.getSceneId()).setRequestId(request.getRequestId())
+                        .setResult(ErrorMsg.ErrorCode.HERO_NOT_FOUND).build());
+                return;
+            }
+            try {
+                bound.setAttacker(SlgHeroSnapshot.freeze(player.getPlayerId(), hero, bound.getTroopCount()));
+            } catch (ly.ConfigLoadException error) {
+                LoggerDef.SystemLogger.error("野怪出征配置错误：{}", error.getMessage());
+                player.sendMsg(Cmd.CMD.SC_SceneMarchStart, Scene.scSceneMarchStart.newBuilder()
+                        .setSceneId(request.getSceneId()).setRequestId(request.getRequestId())
+                        .setResult(ErrorMsg.ErrorCode.SCENE_NOT_READY).build());
+                return;
+            }
+        }
+        Scene.scSceneMarchStart response = call(player, Cmd.CMD.CS_SceneMarchStart, bound.build(),
                 Scene.scSceneMarchStart.class, NORMAL_TIMEOUT_MILLIS, RpcFailSavePolicy.NONE);
         if (response == null) response = Scene.scSceneMarchStart.newBuilder()
                 .setSceneId(request.getSceneId()).setRequestId(request.getRequestId())

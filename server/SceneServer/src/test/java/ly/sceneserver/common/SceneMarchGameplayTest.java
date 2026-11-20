@@ -11,8 +11,9 @@ import ly.sceneserver.common.march.*;
 import org.junit.Test;
 
 public class SceneMarchGameplayTest {
+    @org.junit.Rule public final MonsterBattleFixture battle = new MonsterBattleFixture();
     private final SlgWorldObjectConfig resource = new SlgWorldObjectConfig(1, "RESOURCE", 1, 1000, 0, 0, 50, 1, 900, 30, 20);
-    private final SlgWorldObjectConfig monster = new SlgWorldObjectConfig(2, "MONSTER", 1, 0, 100, 100, 0, 1, 60, 10, 20);
+    private final SlgWorldObjectConfig monster = new SlgWorldObjectConfig(2, "MONSTER", 1, 0, 1, 100, 0, 1, 60, 10, 20);
 
     @Test public void targetRegionOwnsGatheringThroughReturnAndAoiSeesRouteOutsideTargetRegion() throws Exception {
         try (SceneRuntime runtime = new SceneRuntime(0, 200, 1000)) {
@@ -35,7 +36,7 @@ public class SceneMarchGameplayTest {
             long now = System.currentTimeMillis();
             SceneMarchSnapshot started = scene.route(22, 2).query(shard -> shard.marches().start(
                     77, 10, scene.cityPoint(10), 99, new ScenePoint(22, 2),
-                    SceneMarchType.GATHER, 100, 100, now, "game1001")).get(2, TimeUnit.SECONDS);
+                    SceneMarchType.GATHER, 100, 100, now, "game1001", null)).get(2, TimeUnit.SECONDS);
             assertEquals(city, started.origin());
             assertEquals(202, started.targetRegionId());
             SceneViewSnapshot view = scene.updateViewAsync(new SceneViewRequest(20,
@@ -78,7 +79,7 @@ public class SceneMarchGameplayTest {
         }
     }
 
-    @Test public void fakeBattleAwardsOnlyVictoryAndDeadMonsterCannotBeStartedAgain() throws Exception {
+    @Test public void realBattleUsesFrozenHeroAndAwardsOnlyTheFirstKill() throws Exception {
         try (SceneRuntime runtime = new SceneRuntime(0, 200, 1000)) {
             runtime.addScene(new SceneConfig("test", 24, 8, 2, 4, 5));
             SceneRuntime.SceneInstance scene = runtime.scene("test");
@@ -89,16 +90,23 @@ public class SceneMarchGameplayTest {
             scene.shard(1).query(shard -> {
                 long now = System.currentTimeMillis();
                 SceneMarchSnapshot weak = shard.marches().start(70, 10, new ScenePoint(1, 2), 99,
-                        new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 10, now, "game1001");
+                        new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 10, now, "game1001", battle.weak());
                 shard.marches().tick(weak.arrivalAtMillis());
                 assertEquals(0, shard.marches().ownedSnapshot(70, 10).rewardAmount());
                 SceneMarchSnapshot strong = shard.marches().start(71, 10, new ScenePoint(1, 2), 99,
-                        new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100, now, "game1001");
+                        new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100, now, "game1001", battle.strong());
+                SceneMarchSnapshot second = shard.marches().start(72, 10, new ScenePoint(1, 2), 99,
+                        new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100, now, "game1001", battle.strong());
+                assertFalse(SceneMarchProtoMapper.toProto(strong).hasAttacker());
+                SceneMarchSnapshot stored = SceneMarchProtoMapper.fromProto(SceneMarchProtoMapper.toStorageProto(strong));
+                shard.marches().restore(SceneMarchState.restore(stored));
                 shard.marches().tick(strong.arrivalAtMillis());
+                assertFalse(shard.marches().ownedSnapshot(second.marchId(), 10).victory());
+                assertEquals(0, shard.marches().ownedSnapshot(second.marchId(), 10).rewardAmount());
                 assertTrue(shard.marches().ownedSnapshot(71, 10).victory());
                 assertEquals(100, shard.marches().ownedSnapshot(71, 10).rewardAmount());
-                assertThrows(IllegalArgumentException.class, () -> shard.marches().start(72, 10,
-                        new ScenePoint(1, 2), 99, new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100, now, "game1001"));
+                assertThrows(IllegalArgumentException.class, () -> shard.marches().start(73, 10,
+                        new ScenePoint(1, 2), 99, new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100, now, "game1001", battle.strong()));
                 return null;
             }).get(2, TimeUnit.SECONDS);
         }
@@ -134,7 +142,7 @@ public class SceneMarchGameplayTest {
                 for (int i = 0; i < 2; i++) {
                     long id = 70 + i;
                     SceneMarchSnapshot trip = shard.marches().start(id, 10, origin, 99, mine,
-                            SceneMarchType.GATHER, 100, 100, now, "game");
+                            SceneMarchType.GATHER, 100, 100, now, "game", null);
                     shard.marches().tick(trip.arrivalAtMillis());
                     shard.marches().tick(shard.marches().ownedSnapshot(id, 10).gatherEndAtMillis());
                     shard.marches().tick(shard.marches().ownedSnapshot(id, 10).arrivalAtMillis());
@@ -147,7 +155,7 @@ public class SceneMarchGameplayTest {
                 SceneObject wild = shard.worldObjects().stream()
                         .filter(o -> o.type() == SceneObjectType.MONSTER).findFirst().orElseThrow();
                 SceneMarchSnapshot attack = shard.marches().start(72, 10, origin, wild.objectId(),
-                        new ScenePoint(wild.x(), wild.y()), SceneMarchType.ATTACK, 100, 100, now, "game");
+                        new ScenePoint(wild.x(), wild.y()), SceneMarchType.ATTACK, 100, 100, now, "game", battle.strong());
                 shard.marches().tick(attack.arrivalAtMillis());
                 assertNull(shard.object(wild.objectId()));
                 assertEquals(List.of(98L, 99L, wild.objectId()), removed);
@@ -208,6 +216,6 @@ public class SceneMarchGameplayTest {
     private void seed(SceneRuntime.SceneInstance scene, long id, SceneObjectType kind,
                       int x, int y, SlgWorldObjectConfig rule) {
         scene.seedObject(new SceneObject(id, kind, 0, x, y, new SceneWorldObjectState(1,
-                rule.id, 0, 1, rule.amount, rule.health, 0, 0, 0, new byte[0])));
+                rule.id, 0, 1, rule.amount, kind == SceneObjectType.MONSTER ? 100 : 0, 0, 0, 0, new byte[0])));
     }
 }

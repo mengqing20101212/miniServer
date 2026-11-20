@@ -5,10 +5,19 @@ import java.util.function.Consumer;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import ly.config.SlgWorldObjectConfig;
+import ly.config.SlgMonsterConfig;
+import ly.config.SlgMonsterConfigManager;
+import ly.ConfigLoadException;
+import ly.LoggerDef;
+import ly.proto.Battle.*;
+import ly.battle.BattleEngine;
+import ly.battle.BattleRules;
+import ly.slg.SlgBattleUnits;
 import ly.sceneserver.common.*;
 
 /** 每个配置区域独立持有行军；整条生命周期（包括返程）由目标区域线程处理。 */
 public final class SceneMarchService {
+    private static final BattleRules.BattleDamageRules DAMAGE_RULES = new BattleRules.BattleDamageRules(1000, 800, 600, 1670);
     private final SceneShard shard;
     private final Map<Long, SceneMarchState> marches = new LinkedHashMap<>();
     private final Map<Long, SceneMarchSnapshot> completed = new HashMap<>();
@@ -40,7 +49,7 @@ public final class SceneMarchService {
     }
 
     public SceneMarchSnapshot start(long marchId, long playerId, ScenePoint origin,
-            long targetId, ScenePoint targetPoint, SceneMarchType type, int troops, long power, long now, String gameServerId) {
+            long targetId, ScenePoint targetPoint, SceneMarchType type, int troops, long power, long now, String gameServerId, BattleSideSnapshot attacker) {
         if (marches.containsKey(marchId) || completed.containsKey(marchId)) return ownedSnapshot(marchId, playerId);
         SceneObject target = requireTarget(targetId, targetPoint, type);
         boolean gather = type == SceneMarchType.GATHER;
@@ -49,7 +58,7 @@ public final class SceneMarchService {
                 gather ? SceneTargetType.RESOURCE : SceneTargetType.MONSTER, targetPoint, tags, target.stateVersion());
         SceneMarchState march = new SceneMarchState(marchId, playerId, 0, type,
                 SceneMarchTag.SOLO.mask(), origin, descriptor, troops, power, 0);
-        march.hostInRegion(shard.staticMap().regionId(targetPoint.x(), targetPoint.y()), gameServerId);
+        march.hostInRegion(shard.staticMap().regionId(targetPoint.x(), targetPoint.y()), gameServerId, attacker);
         march.assignPath(List.of(origin, targetPoint), travelCost(origin, targetPoint), speed(), now);
         marches.put(marchId, march);
         persist(march);
@@ -120,14 +129,34 @@ public final class SceneMarchService {
             }
             march.beginGathering(now + rule.gatherMillis);
         } else {
-            // 尚未接入战斗模块：用冻结战力与怪物血量比较，不产生战损。
-            boolean victory = snapshot.power() >= state.health();
+            // 旧版已发出的行军没有攻方快照，直接空手回城。
+            boolean victory = false;
+            if (snapshot.attacker() != null) {
+                try {
+                    victory = fightMonster(snapshot, state, rule, now);
+                } catch (ConfigLoadException | IllegalArgumentException error) {
+                    LoggerDef.SystemLogger.error("野怪战斗配置错误，marchId={}，怪物模板={}，{}",
+                            snapshot.marchId(), rule.monsterTemplateId, error.getMessage());
+                }
+            }
             march.setOutcome(rule.resourceId, victory ? rule.reward : 0, victory);
             if (victory) {
                 removeDepletedTarget(target, rule);
             }
             returnHome(march, now);
         }
+    }
+
+    private boolean fightMonster(SceneMarchSnapshot march, SceneWorldObjectState state, SlgWorldObjectConfig rule, long now) {
+        SlgMonsterConfig monster = SlgMonsterConfigManager.getInstance().getConfigMap().get(rule.monsterTemplateId);
+        if (monster == null) throw new ConfigLoadException("slgMonster 缺少模板 " + rule.monsterTemplateId);
+        BattleUnitSnapshot.Builder unit = SlgBattleUnits.single(PRT_HERO.newBuilder()
+                        .setHeroTid(monster.id).setLevel(state.level()).build(), monster.hp, monster.attack, monster.defence, 1,
+                monster.activeSkill == 0 ? null : SlgBattleUnits.skill(monster.activeSkill));
+        unit.setUnitType(1).setMonsterTid(monster.id).setRemainingHp(Math.min(state.health(), monster.hp));
+        BattleSideSnapshot defender = BattleSideSnapshot.newBuilder().addUnits(unit).build();
+        return BattleEngine.fight(march.marchId(), now, 0, 20, DAMAGE_RULES, march.attacker(), defender)
+                .getLog().getWinner() == PRT_BATTLE_SIDE.ATTACKER;
     }
 
     private void gather(SceneMarchState march, long now) {

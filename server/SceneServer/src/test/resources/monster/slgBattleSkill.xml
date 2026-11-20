@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+    <Data actionRate="1000" effectType="1" heroSkillId="0" id="320000" targetCount="1" targetRule="4"/>
+    <Data actionRate="1600" effectType="1" heroSkillId="204" id="2041" targetCount="0" targetRule="2"/>
+</Root>

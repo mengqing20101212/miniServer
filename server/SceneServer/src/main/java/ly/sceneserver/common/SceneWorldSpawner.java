@@ -10,6 +10,9 @@ import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import ly.config.SlgWorldObjectConfig;
+import ly.config.SlgMonsterConfig;
+import ly.config.SlgMonsterConfigManager;
+import ly.LoggerDef;
 
 /** 启动时分配各区域的静态候选格，开服后只在所属区域线程补缺。 */
 public final class SceneWorldSpawner {
@@ -100,6 +103,15 @@ public final class SceneWorldSpawner {
         int needed = Math.min(remaining, budget);
         if (needed <= 0 || cells.length == 0) return 0;
         ThreadLocalRandom random = ThreadLocalRandom.current();
+        long health = 0;
+        if (kind == SceneObjectType.MONSTER) {
+            SlgMonsterConfig monster = SlgMonsterConfigManager.getInstance().getConfigMap().get(rule.monsterTemplateId);
+            if (monster == null) {
+                LoggerDef.SystemLogger.error("slgWorldObject {} 缺少野怪战斗模板 {}", rule.id, rule.monsterTemplateId);
+                return 0;
+            }
+            health = monster.hp;
+        }
         int added = 0;
         int width = shard.config().width();
         for (int checked = 0; checked < cells.length && added < needed; checked++) {
@@ -111,7 +123,7 @@ public final class SceneWorldSpawner {
             int y = cell / width;
             if (!shard.objectsAt(x, y).isEmpty()) continue;
             SceneWorldObjectState state = new SceneWorldObjectState(1, rule.id, rule.id, 1,
-                    rule.amount, rule.health, 0, 0, 0, new byte[0]);
+                    rule.amount, health, 0, 0, 0, new byte[0]);
             SceneObject object = new SceneObject(ids.getAsLong(), kind, 0, x, y, state);
             shard.addObject(object);
             store.accept(object, false);

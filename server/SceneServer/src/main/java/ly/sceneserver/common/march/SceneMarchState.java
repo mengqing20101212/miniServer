@@ -32,9 +32,11 @@ public final class SceneMarchState {
     private long rewardAmount;
     private long gatherEndAtMillis;
     private boolean victory;
+    private ly.proto.Battle.BattleSideSnapshot attacker;
     private String gameServerId = "";
 
-    public void hostInRegion(int regionId, String gameServerId) {
+    public void hostInRegion(int regionId, String gameServerId, ly.proto.Battle.BattleSideSnapshot attacker) {
+        this.attacker = attacker;
         targetRegionId = regionId;
         this.gameServerId = gameServerId;
     }
@@ -124,6 +126,7 @@ public final class SceneMarchState {
         state.gatherEndAtMillis = snapshot.gatherEndAtMillis();
         state.victory = snapshot.victory();
         state.gameServerId = snapshot.gameServerId();
+        state.attacker = snapshot.attacker();
         return state;
     }
 
@@ -199,6 +202,7 @@ public final class SceneMarchState {
         arrivalAtMillis = Math.addExact(nowMillis,
                 Math.max(1L, (totalPathCost * 1_000L + speedCostPerSecond - 1)
                         / speedCostPerSecond));
+        attacker = null;
         status = SceneMarchStatus.RETURNING;
         tagMask &= ~SceneMarchTag.BATTLE_PENDING.mask();
         tagMask |= SceneMarchTag.RETURNING.mask();
@@ -230,7 +234,7 @@ public final class SceneMarchState {
                 armySnapshotVersion,
                 departAtMillis,
                 arrivalAtMillis,
-                stateVersion, targetRegionId, resourceId, rewardAmount, gatherEndAtMillis, victory, gameServerId);
+                stateVersion, targetRegionId, resourceId, rewardAmount, gatherEndAtMillis, victory, gameServerId, attacker);
     }
 
     private void requireStatus(SceneMarchStatus expected) {

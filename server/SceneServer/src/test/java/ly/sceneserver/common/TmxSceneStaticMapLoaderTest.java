@@ -9,6 +9,7 @@ import org.junit.*;
 import ly.sceneserver.common.persistence.TmxSceneStaticMapLoader;
 
 public class TmxSceneStaticMapLoaderTest {
+    @org.junit.Rule public final MonsterBattleFixture battle = new MonsterBattleFixture();
     @Test public void loadsActualCompanyMapAndCreatesOneExecutionShardPerConfiguredRegion() throws Exception {
         String directory = System.getProperty("slg.test.map-dir");
         Assume.assumeNotNull(directory);
@@ -29,7 +30,7 @@ public class TmxSceneStaticMapLoaderTest {
             }
             List<SlgWorldObjectConfig> rules = List.of(
                     new SlgWorldObjectConfig(1, "RESOURCE", 1, 1000, 0, 0, 5000, 10, 900, 30, 20),
-                    new SlgWorldObjectConfig(2, "MONSTER", 1, 0, 100, 100, 0, 10, 60, 10, 20));
+                    new SlgWorldObjectConfig(2, "MONSTER", 1, 0, 1, 100, 0, 10, 60, 10, 20));
             AtomicLong ids = new AtomicLong();
             SceneWorldSpawner.install(scene, () -> rules, ids::incrementAndGet, (o, deleted) -> {}, System.currentTimeMillis());
             for (int i = 0; i < scene.shardCount(); i++) {

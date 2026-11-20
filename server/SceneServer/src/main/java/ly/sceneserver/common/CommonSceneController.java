@@ -57,7 +57,8 @@ public final class CommonSceneController implements IController {
                 .setSceneId(request.getSceneId()).setRequestId(request.getRequestId());
         try {
             SceneRuntime.SceneInstance scene = resolve(request.getSceneId(), request.getScope());
-            if (request.getPlayerId() <= 0 || request.getMarchId() <= 0 || !request.hasTargetPoint()
+            if ((request.getType() == Scene.SceneMarchType.SCENE_MARCH_ATTACK && !request.hasAttacker())
+                    || request.getPlayerId() <= 0 || request.getMarchId() <= 0 || !request.hasTargetPoint()
                     || (request.getType() != Scene.SceneMarchType.SCENE_MARCH_GATHER
                     && request.getType() != Scene.SceneMarchType.SCENE_MARCH_ATTACK))
                 throw new IllegalArgumentException("发车参数错误");
@@ -68,7 +69,8 @@ public final class CommonSceneController implements IController {
                             request.getTargetId(), target,
                             request.getType() == Scene.SceneMarchType.SCENE_MARCH_GATHER
                                     ? ly.sceneserver.common.march.SceneMarchType.GATHER : ly.sceneserver.common.march.SceneMarchType.ATTACK,
-                            request.getTroopCount(), request.getPower(), System.currentTimeMillis(), request.getGameServerId()))
+                            request.getTroopCount(), request.getPower(), System.currentTimeMillis(), request.getGameServerId(),
+                            request.hasAttacker() ? request.getAttacker() : null))
                     .get(OP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
             response.setResult(ErrorMsg.ErrorCode.Ok).setMarch(SceneMarchProtoMapper.toProto(snapshot));
         } catch (Exception error) {

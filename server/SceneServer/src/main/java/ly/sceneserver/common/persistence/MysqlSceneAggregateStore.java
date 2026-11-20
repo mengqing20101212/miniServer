@@ -96,7 +96,7 @@ public final class MysqlSceneAggregateStore implements SceneAggregateStore {
     }
 
     private static SceneMarchEntry toEntry(SceneMarchProjection projection) {
-        Scene.SceneMarchSnapshot proto = SceneMarchProtoMapper.toProto(projection.snapshot());
+        Scene.SceneMarchSnapshot proto = SceneMarchProtoMapper.toStorageProto(projection.snapshot());
         SceneMarchEntry entry = new SceneMarchEntry();
         entry.setSceneId(projection.sceneId());
         entry.setMarchId(projection.snapshot().marchId());

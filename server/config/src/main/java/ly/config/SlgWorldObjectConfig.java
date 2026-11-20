@@ -19,8 +19,8 @@ public class SlgWorldObjectConfig {
   /**初始库存*/
   public final long amount;
 
-  /**怪物血量*/
-  public final long health;
+  /**野怪战斗模板ID*/
+  public final int monsterTemplateId;
 
   /**击杀奖励数量*/
   public final long reward;
@@ -44,12 +44,12 @@ public class SlgWorldObjectConfig {
 
   // @@@@@自定义属性结束区@@@@@
 
-  public SlgWorldObjectConfig(int id, String kind, int resourceId, long amount, long health, long reward, long gatherMillis, int countPerRegion, int checkIntervalSec, int jitterSec, int batchSize) {
+  public SlgWorldObjectConfig(int id, String kind, int resourceId, long amount, int monsterTemplateId, long reward, long gatherMillis, int countPerRegion, int checkIntervalSec, int jitterSec, int batchSize) {
     this.id = id;
     this.kind = kind;
     this.resourceId = resourceId;
     this.amount = amount;
-    this.health = health;
+    this.monsterTemplateId = monsterTemplateId;
     this.reward = reward;
     this.gatherMillis = gatherMillis;
     this.countPerRegion = countPerRegion;

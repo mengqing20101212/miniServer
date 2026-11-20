@@ -37,6 +37,11 @@ public final class SceneMarchProtoMapper {
         return builder.build();
     }
 
+    public static Scene.SceneMarchSnapshot toStorageProto(SceneMarchSnapshot snapshot) {
+        Scene.SceneMarchSnapshot summary = toProto(snapshot);
+        return snapshot.attacker() == null ? summary : summary.toBuilder().setAttacker(snapshot.attacker()).build();
+    }
+
     public static Scene.SceneRallySnapshot toProto(SceneRallySnapshot snapshot) {
         Scene.SceneRallySnapshot.Builder builder = Scene.SceneRallySnapshot.newBuilder()
                 .setRallyId(snapshot.rallyId())
@@ -96,7 +101,8 @@ public final class SceneMarchProtoMapper {
                 snapshot.getDepartAtMillis(),
                 snapshot.getArrivalAtMillis(),
                 snapshot.getStateVersion(), snapshot.getTargetRegionId(), snapshot.getResourceId(),
-                snapshot.getRewardAmount(), snapshot.getGatherEndAtMillis(), snapshot.getVictory(), snapshot.getGameServerId());
+                snapshot.getRewardAmount(), snapshot.getGatherEndAtMillis(), snapshot.getVictory(), snapshot.getGameServerId(),
+                snapshot.hasAttacker() ? snapshot.getAttacker() : null);
     }
 
     /** 从数据库中的 Protobuf 二进制恢复包含完整成员列表的集结快照。 */

@@ -21,6 +21,7 @@ public final class SlgGameplayScenario implements RobotScenario {
     private final String scene = System.getProperty("slg.bot.scene-id", "world-1");
     private RobotSession session;
     private Scene.ScenePoint city;
+    private long heroUid;
     private int width;
     private int[] regions;
     private final List<Scene.ScenePoint> regionWindows = new ArrayList<>();
@@ -46,6 +47,11 @@ public final class SlgGameplayScenario implements RobotScenario {
 
     private void run() {
         try {
+            System.out.println("[SLG-GAMEPLAY] test-player=" + session.getPlayerId());
+            Hero.SC_HeroAdd added = invoke(session, Cmd.CMD.CS_HeroAdd, Cmd.CMD.SC_HeroAdd,
+                    Hero.CS_HeroAdd.newBuilder().setHeroId(2).setCount(1).build(), Hero.SC_HeroAdd.class);
+            require(added.getResult() == ErrorMsg.ErrorCode.Ok, "用例需要未拥有英雄 2 的测试账号");
+            heroUid = added.getHeroList(0).getHeroUid();
             city = enter(session, 1, 1);
             enter(observer, 2, 2);
             loadRegionWindows();
@@ -66,13 +72,20 @@ public final class SlgGameplayScenario implements RobotScenario {
             Map<Long, Scene.SceneObjectSnapshot> afterMine = regionTargets();
             verifyReplacement(before, afterMine, mine);
             Scene.SceneObjectSnapshot monster = chooseTarget(afterMine, Scene.SceneObjectKind.SCENE_OBJECT_MONSTER);
+            if (Boolean.getBoolean("slg.bot.verify-frozen-hero")) {
+                require(balance(session, 4) >= 50, "冻结快照用例需要 50 个升级经验道具");
+                runMarch(monster, 0);
+                require(regionTargets().get(monster.getObjectId()).getPersistentState().getHealth()
+                        == monster.getPersistentState().getHealth(), "败方返程后野怪应保留原血量");
+                System.out.println("[SLG-GAMEPLAY] frozen-level-loss verified");
+            }
             runMarch(monster, 100);
             verifyReplacement(afterMine, regionTargets(), monster);
             require(balance(observer, 1) == observerBalance, "观察者收到其他玩家的奖励");
             for (RobotSession player : List.of(session, observer))
                 invoke(player, Cmd.CMD.CS_SceneLeave, Cmd.CMD.SC_SceneLeave,
                         Scene.csSceneLeave.newBuilder().setSceneId(scene).build(), Scene.scSceneLeave.class);
-            System.out.println("[SLG-GAMEPLAY] PASS partial-gather, depleted-mine-respawn, monster-respawn, automatic-return-award, read-only-query, cross-region-AOI");
+            System.out.println("[SLG-GAMEPLAY] PASS contested-monster-single-award, partial-gather, depleted-mine-respawn, monster-respawn, automatic-return-award, read-only-query, cross-region-AOI");
             completion.complete(null);
         } catch (Throwable failure) { completion.completeExceptionally(failure); }
     }
@@ -86,14 +99,18 @@ public final class SlgGameplayScenario implements RobotScenario {
         require(outside(observing, city) && outside(observing, target.getPoint()),
                 "观察视野应只经过路线，两端均在九宫格外");
         pushes.clear();
-        Scene.scSceneMarchStart start = invoke(session, Cmd.CMD.CS_SceneMarchStart, Cmd.CMD.SC_SceneMarchStart,
-                Scene.csSceneMarchStart.newBuilder().setSceneId(scene).setPlayerId(session.getPlayerId() + 9_000_000_000L)
-                        .setTargetId(target.getObjectId()).setTargetPoint(target.getPoint())
-                        .setType(kind == Scene.SceneObjectKind.SCENE_OBJECT_RESOURCE
-                                ? Scene.SceneMarchType.SCENE_MARCH_GATHER : Scene.SceneMarchType.SCENE_MARCH_ATTACK)
-                        .setTroopCount(999999).setPower(999999).build(), Scene.scSceneMarchStart.class);
-        require(start.getResult() == ErrorMsg.ErrorCode.Ok, "发车失败: " + start.getResult());
-        Scene.SceneMarchSnapshot initial = start.getMarch();
+        Scene.SceneMarchSnapshot initial = startMarch(target);
+        boolean monster = kind == Scene.SceneObjectKind.SCENE_OBJECT_MONSTER;
+        Scene.SceneMarchSnapshot second = null;
+        if (monster && reward == 0) {
+            Hero.SC_HeroLevelUp upgraded = invoke(session, Cmd.CMD.CS_HeroLevelUp, Cmd.CMD.SC_HeroLevelUp,
+                    Hero.CS_HeroLevelUp.newBuilder().setHeroUid(heroUid)
+                            .addAllExpItemIds(Collections.nCopies(50, 4)).build(), Hero.SC_HeroLevelUp.class);
+            require(upgraded.getResult() == ErrorMsg.ErrorCode.Ok && upgraded.getHeroInfo().getLevel() == 2,
+                    "出征途中升到二级失败");
+        } else if (monster) {
+            second = startMarch(target);
+        }
         require(initial.getOrigin().equals(city), "行军未从主城出发");
         require(initial.getOwnerPlayerId() == session.getPlayerId(), "Game未绑定真实玩家");
         require(initial.getTroopCount() == 100 && initial.getPower() == 100, "Game未覆盖客户端兵力战力");
@@ -107,7 +124,7 @@ public final class SlgGameplayScenario implements RobotScenario {
         // 首次查行军前先通过独立的资产接口确认余额，防止查询触发发奖的回归。
         long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(30);
         long actual = balance(session, 1);
-        while (actual == before && System.nanoTime() < deadline) {
+        while (reward > 0 && actual == before && System.nanoTime() < deadline) {
             Thread.sleep(200);
             actual = balance(session, 1);
         }
@@ -118,12 +135,37 @@ public final class SlgGameplayScenario implements RobotScenario {
         require(response.getResult() == ErrorMsg.ErrorCode.Ok
                 && finished.getStatus() == Scene.SceneMarchStatus.SCENE_MARCH_FINISHED
                 && finished.getTargetRegionId() == initial.getTargetRegionId()
-                && finished.getVictory() && finished.getRewardAmount() == reward, "已结束行军记录错误");
+                && finished.getVictory() == (reward > 0) && !finished.hasAttacker() && finished.getRewardAmount() == reward, "已结束行军记录错误");
         invoke(session, Cmd.CMD.CS_SceneMarchQuery, Cmd.CMD.SC_SceneMarchQuery, query, Scene.scSceneMarchQuery.class);
         require(balance(session, 1) == actual, "查询行军改变了余额");
+        if (second != null) {
+            Scene.csSceneMarchQuery secondQuery = query.toBuilder().setMarchId(second.getMarchId()).build();
+            Scene.SceneMarchSnapshot other;
+            do {
+                other = invoke(session, Cmd.CMD.CS_SceneMarchQuery, Cmd.CMD.SC_SceneMarchQuery, secondQuery,
+                        Scene.scSceneMarchQuery.class).getMarch();
+                if (other.getStatus() == Scene.SceneMarchStatus.SCENE_MARCH_FINISHED) break;
+                Thread.sleep(100);
+            } while (System.nanoTime() < deadline);
+            require(other.getStatus() == Scene.SceneMarchStatus.SCENE_MARCH_FINISHED && !other.getVictory()
+                    && other.getRewardAmount() == 0 && balance(session, 1) == actual, "第二支行军不应获得击杀奖励");
+        }
         System.out.printf("[SLG-GAMEPLAY] kind=%s target=(%d,%d) observer=(%d,%d) observerRegion=%d hostRegion=%d balance=%d->%d AOI=moving/returning/removed%n",
                 kind, target.getPoint().getX(), target.getPoint().getY(), midX, midY,
                 regions[midY * width + midX], finished.getTargetRegionId(), before, actual);
+    }
+
+    private Scene.SceneMarchSnapshot startMarch(Scene.SceneObjectSnapshot target) throws Exception {
+        Scene.SceneObjectKind kind = target.getKind();
+        Scene.scSceneMarchStart start = invoke(session, Cmd.CMD.CS_SceneMarchStart, Cmd.CMD.SC_SceneMarchStart,
+                Scene.csSceneMarchStart.newBuilder().setSceneId(scene).setPlayerId(session.getPlayerId() + 9_000_000_000L)
+                        .setTargetId(target.getObjectId()).setTargetPoint(target.getPoint())
+                        .setType(kind == Scene.SceneObjectKind.SCENE_OBJECT_RESOURCE
+                                ? Scene.SceneMarchType.SCENE_MARCH_GATHER : Scene.SceneMarchType.SCENE_MARCH_ATTACK)
+                        .setHeroUid(kind == Scene.SceneObjectKind.SCENE_OBJECT_MONSTER ? heroUid : 0).setTroopCount(999999).setPower(999999).build(), Scene.scSceneMarchStart.class);
+        require(start.getResult() == ErrorMsg.ErrorCode.Ok, "发车失败: " + start.getResult());
+        require(!start.getMarch().hasAttacker(), "发车响应包含私有战斗快照");
+        return start.getMarch();
     }
 
     private void loadRegionWindows() throws Exception {

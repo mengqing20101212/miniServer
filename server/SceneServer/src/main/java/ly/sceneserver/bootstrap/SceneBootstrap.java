@@ -17,7 +17,7 @@ import ly.sceneserver.common.persistence.SceneStaticMapLoader;
 import java.util.function.BiConsumer;
 import ly.LoggerDef;
 import ly.config.SlgWorldObjectConfigManager;
-import ly.db.MysqlService;
+import ly.db.entry.SceneObjectEntryHelper;
 import ly.sceneserver.common.SceneObject;
 import ly.sceneserver.common.SceneWorldSpawner;
 import ly.game.MiniPlayerHelper;
@@ -100,7 +100,7 @@ public final class SceneBootstrap {
                 }
                 if (!fakeDataEnabled) SceneWorldSpawner.install(scene,
                         () -> SlgWorldObjectConfigManager.getInstance().getConfigList(),
-                        MysqlService.getInstance()::generateEntityId, save, System.currentTimeMillis());
+                        SceneObjectEntryHelper::nextObjectId, save, System.currentTimeMillis());
             }
             if (fakeDataEnabled) {
                 int targetOnline = intProperty("slg.scene.fake-online", 10_000);

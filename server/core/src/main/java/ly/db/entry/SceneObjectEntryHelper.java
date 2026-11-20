@@ -10,6 +10,10 @@ public final class SceneObjectEntryHelper {
   private SceneObjectEntryHelper() {
   }
 
+  public static long nextObjectId() {
+    return MysqlService.getInstance().generateEntityId();
+  }
+
   /** 按 object_id 游标加载指定场景的有效动态对象。 */
   public static List<SceneObjectEntry> selectActivePage(
       String sceneId, long afterObjectId, int limit) {

@@ -2,6 +2,7 @@ syntax = "proto3";
 option java_package = "ly.proto";
 
 import "ErrorMsg.proto";
+import "Battle.proto";
 
 // SceneServer 本服和跨服共用的服务器间 RPC 消息。
 enum SceneScope {
@@ -261,6 +262,7 @@ message SceneMarchSnapshot {
   int64 gather_end_at_millis = 20;
   bool victory = 21;
   string game_server_id = 22;
+  mini.battle.BattleSideSnapshot attacker = 23; // 仅服务端行军存档写入，客户端查询和 AOI 省略
 }
 
 // 集结中的单个成员快照；发车后保留冻结版本，不能被 GameServer 实时属性覆盖。
@@ -614,6 +616,8 @@ message csSceneMarchStart {
   int64 power = 10;
   int64 march_id = 11;
   string game_server_id = 12;
+  int64 hero_uid = 13; // 普通打怪使用的自有英雄实例
+  mini.battle.BattleSideSnapshot attacker = 14; // Game 根据登录玩家重新生成
 }
 // Scene 在到家时发给 Game，玩家由内部 RPC 信封指定。
 message csSceneMarchHome {

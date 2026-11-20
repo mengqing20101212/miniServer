@@ -8,6 +8,7 @@ import ly.sceneserver.common.march.*;
 import org.junit.Test;
 
 public class SceneAoiRoutePushTest {
+    @org.junit.Rule public final MonsterBattleFixture battle = new MonsterBattleFixture();
     @Test public void viewerAcrossRegionBoundaryReceivesRouteAndCompletionRemoval() throws Exception {
         try (SceneRuntime runtime = new SceneRuntime(0, 200, 1000)) {
             runtime.addScene(new SceneConfig("test", 24, 8, 2, 4, 5));
@@ -19,7 +20,7 @@ public class SceneAoiRoutePushTest {
                 map.set(x, y, SceneTerrainType.PLAIN, 0, SceneTileFlags.WALKABLE, 0);
             }
             map.loadRegionIds(regions); map.loadRegionDefinitions(List.of(101, 202)); scene.configureRegions();
-            SlgWorldObjectConfig rule = new SlgWorldObjectConfig(2, "MONSTER", 1, 0, 100, 100, 0, 1, 60, 10, 20);
+            SlgWorldObjectConfig rule = new SlgWorldObjectConfig(2, "MONSTER", 1, 0, 1, 100, 0, 1, 60, 10, 20);
             scene.seedObject(new SceneObject(99, SceneObjectType.MONSTER, 0, 22, 2,
                     new SceneWorldObjectState(1, 2, 0, 1, 0, 100, 0, 0, 0, new byte[0])));
             scene.shard(1).marches().configure(() -> Map.of(2, rule), (object, deleted) -> {}, ignored -> {});
@@ -29,7 +30,7 @@ public class SceneAoiRoutePushTest {
             runtime.start();
             SceneMarchSnapshot march = scene.shard(1).query(shard -> shard.marches().start(77, 10,
                     new ScenePoint(1, 2), 99, new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100,
-                    System.currentTimeMillis(), "game1001")).get();
+                    System.currentTimeMillis(), "game1001", battle.strong())).get();
             SceneViewSnapshot visible = changes.poll(2, TimeUnit.SECONDS);
             assertNotNull(visible);
             assertTrue(visible.objects().stream().anyMatch(object -> object.objectId() == 77));
