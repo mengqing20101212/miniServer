@@ -21,6 +21,7 @@ import ly.sceneserver.common.SceneTileFlags;
 import ly.sceneserver.common.ScenePoint;
 import ly.sceneserver.common.SceneWorldObjectState;
 import ly.sceneserver.common.march.SceneMarchState;
+import ly.sceneserver.common.march.SceneMarchSnapshot;
 import ly.sceneserver.common.march.SceneMarchTag;
 import ly.sceneserver.common.march.SceneMarchType;
 import ly.sceneserver.common.march.SceneRallyState;
@@ -78,6 +79,7 @@ public class SceneRecoveryServiceTest {
             assertEquals(99, scene.staticMap().configId(15, 15));
 
             PlayerSceneProjection playerOne = rows.get(0);
+            assertEquals(playerOne.cityPoint(), scene.cityPoint(playerOne.playerId()));
             SceneObject city = scene.route(playerOne.cityPoint().x(), playerOne.cityPoint().y())
                     .object(playerOne.cityObjectId());
             assertNotNull(city);
@@ -154,13 +156,13 @@ public class SceneRecoveryServiceTest {
             assertEquals(1L, report.restoredMarchCount());
             assertEquals(1L, report.restoredRallyCount());
             SceneObject restoredObject = runtime.scene("world-1").route(2, 3).object(5_001L);
-            SceneMarchState restoredMarch = runtime.scene("world-1")
+            SceneMarchSnapshot restoredMarch = runtime.scene("world-1")
                     .route(marchState.snapshot().target().point().x(), marchState.snapshot().target().point().y())
-                    .marches().requireOwned(1_001L, marchState.snapshot().ownerPlayerId());
+                    .marches().ownedSnapshot(1_001L, marchState.snapshot().ownerPlayerId());
             SceneObject restoredRally = runtime.scene("world-1").route(10, 10).object(3_001L);
             assertEquals(resourceState, restoredObject.state());
             assertEquals(6, restoredObject.stateVersion());
-            assertEquals(marchState.snapshot(), restoredMarch.snapshot());
+            assertEquals(marchState.snapshot(), restoredMarch);
             assertTrue(restoredRally.state() instanceof SceneRallyState);
             assertEquals(rallyState.snapshot(), ((SceneRallyState) restoredRally.state()).snapshot());
             assertFalse(runtime.isStarted());

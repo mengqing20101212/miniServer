@@ -16,6 +16,7 @@ public final class SlgGameplayScenario implements RobotScenario {
     private final BlockingQueue<Scene.scSceneView> pushes = new LinkedBlockingQueue<>();
     private final String scene = System.getProperty("slg.bot.scene-id", "world-1");
     private RobotSession session;
+    private Scene.ScenePoint city;
 
     public SlgGameplayScenario(RobotSession observer) { this.observer = observer; }
     public CompletableFuture<Void> completion() { return completion; }
@@ -38,7 +39,7 @@ public final class SlgGameplayScenario implements RobotScenario {
 
     private void run() {
         try {
-            enter(session, 1, 1);
+            city = enter(session, 1, 1);
             enter(observer, 2, 2);
             Map<Scene.SceneObjectKind, Scene.SceneObjectSnapshot> targets = findTargets();
             long observerBalance = balance(observer, 1);
@@ -50,17 +51,17 @@ public final class SlgGameplayScenario implements RobotScenario {
             for (RobotSession player : List.of(session, observer))
                 invoke(player, Cmd.CMD.CS_SceneLeave, Cmd.CMD.SC_SceneLeave,
                         Scene.csSceneLeave.newBuilder().setSceneId(scene).build(), Scene.scSceneLeave.class);
-            System.out.println("[SLG-GAMEPLAY] PASS gather, monster, return-award, duplicate-claim, cross-region-AOI");
+            System.out.println("[SLG-GAMEPLAY] PASS gather, monster, automatic-return-award, read-only-query, cross-region-AOI");
             completion.complete(null);
         } catch (Throwable failure) { completion.completeExceptionally(failure); }
     }
 
     private void runMarch(Scene.SceneObjectKind kind, Scene.SceneObjectSnapshot target) throws Exception {
         long before = balance(session, 1);
-        int midX = (target.getPoint().getX() + 1) / 2;
-        int midY = (target.getPoint().getY() + 1) / 2;
+        int midX = (target.getPoint().getX() + city.getX()) / 2;
+        int midY = (target.getPoint().getY() + city.getY()) / 2;
         Scene.scSceneView observing = view(observer, midX, midY);
-        require(outside(observing, point(1, 1)) && outside(observing, target.getPoint()),
+        require(outside(observing, city) && outside(observing, target.getPoint()),
                 "观察视野应只经过路线，两端均在九宫格外");
         pushes.clear();
         Scene.scSceneMarchStart start = invoke(session, Cmd.CMD.CS_SceneMarchStart, Cmd.CMD.SC_SceneMarchStart,
@@ -71,37 +72,31 @@ public final class SlgGameplayScenario implements RobotScenario {
                         .setTroopCount(999999).setPower(999999).build(), Scene.scSceneMarchStart.class);
         require(start.getResult() == ErrorMsg.ErrorCode.Ok, "发车失败: " + start.getResult());
         Scene.SceneMarchSnapshot initial = start.getMarch();
+        require(initial.getOrigin().equals(city), "行军未从主城出发");
         require(initial.getOwnerPlayerId() == session.getPlayerId(), "Game未绑定真实玩家");
         require(initial.getTroopCount() == 100 && initial.getPower() == 100, "Game未覆盖客户端兵力战力");
         require(initial.getTargetRegionId() == 25, "用例目标应位于公司地图中央区域25");
         awaitPush(initial.getMarchId(), true);
         Scene.csSceneMarchQuery query = Scene.csSceneMarchQuery.newBuilder().setSceneId(scene)
                 .setMarchId(initial.getMarchId()).setTargetRegionId(initial.getTargetRegionId()).build();
-        Set<Scene.SceneMarchStatus> statuses = EnumSet.noneOf(Scene.SceneMarchStatus.class);
-        long deadline = System.nanoTime() + TimeUnit.MINUTES.toNanos(2);
-        Scene.SceneMarchSnapshot finished = null;
-        while (System.nanoTime() < deadline) {
-            Scene.scSceneMarchQuery response = invoke(session, Cmd.CMD.CS_SceneMarchQuery, Cmd.CMD.SC_SceneMarchQuery,
-                    query, Scene.scSceneMarchQuery.class);
-            require(response.getResult() == ErrorMsg.ErrorCode.Ok, "查询行军失败: " + response.getResult());
-            Scene.SceneMarchSnapshot march = response.getMarch();
-            require(march.getTargetRegionId() == initial.getTargetRegionId(), "行军中途改变托管区域");
-            if (statuses.add(march.getStatus()))
-                System.out.printf("[SLG-GAMEPLAY] march=%d status=%s hostRegion=%d%n",
-                        march.getMarchId(), march.getStatus(), march.getTargetRegionId());
-            if (march.getStatus() == Scene.SceneMarchStatus.SCENE_MARCH_RETURNING)
-                require(balance(session, 1) == before, "返程未完成就发奖");
-            if (march.getStatus() == Scene.SceneMarchStatus.SCENE_MARCH_FINISHED) { finished = march; break; }
-            Thread.sleep(200);
-        }
-        require(finished != null && finished.getVictory() && finished.getRewardAmount() == 100, "返程或奖励结果错误");
-        require(statuses.contains(Scene.SceneMarchStatus.SCENE_MARCH_RETURNING), "未观测到返程阶段");
-        if (kind == Scene.SceneObjectKind.SCENE_OBJECT_RESOURCE)
-            require(statuses.contains(Scene.SceneMarchStatus.SCENE_MARCH_GATHERING), "未观测到采集阶段");
-        require(balance(session, 1) == before + finished.getRewardAmount(), "实际余额未到账");
-        invoke(session, Cmd.CMD.CS_SceneMarchQuery, Cmd.CMD.SC_SceneMarchQuery, query, Scene.scSceneMarchQuery.class);
-        require(balance(session, 1) == before + finished.getRewardAmount(), "重复查询重复发奖");
         awaitPush(initial.getMarchId(), false);
+        // 首次查行军前先通过独立的资产接口确认余额，防止查询触发发奖的回归。
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(30);
+        long actual = balance(session, 1);
+        while (actual == before && System.nanoTime() < deadline) {
+            Thread.sleep(200);
+            actual = balance(session, 1);
+        }
+        require(actual == before + 100, "未查行军时返程奖励没有自动到账");
+        Scene.scSceneMarchQuery response = invoke(session, Cmd.CMD.CS_SceneMarchQuery, Cmd.CMD.SC_SceneMarchQuery,
+                query, Scene.scSceneMarchQuery.class);
+        Scene.SceneMarchSnapshot finished = response.getMarch();
+        require(response.getResult() == ErrorMsg.ErrorCode.Ok
+                && finished.getStatus() == Scene.SceneMarchStatus.SCENE_MARCH_FINISHED
+                && finished.getTargetRegionId() == initial.getTargetRegionId()
+                && finished.getVictory() && finished.getRewardAmount() == 100, "已结束行军记录错误");
+        invoke(session, Cmd.CMD.CS_SceneMarchQuery, Cmd.CMD.SC_SceneMarchQuery, query, Scene.scSceneMarchQuery.class);
+        require(balance(session, 1) == actual, "查询行军改变了余额");
         Scene.scSceneView after = view(session, target.getPoint().getX(), target.getPoint().getY());
         Scene.SceneObjectSnapshot updated = after.getObjectsList().stream()
                 .filter(object -> object.getObjectId() == target.getObjectId()).findFirst().orElseThrow();
@@ -127,17 +122,18 @@ public final class SlgGameplayScenario implements RobotScenario {
     }
 
     private void awaitPush(long marchId, boolean present) throws Exception {
-        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(20);
+        long deadline = System.nanoTime() + TimeUnit.MINUTES.toNanos(6);
         while (System.nanoTime() < deadline) {
             Scene.scSceneView view = pushes.poll(1, TimeUnit.SECONDS);
             if (view != null && view.getObjectsList().stream().anyMatch(object -> object.getObjectId() == marchId) == present) return;
         }
         throw new IllegalStateException("跨区域AOI未收到行军" + (present ? "出现" : "移除") + "推送");
     }
-    private void enter(RobotSession player, int x, int y) throws Exception {
+    private Scene.ScenePoint enter(RobotSession player, int x, int y) throws Exception {
         Scene.scSceneEnter response = invoke(player, Cmd.CMD.CS_SceneEnter, Cmd.CMD.SC_SceneEnter,
                 Scene.csSceneEnter.newBuilder().setSceneId(scene).setPoint(point(x, y)).build(), Scene.scSceneEnter.class);
         require(response.getResult() == ErrorMsg.ErrorCode.Ok, "进入地图失败: " + response.getResult());
+        return response.getCityPoint();
     }
     private Scene.scSceneView view(RobotSession player, int x, int y) throws Exception {
         Scene.scSceneView response = invoke(player, Cmd.CMD.CS_SceneView, Cmd.CMD.SC_SceneView,

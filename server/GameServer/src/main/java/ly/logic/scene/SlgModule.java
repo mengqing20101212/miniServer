@@ -7,19 +7,16 @@ import java.util.*;
 import ly.logic.player.AbstractModule;
 import ly.logic.player.event.*;
 import ly.logic.asset.*;
-import ly.proto.Scene;
 
 @ProtobufClass
 public class SlgModule extends AbstractModule {
     @Protobuf(fieldType = FieldType.INT64, order = 1)
     public List<Long> settledMarches = new ArrayList<>();
 
-    public void settle(Scene.SceneMarchSnapshot march) {
-        if (march.getStatus() != Scene.SceneMarchStatus.SCENE_MARCH_FINISHED
-                || settledMarches.contains(march.getMarchId())) return;
-        if (march.getRewardAmount() > 0)
-            Award.create(march.getResourceId(), march.getRewardAmount()).award(player, ChangeReason.OTHER);
-        settledMarches.add(march.getMarchId());
+    public void settle(long marchId, int resourceId, long amount) {
+        if (settledMarches.contains(marchId)) return;
+        Award.create(resourceId, amount).award(player, ChangeReason.OTHER);
+        settledMarches.add(marchId);
         markModuleDataDirty();
     }
     @Override public void onLoadData() {}

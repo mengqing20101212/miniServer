@@ -61,19 +61,14 @@ public final class CommonSceneController implements IController {
                     || (request.getType() != Scene.SceneMarchType.SCENE_MARCH_GATHER
                     && request.getType() != Scene.SceneMarchType.SCENE_MARCH_ATTACK))
                 throw new IllegalArgumentException("发车参数错误");
-            SceneShard playerShard = scene.locateObject(request.getPlayerId()).get(OP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-            if (playerShard == null) throw new IllegalArgumentException("玩家尚未进入地图");
-            ScenePoint origin = playerShard.query(shard -> {
-                SceneObject player = shard.object(request.getPlayerId());
-                return new ScenePoint(player.x(), player.y());
-            }).get(OP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+            ScenePoint origin = scene.cityPoint(request.getPlayerId());
             ScenePoint target = new ScenePoint(request.getTargetPoint().getX(), request.getTargetPoint().getY());
             ly.sceneserver.common.march.SceneMarchSnapshot snapshot = scene.route(target.x(), target.y()).query(shard ->
                     shard.marches().start(request.getMarchId(), request.getPlayerId(), origin,
                             request.getTargetId(), target,
                             request.getType() == Scene.SceneMarchType.SCENE_MARCH_GATHER
                                     ? ly.sceneserver.common.march.SceneMarchType.GATHER : ly.sceneserver.common.march.SceneMarchType.ATTACK,
-                            request.getTroopCount(), request.getPower(), System.currentTimeMillis()))
+                            request.getTroopCount(), request.getPower(), System.currentTimeMillis(), request.getGameServerId()))
                     .get(OP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
             response.setResult(ErrorMsg.ErrorCode.Ok).setMarch(SceneMarchProtoMapper.toProto(snapshot));
         } catch (Exception error) {
@@ -91,7 +86,7 @@ public final class CommonSceneController implements IController {
             int owner = scene.staticMap().regionDefinitions().indexOf(request.getTargetRegionId());
             if (owner < 0) throw new IllegalArgumentException("目标区域不存在");
             ly.sceneserver.common.march.SceneMarchSnapshot snapshot = scene.shard(owner).query(shard ->
-                    shard.marches().requireOwned(request.getMarchId(), request.getPlayerId()).snapshot())
+                    shard.marches().ownedSnapshot(request.getMarchId(), request.getPlayerId()))
                     .get(OP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
             response.setResult(ErrorMsg.ErrorCode.Ok).setMarch(SceneMarchProtoMapper.toProto(snapshot));
         } catch (Exception error) {
@@ -163,6 +158,10 @@ public final class CommonSceneController implements IController {
                             shard.moveObject(object.objectId(), point.getX(), point.getY());
                         }
                     }).get(OP_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+                    ScenePoint city = scene.ensureCity(request.getPlayerId(),
+                            () -> ly.db.MysqlService.getInstance().generateEntityId(),
+                            projection -> SceneBootstrap.getPlayerPersistenceService().submit(projection).join());
+                    response.setCityPoint(toProtoPoint(city));
                     // 玩家刚进入时默认观察所在块及周边一圈，保证战争迷雾立即拥有初始状态。
                     scene.updateViewAsync(new SceneViewRequest(
                                     request.getPlayerId(),

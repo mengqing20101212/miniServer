@@ -3,6 +3,15 @@ package ly.logic.scene;
 import com.google.protobuf.AbstractMessage;
 
 import ly.LoggerDef;
+import ly.ServerContext;
+import ly.db.MysqlService;
+import ly.logic.login.LoginManager;
+import ly.logic.player.ModuleEnum;
+import ly.net.GameConnectSession;
+import ly.net.HandlerContext;
+import ly.net.Server2ServerRpcContext;
+import ly.net.packet.MessagePacket;
+import ly.net.packet.MessagePacketFactory;
 import ly.logic.player.Player;
 import ly.net.GameHandlerContext;
 import ly.net.IGameController;
@@ -32,6 +41,8 @@ public final class SceneProxyController implements IGameController {
 
     @Override
     public void registerHandlerRouter() {
+        register(Cmd.CMD.CS_SceneMarchHome, GameConnectSession.class, MessagePacket.class,
+                Scene.csSceneMarchHome.class, this::handleMarchHome);
         gameHandlerRegister(Cmd.CMD.CS_SceneQuery, this::handleQuery);
         gameHandlerRegister(Cmd.CMD.CS_SceneEnter, this::handleEnter);
         gameHandlerRegister(Cmd.CMD.CS_SceneMove, this::handleMove);
@@ -44,11 +55,29 @@ public final class SceneProxyController implements IGameController {
         gameHandlerRegister(Cmd.CMD.CS_ScenePathFind, this::handlePathFind);
     }
 
+    private void handleMarchHome(HandlerContext<GameConnectSession, MessagePacket> context,
+            Scene.csSceneMarchHome request) {
+        long callId = Server2ServerRpcContext.currentCallId();
+        if (callId <= 0) return;
+        long playerId = context.packet().getGuid();
+        LoginManager.getInstance().runPlayerTask(playerId,
+                player -> ((SlgModule) player.getPlayerData().getModule(ModuleEnum.SLG_MODULE))
+                        .settle(request.getMarchId(), request.getResourceId(), request.getRewardAmount())).whenComplete((ignored, error) -> {
+            if (error != null) {
+                LoggerDef.SystemLogger.error("行军到家结算失败, marchId={}", request.getMarchId(), error);
+                return;
+            }
+            Server2ServerRpcContext.run(callId, () -> context.session().addSendPacket(
+                    MessagePacketFactory.createMessagePacket(playerId,
+                            Cmd.CMD.SC_SceneMarchHome_VALUE, Scene.scSceneMarchHome.getDefaultInstance(), 0, 0)));
+        });
+    }
+
     private void handleMarchStart(GameHandlerContext context, Scene.csSceneMarchStart request) {
         Player player = context.player();
         // 部队系统尚未接入，基础验证部队由Game配置冻结，客户端传入的兵量和战力不参与结算。
         Scene.csSceneMarchStart bound = request.toBuilder().setPlayerId(player.getPlayerId())
-                .clearOrigin().setMarchId(ly.db.MysqlService.getInstance().generateEntityId())
+                .setGameServerId(ServerContext.getServerId()).clearOrigin().setMarchId(MysqlService.getInstance().generateEntityId())
                 .setTroopCount(Integer.getInteger("slg.march.troops", 100))
                 .setPower(Long.getLong("slg.march.power", 100L)).build();
         Scene.scSceneMarchStart response = call(player, Cmd.CMD.CS_SceneMarchStart, bound,
@@ -67,9 +96,6 @@ public final class SceneProxyController implements IGameController {
         if (response == null) response = Scene.scSceneMarchQuery.newBuilder()
                 .setSceneId(request.getSceneId()).setRequestId(request.getRequestId())
                 .setResult(ErrorMsg.ErrorCode.SCENE_NOT_READY).build();
-        if (response.getResult() == ErrorMsg.ErrorCode.Ok)
-            ((SlgModule) player.getPlayerData().getModule(ly.logic.player.ModuleEnum.SLG_MODULE))
-                    .settle(response.getMarch());
         player.sendMsg(Cmd.CMD.SC_SceneMarchQuery, response);
     }
 
@@ -236,7 +262,7 @@ public final class SceneProxyController implements IGameController {
         return responseType.cast(response);
     }
 
-    private static boolean routeSceneNotification(ly.net.packet.MessagePacket packet) {
+    private static boolean routeSceneNotification(MessagePacket packet) {
         if (packet.getCmd() != Cmd.CMD.SC_SceneChanged_VALUE) return false;
         Player player = ly.logic.player.PlayerManager.getInstance().getOnlinePlayer(packet.getGuid());
         if (player != null) player.getGamePlayer().addPacket(packet);

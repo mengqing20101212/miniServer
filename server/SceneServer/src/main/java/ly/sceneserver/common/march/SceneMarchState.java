@@ -32,8 +32,12 @@ public final class SceneMarchState {
     private long rewardAmount;
     private long gatherEndAtMillis;
     private boolean victory;
+    private String gameServerId = "";
 
-    public void hostInRegion(int regionId) { targetRegionId = regionId; }
+    public void hostInRegion(int regionId, String gameServerId) {
+        targetRegionId = regionId;
+        this.gameServerId = gameServerId;
+    }
 
     public void beginGathering(long endAtMillis) {
         status = SceneMarchStatus.GATHERING;
@@ -119,6 +123,7 @@ public final class SceneMarchState {
         state.rewardAmount = snapshot.rewardAmount();
         state.gatherEndAtMillis = snapshot.gatherEndAtMillis();
         state.victory = snapshot.victory();
+        state.gameServerId = snapshot.gameServerId();
         return state;
     }
 
@@ -225,7 +230,7 @@ public final class SceneMarchState {
                 armySnapshotVersion,
                 departAtMillis,
                 arrivalAtMillis,
-                stateVersion, targetRegionId, resourceId, rewardAmount, gatherEndAtMillis, victory);
+                stateVersion, targetRegionId, resourceId, rewardAmount, gatherEndAtMillis, victory, gameServerId);
     }
 
     private void requireStatus(SceneMarchStatus expected) {

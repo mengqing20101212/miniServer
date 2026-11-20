@@ -260,6 +260,7 @@ message SceneMarchSnapshot {
   int64 reward_amount = 19;
   int64 gather_end_at_millis = 20;
   bool victory = 21;
+  string game_server_id = 22;
 }
 
 // 集结中的单个成员快照；发车后保留冻结版本，不能被 GameServer 实时属性覆盖。
@@ -432,6 +433,7 @@ message scSceneEnter {
   ScenePoint current_point = 4;
   // 原样返回业务幂等请求 ID。
   int64 request_id = 5;
+  ScenePoint city_point = 6;
 }
 
 // 请求把玩家场景实体移动到目标坐标；服务端仍会校验地形、迷雾和分片边界。
@@ -611,7 +613,16 @@ message csSceneMarchStart {
   int32 troop_count = 9;
   int64 power = 10;
   int64 march_id = 11;
+  string game_server_id = 12;
 }
+// Scene 在到家时发给 Game，玩家由内部 RPC 信封指定。
+message csSceneMarchHome {
+  int64 march_id = 1;
+  int32 resource_id = 2;
+  int64 reward_amount = 3;
+}
+message scSceneMarchHome {}
+
 message scSceneMarchStart {
   ErrorCode result = 1;
   string scene_id = 2;
@@ -633,5 +644,5 @@ message scSceneMarchQuery {
   SceneMarchSnapshot march = 4;
 }
 
-// 完整可见快照替换，用于资源、怪物和行军变化推送；资产领取仍查询权威行军结果。
+// 完整可见快照替换，用于资源、怪物和行军变化推送。
 message scSceneChanged { scSceneView view = 1; }

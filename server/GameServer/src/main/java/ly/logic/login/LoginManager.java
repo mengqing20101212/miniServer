@@ -1,6 +1,10 @@
 package ly.logic.login;
 
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import ly.db.PersistenceScope;
+import ly.logic.player.coroutine.PlayerCoroutineTask;
 
 import ly.LoggerDef;
 import ly.ServerContext;
@@ -28,7 +32,7 @@ import ly.redis.RedisUtils;
 public class LoginManager {
     private static final LoginManager instance = new LoginManager();
 
-    private final ArrayBlockingQueue<LoginTask> loginTasks = new ArrayBlockingQueue<>(100);
+    private final ArrayBlockingQueue<Runnable> loginTasks = new ArrayBlockingQueue<>(100);
 
     public static LoginManager getInstance() {
         return instance;
@@ -38,13 +42,12 @@ public class LoginManager {
         Thread.ofVirtual().start(() -> {
             while (true) {
                 try {
-                    LoginTask task = loginTasks.take();
+                    Runnable task = loginTasks.take();
                     long startTime = System.currentTimeMillis();
-                    handleLogin(task);
+                    task.run();
                     long endTime = System.currentTimeMillis();
                     LoggerDef.SystemLogger.info(
-                            "LoginManager handle login {} cost {} ms",
-                            task.request,
+                            "LoginManager task cost {} ms",
                             endTime - startTime);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -58,12 +61,45 @@ public class LoginManager {
     }
 
     public void addLoginTask(LoginTask task) {
-        loginTasks.add(task);
+        loginTasks.add(() -> handleLogin(task));
         LoggerDef.SystemLogger.info(
                 "LoginManager add login task account:{} token:{} callId:{}",
                 task.request.getAccount(),
                 task.request.getToken(),
                 task.callId);
+    }
+
+    /** 离线读档与登录在同一个队列交接，在线资产变更仍由玩家自己的 FIFO 执行。 */
+    public CompletableFuture<Void> runPlayerTask(long playerId, Consumer<Player> action) {
+        CompletableFuture<Void> done = new CompletableFuture<>();
+        loginTasks.add(() -> {
+            try {
+                Player online = PlayerManager.getInstance().getOnlinePlayer(playerId);
+                if (online == null) {
+                    Player offline = PlayerManager.getInstance().getPlayerByDB(playerId);
+                    try (PersistenceScope scope = PersistenceScope.open()) {
+                        action.accept(offline);
+                    }
+                    done.complete(null);
+                    return;
+                }
+                PlayerCoroutineTask<Void> work = new PlayerCoroutineTask<>(0, playerId, "玩家返程结算", player -> {
+                    action.accept(player);
+                    PersistenceScope.flushCurrent();
+                    return null;
+                });
+                if (!online.getGamePlayer().addCoroutineTask(work)) {
+                    throw new IllegalStateException("玩家队列未接收结算");
+                }
+                work.future().whenComplete((result, error) -> {
+                    if (error == null) done.complete(null);
+                    else done.completeExceptionally(error);
+                });
+            } catch (Exception error) {
+                done.completeExceptionally(error);
+            }
+        });
+        return done;
     }
 
     private void handleLogin(LoginTask task) {

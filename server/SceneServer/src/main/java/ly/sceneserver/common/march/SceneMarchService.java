@@ -10,6 +10,9 @@ import ly.sceneserver.common.*;
 public final class SceneMarchService {
     private final SceneShard shard;
     private final Map<Long, SceneMarchState> marches = new LinkedHashMap<>();
+    private final Map<Long, SceneMarchSnapshot> completed = new HashMap<>();
+    private Consumer<SceneMarchSnapshot> home;
+
     private final Map<Long, Long> occupiedTargets = new HashMap<>();
     private Supplier<Map<Integer, SlgWorldObjectConfig>> rules;
     private Consumer<SceneMarchSnapshot> changed = snapshot -> {};
@@ -17,22 +20,27 @@ public final class SceneMarchService {
     private Consumer<SceneObject> persistence = object -> {};
 
     public SceneMarchService(SceneShard shard) { this.shard = shard; }
-    public void configure(Supplier<Map<Integer, SlgWorldObjectConfig>> rules, Consumer<SceneObject> persistence) {
+    public void configure(Supplier<Map<Integer, SlgWorldObjectConfig>> rules, Consumer<SceneObject> persistence,
+            Consumer<SceneMarchSnapshot> home) {
+        this.home = home;
         this.rules = rules;
         this.persistence = persistence;
     }
 
     public void restore(SceneMarchState march) {
         SceneMarchSnapshot snapshot = march.snapshot();
+        if (snapshot.status() == SceneMarchStatus.FINISHED || snapshot.status() == SceneMarchStatus.CANCELLED) {
+            completed.put(snapshot.marchId(), snapshot);
+            return;
+        }
         marches.put(snapshot.marchId(), march);
         if (snapshot.status() == SceneMarchStatus.GATHERING)
             occupiedTargets.put(snapshot.target().targetId(), snapshot.marchId());
     }
 
     public SceneMarchSnapshot start(long marchId, long playerId, ScenePoint origin,
-            long targetId, ScenePoint targetPoint, SceneMarchType type, int troops, long power, long now) {
-        SceneMarchState existing = marches.get(marchId);
-        if (existing != null) return requireOwned(marchId, playerId).snapshot();
+            long targetId, ScenePoint targetPoint, SceneMarchType type, int troops, long power, long now, String gameServerId) {
+        if (marches.containsKey(marchId) || completed.containsKey(marchId)) return ownedSnapshot(marchId, playerId);
         SceneObject target = requireTarget(targetId, targetPoint, type);
         boolean gather = type == SceneMarchType.GATHER;
         long tags = gather ? SceneTargetTag.GATHERABLE.mask() : SceneTargetTag.ATTACKABLE.mask();
@@ -40,7 +48,7 @@ public final class SceneMarchService {
                 gather ? SceneTargetType.RESOURCE : SceneTargetType.MONSTER, targetPoint, tags, target.stateVersion());
         SceneMarchState march = new SceneMarchState(marchId, playerId, 0, type,
                 SceneMarchTag.SOLO.mask(), origin, descriptor, troops, power, 0);
-        march.hostInRegion(shard.staticMap().regionId(targetPoint.x(), targetPoint.y()));
+        march.hostInRegion(shard.staticMap().regionId(targetPoint.x(), targetPoint.y()), gameServerId);
         march.assignPath(List.of(origin, targetPoint), travelCost(origin, targetPoint), speed(), now);
         marches.put(marchId, march);
         persist(march);
@@ -60,11 +68,12 @@ public final class SceneMarchService {
         return target;
     }
 
-    public SceneMarchState requireOwned(long marchId, long playerId) {
+    public SceneMarchSnapshot ownedSnapshot(long marchId, long playerId) {
         SceneMarchState march = marches.get(marchId);
-        if (march == null || march.snapshot().ownerPlayerId() != playerId)
+        SceneMarchSnapshot snapshot = march == null ? completed.get(marchId) : march.snapshot();
+        if (snapshot == null || snapshot.ownerPlayerId() != playerId)
             throw new IllegalArgumentException("行军不存在或不属于当前玩家");
-        return march;
+        return snapshot;
     }
 
     public SceneMarchState march(long marchId) { return marches.get(marchId); }
@@ -73,7 +82,8 @@ public final class SceneMarchService {
 
     public void tick(long now) {
         if (rules == null) return;
-        for (SceneMarchState march : marches.values()) {
+        for (Iterator<SceneMarchState> it = marches.values().iterator(); it.hasNext();) {
+            SceneMarchState march = it.next();
             SceneMarchSnapshot snapshot = march.snapshot();
             if (snapshot.status() == SceneMarchStatus.MARCHING && now >= snapshot.arrivalAtMillis()) {
                 march.arrive();
@@ -83,7 +93,11 @@ public final class SceneMarchService {
                 gather(march, now);
                 persist(march);
             } else if (snapshot.status() == SceneMarchStatus.RETURNING && now >= snapshot.arrivalAtMillis()) {
+                if (snapshot.rewardAmount() > 0) home.accept(snapshot);
                 march.arrive();
+                SceneMarchSnapshot finished = march.snapshot();
+                completed.put(finished.marchId(), finished);
+                it.remove();
                 persist(march);
             }
         }

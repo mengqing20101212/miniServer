@@ -47,6 +47,8 @@ public class ProtoMessageFactory {
         case Cmd.CMD.SC_HeroAdd_VALUE ->{return Hero.SC_HeroAdd.parseFrom(data);}
         case Cmd.CMD.CS_ErrorCode_VALUE ->{return ErrorMsg.csErrorCode.parseFrom(data);}
         case Cmd.CMD.SC_ErrorCode_VALUE ->{return ErrorMsg.scErrorCode.parseFrom(data);}
+        case Cmd.CMD.CS_SceneMarchHome_VALUE ->{return Scene.csSceneMarchHome.parseFrom(data);}
+        case Cmd.CMD.SC_SceneMarchHome_VALUE ->{return Scene.scSceneMarchHome.parseFrom(data);}
         case Cmd.CMD.CS_SceneQuery_VALUE ->{return Scene.csSceneQuery.parseFrom(data);}
         case Cmd.CMD.SC_SceneQuery_VALUE ->{return Scene.scSceneQuery.parseFrom(data);}
         case Cmd.CMD.CS_SceneEnter_VALUE ->{return Scene.csSceneEnter.parseFrom(data);}

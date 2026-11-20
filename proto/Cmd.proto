@@ -47,6 +47,9 @@ enum CMD{
   CS_GmRuntimeScriptExecute = 10011;                                                // GM 推送一次性运行时脚本
   SC_GmRuntimeScriptExecute = 10012;                                                // 一次性运行时脚本执行结果
 
+  CS_SceneMarchHome = 10013;
+  SC_SceneMarchHome = 10014;
+
   // Scene 地图客户端协议 2000-2099。客户端经 Gate -> Game 发送；Game 再使用
   // CS_Server2Server 外壳把同一业务消息转给 SceneServer，不能放在服务器内部号段。
   CS_SceneQuery = 2001;                                                             // 查询地图对象和静态格信息

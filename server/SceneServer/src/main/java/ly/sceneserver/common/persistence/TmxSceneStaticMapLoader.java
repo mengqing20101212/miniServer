@@ -28,8 +28,15 @@ public final class TmxSceneStaticMapLoader implements SceneStaticMapLoader {
             if (regionIds.length != map.cellCount()) throw new IllegalArgumentException("区域格子数量错误");
             new FlatSceneStaticMapLoader().load(config, map);
             map.loadRegionIds(regionIds);
-            map.loadRegionDefinitions(regions.getJSONArray("regionDefs").toList(JSONObject.class).stream()
-                    .map(definition -> definition.getIntValue("id")).toList());
+            List<Integer> ids = new ArrayList<>();
+            Set<Integer> spawnRegions = new HashSet<>();
+            for (JSONObject region : regions.getJSONArray("regionDefs").toList(JSONObject.class)) {
+                int id = region.getIntValue("id");
+                ids.add(id);
+                if (region.getBooleanValue("isSpawn")) spawnRegions.add(id);
+            }
+            map.loadRegionDefinitions(ids);
+            map.loadSpawnRegions(spawnRegions);
             SAXParserFactory factory = SAXParserFactory.newDefaultInstance();
             factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             Handler handler = new Handler(map);

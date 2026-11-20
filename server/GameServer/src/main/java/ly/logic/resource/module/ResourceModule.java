@@ -90,7 +90,7 @@ public class ResourceModule extends AbstractModule {
         java.util.Map<Integer, Long> changes = new java.util.LinkedHashMap<>(pendingNotifications);
         pendingNotifications.clear();
         changes.values().removeIf(amount -> amount == 0);
-        if (changes.isEmpty()) return;
+        if (changes.isEmpty() || player.getGamePlayer() == null) return;
         try {
             Resource.SC_ResourceChange message =
                     Resource.SC_ResourceChange.newBuilder().putAllChanges(changes).build();

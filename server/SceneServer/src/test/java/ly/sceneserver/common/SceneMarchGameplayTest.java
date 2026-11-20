@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import ly.config.SlgWorldObjectConfig;
+import ly.sceneserver.common.persistence.PlayerSceneProjection;
 import ly.sceneserver.common.march.*;
 import org.junit.Test;
 
@@ -19,13 +20,22 @@ public class SceneMarchGameplayTest {
             setupRegions(scene);
             seed(scene, 99, SceneObjectType.RESOURCE, 22, 2, resource);
             List<SceneObject> persisted = Collections.synchronizedList(new ArrayList<>());
+            List<SceneMarchSnapshot> home = new ArrayList<>();
             for (int index = 0; index < 2; index++) scene.shard(index).marches().configure(
-                    () -> Map.of(1, resource, 2, monster), persisted::add);
+                    () -> Map.of(1, resource, 2, monster), persisted::add, home::add);
             runtime.start();
+            List<PlayerSceneProjection> cities = new ArrayList<>();
+            AtomicLong ids = new AtomicLong(1000);
+            ScenePoint city = scene.ensureCity(10, ids::incrementAndGet, cities::add);
+            assertEquals(101, scene.staticMap().regionId(city.x(), city.y()));
+            scene.updateViewAsync(new SceneViewRequest(10, new ScenePoint(23, 7), 1, SceneViewLevel.DETAIL, 0)).get();
+            assertEquals(city, scene.ensureCity(10, ids::incrementAndGet, cities::add));
+            assertEquals(1, cities.size());
             long now = System.currentTimeMillis();
             SceneMarchSnapshot started = scene.route(22, 2).query(shard -> shard.marches().start(
-                    77, 10, new ScenePoint(1, 2), 99, new ScenePoint(22, 2),
-                    SceneMarchType.GATHER, 100, 100, now)).get(2, TimeUnit.SECONDS);
+                    77, 10, scene.cityPoint(10), 99, new ScenePoint(22, 2),
+                    SceneMarchType.GATHER, 100, 100, now, "game1001")).get(2, TimeUnit.SECONDS);
+            assertEquals(city, started.origin());
             assertEquals(202, started.targetRegionId());
             SceneViewSnapshot view = scene.updateViewAsync(new SceneViewRequest(20,
                     new ScenePoint(9, 2), 1, SceneViewLevel.DETAIL, 0)).get(2, TimeUnit.SECONDS);
@@ -34,16 +44,31 @@ public class SceneMarchGameplayTest {
             scene.shard(1).query(shard -> {
                 assertTrue(shard.objectsAt(22, 2).stream().noneMatch(object -> object.type() == SceneObjectType.MARCH));
                 shard.marches().tick(started.arrivalAtMillis());
-                SceneMarchSnapshot gathering = shard.marches().requireOwned(77, 10).snapshot();
+                SceneMarchSnapshot gathering = shard.marches().ownedSnapshot(77, 10);
                 assertEquals(SceneMarchStatus.GATHERING, gathering.status());
                 shard.marches().tick(gathering.gatherEndAtMillis());
-                SceneMarchSnapshot returning = shard.marches().requireOwned(77, 10).snapshot();
+                SceneMarchSnapshot returning = shard.marches().ownedSnapshot(77, 10);
                 assertEquals(SceneMarchStatus.RETURNING, returning.status());
+                assertTrue(home.isEmpty());
                 shard.marches().tick(returning.arrivalAtMillis());
+                shard.marches().tick(returning.arrivalAtMillis() + 1);
                 return null;
             }).get(2, TimeUnit.SECONDS);
-            SceneMarchSnapshot finished = scene.shard(1).query(shard -> shard.marches().requireOwned(77, 10).snapshot()).get();
+            SceneMarchSnapshot finished = scene.shard(1).query(shard -> shard.marches().ownedSnapshot(77, 10)).get();
             assertEquals(SceneMarchStatus.FINISHED, finished.status());
+            assertEquals(1, home.size());
+            assertEquals(finished.marchId(), home.getFirst().marchId());
+            assertEquals(finished.rewardAmount(), home.getFirst().rewardAmount());
+            assertTrue(scene.shard(1).query(shard -> shard.marches().marches().isEmpty()).get());
+            try (SceneRuntime restarted = new SceneRuntime(0, 200, 1000)) {
+                restarted.addScene(scene.config());
+                SceneRuntime.SceneInstance recovered = restarted.scene("test");
+                setupRegions(recovered);
+                recovered.seedObject(new SceneObject(finished.marchId(), SceneObjectType.MARCH,
+                        finished.ownerPlayerId(), 22, 2, SceneMarchState.restore(finished)));
+                assertEquals(finished, recovered.shard(1).marches().ownedSnapshot(77, 10));
+                assertTrue(recovered.shard(1).marches().marches().isEmpty());
+            }
             assertEquals(100, finished.rewardAmount());
             assertEquals(202, finished.targetRegionId());
             assertEquals(finished, SceneMarchProtoMapper.fromProto(SceneMarchProtoMapper.toProto(finished)));
@@ -58,21 +83,21 @@ public class SceneMarchGameplayTest {
             SceneRuntime.SceneInstance scene = runtime.scene("test");
             setupRegions(scene);
             seed(scene, 99, SceneObjectType.MONSTER, 22, 2, monster);
-            scene.shard(1).marches().configure(() -> Map.of(2, monster), object -> {});
+            scene.shard(1).marches().configure(() -> Map.of(2, monster), object -> {}, ignored -> {});
             runtime.start();
             scene.shard(1).query(shard -> {
                 long now = System.currentTimeMillis();
                 SceneMarchSnapshot weak = shard.marches().start(70, 10, new ScenePoint(1, 2), 99,
-                        new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 10, now);
+                        new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 10, now, "game1001");
                 shard.marches().tick(weak.arrivalAtMillis());
-                assertEquals(0, shard.marches().requireOwned(70, 10).snapshot().rewardAmount());
+                assertEquals(0, shard.marches().ownedSnapshot(70, 10).rewardAmount());
                 SceneMarchSnapshot strong = shard.marches().start(71, 10, new ScenePoint(1, 2), 99,
-                        new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100, now);
+                        new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100, now, "game1001");
                 shard.marches().tick(strong.arrivalAtMillis());
-                assertTrue(shard.marches().requireOwned(71, 10).snapshot().victory());
-                assertEquals(100, shard.marches().requireOwned(71, 10).snapshot().rewardAmount());
+                assertTrue(shard.marches().ownedSnapshot(71, 10).victory());
+                assertEquals(100, shard.marches().ownedSnapshot(71, 10).rewardAmount());
                 assertThrows(IllegalArgumentException.class, () -> shard.marches().start(72, 10,
-                        new ScenePoint(1, 2), 99, new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100, now));
+                        new ScenePoint(1, 2), 99, new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100, now, "game1001"));
                 return null;
             }).get(2, TimeUnit.SECONDS);
         }
@@ -87,6 +112,7 @@ public class SceneMarchGameplayTest {
             map.set(x, y, SceneTerrainType.PLAIN, 0, SceneTileFlags.WALKABLE, 0);
         }
         map.loadRegionIds(regions);
+        map.loadSpawnRegions(Set.of(101));
         map.loadRegionDefinitions(List.of(101, 202));
         scene.configureRegions();
         assertNotSame(scene.route(10, 2), scene.route(11, 2));

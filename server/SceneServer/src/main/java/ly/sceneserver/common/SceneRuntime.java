@@ -16,6 +16,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.Consumer;
+import java.util.function.LongSupplier;
+import java.time.LocalDateTime;
+import ly.sceneserver.common.persistence.PlayerSceneProjection;
 import java.util.function.Supplier;
 
 import ly.LoggerDef;
@@ -160,6 +163,7 @@ public final class SceneRuntime implements AutoCloseable {
     public final class SceneInstance {
         private final SceneConfig config;
         private final SceneStaticMap staticMap;
+        private final Map<Long, ScenePoint> cities = new ConcurrentHashMap<>();
         private final SceneAoiService aoi = new SceneAoiService(this);
         public SceneAoiService aoi() { return aoi; }
         private final SceneRegionDirectory regionDirectory;
@@ -542,11 +546,46 @@ public final class SceneRuntime implements AutoCloseable {
             return returnedOnTick;
         }
 
+        public ScenePoint cityPoint(long playerId) {
+            ScenePoint city = cities.get(playerId);
+            if (city == null) throw new IllegalArgumentException("玩家没有主城");
+            return city;
+        }
+
+        public ScenePoint ensureCity(long playerId, LongSupplier ids,
+                Consumer<PlayerSceneProjection> save) {
+            return cities.computeIfAbsent(playerId, owner -> {
+                int cells = staticMap.cellCount();
+                int start = Math.floorMod(Long.hashCode(owner), cells);
+                for (int offset = 0; offset < cells; offset++) {
+                    int index = (start + offset) % cells;
+                    ScenePoint point = new ScenePoint(index % config.width(), index / config.width());
+                    if (!staticMap.canPlaceCity(point.x(), point.y())) continue;
+                    PlayerSceneProjection city = route(point.x(), point.y()).query(shard -> {
+                        if (!shard.objectsAt(point.x(), point.y()).isEmpty()) return null;
+                        PlayerSceneProjection projection = new PlayerSceneProjection(owner,
+                                config.sceneId(), ids.getAsLong(), 0, point, 1, 1, new BitSet(), 1, 1,
+                                false, LocalDateTime.now());
+                        shard.addObject(new SceneObject(projection.cityObjectId(), SceneObjectType.BUILDING,
+                                owner, point.x(), point.y(), projection));
+                        return projection;
+                    }).join();
+                    if (city != null) {
+                        save.accept(city);
+                        return point;
+                    }
+                }
+                throw new IllegalStateException("地图没有可用的主城出生格");
+            });
+        }
+
         /** 启动前加载假数据或地图快照时使用，运行中业务必须通过 submit。 */
         public void seedObject(SceneObject object) {
             if (started) {
                 throw new IllegalStateException("cannot seed scene object after runtime started");
             }
+            if (object.state() instanceof PlayerSceneProjection city)
+                cities.put(city.playerId(), city.cityPoint());
             if (object.type() == SceneObjectType.MARCH && object.state() instanceof ly.sceneserver.common.march.SceneMarchState march) {
                 ScenePoint target = march.snapshot().target().point();
                 route(target.x(), target.y()).addMarch(march);

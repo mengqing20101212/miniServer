@@ -25,6 +25,7 @@ public final class SceneStaticMap {
     private long modificationVersion;
     private int[] regionIds;
     private java.util.List<Integer> regionDefinitions = java.util.List.of();
+    private java.util.Set<Integer> spawnRegions = java.util.Set.of();
     /** SceneRuntime 启动前置为 true；冻结后只能通过动态对象/阻挡快照表达变化。 */
     private boolean frozen;
 
@@ -54,6 +55,16 @@ public final class SceneStaticMap {
 
     public int regionId(int x, int y) {
         return regionIds == null ? 0 : regionIds[index(x, y)];
+    }
+
+    public void loadSpawnRegions(java.util.Set<Integer> ids) {
+        requireMutable();
+        spawnRegions = java.util.Set.copyOf(ids);
+    }
+
+    public boolean canPlaceCity(int x, int y) {
+        return SceneTileFlags.isWalkable(flags(x, y))
+                && (regionIds == null || spawnRegions.contains(regionId(x, y)));
     }
 
     public int width() {

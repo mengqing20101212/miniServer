@@ -22,20 +22,20 @@ public class SceneAoiRoutePushTest {
             SlgWorldObjectConfig rule = new SlgWorldObjectConfig(2, "MONSTER", 1, 0, 100, 100, 0, 1);
             scene.seedObject(new SceneObject(99, SceneObjectType.MONSTER, 0, 22, 2,
                     new SceneWorldObjectState(1, 2, 0, 1, 0, 100, 0, 0, 0, new byte[0])));
-            scene.shard(1).marches().configure(() -> Map.of(2, rule), object -> {});
+            scene.shard(1).marches().configure(() -> Map.of(2, rule), object -> {}, ignored -> {});
             scene.shard(1).marches().onChanged(scene.aoi()::marchChanged);
             BlockingQueue<SceneViewSnapshot> changes = new LinkedBlockingQueue<>();
             scene.aoi().subscribe(new SceneViewRequest(20, new ScenePoint(9, 2), 1, SceneViewLevel.DETAIL, 0), changes::add);
             runtime.start();
             SceneMarchSnapshot march = scene.shard(1).query(shard -> shard.marches().start(77, 10,
                     new ScenePoint(1, 2), 99, new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100,
-                    System.currentTimeMillis())).get();
+                    System.currentTimeMillis(), "game1001")).get();
             SceneViewSnapshot visible = changes.poll(2, TimeUnit.SECONDS);
             assertNotNull(visible);
             assertTrue(visible.objects().stream().anyMatch(object -> object.objectId() == 77));
             scene.shard(1).submit(shard -> {
                 shard.marches().tick(march.arrivalAtMillis());
-                shard.marches().tick(shard.marches().requireOwned(77, 10).snapshot().arrivalAtMillis());
+                shard.marches().tick(shard.marches().ownedSnapshot(77, 10).arrivalAtMillis());
             }).get();
             SceneViewSnapshot removed = null;
             long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(2);

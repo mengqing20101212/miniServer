@@ -7064,6 +7064,18 @@ public final class Scene {
      * @return The victory.
      */
     boolean getVictory();
+
+    /**
+     * <code>string game_server_id = 22;</code>
+     * @return The gameServerId.
+     */
+    java.lang.String getGameServerId();
+    /**
+     * <code>string game_server_id = 22;</code>
+     * @return The bytes for gameServerId.
+     */
+    com.google.protobuf.ByteString
+        getGameServerIdBytes();
   }
   /**
    * <pre>
@@ -7085,6 +7097,7 @@ public final class Scene {
       type_ = 0;
       status_ = 0;
       path_ = java.util.Collections.emptyList();
+      gameServerId_ = "";
     }
 
     @java.lang.Override
@@ -7517,6 +7530,45 @@ public final class Scene {
       return victory_;
     }
 
+    public static final int GAME_SERVER_ID_FIELD_NUMBER = 22;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object gameServerId_ = "";
+    /**
+     * <code>string game_server_id = 22;</code>
+     * @return The gameServerId.
+     */
+    @java.lang.Override
+    public java.lang.String getGameServerId() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        gameServerId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string game_server_id = 22;</code>
+     * @return The bytes for gameServerId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getGameServerIdBytes() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        gameServerId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -7593,6 +7645,9 @@ public final class Scene {
       }
       if (victory_ != false) {
         output.writeBool(21, victory_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 22, gameServerId_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -7687,6 +7742,9 @@ public final class Scene {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(21, victory_);
       }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(22, gameServerId_);
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -7748,6 +7806,8 @@ public final class Scene {
           != other.getGatherEndAtMillis()) return false;
       if (getVictory()
           != other.getVictory()) return false;
+      if (!getGameServerId()
+          .equals(other.getGameServerId())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -7818,6 +7878,8 @@ public final class Scene {
       hash = (37 * hash) + VICTORY_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getVictory());
+      hash = (37 * hash) + GAME_SERVER_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getGameServerId().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -7996,6 +8058,7 @@ public final class Scene {
         rewardAmount_ = 0L;
         gatherEndAtMillis_ = 0L;
         victory_ = false;
+        gameServerId_ = "";
         return this;
       }
 
@@ -8108,6 +8171,9 @@ public final class Scene {
         }
         if (((from_bitField0_ & 0x00100000) != 0)) {
           result.victory_ = victory_;
+        }
+        if (((from_bitField0_ & 0x00200000) != 0)) {
+          result.gameServerId_ = gameServerId_;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -8241,6 +8307,11 @@ public final class Scene {
         }
         if (other.getVictory() != false) {
           setVictory(other.getVictory());
+        }
+        if (!other.getGameServerId().isEmpty()) {
+          gameServerId_ = other.gameServerId_;
+          bitField0_ |= 0x00200000;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -8385,6 +8456,11 @@ public final class Scene {
                 bitField0_ |= 0x00100000;
                 break;
               } // case 168
+              case 178: {
+                gameServerId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00200000;
+                break;
+              } // case 178
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -9814,6 +9890,78 @@ public final class Scene {
       public Builder clearVictory() {
         bitField0_ = (bitField0_ & ~0x00100000);
         victory_ = false;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object gameServerId_ = "";
+      /**
+       * <code>string game_server_id = 22;</code>
+       * @return The gameServerId.
+       */
+      public java.lang.String getGameServerId() {
+        java.lang.Object ref = gameServerId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          gameServerId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string game_server_id = 22;</code>
+       * @return The bytes for gameServerId.
+       */
+      public com.google.protobuf.ByteString
+          getGameServerIdBytes() {
+        java.lang.Object ref = gameServerId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          gameServerId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string game_server_id = 22;</code>
+       * @param value The gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        gameServerId_ = value;
+        bitField0_ |= 0x00200000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string game_server_id = 22;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearGameServerId() {
+        gameServerId_ = getDefaultInstance().getGameServerId();
+        bitField0_ = (bitField0_ & ~0x00200000);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string game_server_id = 22;</code>
+       * @param value The bytes for gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        gameServerId_ = value;
+        bitField0_ |= 0x00200000;
         onChanged();
         return this;
       }
@@ -22647,6 +22795,21 @@ public final class Scene {
      * @return The requestId.
      */
     long getRequestId();
+
+    /**
+     * <code>.ScenePoint city_point = 6;</code>
+     * @return Whether the cityPoint field is set.
+     */
+    boolean hasCityPoint();
+    /**
+     * <code>.ScenePoint city_point = 6;</code>
+     * @return The cityPoint.
+     */
+    ly.proto.Scene.ScenePoint getCityPoint();
+    /**
+     * <code>.ScenePoint city_point = 6;</code>
+     */
+    ly.proto.Scene.ScenePointOrBuilder getCityPointOrBuilder();
   }
   /**
    * <pre>
@@ -22831,6 +22994,32 @@ public final class Scene {
       return requestId_;
     }
 
+    public static final int CITY_POINT_FIELD_NUMBER = 6;
+    private ly.proto.Scene.ScenePoint cityPoint_;
+    /**
+     * <code>.ScenePoint city_point = 6;</code>
+     * @return Whether the cityPoint field is set.
+     */
+    @java.lang.Override
+    public boolean hasCityPoint() {
+      return ((bitField0_ & 0x00000002) != 0);
+    }
+    /**
+     * <code>.ScenePoint city_point = 6;</code>
+     * @return The cityPoint.
+     */
+    @java.lang.Override
+    public ly.proto.Scene.ScenePoint getCityPoint() {
+      return cityPoint_ == null ? ly.proto.Scene.ScenePoint.getDefaultInstance() : cityPoint_;
+    }
+    /**
+     * <code>.ScenePoint city_point = 6;</code>
+     */
+    @java.lang.Override
+    public ly.proto.Scene.ScenePointOrBuilder getCityPointOrBuilder() {
+      return cityPoint_ == null ? ly.proto.Scene.ScenePoint.getDefaultInstance() : cityPoint_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -22860,6 +23049,9 @@ public final class Scene {
       if (requestId_ != 0L) {
         output.writeInt64(5, requestId_);
       }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        output.writeMessage(6, getCityPoint());
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -22888,6 +23080,10 @@ public final class Scene {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(5, requestId_);
       }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(6, getCityPoint());
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -22915,6 +23111,11 @@ public final class Scene {
       }
       if (getRequestId()
           != other.getRequestId()) return false;
+      if (hasCityPoint() != other.hasCityPoint()) return false;
+      if (hasCityPoint()) {
+        if (!getCityPoint()
+            .equals(other.getCityPoint())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -22939,6 +23140,10 @@ public final class Scene {
       hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getRequestId());
+      if (hasCityPoint()) {
+        hash = (37 * hash) + CITY_POINT_FIELD_NUMBER;
+        hash = (53 * hash) + getCityPoint().hashCode();
+      }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -23074,6 +23279,7 @@ public final class Scene {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
           getCurrentPointFieldBuilder();
+          getCityPointFieldBuilder();
         }
       }
       @java.lang.Override
@@ -23089,6 +23295,11 @@ public final class Scene {
           currentPointBuilder_ = null;
         }
         requestId_ = 0L;
+        cityPoint_ = null;
+        if (cityPointBuilder_ != null) {
+          cityPointBuilder_.dispose();
+          cityPointBuilder_ = null;
+        }
         return this;
       }
 
@@ -23140,6 +23351,12 @@ public final class Scene {
         }
         if (((from_bitField0_ & 0x00000010) != 0)) {
           result.requestId_ = requestId_;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.cityPoint_ = cityPointBuilder_ == null
+              ? cityPoint_
+              : cityPointBuilder_.build();
+          to_bitField0_ |= 0x00000002;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -23205,6 +23422,9 @@ public final class Scene {
         if (other.getRequestId() != 0L) {
           setRequestId(other.getRequestId());
         }
+        if (other.hasCityPoint()) {
+          mergeCityPoint(other.getCityPoint());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -23258,6 +23478,13 @@ public final class Scene {
                 bitField0_ |= 0x00000010;
                 break;
               } // case 40
+              case 50: {
+                input.readMessage(
+                    getCityPointFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000020;
+                break;
+              } // case 50
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -23683,6 +23910,127 @@ public final class Scene {
         requestId_ = 0L;
         onChanged();
         return this;
+      }
+
+      private ly.proto.Scene.ScenePoint cityPoint_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          ly.proto.Scene.ScenePoint, ly.proto.Scene.ScenePoint.Builder, ly.proto.Scene.ScenePointOrBuilder> cityPointBuilder_;
+      /**
+       * <code>.ScenePoint city_point = 6;</code>
+       * @return Whether the cityPoint field is set.
+       */
+      public boolean hasCityPoint() {
+        return ((bitField0_ & 0x00000020) != 0);
+      }
+      /**
+       * <code>.ScenePoint city_point = 6;</code>
+       * @return The cityPoint.
+       */
+      public ly.proto.Scene.ScenePoint getCityPoint() {
+        if (cityPointBuilder_ == null) {
+          return cityPoint_ == null ? ly.proto.Scene.ScenePoint.getDefaultInstance() : cityPoint_;
+        } else {
+          return cityPointBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.ScenePoint city_point = 6;</code>
+       */
+      public Builder setCityPoint(ly.proto.Scene.ScenePoint value) {
+        if (cityPointBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          cityPoint_ = value;
+        } else {
+          cityPointBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.ScenePoint city_point = 6;</code>
+       */
+      public Builder setCityPoint(
+          ly.proto.Scene.ScenePoint.Builder builderForValue) {
+        if (cityPointBuilder_ == null) {
+          cityPoint_ = builderForValue.build();
+        } else {
+          cityPointBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.ScenePoint city_point = 6;</code>
+       */
+      public Builder mergeCityPoint(ly.proto.Scene.ScenePoint value) {
+        if (cityPointBuilder_ == null) {
+          if (((bitField0_ & 0x00000020) != 0) &&
+            cityPoint_ != null &&
+            cityPoint_ != ly.proto.Scene.ScenePoint.getDefaultInstance()) {
+            getCityPointBuilder().mergeFrom(value);
+          } else {
+            cityPoint_ = value;
+          }
+        } else {
+          cityPointBuilder_.mergeFrom(value);
+        }
+        if (cityPoint_ != null) {
+          bitField0_ |= 0x00000020;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.ScenePoint city_point = 6;</code>
+       */
+      public Builder clearCityPoint() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        cityPoint_ = null;
+        if (cityPointBuilder_ != null) {
+          cityPointBuilder_.dispose();
+          cityPointBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.ScenePoint city_point = 6;</code>
+       */
+      public ly.proto.Scene.ScenePoint.Builder getCityPointBuilder() {
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return getCityPointFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.ScenePoint city_point = 6;</code>
+       */
+      public ly.proto.Scene.ScenePointOrBuilder getCityPointOrBuilder() {
+        if (cityPointBuilder_ != null) {
+          return cityPointBuilder_.getMessageOrBuilder();
+        } else {
+          return cityPoint_ == null ?
+              ly.proto.Scene.ScenePoint.getDefaultInstance() : cityPoint_;
+        }
+      }
+      /**
+       * <code>.ScenePoint city_point = 6;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          ly.proto.Scene.ScenePoint, ly.proto.Scene.ScenePoint.Builder, ly.proto.Scene.ScenePointOrBuilder> 
+          getCityPointFieldBuilder() {
+        if (cityPointBuilder_ == null) {
+          cityPointBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              ly.proto.Scene.ScenePoint, ly.proto.Scene.ScenePoint.Builder, ly.proto.Scene.ScenePointOrBuilder>(
+                  getCityPoint(),
+                  getParentForChildren(),
+                  isClean());
+          cityPoint_ = null;
+        }
+        return cityPointBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -37643,6 +37991,18 @@ public final class Scene {
      * @return The marchId.
      */
     long getMarchId();
+
+    /**
+     * <code>string game_server_id = 12;</code>
+     * @return The gameServerId.
+     */
+    java.lang.String getGameServerId();
+    /**
+     * <code>string game_server_id = 12;</code>
+     * @return The bytes for gameServerId.
+     */
+    com.google.protobuf.ByteString
+        getGameServerIdBytes();
   }
   /**
    * <pre>
@@ -37664,6 +38024,7 @@ public final class Scene {
       sceneId_ = "";
       scope_ = 0;
       type_ = 0;
+      gameServerId_ = "";
     }
 
     @java.lang.Override
@@ -37880,6 +38241,45 @@ public final class Scene {
       return marchId_;
     }
 
+    public static final int GAME_SERVER_ID_FIELD_NUMBER = 12;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object gameServerId_ = "";
+    /**
+     * <code>string game_server_id = 12;</code>
+     * @return The gameServerId.
+     */
+    @java.lang.Override
+    public java.lang.String getGameServerId() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        gameServerId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string game_server_id = 12;</code>
+     * @return The bytes for gameServerId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getGameServerIdBytes() {
+      java.lang.Object ref = gameServerId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        gameServerId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -37926,6 +38326,9 @@ public final class Scene {
       }
       if (marchId_ != 0L) {
         output.writeInt64(11, marchId_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 12, gameServerId_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -37979,6 +38382,9 @@ public final class Scene {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(11, marchId_);
       }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(gameServerId_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(12, gameServerId_);
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -38020,6 +38426,8 @@ public final class Scene {
           != other.getPower()) return false;
       if (getMarchId()
           != other.getMarchId()) return false;
+      if (!getGameServerId()
+          .equals(other.getGameServerId())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -38062,6 +38470,8 @@ public final class Scene {
       hash = (37 * hash) + MARCH_ID_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getMarchId());
+      hash = (37 * hash) + GAME_SERVER_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getGameServerId().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -38223,6 +38633,7 @@ public final class Scene {
         troopCount_ = 0;
         power_ = 0L;
         marchId_ = 0L;
+        gameServerId_ = "";
         return this;
       }
 
@@ -38295,6 +38706,9 @@ public final class Scene {
         }
         if (((from_bitField0_ & 0x00000400) != 0)) {
           result.marchId_ = marchId_;
+        }
+        if (((from_bitField0_ & 0x00000800) != 0)) {
+          result.gameServerId_ = gameServerId_;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -38377,6 +38791,11 @@ public final class Scene {
         }
         if (other.getMarchId() != 0L) {
           setMarchId(other.getMarchId());
+        }
+        if (!other.getGameServerId().isEmpty()) {
+          gameServerId_ = other.gameServerId_;
+          bitField0_ |= 0x00000800;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -38463,6 +38882,11 @@ public final class Scene {
                 bitField0_ |= 0x00000400;
                 break;
               } // case 88
+              case 98: {
+                gameServerId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000800;
+                break;
+              } // case 98
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -39091,6 +39515,78 @@ public final class Scene {
         onChanged();
         return this;
       }
+
+      private java.lang.Object gameServerId_ = "";
+      /**
+       * <code>string game_server_id = 12;</code>
+       * @return The gameServerId.
+       */
+      public java.lang.String getGameServerId() {
+        java.lang.Object ref = gameServerId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          gameServerId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string game_server_id = 12;</code>
+       * @return The bytes for gameServerId.
+       */
+      public com.google.protobuf.ByteString
+          getGameServerIdBytes() {
+        java.lang.Object ref = gameServerId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          gameServerId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string game_server_id = 12;</code>
+       * @param value The gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        gameServerId_ = value;
+        bitField0_ |= 0x00000800;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string game_server_id = 12;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearGameServerId() {
+        gameServerId_ = getDefaultInstance().getGameServerId();
+        bitField0_ = (bitField0_ & ~0x00000800);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string game_server_id = 12;</code>
+       * @param value The bytes for gameServerId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGameServerIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        gameServerId_ = value;
+        bitField0_ |= 0x00000800;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -39150,6 +39646,1033 @@ public final class Scene {
 
     @java.lang.Override
     public ly.proto.Scene.csSceneMarchStart getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface csSceneMarchHomeOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:csSceneMarchHome)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>int64 march_id = 1;</code>
+     * @return The marchId.
+     */
+    long getMarchId();
+
+    /**
+     * <code>int32 resource_id = 2;</code>
+     * @return The resourceId.
+     */
+    int getResourceId();
+
+    /**
+     * <code>int64 reward_amount = 3;</code>
+     * @return The rewardAmount.
+     */
+    long getRewardAmount();
+  }
+  /**
+   * <pre>
+   * Scene 在到家时发给 Game，玩家由内部 RPC 信封指定。
+   * </pre>
+   *
+   * Protobuf type {@code csSceneMarchHome}
+   */
+  public static final class csSceneMarchHome extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:csSceneMarchHome)
+      csSceneMarchHomeOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use csSceneMarchHome.newBuilder() to construct.
+    private csSceneMarchHome(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private csSceneMarchHome() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new csSceneMarchHome();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return ly.proto.Scene.internal_static_csSceneMarchHome_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return ly.proto.Scene.internal_static_csSceneMarchHome_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              ly.proto.Scene.csSceneMarchHome.class, ly.proto.Scene.csSceneMarchHome.Builder.class);
+    }
+
+    public static final int MARCH_ID_FIELD_NUMBER = 1;
+    private long marchId_ = 0L;
+    /**
+     * <code>int64 march_id = 1;</code>
+     * @return The marchId.
+     */
+    @java.lang.Override
+    public long getMarchId() {
+      return marchId_;
+    }
+
+    public static final int RESOURCE_ID_FIELD_NUMBER = 2;
+    private int resourceId_ = 0;
+    /**
+     * <code>int32 resource_id = 2;</code>
+     * @return The resourceId.
+     */
+    @java.lang.Override
+    public int getResourceId() {
+      return resourceId_;
+    }
+
+    public static final int REWARD_AMOUNT_FIELD_NUMBER = 3;
+    private long rewardAmount_ = 0L;
+    /**
+     * <code>int64 reward_amount = 3;</code>
+     * @return The rewardAmount.
+     */
+    @java.lang.Override
+    public long getRewardAmount() {
+      return rewardAmount_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (marchId_ != 0L) {
+        output.writeInt64(1, marchId_);
+      }
+      if (resourceId_ != 0) {
+        output.writeInt32(2, resourceId_);
+      }
+      if (rewardAmount_ != 0L) {
+        output.writeInt64(3, rewardAmount_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (marchId_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(1, marchId_);
+      }
+      if (resourceId_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, resourceId_);
+      }
+      if (rewardAmount_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(3, rewardAmount_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof ly.proto.Scene.csSceneMarchHome)) {
+        return super.equals(obj);
+      }
+      ly.proto.Scene.csSceneMarchHome other = (ly.proto.Scene.csSceneMarchHome) obj;
+
+      if (getMarchId()
+          != other.getMarchId()) return false;
+      if (getResourceId()
+          != other.getResourceId()) return false;
+      if (getRewardAmount()
+          != other.getRewardAmount()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + MARCH_ID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getMarchId());
+      hash = (37 * hash) + RESOURCE_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getResourceId();
+      hash = (37 * hash) + REWARD_AMOUNT_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getRewardAmount());
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static ly.proto.Scene.csSceneMarchHome parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Scene.csSceneMarchHome parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Scene.csSceneMarchHome parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Scene.csSceneMarchHome parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Scene.csSceneMarchHome parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Scene.csSceneMarchHome parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Scene.csSceneMarchHome parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Scene.csSceneMarchHome parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static ly.proto.Scene.csSceneMarchHome parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static ly.proto.Scene.csSceneMarchHome parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static ly.proto.Scene.csSceneMarchHome parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Scene.csSceneMarchHome parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(ly.proto.Scene.csSceneMarchHome prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Scene 在到家时发给 Game，玩家由内部 RPC 信封指定。
+     * </pre>
+     *
+     * Protobuf type {@code csSceneMarchHome}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:csSceneMarchHome)
+        ly.proto.Scene.csSceneMarchHomeOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return ly.proto.Scene.internal_static_csSceneMarchHome_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return ly.proto.Scene.internal_static_csSceneMarchHome_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                ly.proto.Scene.csSceneMarchHome.class, ly.proto.Scene.csSceneMarchHome.Builder.class);
+      }
+
+      // Construct using ly.proto.Scene.csSceneMarchHome.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        marchId_ = 0L;
+        resourceId_ = 0;
+        rewardAmount_ = 0L;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return ly.proto.Scene.internal_static_csSceneMarchHome_descriptor;
+      }
+
+      @java.lang.Override
+      public ly.proto.Scene.csSceneMarchHome getDefaultInstanceForType() {
+        return ly.proto.Scene.csSceneMarchHome.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public ly.proto.Scene.csSceneMarchHome build() {
+        ly.proto.Scene.csSceneMarchHome result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public ly.proto.Scene.csSceneMarchHome buildPartial() {
+        ly.proto.Scene.csSceneMarchHome result = new ly.proto.Scene.csSceneMarchHome(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(ly.proto.Scene.csSceneMarchHome result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.marchId_ = marchId_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.resourceId_ = resourceId_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.rewardAmount_ = rewardAmount_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof ly.proto.Scene.csSceneMarchHome) {
+          return mergeFrom((ly.proto.Scene.csSceneMarchHome)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(ly.proto.Scene.csSceneMarchHome other) {
+        if (other == ly.proto.Scene.csSceneMarchHome.getDefaultInstance()) return this;
+        if (other.getMarchId() != 0L) {
+          setMarchId(other.getMarchId());
+        }
+        if (other.getResourceId() != 0) {
+          setResourceId(other.getResourceId());
+        }
+        if (other.getRewardAmount() != 0L) {
+          setRewardAmount(other.getRewardAmount());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                marchId_ = input.readInt64();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 16: {
+                resourceId_ = input.readInt32();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 24: {
+                rewardAmount_ = input.readInt64();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private long marchId_ ;
+      /**
+       * <code>int64 march_id = 1;</code>
+       * @return The marchId.
+       */
+      @java.lang.Override
+      public long getMarchId() {
+        return marchId_;
+      }
+      /**
+       * <code>int64 march_id = 1;</code>
+       * @param value The marchId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMarchId(long value) {
+
+        marchId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 march_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMarchId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        marchId_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private int resourceId_ ;
+      /**
+       * <code>int32 resource_id = 2;</code>
+       * @return The resourceId.
+       */
+      @java.lang.Override
+      public int getResourceId() {
+        return resourceId_;
+      }
+      /**
+       * <code>int32 resource_id = 2;</code>
+       * @param value The resourceId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setResourceId(int value) {
+
+        resourceId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 resource_id = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearResourceId() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        resourceId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private long rewardAmount_ ;
+      /**
+       * <code>int64 reward_amount = 3;</code>
+       * @return The rewardAmount.
+       */
+      @java.lang.Override
+      public long getRewardAmount() {
+        return rewardAmount_;
+      }
+      /**
+       * <code>int64 reward_amount = 3;</code>
+       * @param value The rewardAmount to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRewardAmount(long value) {
+
+        rewardAmount_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 reward_amount = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRewardAmount() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        rewardAmount_ = 0L;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:csSceneMarchHome)
+    }
+
+    // @@protoc_insertion_point(class_scope:csSceneMarchHome)
+    private static final ly.proto.Scene.csSceneMarchHome DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new ly.proto.Scene.csSceneMarchHome();
+    }
+
+    public static ly.proto.Scene.csSceneMarchHome getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<csSceneMarchHome>
+        PARSER = new com.google.protobuf.AbstractParser<csSceneMarchHome>() {
+      @java.lang.Override
+      public csSceneMarchHome parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<csSceneMarchHome> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<csSceneMarchHome> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public ly.proto.Scene.csSceneMarchHome getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface scSceneMarchHomeOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:scSceneMarchHome)
+      com.google.protobuf.MessageOrBuilder {
+  }
+  /**
+   * Protobuf type {@code scSceneMarchHome}
+   */
+  public static final class scSceneMarchHome extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:scSceneMarchHome)
+      scSceneMarchHomeOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use scSceneMarchHome.newBuilder() to construct.
+    private scSceneMarchHome(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private scSceneMarchHome() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new scSceneMarchHome();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return ly.proto.Scene.internal_static_scSceneMarchHome_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return ly.proto.Scene.internal_static_scSceneMarchHome_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              ly.proto.Scene.scSceneMarchHome.class, ly.proto.Scene.scSceneMarchHome.Builder.class);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof ly.proto.Scene.scSceneMarchHome)) {
+        return super.equals(obj);
+      }
+      ly.proto.Scene.scSceneMarchHome other = (ly.proto.Scene.scSceneMarchHome) obj;
+
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static ly.proto.Scene.scSceneMarchHome parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Scene.scSceneMarchHome parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Scene.scSceneMarchHome parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Scene.scSceneMarchHome parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Scene.scSceneMarchHome parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ly.proto.Scene.scSceneMarchHome parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ly.proto.Scene.scSceneMarchHome parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Scene.scSceneMarchHome parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static ly.proto.Scene.scSceneMarchHome parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static ly.proto.Scene.scSceneMarchHome parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static ly.proto.Scene.scSceneMarchHome parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static ly.proto.Scene.scSceneMarchHome parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(ly.proto.Scene.scSceneMarchHome prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code scSceneMarchHome}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:scSceneMarchHome)
+        ly.proto.Scene.scSceneMarchHomeOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return ly.proto.Scene.internal_static_scSceneMarchHome_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return ly.proto.Scene.internal_static_scSceneMarchHome_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                ly.proto.Scene.scSceneMarchHome.class, ly.proto.Scene.scSceneMarchHome.Builder.class);
+      }
+
+      // Construct using ly.proto.Scene.scSceneMarchHome.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return ly.proto.Scene.internal_static_scSceneMarchHome_descriptor;
+      }
+
+      @java.lang.Override
+      public ly.proto.Scene.scSceneMarchHome getDefaultInstanceForType() {
+        return ly.proto.Scene.scSceneMarchHome.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public ly.proto.Scene.scSceneMarchHome build() {
+        ly.proto.Scene.scSceneMarchHome result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public ly.proto.Scene.scSceneMarchHome buildPartial() {
+        ly.proto.Scene.scSceneMarchHome result = new ly.proto.Scene.scSceneMarchHome(this);
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof ly.proto.Scene.scSceneMarchHome) {
+          return mergeFrom((ly.proto.Scene.scSceneMarchHome)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(ly.proto.Scene.scSceneMarchHome other) {
+        if (other == ly.proto.Scene.scSceneMarchHome.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:scSceneMarchHome)
+    }
+
+    // @@protoc_insertion_point(class_scope:scSceneMarchHome)
+    private static final ly.proto.Scene.scSceneMarchHome DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new ly.proto.Scene.scSceneMarchHome();
+    }
+
+    public static ly.proto.Scene.scSceneMarchHome getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<scSceneMarchHome>
+        PARSER = new com.google.protobuf.AbstractParser<scSceneMarchHome>() {
+      @java.lang.Override
+      public scSceneMarchHome parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<scSceneMarchHome> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<scSceneMarchHome> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public ly.proto.Scene.scSceneMarchHome getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -42000,7 +43523,7 @@ public final class Scene {
   }
   /**
    * <pre>
-   * 完整可见快照替换，用于资源、怪物和行军变化推送；资产领取仍查询权威行军结果。
+   * 完整可见快照替换，用于资源、怪物和行军变化推送。
    * </pre>
    *
    * Protobuf type {@code scSceneChanged}
@@ -42228,7 +43751,7 @@ public final class Scene {
     }
     /**
      * <pre>
-     * 完整可见快照替换，用于资源、怪物和行军变化推送；资产领取仍查询权威行军结果。
+     * 完整可见快照替换，用于资源、怪物和行军变化推送。
      * </pre>
      *
      * Protobuf type {@code scSceneChanged}
@@ -42730,6 +44253,16 @@ public final class Scene {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_csSceneMarchStart_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_csSceneMarchHome_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_csSceneMarchHome_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_scSceneMarchHome_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_scSceneMarchHome_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_scSceneMarchStart_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -42776,7 +44309,7 @@ public final class Scene {
       "eneMarchTarget\022\021\n\ttarget_id\030\001 \001(\003\022\036\n\004typ" +
       "e\030\002 \001(\0162\020.SceneTargetType\022\032\n\005point\030\003 \001(\013" +
       "2\013.ScenePoint\022\020\n\010tag_mask\030\004 \001(\004\022\026\n\016targe" +
-      "t_version\030\005 \001(\003\"\233\004\n\022SceneMarchSnapshot\022\020" +
+      "t_version\030\005 \001(\003\"\263\004\n\022SceneMarchSnapshot\022\020" +
       "\n\010march_id\030\001 \001(\003\022\027\n\017owner_player_id\030\002 \001(" +
       "\003\022\023\n\013alliance_id\030\003 \001(\003\022\035\n\004type\030\004 \001(\0162\017.S" +
       "ceneMarchType\022\020\n\010tag_mask\030\005 \001(\004\022!\n\006statu" +
@@ -42789,160 +44322,164 @@ public final class Scene {
       "l_at_millis\030\017 \001(\003\022\025\n\rstate_version\030\020 \001(\005" +
       "\022\030\n\020target_region_id\030\021 \001(\005\022\023\n\013resource_i" +
       "d\030\022 \001(\005\022\025\n\rreward_amount\030\023 \001(\003\022\034\n\024gather" +
-      "_end_at_millis\030\024 \001(\003\022\017\n\007victory\030\025 \001(\010\"\305\001" +
-      "\n\030SceneRallyMemberSnapshot\022\021\n\tplayer_id\030" +
-      "\001 \001(\003\022\020\n\010march_id\030\002 \001(\003\022\023\n\013troop_count\030\003" +
-      " \001(\005\022\r\n\005power\030\004 \001(\003\022\035\n\025army_snapshot_ver" +
-      "sion\030\005 \001(\003\022\'\n\006status\030\006 \001(\0162\027.SceneRallyM" +
-      "emberStatus\022\030\n\020remaining_troops\030\007 \001(\005\"\373\002" +
-      "\n\022SceneRallySnapshot\022\020\n\010rally_id\030\001 \001(\003\022\030" +
-      "\n\020leader_player_id\030\002 \001(\003\022\023\n\013alliance_id\030" +
-      "\003 \001(\003\022#\n\016assembly_point\030\004 \001(\0132\013.ScenePoi" +
-      "nt\022!\n\006target\030\005 \001(\0132\021.SceneMarchTarget\022\020\n" +
-      "\010capacity\030\006 \001(\005\022\027\n\017minimum_members\030\007 \001(\005" +
-      "\022\030\n\020launch_at_millis\030\010 \001(\003\022!\n\006status\030\t \001" +
-      "(\0162\021.SceneRallyStatus\022*\n\007members\030\n \003(\0132\031" +
-      ".SceneRallyMemberSnapshot\022 \n\030applied_bat" +
-      "tle_result_id\030\013 \001(\003\022\017\n\007victory\030\014 \001(\010\022\025\n\r" +
-      "state_version\030\r \001(\005\"\255\002\n\030SceneRallyLaunch" +
-      "Snapshot\022\020\n\010rally_id\030\001 \001(\003\022\030\n\020leader_pla" +
-      "yer_id\030\002 \001(\003\022\023\n\013alliance_id\030\003 \001(\003\022#\n\016ass" +
-      "embly_point\030\004 \001(\0132\013.ScenePoint\022!\n\006target" +
-      "\030\005 \001(\0132\021.SceneMarchTarget\022*\n\007members\030\006 \003" +
-      "(\0132\031.SceneRallyMemberSnapshot\022\024\n\014total_t" +
-      "roops\030\007 \001(\005\022\023\n\013total_power\030\010 \001(\003\022\032\n\022laun" +
-      "ched_at_millis\030\t \001(\003\022\025\n\rrally_version\030\n " +
-      "\001(\005\"K\n\034SceneRallyMemberBattleResult\022\021\n\tp" +
-      "layer_id\030\001 \001(\003\022\030\n\020remaining_troops\030\002 \001(\005" +
-      "\"\327\001\n\026SceneRallyBattleResult\022\030\n\020battle_re" +
-      "sult_id\030\001 \001(\003\022\020\n\010rally_id\030\002 \001(\003\022\021\n\ttarge" +
-      "t_id\030\003 \001(\003\022\026\n\016target_version\030\004 \001(\003\022\017\n\007vi" +
-      "ctory\030\005 \001(\010\022\036\n\026target_durability_loss\030\006 " +
-      "\001(\005\0225\n\016member_results\030\007 \003(\0132\035.SceneRally" +
-      "MemberBattleResult\"\235\001\n\022SceneBlockSnapsho" +
-      "t\022\023\n\013block_index\030\001 \001(\005\022 \n\013block_point\030\002 " +
-      "\001(\0132\013.ScenePoint\022\017\n\007visible\030\003 \001(\010\022\022\n\ndis" +
-      "covered\030\004 \001(\010\022\024\n\014object_count\030\005 \001(\005\022\025\n\rd" +
-      "ata_tag_mask\030\006 \001(\004\"h\n\014csSceneQuery\022\020\n\010sc" +
-      "ene_id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.SceneScope" +
-      "\022\032\n\005point\030\003 \001(\0132\013.ScenePoint\022\016\n\006radius\030\004" +
-      " \001(\005\"\255\001\n\014scSceneQuery\022\032\n\006result\030\001 \001(\0162\n." +
-      "ErrorCode\022\020\n\010scene_id\030\002 \001(\t\022\017\n\007terrain\030\003" +
-      " \001(\005\022\021\n\tconfig_id\030\004 \001(\005\022\r\n\005flags\030\005 \001(\005\022\025" +
-      "\n\rspawn_rule_id\030\006 \001(\005\022%\n\007objects\030\007 \003(\0132\024" +
-      ".SceneObjectSnapshot\"\177\n\014csSceneEnter\022\020\n\010" +
-      "scene_id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.SceneSco" +
-      "pe\022\021\n\tplayer_id\030\003 \001(\003\022\032\n\005point\030\004 \001(\0132\013.S" +
-      "cenePoint\022\022\n\nrequest_id\030\005 \001(\003\"\211\001\n\014scScen" +
-      "eEnter\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\020\n\010sc" +
-      "ene_id\030\002 \001(\t\022\023\n\013shard_index\030\003 \001(\005\022\"\n\rcur" +
-      "rent_point\030\004 \001(\0132\013.ScenePoint\022\022\n\nrequest" +
-      "_id\030\005 \001(\003\"\205\001\n\013csSceneMove\022\020\n\010scene_id\030\001 " +
-      "\001(\t\022\032\n\005scope\030\002 \001(\0162\013.SceneScope\022\021\n\tplaye" +
-      "r_id\030\003 \001(\003\022!\n\014target_point\030\004 \001(\0132\013.Scene" +
-      "Point\022\022\n\nrequest_id\030\005 \001(\003\"\210\001\n\013scSceneMov" +
-      "e\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene_i" +
-      "d\030\002 \001(\t\022\023\n\013shard_index\030\003 \001(\005\022\"\n\rcurrent_" +
-      "point\030\004 \001(\0132\013.ScenePoint\022\022\n\nrequest_id\030\005" +
-      " \001(\003\">\n\016csSceneMetrics\022\020\n\010scene_id\030\001 \001(\t" +
-      "\022\032\n\005scope\030\002 \001(\0162\013.SceneScope\"\316\001\n\016scScene" +
-      "Metrics\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\020\n\010s" +
-      "cene_id\030\002 \001(\t\022\r\n\005width\030\003 \001(\005\022\016\n\006height\030\004" +
-      " \001(\005\022\023\n\013shard_count\030\005 \001(\005\022\023\n\013tick_number" +
-      "\030\006 \001(\003\022\030\n\020last_tick_millis\030\007 \001(\003\022\024\n\014obje" +
-      "ct_count\030\010 \001(\005\022\025\n\ronline_target\030\t \001(\005\"c\n" +
-      "\014csSceneLeave\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope" +
-      "\030\002 \001(\0162\013.SceneScope\022\021\n\tplayer_id\030\003 \001(\003\022\022" +
-      "\n\nrequest_id\030\004 \001(\003\"c\n\014scSceneLeave\022\032\n\006re" +
-      "sult\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene_id\030\002 \001(\t" +
-      "\022\021\n\tplayer_id\030\003 \001(\003\022\022\n\nrequest_id\030\004 \001(\003\"" +
-      "\335\001\n\013csSceneView\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005sco" +
-      "pe\030\002 \001(\0162\013.SceneScope\022\021\n\tplayer_id\030\003 \001(\003" +
-      "\022!\n\014center_point\030\004 \001(\0132\013.ScenePoint\022\025\n\rr" +
-      "adius_blocks\030\005 \001(\005\022#\n\nview_level\030\006 \001(\0162\017" +
-      ".SceneViewLevel\022\032\n\022requested_tag_mask\030\007 " +
-      "\001(\004\022\022\n\nrequest_id\030\010 \001(\003\"\255\002\n\013scSceneView\022" +
-      "\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene_id\030" +
-      "\002 \001(\t\022\021\n\tplayer_id\030\003 \001(\003\022!\n\014center_block" +
-      "\030\004 \001(\0132\013.ScenePoint\022#\n\nview_level\030\005 \001(\0162" +
-      "\017.SceneViewLevel\022\023\n\013tick_number\030\006 \001(\003\022%\n" +
-      "\007objects\030\007 \003(\0132\024.SceneObjectSnapshot\022#\n\006" +
-      "blocks\030\010 \003(\0132\023.SceneBlockSnapshot\022 \n\030dis" +
-      "covered_block_indices\030\t \003(\005\022\022\n\nrequest_i" +
-      "d\030\n \001(\003\"\353\001\n\017csScenePathFind\022\020\n\010scene_id\030" +
-      "\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.SceneScope\022\021\n\tpla" +
-      "yer_id\030\003 \001(\003\022 \n\013start_point\030\004 \001(\0132\013.Scen" +
-      "ePoint\022!\n\014target_point\030\005 \001(\0132\013.ScenePoin" +
-      "t\022#\n\nfog_policy\030\006 \001(\0162\017.SceneFogPolicy\022\031" +
-      "\n\021max_visited_nodes\030\007 \001(\005\022\022\n\nrequest_id\030" +
-      "\010 \001(\003\"\263\001\n\017scScenePathFind\022\032\n\006result\030\001 \001(" +
-      "\0162\n.ErrorCode\022\020\n\010scene_id\030\002 \001(\t\022\022\n\nreque" +
-      "st_id\030\003 \001(\003\022\033\n\006points\030\004 \003(\0132\013.ScenePoint" +
-      "\022\022\n\ntotal_cost\030\005 \001(\005\022\025\n\rvisited_nodes\030\006 " +
-      "\001(\005\022\026\n\016completed_tick\030\007 \001(\003\"\220\002\n\021csSceneM" +
-      "archStart\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope\030\002 \001" +
-      "(\0162\013.SceneScope\022\021\n\tplayer_id\030\003 \001(\003\022\022\n\nre" +
-      "quest_id\030\004 \001(\003\022\033\n\006origin\030\005 \001(\0132\013.ScenePo" +
-      "int\022\021\n\ttarget_id\030\006 \001(\003\022!\n\014target_point\030\007" +
-      " \001(\0132\013.ScenePoint\022\035\n\004type\030\010 \001(\0162\017.SceneM" +
-      "archType\022\023\n\013troop_count\030\t \001(\005\022\r\n\005power\030\n" +
-      " \001(\003\022\020\n\010march_id\030\013 \001(\003\"y\n\021scSceneMarchSt" +
-      "art\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene" +
-      "_id\030\002 \001(\t\022\022\n\nrequest_id\030\003 \001(\003\022\"\n\005march\030\004" +
-      " \001(\0132\023.SceneMarchSnapshot\"\224\001\n\021csSceneMar" +
-      "chQuery\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\016" +
-      "2\013.SceneScope\022\021\n\tplayer_id\030\003 \001(\003\022\022\n\nrequ" +
-      "est_id\030\004 \001(\003\022\020\n\010march_id\030\005 \001(\003\022\030\n\020target" +
-      "_region_id\030\006 \001(\005\"y\n\021scSceneMarchQuery\022\032\n" +
-      "\006result\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene_id\030\002 " +
-      "\001(\t\022\022\n\nrequest_id\030\003 \001(\003\022\"\n\005march\030\004 \001(\0132\023" +
-      ".SceneMarchSnapshot\",\n\016scSceneChanged\022\032\n" +
-      "\004view\030\001 \001(\0132\014.scSceneView*:\n\nSceneScope\022" +
-      "\025\n\021SCENE_SCOPE_LOCAL\020\000\022\025\n\021SCENE_SCOPE_CR" +
-      "OSS\020\001*\365\001\n\017SceneObjectKind\022\027\n\023SCENE_OBJEC" +
-      "T_PLAYER\020\000\022\031\n\025SCENE_OBJECT_RESOURCE\020\001\022\030\n" +
-      "\024SCENE_OBJECT_MONSTER\020\002\022\025\n\021SCENE_OBJECT_" +
-      "FARM\020\003\022\025\n\021SCENE_OBJECT_DROP\020\004\022\031\n\025SCENE_O" +
-      "BJECT_BUILDING\020\005\022\033\n\027SCENE_OBJECT_DECORAT" +
-      "ION\020\006\022\026\n\022SCENE_OBJECT_MARCH\020\007\022\026\n\022SCENE_O" +
-      "BJECT_RALLY\020\010*\371\001\n\016SceneMarchType\022\026\n\022SCEN" +
-      "E_MARCH_ATTACK\020\000\022\034\n\030SCENE_MARCH_RALLY_ME" +
-      "MBER\020\001\022\032\n\026SCENE_MARCH_RALLY_ARMY\020\002\022\031\n\025SC" +
-      "ENE_MARCH_REINFORCE\020\003\022\030\n\024SCENE_MARCH_GAR" +
-      "RISON\020\004\022\026\n\022SCENE_MARCH_GATHER\020\005\022\025\n\021SCENE" +
-      "_MARCH_SCOUT\020\006\022\031\n\025SCENE_MARCH_TRANSPORT\020" +
-      "\007\022\026\n\022SCENE_MARCH_RETURN\020\010*\210\002\n\020SceneMarch" +
-      "Status\022\031\n\025SCENE_MARCH_PREPARING\020\000\022\026\n\022SCE" +
-      "NE_MARCH_MOVING\020\001\022\035\n\031SCENE_MARCH_WAITING" +
-      "_RALLY\020\002\022\027\n\023SCENE_MARCH_ARRIVED\020\003\022\036\n\032SCE" +
-      "NE_MARCH_BATTLE_PENDING\020\004\022\031\n\025SCENE_MARCH" +
-      "_RETURNING\020\005\022\030\n\024SCENE_MARCH_FINISHED\020\006\022\031" +
-      "\n\025SCENE_MARCH_CANCELLED\020\007\022\031\n\025SCENE_MARCH" +
-      "_GATHERING\020\010*\233\002\n\017SceneTargetType\022\026\n\022SCEN" +
-      "E_TARGET_POINT\020\000\022\034\n\030SCENE_TARGET_PLAYER_" +
-      "CITY\020\001\022\036\n\032SCENE_TARGET_ALLIANCE_CITY\020\002\022\"" +
-      "\n\036SCENE_TARGET_ALLIANCE_BUILDING\020\003\022\031\n\025SC" +
-      "ENE_TARGET_RESOURCE\020\004\022\030\n\024SCENE_TARGET_MO" +
-      "NSTER\020\005\022\033\n\027SCENE_TARGET_RALLY_CAMP\020\006\022\026\n\022" +
-      "SCENE_TARGET_TROOP\020\007\022$\n SCENE_TARGET_CRO" +
-      "SS_SERVER_OBJECT\020\010*\266\001\n\020SceneRallyStatus\022" +
-      "\032\n\026SCENE_RALLY_RECRUITING\020\000\022\026\n\022SCENE_RAL" +
-      "LY_MOVING\020\001\022\036\n\032SCENE_RALLY_BATTLE_PENDIN" +
-      "G\020\002\022\031\n\025SCENE_RALLY_RETURNING\020\003\022\030\n\024SCENE_" +
-      "RALLY_FINISHED\020\004\022\031\n\025SCENE_RALLY_CANCELLE" +
-      "D\020\005*\235\002\n\026SceneRallyMemberStatus\022\036\n\032SCENE_" +
-      "RALLY_MEMBER_JOINING\020\000\022\034\n\030SCENE_RALLY_ME" +
-      "MBER_READY\020\001\022\035\n\031SCENE_RALLY_MEMBER_MOVIN" +
-      "G\020\002\022%\n!SCENE_RALLY_MEMBER_BATTLE_PENDING" +
-      "\020\003\022 \n\034SCENE_RALLY_MEMBER_RETURNING\020\004\022\037\n\033" +
-      "SCENE_RALLY_MEMBER_FINISHED\020\005\022\033\n\027SCENE_R" +
-      "ALLY_MEMBER_LEFT\020\006\022\037\n\033SCENE_RALLY_MEMBER" +
-      "_EXCLUDED\020\007*T\n\016SceneViewLevel\022\025\n\021SCENE_V" +
-      "IEW_DETAIL\020\000\022\025\n\021SCENE_VIEW_REGION\020\001\022\024\n\020S" +
-      "CENE_VIEW_WORLD\020\002*a\n\016SceneFogPolicy\022\024\n\020S" +
-      "CENE_FOG_IGNORE\020\000\022\035\n\031SCENE_FOG_DISCOVERE" +
-      "D_ONLY\020\001\022\032\n\026SCENE_FOG_VISIBLE_ONLY\020\002B\n\n\010" +
-      "ly.protob\006proto3"
+      "_end_at_millis\030\024 \001(\003\022\017\n\007victory\030\025 \001(\010\022\026\n" +
+      "\016game_server_id\030\026 \001(\t\"\305\001\n\030SceneRallyMemb" +
+      "erSnapshot\022\021\n\tplayer_id\030\001 \001(\003\022\020\n\010march_i" +
+      "d\030\002 \001(\003\022\023\n\013troop_count\030\003 \001(\005\022\r\n\005power\030\004 " +
+      "\001(\003\022\035\n\025army_snapshot_version\030\005 \001(\003\022\'\n\006st" +
+      "atus\030\006 \001(\0162\027.SceneRallyMemberStatus\022\030\n\020r" +
+      "emaining_troops\030\007 \001(\005\"\373\002\n\022SceneRallySnap" +
+      "shot\022\020\n\010rally_id\030\001 \001(\003\022\030\n\020leader_player_" +
+      "id\030\002 \001(\003\022\023\n\013alliance_id\030\003 \001(\003\022#\n\016assembl" +
+      "y_point\030\004 \001(\0132\013.ScenePoint\022!\n\006target\030\005 \001" +
+      "(\0132\021.SceneMarchTarget\022\020\n\010capacity\030\006 \001(\005\022" +
+      "\027\n\017minimum_members\030\007 \001(\005\022\030\n\020launch_at_mi" +
+      "llis\030\010 \001(\003\022!\n\006status\030\t \001(\0162\021.SceneRallyS" +
+      "tatus\022*\n\007members\030\n \003(\0132\031.SceneRallyMembe" +
+      "rSnapshot\022 \n\030applied_battle_result_id\030\013 " +
+      "\001(\003\022\017\n\007victory\030\014 \001(\010\022\025\n\rstate_version\030\r " +
+      "\001(\005\"\255\002\n\030SceneRallyLaunchSnapshot\022\020\n\010rall" +
+      "y_id\030\001 \001(\003\022\030\n\020leader_player_id\030\002 \001(\003\022\023\n\013" +
+      "alliance_id\030\003 \001(\003\022#\n\016assembly_point\030\004 \001(" +
+      "\0132\013.ScenePoint\022!\n\006target\030\005 \001(\0132\021.SceneMa" +
+      "rchTarget\022*\n\007members\030\006 \003(\0132\031.SceneRallyM" +
+      "emberSnapshot\022\024\n\014total_troops\030\007 \001(\005\022\023\n\013t" +
+      "otal_power\030\010 \001(\003\022\032\n\022launched_at_millis\030\t" +
+      " \001(\003\022\025\n\rrally_version\030\n \001(\005\"K\n\034SceneRall" +
+      "yMemberBattleResult\022\021\n\tplayer_id\030\001 \001(\003\022\030" +
+      "\n\020remaining_troops\030\002 \001(\005\"\327\001\n\026SceneRallyB" +
+      "attleResult\022\030\n\020battle_result_id\030\001 \001(\003\022\020\n" +
+      "\010rally_id\030\002 \001(\003\022\021\n\ttarget_id\030\003 \001(\003\022\026\n\016ta" +
+      "rget_version\030\004 \001(\003\022\017\n\007victory\030\005 \001(\010\022\036\n\026t" +
+      "arget_durability_loss\030\006 \001(\005\0225\n\016member_re" +
+      "sults\030\007 \003(\0132\035.SceneRallyMemberBattleResu" +
+      "lt\"\235\001\n\022SceneBlockSnapshot\022\023\n\013block_index" +
+      "\030\001 \001(\005\022 \n\013block_point\030\002 \001(\0132\013.ScenePoint" +
+      "\022\017\n\007visible\030\003 \001(\010\022\022\n\ndiscovered\030\004 \001(\010\022\024\n" +
+      "\014object_count\030\005 \001(\005\022\025\n\rdata_tag_mask\030\006 \001" +
+      "(\004\"h\n\014csSceneQuery\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005" +
+      "scope\030\002 \001(\0162\013.SceneScope\022\032\n\005point\030\003 \001(\0132" +
+      "\013.ScenePoint\022\016\n\006radius\030\004 \001(\005\"\255\001\n\014scScene" +
+      "Query\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\020\n\010sce" +
+      "ne_id\030\002 \001(\t\022\017\n\007terrain\030\003 \001(\005\022\021\n\tconfig_i" +
+      "d\030\004 \001(\005\022\r\n\005flags\030\005 \001(\005\022\025\n\rspawn_rule_id\030" +
+      "\006 \001(\005\022%\n\007objects\030\007 \003(\0132\024.SceneObjectSnap" +
+      "shot\"\177\n\014csSceneEnter\022\020\n\010scene_id\030\001 \001(\t\022\032" +
+      "\n\005scope\030\002 \001(\0162\013.SceneScope\022\021\n\tplayer_id\030" +
+      "\003 \001(\003\022\032\n\005point\030\004 \001(\0132\013.ScenePoint\022\022\n\nreq" +
+      "uest_id\030\005 \001(\003\"\252\001\n\014scSceneEnter\022\032\n\006result" +
+      "\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene_id\030\002 \001(\t\022\023\n\013" +
+      "shard_index\030\003 \001(\005\022\"\n\rcurrent_point\030\004 \001(\013" +
+      "2\013.ScenePoint\022\022\n\nrequest_id\030\005 \001(\003\022\037\n\ncit" +
+      "y_point\030\006 \001(\0132\013.ScenePoint\"\205\001\n\013csSceneMo" +
+      "ve\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.Sc" +
+      "eneScope\022\021\n\tplayer_id\030\003 \001(\003\022!\n\014target_po" +
+      "int\030\004 \001(\0132\013.ScenePoint\022\022\n\nrequest_id\030\005 \001" +
+      "(\003\"\210\001\n\013scSceneMove\022\032\n\006result\030\001 \001(\0162\n.Err" +
+      "orCode\022\020\n\010scene_id\030\002 \001(\t\022\023\n\013shard_index\030" +
+      "\003 \001(\005\022\"\n\rcurrent_point\030\004 \001(\0132\013.ScenePoin" +
+      "t\022\022\n\nrequest_id\030\005 \001(\003\">\n\016csSceneMetrics\022" +
+      "\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.Scene" +
+      "Scope\"\316\001\n\016scSceneMetrics\022\032\n\006result\030\001 \001(\016" +
+      "2\n.ErrorCode\022\020\n\010scene_id\030\002 \001(\t\022\r\n\005width\030" +
+      "\003 \001(\005\022\016\n\006height\030\004 \001(\005\022\023\n\013shard_count\030\005 \001" +
+      "(\005\022\023\n\013tick_number\030\006 \001(\003\022\030\n\020last_tick_mil" +
+      "lis\030\007 \001(\003\022\024\n\014object_count\030\010 \001(\005\022\025\n\ronlin" +
+      "e_target\030\t \001(\005\"c\n\014csSceneLeave\022\020\n\010scene_" +
+      "id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.SceneScope\022\021\n\t" +
+      "player_id\030\003 \001(\003\022\022\n\nrequest_id\030\004 \001(\003\"c\n\014s" +
+      "cSceneLeave\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022" +
+      "\020\n\010scene_id\030\002 \001(\t\022\021\n\tplayer_id\030\003 \001(\003\022\022\n\n" +
+      "request_id\030\004 \001(\003\"\335\001\n\013csSceneView\022\020\n\010scen" +
+      "e_id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.SceneScope\022\021" +
+      "\n\tplayer_id\030\003 \001(\003\022!\n\014center_point\030\004 \001(\0132" +
+      "\013.ScenePoint\022\025\n\rradius_blocks\030\005 \001(\005\022#\n\nv" +
+      "iew_level\030\006 \001(\0162\017.SceneViewLevel\022\032\n\022requ" +
+      "ested_tag_mask\030\007 \001(\004\022\022\n\nrequest_id\030\010 \001(\003" +
+      "\"\255\002\n\013scSceneView\022\032\n\006result\030\001 \001(\0162\n.Error" +
+      "Code\022\020\n\010scene_id\030\002 \001(\t\022\021\n\tplayer_id\030\003 \001(" +
+      "\003\022!\n\014center_block\030\004 \001(\0132\013.ScenePoint\022#\n\n" +
+      "view_level\030\005 \001(\0162\017.SceneViewLevel\022\023\n\013tic" +
+      "k_number\030\006 \001(\003\022%\n\007objects\030\007 \003(\0132\024.SceneO" +
+      "bjectSnapshot\022#\n\006blocks\030\010 \003(\0132\023.SceneBlo" +
+      "ckSnapshot\022 \n\030discovered_block_indices\030\t" +
+      " \003(\005\022\022\n\nrequest_id\030\n \001(\003\"\353\001\n\017csScenePath" +
+      "Find\022\020\n\010scene_id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013." +
+      "SceneScope\022\021\n\tplayer_id\030\003 \001(\003\022 \n\013start_p" +
+      "oint\030\004 \001(\0132\013.ScenePoint\022!\n\014target_point\030" +
+      "\005 \001(\0132\013.ScenePoint\022#\n\nfog_policy\030\006 \001(\0162\017" +
+      ".SceneFogPolicy\022\031\n\021max_visited_nodes\030\007 \001" +
+      "(\005\022\022\n\nrequest_id\030\010 \001(\003\"\263\001\n\017scScenePathFi" +
+      "nd\022\032\n\006result\030\001 \001(\0162\n.ErrorCode\022\020\n\010scene_" +
+      "id\030\002 \001(\t\022\022\n\nrequest_id\030\003 \001(\003\022\033\n\006points\030\004" +
+      " \003(\0132\013.ScenePoint\022\022\n\ntotal_cost\030\005 \001(\005\022\025\n" +
+      "\rvisited_nodes\030\006 \001(\005\022\026\n\016completed_tick\030\007" +
+      " \001(\003\"\250\002\n\021csSceneMarchStart\022\020\n\010scene_id\030\001" +
+      " \001(\t\022\032\n\005scope\030\002 \001(\0162\013.SceneScope\022\021\n\tplay" +
+      "er_id\030\003 \001(\003\022\022\n\nrequest_id\030\004 \001(\003\022\033\n\006origi" +
+      "n\030\005 \001(\0132\013.ScenePoint\022\021\n\ttarget_id\030\006 \001(\003\022" +
+      "!\n\014target_point\030\007 \001(\0132\013.ScenePoint\022\035\n\004ty" +
+      "pe\030\010 \001(\0162\017.SceneMarchType\022\023\n\013troop_count" +
+      "\030\t \001(\005\022\r\n\005power\030\n \001(\003\022\020\n\010march_id\030\013 \001(\003\022" +
+      "\026\n\016game_server_id\030\014 \001(\t\"P\n\020csSceneMarchH" +
+      "ome\022\020\n\010march_id\030\001 \001(\003\022\023\n\013resource_id\030\002 \001" +
+      "(\005\022\025\n\rreward_amount\030\003 \001(\003\"\022\n\020scSceneMarc" +
+      "hHome\"y\n\021scSceneMarchStart\022\032\n\006result\030\001 \001" +
+      "(\0162\n.ErrorCode\022\020\n\010scene_id\030\002 \001(\t\022\022\n\nrequ" +
+      "est_id\030\003 \001(\003\022\"\n\005march\030\004 \001(\0132\023.SceneMarch" +
+      "Snapshot\"\224\001\n\021csSceneMarchQuery\022\020\n\010scene_" +
+      "id\030\001 \001(\t\022\032\n\005scope\030\002 \001(\0162\013.SceneScope\022\021\n\t" +
+      "player_id\030\003 \001(\003\022\022\n\nrequest_id\030\004 \001(\003\022\020\n\010m" +
+      "arch_id\030\005 \001(\003\022\030\n\020target_region_id\030\006 \001(\005\"" +
+      "y\n\021scSceneMarchQuery\022\032\n\006result\030\001 \001(\0162\n.E" +
+      "rrorCode\022\020\n\010scene_id\030\002 \001(\t\022\022\n\nrequest_id" +
+      "\030\003 \001(\003\022\"\n\005march\030\004 \001(\0132\023.SceneMarchSnapsh" +
+      "ot\",\n\016scSceneChanged\022\032\n\004view\030\001 \001(\0132\014.scS" +
+      "ceneView*:\n\nSceneScope\022\025\n\021SCENE_SCOPE_LO" +
+      "CAL\020\000\022\025\n\021SCENE_SCOPE_CROSS\020\001*\365\001\n\017SceneOb" +
+      "jectKind\022\027\n\023SCENE_OBJECT_PLAYER\020\000\022\031\n\025SCE" +
+      "NE_OBJECT_RESOURCE\020\001\022\030\n\024SCENE_OBJECT_MON" +
+      "STER\020\002\022\025\n\021SCENE_OBJECT_FARM\020\003\022\025\n\021SCENE_O" +
+      "BJECT_DROP\020\004\022\031\n\025SCENE_OBJECT_BUILDING\020\005\022" +
+      "\033\n\027SCENE_OBJECT_DECORATION\020\006\022\026\n\022SCENE_OB" +
+      "JECT_MARCH\020\007\022\026\n\022SCENE_OBJECT_RALLY\020\010*\371\001\n" +
+      "\016SceneMarchType\022\026\n\022SCENE_MARCH_ATTACK\020\000\022" +
+      "\034\n\030SCENE_MARCH_RALLY_MEMBER\020\001\022\032\n\026SCENE_M" +
+      "ARCH_RALLY_ARMY\020\002\022\031\n\025SCENE_MARCH_REINFOR" +
+      "CE\020\003\022\030\n\024SCENE_MARCH_GARRISON\020\004\022\026\n\022SCENE_" +
+      "MARCH_GATHER\020\005\022\025\n\021SCENE_MARCH_SCOUT\020\006\022\031\n" +
+      "\025SCENE_MARCH_TRANSPORT\020\007\022\026\n\022SCENE_MARCH_" +
+      "RETURN\020\010*\210\002\n\020SceneMarchStatus\022\031\n\025SCENE_M" +
+      "ARCH_PREPARING\020\000\022\026\n\022SCENE_MARCH_MOVING\020\001" +
+      "\022\035\n\031SCENE_MARCH_WAITING_RALLY\020\002\022\027\n\023SCENE" +
+      "_MARCH_ARRIVED\020\003\022\036\n\032SCENE_MARCH_BATTLE_P" +
+      "ENDING\020\004\022\031\n\025SCENE_MARCH_RETURNING\020\005\022\030\n\024S" +
+      "CENE_MARCH_FINISHED\020\006\022\031\n\025SCENE_MARCH_CAN" +
+      "CELLED\020\007\022\031\n\025SCENE_MARCH_GATHERING\020\010*\233\002\n\017" +
+      "SceneTargetType\022\026\n\022SCENE_TARGET_POINT\020\000\022" +
+      "\034\n\030SCENE_TARGET_PLAYER_CITY\020\001\022\036\n\032SCENE_T" +
+      "ARGET_ALLIANCE_CITY\020\002\022\"\n\036SCENE_TARGET_AL" +
+      "LIANCE_BUILDING\020\003\022\031\n\025SCENE_TARGET_RESOUR" +
+      "CE\020\004\022\030\n\024SCENE_TARGET_MONSTER\020\005\022\033\n\027SCENE_" +
+      "TARGET_RALLY_CAMP\020\006\022\026\n\022SCENE_TARGET_TROO" +
+      "P\020\007\022$\n SCENE_TARGET_CROSS_SERVER_OBJECT\020" +
+      "\010*\266\001\n\020SceneRallyStatus\022\032\n\026SCENE_RALLY_RE" +
+      "CRUITING\020\000\022\026\n\022SCENE_RALLY_MOVING\020\001\022\036\n\032SC" +
+      "ENE_RALLY_BATTLE_PENDING\020\002\022\031\n\025SCENE_RALL" +
+      "Y_RETURNING\020\003\022\030\n\024SCENE_RALLY_FINISHED\020\004\022" +
+      "\031\n\025SCENE_RALLY_CANCELLED\020\005*\235\002\n\026SceneRall" +
+      "yMemberStatus\022\036\n\032SCENE_RALLY_MEMBER_JOIN" +
+      "ING\020\000\022\034\n\030SCENE_RALLY_MEMBER_READY\020\001\022\035\n\031S" +
+      "CENE_RALLY_MEMBER_MOVING\020\002\022%\n!SCENE_RALL" +
+      "Y_MEMBER_BATTLE_PENDING\020\003\022 \n\034SCENE_RALLY" +
+      "_MEMBER_RETURNING\020\004\022\037\n\033SCENE_RALLY_MEMBE" +
+      "R_FINISHED\020\005\022\033\n\027SCENE_RALLY_MEMBER_LEFT\020" +
+      "\006\022\037\n\033SCENE_RALLY_MEMBER_EXCLUDED\020\007*T\n\016Sc" +
+      "eneViewLevel\022\025\n\021SCENE_VIEW_DETAIL\020\000\022\025\n\021S" +
+      "CENE_VIEW_REGION\020\001\022\024\n\020SCENE_VIEW_WORLD\020\002" +
+      "*a\n\016SceneFogPolicy\022\024\n\020SCENE_FOG_IGNORE\020\000" +
+      "\022\035\n\031SCENE_FOG_DISCOVERED_ONLY\020\001\022\032\n\026SCENE" +
+      "_FOG_VISIBLE_ONLY\020\002B\n\n\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -42978,7 +44515,7 @@ public final class Scene {
     internal_static_SceneMarchSnapshot_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_SceneMarchSnapshot_descriptor,
-        new java.lang.String[] { "MarchId", "OwnerPlayerId", "AllianceId", "Type", "TagMask", "Status", "Origin", "Target", "Path", "PathIndex", "TroopCount", "Power", "ArmySnapshotVersion", "DepartAtMillis", "ArrivalAtMillis", "StateVersion", "TargetRegionId", "ResourceId", "RewardAmount", "GatherEndAtMillis", "Victory", });
+        new java.lang.String[] { "MarchId", "OwnerPlayerId", "AllianceId", "Type", "TagMask", "Status", "Origin", "Target", "Path", "PathIndex", "TroopCount", "Power", "ArmySnapshotVersion", "DepartAtMillis", "ArrivalAtMillis", "StateVersion", "TargetRegionId", "ResourceId", "RewardAmount", "GatherEndAtMillis", "Victory", "GameServerId", });
     internal_static_SceneRallyMemberSnapshot_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_SceneRallyMemberSnapshot_fieldAccessorTable = new
@@ -43038,7 +44575,7 @@ public final class Scene {
     internal_static_scSceneEnter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scSceneEnter_descriptor,
-        new java.lang.String[] { "Result", "SceneId", "ShardIndex", "CurrentPoint", "RequestId", });
+        new java.lang.String[] { "Result", "SceneId", "ShardIndex", "CurrentPoint", "RequestId", "CityPoint", });
     internal_static_csSceneMove_descriptor =
       getDescriptor().getMessageTypes().get(15);
     internal_static_csSceneMove_fieldAccessorTable = new
@@ -43104,27 +44641,39 @@ public final class Scene {
     internal_static_csSceneMarchStart_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csSceneMarchStart_descriptor,
-        new java.lang.String[] { "SceneId", "Scope", "PlayerId", "RequestId", "Origin", "TargetId", "TargetPoint", "Type", "TroopCount", "Power", "MarchId", });
-    internal_static_scSceneMarchStart_descriptor =
+        new java.lang.String[] { "SceneId", "Scope", "PlayerId", "RequestId", "Origin", "TargetId", "TargetPoint", "Type", "TroopCount", "Power", "MarchId", "GameServerId", });
+    internal_static_csSceneMarchHome_descriptor =
       getDescriptor().getMessageTypes().get(26);
+    internal_static_csSceneMarchHome_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_csSceneMarchHome_descriptor,
+        new java.lang.String[] { "MarchId", "ResourceId", "RewardAmount", });
+    internal_static_scSceneMarchHome_descriptor =
+      getDescriptor().getMessageTypes().get(27);
+    internal_static_scSceneMarchHome_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_scSceneMarchHome_descriptor,
+        new java.lang.String[] { });
+    internal_static_scSceneMarchStart_descriptor =
+      getDescriptor().getMessageTypes().get(28);
     internal_static_scSceneMarchStart_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scSceneMarchStart_descriptor,
         new java.lang.String[] { "Result", "SceneId", "RequestId", "March", });
     internal_static_csSceneMarchQuery_descriptor =
-      getDescriptor().getMessageTypes().get(27);
+      getDescriptor().getMessageTypes().get(29);
     internal_static_csSceneMarchQuery_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_csSceneMarchQuery_descriptor,
         new java.lang.String[] { "SceneId", "Scope", "PlayerId", "RequestId", "MarchId", "TargetRegionId", });
     internal_static_scSceneMarchQuery_descriptor =
-      getDescriptor().getMessageTypes().get(28);
+      getDescriptor().getMessageTypes().get(30);
     internal_static_scSceneMarchQuery_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scSceneMarchQuery_descriptor,
         new java.lang.String[] { "Result", "SceneId", "RequestId", "March", });
     internal_static_scSceneChanged_descriptor =
-      getDescriptor().getMessageTypes().get(29);
+      getDescriptor().getMessageTypes().get(31);
     internal_static_scSceneChanged_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_scSceneChanged_descriptor,

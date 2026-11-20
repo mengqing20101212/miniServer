@@ -15,6 +15,15 @@ import ly.sceneserver.common.persistence.SceneRecoveryService;
 import ly.sceneserver.common.persistence.SceneStaticMapLoader;
 
 import ly.LoggerDef;
+import ly.game.MiniPlayerHelper;
+import ly.proto.Cmd;
+import ly.proto.Scene;
+import ly.net.packet.MessagePacket;
+import ly.rpc.ReliableRpcStore;
+import ly.rpc.RpcFailSavePolicy;
+import ly.rpc.RpcNodeConnector;
+import ly.rpc.RpcService;
+import ly.sceneserver.common.march.SceneMarchSnapshot;
 
 /** SceneServer 中 SLG 场景运行时的启动和关闭入口。 */
 public final class SceneBootstrap {
@@ -82,7 +91,7 @@ public final class SceneBootstrap {
                 for (int index = 0; index < scene.shardCount(); index++) {
                     scene.shard(index).marches().onChanged(scene.aoi()::marchChanged);
                     scene.shard(index).marches().configure(
-                            () -> ly.config.SlgWorldObjectConfigManager.getInstance().getConfigMap(), save);
+                            () -> ly.config.SlgWorldObjectConfigManager.getInstance().getConfigMap(), save, SceneBootstrap::sendHomeReward);
                 }
                 if (!fakeDataEnabled) ly.sceneserver.common.SceneWorldSpawner.seed(scene,
                         ly.config.SlgWorldObjectConfigManager.getInstance().getConfigList(),
@@ -111,6 +120,28 @@ public final class SceneBootstrap {
             created.close();
             throw error;
         }
+    }
+
+    private static void sendHomeReward(SceneMarchSnapshot march) {
+        // RPC 建连和旧档的玩家分服查询不能占用区域 Tick。
+        Thread.ofVirtual().name("march-home-" + march.marchId()).start(() -> {
+            String serverId = march.gameServerId();
+            if (serverId.isEmpty()) {
+                serverId = MiniPlayerHelper.getMiniPlayerFromRedis(march.ownerPlayerId()).getGameServerId();
+            }
+            Scene.csSceneMarchHome request = Scene.csSceneMarchHome.newBuilder()
+                    .setMarchId(march.marchId()).setResourceId(march.resourceId())
+                    .setRewardAmount(march.rewardAmount()).build();
+            RpcNodeConnector connector = RpcService.getInstance().getRpcNodeConnector(serverId);
+            if (connector == null) {
+                MessagePacket packet = RpcNodeConnector.createServer2ServerRpcPacket(march.ownerPlayerId(),
+                        Cmd.CMD.CS_SceneMarchHome_VALUE, request, 0, 0, march.marchId());
+                ReliableRpcStore.getInstance().save(serverId, packet, "玩家游戏服未连接");
+                return;
+            }
+            connector.asyncSendProtoMessage(march.ownerPlayerId(), Cmd.CMD.CS_SceneMarchHome_VALUE,
+                    request, 5_000, RpcFailSavePolicy.SEND_FAILED_OR_TIMEOUT);
+        });
     }
 
     public static SceneRuntime getRuntime() {

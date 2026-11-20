@@ -29,7 +29,8 @@ public final class SceneMarchProtoMapper {
                 .setResourceId(snapshot.resourceId())
                 .setRewardAmount(snapshot.rewardAmount())
                 .setGatherEndAtMillis(snapshot.gatherEndAtMillis())
-                .setVictory(snapshot.victory());
+                .setVictory(snapshot.victory())
+                .setGameServerId(snapshot.gameServerId());
         for (ScenePoint point : snapshot.path()) {
             builder.addPath(toProto(point));
         }
@@ -95,7 +96,7 @@ public final class SceneMarchProtoMapper {
                 snapshot.getDepartAtMillis(),
                 snapshot.getArrivalAtMillis(),
                 snapshot.getStateVersion(), snapshot.getTargetRegionId(), snapshot.getResourceId(),
-                snapshot.getRewardAmount(), snapshot.getGatherEndAtMillis(), snapshot.getVictory());
+                snapshot.getRewardAmount(), snapshot.getGatherEndAtMillis(), snapshot.getVictory(), snapshot.getGameServerId());
     }
 
     /** 从数据库中的 Protobuf 二进制恢复包含完整成员列表的集结快照。 */

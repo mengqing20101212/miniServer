@@ -301,6 +301,14 @@ public final class Cmd {
      */
     SC_GmRuntimeScriptExecute(10012),
     /**
+     * <code>CS_SceneMarchHome = 10013;</code>
+     */
+    CS_SceneMarchHome(10013),
+    /**
+     * <code>SC_SceneMarchHome = 10014;</code>
+     */
+    SC_SceneMarchHome(10014),
+    /**
      * <pre>
      * Scene 地图客户端协议 2000-2099。客户端经 Gate -&gt; Game 发送；Game 再使用
      * CS_Server2Server 外壳把同一业务消息转给 SceneServer，不能放在服务器内部号段。
@@ -693,6 +701,14 @@ public final class Cmd {
      */
     public static final int SC_GmRuntimeScriptExecute_VALUE = 10012;
     /**
+     * <code>CS_SceneMarchHome = 10013;</code>
+     */
+    public static final int CS_SceneMarchHome_VALUE = 10013;
+    /**
+     * <code>SC_SceneMarchHome = 10014;</code>
+     */
+    public static final int SC_SceneMarchHome_VALUE = 10014;
+    /**
      * <pre>
      * Scene 地图客户端协议 2000-2099。客户端经 Gate -&gt; Game 发送；Game 再使用
      * CS_Server2Server 外壳把同一业务消息转给 SceneServer，不能放在服务器内部号段。
@@ -866,6 +882,8 @@ public final class Cmd {
         case 10010: return SC_GmUpdatePlayerModule;
         case 10011: return CS_GmRuntimeScriptExecute;
         case 10012: return SC_GmRuntimeScriptExecute;
+        case 10013: return CS_SceneMarchHome;
+        case 10014: return SC_SceneMarchHome;
         case 2001: return CS_SceneQuery;
         case 2002: return SC_SceneQuery;
         case 2003: return CS_SceneEnter;
@@ -951,7 +969,7 @@ public final class Cmd {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\tCmd.proto*\227\t\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_" +
+      "\n\tCmd.proto*\307\t\n\003CMD\022\014\n\010CMD_null\020\000\022\014\n\010CS_" +
       "Login\020e\022\014\n\010SC_Login\020f\022\r\n\tCS_Logout\020g\022\r\n\t" +
       "SC_Logout\020h\022\021\n\014CS_ErrorCode\020\311\001\022\021\n\014SC_Err" +
       "orCode\020\312\001\022\020\n\013CS_HeroList\020\351\007\022\020\n\013SC_HeroLi" +
@@ -970,18 +988,19 @@ public final class Cmd {
       "CS_GmUpdatePlayerModule\020\231N\022\034\n\027SC_GmUpdat" +
       "ePlayerModule\020\232N\022\036\n\031CS_GmRuntimeScriptEx" +
       "ecute\020\233N\022\036\n\031SC_GmRuntimeScriptExecute\020\234N" +
-      "\022\022\n\rCS_SceneQuery\020\321\017\022\022\n\rSC_SceneQuery\020\322\017" +
-      "\022\022\n\rCS_SceneEnter\020\323\017\022\022\n\rSC_SceneEnter\020\324\017" +
-      "\022\021\n\014CS_SceneMove\020\325\017\022\021\n\014SC_SceneMove\020\326\017\022\024" +
-      "\n\017CS_SceneMetrics\020\327\017\022\024\n\017SC_SceneMetrics\020" +
-      "\330\017\022\022\n\rCS_SceneLeave\020\331\017\022\022\n\rSC_SceneLeave\020" +
-      "\332\017\022\021\n\014CS_SceneView\020\333\017\022\021\n\014SC_SceneView\020\334\017" +
-      "\022\024\n\017SC_SceneChanged\020\343\017\022\027\n\022CS_SceneMarchS" +
-      "tart\020\337\017\022\027\n\022SC_SceneMarchStart\020\340\017\022\027\n\022CS_S" +
-      "ceneMarchQuery\020\341\017\022\027\n\022SC_SceneMarchQuery\020" +
-      "\342\017\022\025\n\020CS_ScenePathFind\020\335\017\022\025\n\020SC_ScenePat" +
-      "hFind\020\336\017\022\023\n\rMaxServeMsgId\020\240\234\001B\n\n\010ly.prot" +
-      "ob\006proto3"
+      "\022\026\n\021CS_SceneMarchHome\020\235N\022\026\n\021SC_SceneMarc" +
+      "hHome\020\236N\022\022\n\rCS_SceneQuery\020\321\017\022\022\n\rSC_Scene" +
+      "Query\020\322\017\022\022\n\rCS_SceneEnter\020\323\017\022\022\n\rSC_Scene" +
+      "Enter\020\324\017\022\021\n\014CS_SceneMove\020\325\017\022\021\n\014SC_SceneM" +
+      "ove\020\326\017\022\024\n\017CS_SceneMetrics\020\327\017\022\024\n\017SC_Scene" +
+      "Metrics\020\330\017\022\022\n\rCS_SceneLeave\020\331\017\022\022\n\rSC_Sce" +
+      "neLeave\020\332\017\022\021\n\014CS_SceneView\020\333\017\022\021\n\014SC_Scen" +
+      "eView\020\334\017\022\024\n\017SC_SceneChanged\020\343\017\022\027\n\022CS_Sce" +
+      "neMarchStart\020\337\017\022\027\n\022SC_SceneMarchStart\020\340\017" +
+      "\022\027\n\022CS_SceneMarchQuery\020\341\017\022\027\n\022SC_SceneMar" +
+      "chQuery\020\342\017\022\025\n\020CS_ScenePathFind\020\335\017\022\025\n\020SC_" +
+      "ScenePathFind\020\336\017\022\023\n\rMaxServeMsgId\020\240\234\001B\n\n" +
+      "\010ly.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
