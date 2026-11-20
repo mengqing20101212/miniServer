@@ -1,0 +1,356 @@
+syntax = "proto3";
+package mini.battle;
+option java_package = "ly.proto";
+option java_outer_classname = "Battle";
+
+// 入场快照与回放共用公司服的属性 ID 和战报字段编号。
+enum AttrTypeEnum {
+    ATTR_UNSPECIFIED = 0;
+    HP = 1; // 血量基础值
+    HP_BASE_ADD = 2; // 基础血量加值
+    HP_RATE = 3; // 血量加成百分比
+    HP_EXT_ADD = 4; // 额外血量加成
+    ATK = 5; // 攻击基础值
+    ATK_BASE_ADD = 6; // 基础攻击加值
+    ATK_RATE = 7; // 攻击加成百分比
+    ATK_EXT_ADD = 8; // 额外攻击加成
+    DEF = 9; // 防御基础值
+    DEF_BASE_ADD = 10; // 基础防御加值
+    DEF_RATE = 11; // 防御加成百分比
+    DEF_EXT_ADD = 12; // 额外防御加成
+    ARM = 13; // 带兵量基础值
+    ARM_BASE_ADD = 14; // 基础带兵量加值
+    ARM_RATE = 15; // 带兵量加成百分比
+    ARM_EXT_ADD = 16; // 额外带兵量加成
+    SHIELD = 17; // 护盾值
+    DAMAGE_DEEPEN_RATE = 18; // 伤害加深
+    DAMAGE_RESIST_RATE = 19; // 伤害抵抗
+    SKILL_ENERGY_GAIN_RATE = 20; // 蓄能加速
+    DAMAGE_REDUCTION_RATE = 21; // 直接减伤
+    ATTACK_BOOST_RATE = 22; // 战中攻击提升
+    SOLDIER_ATK_RATE = 23; // 兵种攻击增幅
+    SOLDIER_DEF_RATE = 24; // 兵种防御增幅
+    SOLDIER_HP_RATE = 25; // 兵种血量增幅
+    CURRENT_HP = 26; // 战斗当前HP
+    SKILL_ENERGY = 27; // 战斗当前蓄能
+    EQUIP_ATK = 28; // 装备攻击基础值
+    EQUIP_DEF = 29; // 装备防御基础值
+    EQUIP_HP = 30; // 装备血量基础值
+    EQUIP_ATK_BASE_ADD = 31; // 装备攻击基础加值
+    EQUIP_ATK_RATE = 32; // 装备攻击加成百分比
+    EQUIP_ATK_EXT_ADD = 33; // 装备攻击额外加值
+    EQUIP_DEF_BASE_ADD = 34; // 装备防御基础加值
+    EQUIP_DEF_RATE = 35; // 装备防御加成百分比
+    EQUIP_DEF_EXT_ADD = 36; // 装备防御额外加值
+    EQUIP_HP_BASE_ADD = 37; // 装备血量基础加值
+    EQUIP_HP_RATE = 38; // 装备血量加成百分比
+    EQUIP_HP_EXT_ADD = 39; // 装备血量额外加值
+}
+
+message BattleBuffSpec {
+    enum Effect {
+        BUFF_UNSPECIFIED = 0;
+        TAUNT = 1; // 嘲讽
+        DAMAGE_REDUCTION = 2; // 受到的伤害按千分比减少
+        ATTACK_BOOST = 3; // 有效攻击按千分比提升
+        ATTACK_ADD = 4; // 攻击固定加值
+        DEFENSE_ADD = 5; // 防御固定加值
+        HEALTH_ADD = 6; // 最大生命固定加值，首次生效同步增加当前生命，到期仅截断上限
+    }
+    int32 id = 1;
+    Effect effectType = 2;
+    int32 value = 3;
+    int32 durationRounds = 4;
+    int32 effectTiming = 5; // 0 下一回合，1 立即生效
+    repeated BattleBuffSpec onRemoveBuffs = 6;
+}
+
+message BattleSkillSpec {
+    enum Effect {
+        SKILL_UNSPECIFIED = 0;
+        DAMAGE = 1; // 伤害
+        HEAL = 2; // 治疗
+        NONE = 3; // 只附加Buff，不产生直接伤害或治疗
+        SHIELD = 4; // 授予护盾，当前五职业暂未配置
+    }
+    enum Target {
+        TARGET_UNSPECIFIED = 0;
+        ENEMY_LOWEST_HP = 1; // 敌方绝对当前血量最低
+        ALL_ENEMIES = 2; // 敌方全体存活单位
+        ALLY_LOWEST_HP = 3; // 友方绝对当前血量最低，含自己
+        FRONT_COLUMN = 4; // 普攻：前排优先，同列优先，等距先左后右
+    }
+    int32 id = 1;
+    Effect effectType = 2;
+    Target targetRule = 3;
+    int32 targetCount = 4;
+    int32 actionRate = 5;
+    repeated BattleBuffSpec selfBuffs = 6;
+    repeated BattleBuffSpec allyBuffs = 7;
+    repeated BattleBuffSpec enemyBuffs = 8;
+    repeated BattleSkillSpec subSkills = 9;
+}
+
+message BattleSkillSlot {
+    int32 slot = 1;
+    int32 level = 2;
+    BattleSkillSpec definition = 3;
+}
+
+message BattleUnitSnapshot {
+    int32 position = 1;
+    int32 unitType = 2;
+    PRT_HERO hero = 3;
+    map<int32, int64> entryAttrs = 4; // 冻结的最终入场属性，HP 为最大生命；能量和剩余生命由下两项给出
+    int32 initialEnergy = 5; // 按阵位冻结，0 也是有效初始值
+    optional int64 remainingHp = 6; // 跨场继承，首场省略时取满血
+    repeated PRT_FORMATION_SOLDIER soldiers = 7;
+    repeated BattleSkillSlot skills = 8;
+    int32 monsterTid = 9;
+}
+
+// 技能与 Buff 已展开，开战时无需回查当前配表。
+message BattleSideSnapshot {
+    PRT_MINI_PLAYER player = 1;
+    repeated BattleUnitSnapshot units = 2;
+}
+
+enum PRT_BATTLE_SIDE {
+    SIDE_UNSPECIFIED = 0;
+    ATTACKER = 1;
+    DEFENDER = 2;
+}
+
+enum PRT_BATTLE_END_REASON {
+    END_UNSPECIFIED = 0;
+    ELIMINATION = 1; // 一方或双方全灭，优先于回合上限
+    ROUND_LIMIT = 2; // 达到上限，比较双方剩余总HP，不含护盾
+}
+
+enum PRT_BATTLE_PHASE {
+    PHASE_UNSPECIFIED = 0;
+    ENERGY = 1; // 回合开始的系统行动：加能、Buff生效等
+    SKILL = 2; // 同队列序号的技能共同结算；死亡跳过，不压缩原序号
+    NORMAL_ATTACK = 3; // 所有符合条件的普攻共同结算
+    ROUND_END = 4; // 回合结束的系统行动：Buff计时、到期移除等
+    BUFF_TRIGGER = 5; // 持续Buff/Debuff触发效果；按触发规则插入列表，不固定在回合末
+}
+
+enum PRT_BATTLE_EFFECT_TYPE {
+    EFFECT_UNSPECIFIED = 0;
+    EFFECT_DAMAGE = 1; // 实际HP/护盾扣减，计入伤害
+    EFFECT_HEAL = 2; // 实际HP恢复，计入治疗
+    EFFECT_SHIELD = 3; // 护盾增加，不计治疗
+    EFFECT_ATTRIBUTE = 4; // 加能、扣能等其他属性变化
+    EFFECT_BUFF = 5; // Buff新增/更新/移除，以及对应的属性变化
+}
+
+message PRT_BATTLE_REPORT {
+    repeated PRT_BATTLE_ROUND rounds = 1; // 按round升序，完整记录
+}
+
+message PRT_BATTLE_LOG {
+    string title = 1; // 玩法生成的战报标题，例如“调试挑战胜利”；时间使用stage.battleTime
+    PRT_BATTLE_SIDE winner = 2; // ATTACKER或DEFENDER，无平局
+    PRT_BATTLE_END_REASON endReason = 3;
+    repeated PRT_BATTLE_UNIT_RESULT unitResults = 4; // 双方全部入场单位的最终状态及统计
+    PRT_BATTLE_SETTLEMENT atkSettlement = 5; // 进攻方正式伤亡/战力结算；未结算不传，不能按全0展示
+    PRT_BATTLE_SETTLEMENT defSettlement = 6; // 防守方正式伤亡/战力结算；调试挑战不传
+    PRT_AWARD_DROP award = 7; // 战报独立掉落预留；当前留空，等待策划配置与领取规则
+}
+
+message PRT_BATTLE_SETTLEMENT {
+    optional int64 deadSoldiers = 1; // 死亡兵数
+    optional int64 woundedSoldiers = 2; // 重伤兵数
+    optional int64 lightlyWoundedSoldiers = 3; // 轻伤兵数
+    optional int64 powerLost = 4; // 实际损失战力，非负；展示负号由客户端处理
+}
+
+message PRT_BATTLE_STAGE {
+    int64 battleTime = 1; // 开战Unix时间戳，毫秒；不是战斗持续时间
+    int32 type = 2; // 玩法类型，当前0=PVE；与unitType无关
+    int64 battleId = 3; // 服务端生成的全局唯一战斗ID，同时用于查询战报
+    repeated PRT_BATTLE_UNIT atkUnits = 4; // 进攻方入场快照，按pos排序
+    repeated PRT_BATTLE_UNIT defUnits = 5; // 防守方入场快照，按pos排序
+    PRT_BATTLE_REPORT report = 6; // 战斗录像，for循环产生的逐回合行动
+    PRT_MINI_PLAYER atkPlayer = 7; // 进攻方玩家信息；怪物方不传，客户端按怪物配置展示
+    PRT_MINI_PLAYER defPlayer = 8; // 防守方玩家信息；有值表示对应参战玩家，怪物方不传
+    int32 roundLimit = 9; // 本场初始化时固定，常量表默认20、范围1～100
+    PRT_BATTLE_LOG log = 10; // 战报详情，用于结果、兵力、英雄和技能统计展示
+}
+
+message PRT_BATTLE_UNIT {
+    int32 pos = 1; // 固定位置1～5；阵亡不重排
+    int32 unitType = 2; // 0=玩家英雄；1=怪物（当前通过Hero模板构建）
+    PRT_ATTR_MAP attr = 3; // BattleUnit独立战斗属性表的入场快照；已计算，勿重复套养成系数
+    PRT_HERO hero = 4; // 入场英雄信息快照；不包含装备
+    int64 unitId = 5; // 战斗单位实例ID，与技能/Buff实例ID不重复；不是heroId、heroTid或位置
+    repeated PRT_BATTLE_SKILL skills = 6; // 本单位持有的技能实例（含普攻、已解锁主动/被动），按slot排序
+    int32 soldierDid = 7; // 携带兵种等级配置ID，对应UserArmyEntity.soldierDid
+    int64 initialSoldiers = 8; // 本英雄实际分配的入场兵数
+    repeated PRT_BATTLE_BUFF_STATE initBuffs = 9; // 入场Buff列表，空列表表示无Buff；初始HP、能量和护盾由attr提供
+    int32 monsterTid = 10; // 怪物阵容monster_army_td.id，与pos一起定位本位Hero模板；玩家英雄填0
+    repeated PRT_FORMATION_SOLDIER soldiers = 11; // SLG逐兵阶实际入场组成；混兵时soldierDid=0，不压成最高阶
+}
+
+message PRT_BATTLE_SKILL {
+    int64 skillId = 1; // 技能实例唯一ID；所属单位由外层PRT_BATTLE_UNIT确定
+    int32 skillTid = 2; // 技能效果配置ID；普攻/主动技能对应battle_skill.id，静态效果读表
+    int32 slot = 3; // 0=普攻，1=主动技能，2～5=被动技能；子技能继承根技能槽，只有根技能进入蓄能队列
+    int32 level = 4; // 本实例实际技能等级
+}
+
+message PRT_BATTLE_UNIT_STATE {
+    int64 unitId = 1;
+    repeated PRT_BATTLE_BUFF_STATE buffs = 2;
+    PRT_ATTR_MAP attr = 3; // 该时点BattleUnit的完整属性表快照，覆盖旧值；不重复执行养成计算
+}
+
+message PRT_BATTLE_BUFF_STATE {
+    int64 buffId = 1; // Buff实例唯一ID；挂载单位由外层单位或行动targetUnitId确定
+    int32 buffTid = 2; // battle_buff.id
+    int64 sourceId = 3; // 施加来源的技能/Buff/单位实例ID；0为系统来源
+    int32 remainingRounds = 4; // 当前剩余计数；首次施加或刷新当回合结束不扣1
+    int32 effectiveFromRound = 5; //首次可生效回合；立即生效时还需以其出现的批次位置为准
+    int32 lastAppliedRound = 6; // 最近施加/刷新回合，用于展示计时，不由客户端执行衰减
+    bool active = 7; // 当前是否已生效
+}
+
+message PRT_BATTLE_ROUND {
+    int32 round = 1; // 从1开始
+    repeated PRT_BATTLE_BATCH batches = 2; // 按列表顺序执行
+}
+
+message PRT_BATTLE_BATCH {
+    PRT_BATTLE_PHASE phase = 1;
+    repeated PRT_BATTLE_ACTION actions = 2; // 锁定的行动；技能先治疗/护盾，再伤害和Buff
+}
+
+message PRT_BATTLE_ACTION {
+    int64 sourceId = 1; // 产生效果的实例ID：技能/普攻填技能实例ID，持续Buff填Buff实例ID，单位直接效果填unitId；系统为0
+    repeated PRT_BATTLE_TARGET_RESULT targets = 2; // 实际受影响单位及效果，包括技能所属单位自身扣能
+}
+
+message PRT_BATTLE_TARGET_RESULT {
+    int64 targetUnitId = 1;
+    PRT_BATTLE_EFFECT_TYPE effectType = 2;
+    // 所有属性统一传实际增减量，正数增加、负数减少；只填finalAttrs，baseAttrs不传。
+    // 按attrType累加到目标当前属性，不替换整个属性表，也不再次套养成或Buff公式。
+    // 每条效果的同一属性最多出现一次；例如伤害为CURRENT_HP-100、护盾-30，治疗为CURRENT_HP+50，加能为能量+20。
+    // 伤害统计为EFFECT_DAMAGE中实际HP和护盾扣减量之和；治疗只统计EFFECT_HEAL的HP增加量。
+    PRT_ATTR_MAP attrDeltas = 3;
+    repeated PRT_BATTLE_BUFF_STATE addedBuffs = 4; // EFFECT_BUFF新增的实例，按buffId添加
+    repeated PRT_BATTLE_BUFF_STATE updatedBuffs = 5; // EFFECT_BUFF刷新、计时或生效变化后的状态，按buffId覆盖
+    repeated int64 removedBuffIds = 6; // EFFECT_BUFF移除的实例ID；自然到期由ROUND_END行动记录
+    // Buff列表操作本身不再增减属性，实际属性变化仅应用本条attrDeltas一次。
+}
+
+message PRT_BATTLE_UNIT_RESULT {
+    int64 unitId = 1;
+    PRT_BATTLE_UNIT_STATE finalState = 2;
+    int64 remainingSoldiers = 3; // floor(入场兵数×最终HP/最大HP)
+    int64 lostSoldiers = 4; // 入场兵数-remainingSoldiers，不等同于已判定的死兵数
+    int64 damageDealt = 5; // 实际护盾吸收+实际扣血
+    int64 damageTaken = 6;
+    int64 healingDone = 7; // 实际治疗
+    int32 normalAttackCount = 8;
+    int32 skillCastCount = 9; // 群攻只计一次
+    int64 normalAttackDamage = 10;
+    int64 skillDamage = 11;
+    repeated PRT_BATTLE_SKILL_RESULT skills = 12; // 按入场技能顺序，每个技能实例独立统计；未执行的技能为0
+}
+
+message PRT_BATTLE_SKILL_RESULT {
+    int64 skillId = 1;
+    int32 castCount = 2; // 该实例实际执行次数；群攻只计一次，组合子技能各记自己的执行次数
+    int64 damageDealt = 3; // 该实例及其产生的Buff链造成的实际伤害，不计溢出
+    int64 healingDone = 4; // 该实例及其产生的Buff链产生的实际治疗，不计护盾和溢出
+    optional int64 defeatedSoldiers = 5; // 技能击溃兵数，由玩法提供归属口径；未定义不传，不能用伤害量代替
+}
+
+message PRT_MINI_PLAYER
+{
+  int64 uid = 1;//uid 全局唯一
+  string username = 2; // 玩家名称，沿用旧 JSON 字段名
+  string account = 3; // 账号
+  int64 allianceId = 4; // 联盟id
+  int32 headId = 5; // 头像id
+  int64 powerFight = 6; // 战斗力
+  int32 skinId = 7; // 皮肤id
+  string allianceName = 8; // 联盟名称
+  int32 onlineTime = 9; // 累计在线时长，秒，对应旧 onlineTime
+  int64 lastLogoutTimer = 10; // 上次下线时间戳，秒，对应旧 lastOnlineTime
+}
+
+message PRT_THING
+{
+  int64 id = 1; //部分资源需要唯一id；装备为实例ID，每个实例单独返回，num=1
+  int32 tid = 2; //配表id
+  int64 num = 3; //数量
+  int32 module = 5; // 0沿用tid识别；5为数量兵，tid为soldiers.id，避免与道具号段重叠
+  repeated int32 params = 4;//额外参数 部分需求扩展使用    0 类型 额外参数的类型  其他的是 具体的业务需要的值  目前 抽卡英雄这一块
+    // type=1 英雄获取 参数2  是转换成碎片前的 英雄的配表id
+}
+
+message PRT_AWARD_DROP{
+    repeated PRT_THING drops = 1; //掉落
+}
+
+message PRT_HERO
+{
+  int64 heroId = 1; // 英雄服务器ID
+  int32 heroTid = 2; // 英雄配置表ID
+  int32 level = 3; // 英雄等级
+  int32 starRank = 4; // 英雄星阶
+  int64 exp = 5; // 英雄经验
+  int64 maxSoldierCount = 6; // 该英雄应用当前养成和系统加成后的最大携兵总量，不扣除出征、伤兵、死亡数量
+  repeated PRT_HERO_EQUIPMENT_SLOT equipmentSlots = 7; // 固定四个部位，各部位恰好一个槽；按完整快照覆盖，空槽不设置equipment
+  PRT_ATTR_MAP attrs = 8; // 英雄当前养成属性，包含装备贡献，不是战斗运行状态
+  repeated PRT_HERO_SKILL skills = 9; // 完整五槽技能快照，按slot升序且不重复；客户端整体覆盖
+}
+
+message PRT_HERO_SKILL {
+  int32 slot = 1; // 技能槽位，1～5
+  int32 skillTid = 2; // new_hero_skill.id，不是战斗效果skillId；空槽为0
+  int32 level = 3; // 0未解锁，1～maxLevel已解锁；空槽固定为0
+}
+
+message PRT_ATTR_MAP
+{
+    repeated PRT_ATTR baseAttrs = 1;//计算前的属性列表
+    repeated PRT_ATTR finalAttrs = 2;//最终的属性列表
+}
+
+message PRT_ATTR
+{
+    int32 attrType = 1; //属性枚举类型
+    int64 atrrVal = 2; //属性枚举值
+}
+
+message PRT_EQUIPMENT {
+  int64 id = 1; // 装备实例ID，与装备奖励PRT_THING.id一致
+  int32 equipmentTid = 2; // 装备模板ID
+  int64 heroId = 3; // 穿戴英雄实例ID，0表示未穿戴
+  int32 strengthLevel = 4; // 强化等级，初始0
+  int64 strengthExp = 5; // 当前强化等级内剩余经验
+  int32 forgeLevel = 6; // 独立的锻造等级，初始0
+  repeated PRT_ATTR attrs = 7; // 本件装备最终属性，EQUIP_ATK(28)/EQUIP_DEF(29)/EQUIP_HP(30)
+}
+
+enum PRT_EQUIPMENT_PART {
+  EQUIPMENT_PART_UNSPECIFIED = 0; // 未指定；脱下请求中表示一键脱下
+  EQUIPMENT_PART_HEAD = 1; // 头
+  EQUIPMENT_PART_HAND = 2; // 手
+  EQUIPMENT_PART_CHEST = 3; // 胸
+  EQUIPMENT_PART_SHOES = 4; // 鞋
+}
+
+message PRT_HERO_EQUIPMENT_SLOT {
+  PRT_EQUIPMENT_PART part = 1; // 只返回HEAD/HAND/CHEST/SHOES，按枚举值升序，不重复
+  PRT_EQUIPMENT equipment = 2; // 未设置表示空槽，通过消息字段存在性判断
+}
+
+message PRT_FORMATION_SOLDIER {
+  int32 soldierDid = 1; // 兵种等级配表 ID，与士兵系统一致
+  int64 count = 2; // 计划携带数量，必须大于零
+}

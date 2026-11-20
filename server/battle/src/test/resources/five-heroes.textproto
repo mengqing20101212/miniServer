@@ -1,0 +1,67 @@
+# 五个实际主动技能取自公司 battle_skill / battle_buff，入场面板固定为测试值。
+player { uid: 123 }
+units {
+  position: 1
+  hero { heroTid: 101 level: 1 }
+  entryAttrs { key: 1 value: 1150 }
+  entryAttrs { key: 5 value: 170 }
+  entryAttrs { key: 9 value: 100 }
+  entryAttrs { key: 13 value: 100 }
+  soldiers { soldierDid: 1 count: 70 }
+  soldiers { soldierDid: 2 count: 30 }
+  initialEnergy: 80
+  skills { slot: 0 level: 1 definition { id: 320000 effectType: 1 targetRule: 4 targetCount: 1 actionRate: 1000 } }
+  skills { slot: 1 level: 1 definition { id: 320001 effectType: 3 targetRule: 2 targetCount: 0 actionRate: 0 selfBuffs { id: 330004 effectType: 4 value: 100 durationRounds: 3 effectTiming: 0 } selfBuffs { id: 330005 effectType: 5 value: 100 durationRounds: 3 effectTiming: 0 } selfBuffs { id: 330006 effectType: 6 value: 100 durationRounds: 3 effectTiming: 0 } } }
+}
+units {
+  position: 2
+  hero { heroTid: 102 level: 1 }
+  entryAttrs { key: 1 value: 1200 }
+  entryAttrs { key: 5 value: 180 }
+  entryAttrs { key: 9 value: 100 }
+  entryAttrs { key: 13 value: 100 }
+  soldiers { soldierDid: 1 count: 70 }
+  soldiers { soldierDid: 2 count: 30 }
+  initialEnergy: 60
+  skills { slot: 0 level: 1 definition { id: 320000 effectType: 1 targetRule: 4 targetCount: 1 actionRate: 1000 } }
+  skills { slot: 1 level: 1 definition { id: 320002 effectType: 1 targetRule: 1 targetCount: 1 actionRate: 3000 } }
+}
+units {
+  position: 3
+  hero { heroTid: 103 level: 1 }
+  entryAttrs { key: 1 value: 1250 }
+  entryAttrs { key: 5 value: 190 }
+  entryAttrs { key: 9 value: 100 }
+  entryAttrs { key: 13 value: 100 }
+  soldiers { soldierDid: 1 count: 70 }
+  soldiers { soldierDid: 2 count: 30 }
+  initialEnergy: 40
+  skills { slot: 0 level: 1 definition { id: 320000 effectType: 1 targetRule: 4 targetCount: 1 actionRate: 1000 } }
+  skills { slot: 1 level: 1 definition { id: 320003 effectType: 1 targetRule: 1 targetCount: 1 actionRate: 1000 } }
+}
+units {
+  position: 4
+  hero { heroTid: 107 level: 1 }
+  entryAttrs { key: 1 value: 1300 }
+  entryAttrs { key: 5 value: 200 }
+  entryAttrs { key: 9 value: 100 }
+  entryAttrs { key: 13 value: 100 }
+  soldiers { soldierDid: 1 count: 70 }
+  soldiers { soldierDid: 2 count: 30 }
+  initialEnergy: 20
+  skills { slot: 0 level: 1 definition { id: 320000 effectType: 1 targetRule: 4 targetCount: 1 actionRate: 1000 } }
+  skills { slot: 1 level: 1 definition { id: 320004 effectType: 1 targetRule: 1 targetCount: 1 actionRate: 500 } }
+}
+units {
+  position: 5
+  hero { heroTid: 105 level: 1 }
+  entryAttrs { key: 1 value: 1350 }
+  entryAttrs { key: 5 value: 210 }
+  entryAttrs { key: 9 value: 100 }
+  entryAttrs { key: 13 value: 100 }
+  soldiers { soldierDid: 1 count: 70 }
+  soldiers { soldierDid: 2 count: 30 }
+  initialEnergy: 0
+  skills { slot: 0 level: 1 definition { id: 320000 effectType: 1 targetRule: 4 targetCount: 1 actionRate: 1000 } }
+  skills { slot: 1 level: 1 definition { id: 320005 effectType: 2 targetRule: 3 targetCount: 5 actionRate: 1500 } }
+}

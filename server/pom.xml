@@ -29,6 +29,7 @@
     <modules>
         <module>config</module>
         <module>proto</module>
+        <module>battle</module>
         <module>tool</module>
         <module>core</module>
         <module>LoginServer</module>
