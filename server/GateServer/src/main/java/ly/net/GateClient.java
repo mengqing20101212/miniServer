@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.google.protobuf.Message;
 
 import ly.LoggerDef;
+import ly.GateClientManager;
 import ly.ProtoMessageFactory;
 import ly.net.packet.MessagePacket;
 import ly.net.packet.MessagePacketFactory;
@@ -142,6 +143,7 @@ public class GateClient {
             return null;
         }
 
+        rpcNodeConnector.getClient().setUnsolicitedPacketHandler(GateClient::forwardGamePush);
         int rpcSeq = rpcNodeConnector.getClient().getSendSeq();
         // 登录后只能使用 Gate 已绑定的 playerId。不能相信客户端包里的 guid，否则客户端可以
         // 伪造其他在线玩家 ID，让 GameServer 把请求投递到错误的玩家队列。
@@ -218,6 +220,18 @@ public class GateClient {
                 0,
                 0);
         ReliableRpcStore.getInstance().save(gameServerId, reliablePacket, reason);
+    }
+
+    static boolean forwardGamePush(MessagePacket packet) {
+        int cmd = packet.getCmd();
+        if (cmd != Cmd.CMD.SC_SceneChanged_VALUE && cmd != Cmd.CMD.SC_HeroList_VALUE
+                && cmd != Cmd.CMD.SC_ResourceChange_VALUE) return false;
+        GateClient client = GateClientManager.getInstance().getClient(packet.getGuid());
+        if (client != null) {
+            client.sendPacketToClient(new MessagePacket(packet.getGuid(), cmd, client.getClientSid(),
+                    client.nextClientDownSeq(), packet.getData()));
+        }
+        return true;
     }
 
     public void sendPacketToClient(MessagePacket s2cPacket) {

@@ -47,6 +47,9 @@ public class SlgWorldObjectConfigManager implements InterfaceConfigManagerProxy 
       ly.ConfigValueType type5 = ly.ConfigValueType.parse("long");
       ly.ConfigValueType type6 = ly.ConfigValueType.parse("long");
       ly.ConfigValueType type7 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type8 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type9 = ly.ConfigValueType.parse("int");
+      ly.ConfigValueType type10 = ly.ConfigValueType.parse("int");
       String fileName = configDir + File.separator + getConfigFileName();
       SlgWorldObjectConfigChecker checker = new SlgWorldObjectConfigChecker();
       List<SlgWorldObjectConfig> newList = new ArrayList<>();
@@ -60,6 +63,9 @@ public class SlgWorldObjectConfigManager implements InterfaceConfigManagerProxy 
           long parsedField5 = 0L;
           long parsedField6 = 0L;
           int parsedField7 = 0;
+          int parsedField8 = 0;
+          int parsedField9 = 0;
+          int parsedField10 = 0;
           try {
             parsedField0 = ly.ConfigValues.read(type0, values.get("id"), fileName + ":行" + lineNumber + ":字段 id");
             parsedField1 = ly.ConfigValues.read(type1, values.get("kind"), fileName + ":行" + lineNumber + ":字段 kind");
@@ -69,11 +75,14 @@ public class SlgWorldObjectConfigManager implements InterfaceConfigManagerProxy 
             parsedField5 = ly.ConfigValues.read(type5, values.get("reward"), fileName + ":行" + lineNumber + ":字段 reward");
             parsedField6 = ly.ConfigValues.read(type6, values.get("gatherMillis"), fileName + ":行" + lineNumber + ":字段 gatherMillis");
             parsedField7 = ly.ConfigValues.read(type7, values.get("countPerRegion"), fileName + ":行" + lineNumber + ":字段 countPerRegion");
+            parsedField8 = ly.ConfigValues.read(type8, values.get("checkIntervalSec"), fileName + ":行" + lineNumber + ":字段 checkIntervalSec");
+            parsedField9 = ly.ConfigValues.read(type9, values.get("jitterSec"), fileName + ":行" + lineNumber + ":字段 jitterSec");
+            parsedField10 = ly.ConfigValues.read(type10, values.get("batchSize"), fileName + ":行" + lineNumber + ":字段 batchSize");
           } catch (ConfigLoadException error) {
             logger.error(error.getMessage());
             return;
           }
-          SlgWorldObjectConfig config = new SlgWorldObjectConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7);
+          SlgWorldObjectConfig config = new SlgWorldObjectConfig(parsedField0, parsedField1, parsedField2, parsedField3, parsedField4, parsedField5, parsedField6, parsedField7, parsedField8, parsedField9, parsedField10);
           newList.add(config);
           newMap.put(config.id, config);
       });
@@ -110,10 +119,9 @@ public class SlgWorldObjectConfigManager implements InterfaceConfigManagerProxy 
     }
 
     // @@@@@自定义方法开始区@@@@@
-    @Override
+@Override
     protected void afterLoad() {
     }
-
     // @@@@@自定义方法结束区@@@@@
   }
 }

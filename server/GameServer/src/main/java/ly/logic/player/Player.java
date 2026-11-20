@@ -11,6 +11,7 @@ import ly.logic.player.event.PlayerEventParam;
 import ly.logic.player.event.PlayerEventSource;
 import ly.logic.player.event.PlayerEventType;
 import ly.net.GamePlayer;
+import ly.net.packet.MessagePacketFactory;
 import ly.proto.Cmd;
 import ly.proto.ErrorMsg;
 import ly.utils.TimeStatisticsUtils;
@@ -216,6 +217,12 @@ public class Player {
 
     public void sendErrorCode(Cmd.CMD cmd, ErrorMsg.ErrorCode errorCode) {
         gamePlayer.sendErrorCode(cmd.getNumber(), errorCode);
+    }
+
+    /** 主动通知独立于当前客户端请求，Gate 按玩家 ID 分配下行序号。 */
+    public void pushMsg(Cmd.CMD cmd, AbstractMessage message) {
+        gamePlayer.getSession().addSendPacket(MessagePacketFactory.createMessagePacket(
+                getPlayerId(), cmd.getNumber(), message, 0, 0));
     }
 
     public void sendMsg(Cmd.CMD cmd, AbstractMessage message) {

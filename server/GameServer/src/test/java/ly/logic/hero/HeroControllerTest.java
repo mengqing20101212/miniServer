@@ -3,6 +3,9 @@ package ly.logic.hero;
 import static org.junit.Assert.*;
 
 import ly.config.ResourceType;
+import ly.db.PersistenceScope;
+import ly.logic.asset.Award;
+import ly.logic.asset.ChangeReason;
 import ly.db.entry.PlayerHeroEntry;
 import ly.logic.hero.module.HeroModule;
 import ly.logic.player.ModuleEnum;
@@ -120,6 +123,19 @@ public class HeroControllerTest {
         entry.setId(100001L);
         entry.setAccount("test_account");
         return PlayerDataTestFactory.create(entry);
+    }
+
+    @Test public void awardingHeroesPushesTheOwnedListAfterSaveWithoutClientQuery() {
+        heroModule.addHero(validHeroId(0));
+        try (PersistenceScope scope = PersistenceScope.open()) {
+            Award.create().addHero(validHeroId(1)).award(mockPlayer, ChangeReason.QUEST_REWARD);
+            assertNull(mockGamePlayer.getSentMessage(Cmd.CMD.SC_HeroList_VALUE));
+        }
+        Hero.SC_HeroList push = (Hero.SC_HeroList) mockGamePlayer.getSentMessage(Cmd.CMD.SC_HeroList_VALUE).message;
+        assertEquals(List.of(validHeroId(0), validHeroId(1)),
+                push.getHeroListList().stream().map(Hero.HeroInfo::getHeroId).toList());
+        heroController.handleHeroList(mockContext, Hero.CS_HeroList.getDefaultInstance());
+        assertEquals(push, mockGamePlayer.getSentMessage(Cmd.CMD.SC_HeroList_VALUE).message);
     }
 
     /** 测试获取英雄列表 */

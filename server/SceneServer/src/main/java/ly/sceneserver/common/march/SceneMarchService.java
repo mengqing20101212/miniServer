@@ -2,6 +2,7 @@ package ly.sceneserver.common.march;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import ly.config.SlgWorldObjectConfig;
 import ly.sceneserver.common.*;
@@ -17,10 +18,10 @@ public final class SceneMarchService {
     private Supplier<Map<Integer, SlgWorldObjectConfig>> rules;
     private Consumer<SceneMarchSnapshot> changed = snapshot -> {};
     public void onChanged(Consumer<SceneMarchSnapshot> changed) { this.changed = changed; }
-    private Consumer<SceneObject> persistence = object -> {};
+    private BiConsumer<SceneObject, Boolean> persistence = (object, deleted) -> {};
 
     public SceneMarchService(SceneShard shard) { this.shard = shard; }
-    public void configure(Supplier<Map<Integer, SlgWorldObjectConfig>> rules, Consumer<SceneObject> persistence,
+    public void configure(Supplier<Map<Integer, SlgWorldObjectConfig>> rules, BiConsumer<SceneObject, Boolean> persistence,
             Consumer<SceneMarchSnapshot> home) {
         this.home = home;
         this.rules = rules;
@@ -123,8 +124,7 @@ public final class SceneMarchService {
             boolean victory = snapshot.power() >= state.health();
             march.setOutcome(rule.resourceId, victory ? rule.reward : 0, victory);
             if (victory) {
-                target.state(withAmounts(state, state.amount(), 0));
-                persistence.accept(target);
+                removeDepletedTarget(target, rule);
             }
             returnHome(march, now);
         }
@@ -136,11 +136,20 @@ public final class SceneMarchService {
         SceneWorldObjectState state = (SceneWorldObjectState) target.state();
         SlgWorldObjectConfig rule = rules.get().get(state.configId());
         long amount = Math.min(state.amount(), snapshot.troopCount());
-        target.state(withAmounts(state, state.amount() - amount, state.health()));
-        persistence.accept(target);
+        if (amount == state.amount()) {
+            removeDepletedTarget(target, rule);
+        } else {
+            target.state(withAmounts(state, state.amount() - amount, state.health()));
+            persistence.accept(target, false);
+        }
         occupiedTargets.remove(target.objectId());
         march.setOutcome(rule.resourceId, amount, true);
         returnHome(march, now);
+    }
+
+    private void removeDepletedTarget(SceneObject target, SlgWorldObjectConfig rule) {
+        persistence.accept(target, true);
+        shard.removeDepletedTarget(target, rule);
     }
 
     private void returnHome(SceneMarchState march, long now) {
@@ -153,7 +162,7 @@ public final class SceneMarchService {
         SceneMarchSnapshot snapshot = march.snapshot();
         persistence.accept(SceneObject.restore(snapshot.marchId(), SceneObjectType.MARCH,
                 snapshot.ownerPlayerId(), snapshot.target().point().x(), snapshot.target().point().y(),
-                march, snapshot.stateVersion(), snapshot.tagMask()));
+                march, snapshot.stateVersion(), snapshot.tagMask()), false);
         changed.accept(snapshot);
     }
 

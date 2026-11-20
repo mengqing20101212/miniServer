@@ -48,8 +48,6 @@ public final class SceneProxyController implements IGameController {
         gameHandlerRegister(Cmd.CMD.CS_SceneMove, this::handleMove);
         gameHandlerRegister(Cmd.CMD.CS_SceneLeave, this::handleLeave);
         gameHandlerRegister(Cmd.CMD.CS_SceneView, this::handleView);
-        gameHandlerRegister(Cmd.CMD.SC_SceneChanged, (GameHandlerContext context, Scene.scSceneChanged changed) ->
-                context.player().sendMsg(Cmd.CMD.SC_SceneChanged, changed));
         gameHandlerRegister(Cmd.CMD.CS_SceneMarchStart, this::handleMarchStart);
         gameHandlerRegister(Cmd.CMD.CS_SceneMarchQuery, this::handleMarchQuery);
         gameHandlerRegister(Cmd.CMD.CS_ScenePathFind, this::handlePathFind);
@@ -265,7 +263,8 @@ public final class SceneProxyController implements IGameController {
     private static boolean routeSceneNotification(MessagePacket packet) {
         if (packet.getCmd() != Cmd.CMD.SC_SceneChanged_VALUE) return false;
         Player player = ly.logic.player.PlayerManager.getInstance().getOnlinePlayer(packet.getGuid());
-        if (player != null) player.getGamePlayer().addPacket(packet);
+        // 公开视野快照已经由 Scene 生成，按所属 Gate 连接下发即可。
+        if (player != null) player.getGamePlayer().getSession().addSendPacket(packet);
         return true;
     }
 

@@ -132,7 +132,12 @@ public class GateLoginController implements IGateController {
                         return;
                     }
 
+                    long loginGuid = client.getSessionGuid();
                     client.setPlayerId(scLogin.getPlayerId());
+                    if (client.getSessionGuid() != loginGuid) {
+                        GateClientManager.getInstance().removeClient(loginGuid);
+                        GateClientManager.getInstance().addClient(client);
+                    }
                     // 登录响应解析成功后仍走统一转发入口，由 Gate 分配客户端下行 seq。
                     client.sendGameResponseToClient(resp);
                 } finally {

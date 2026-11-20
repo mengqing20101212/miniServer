@@ -21,6 +21,9 @@ public abstract class SlgWorldObjectConfigCheckerBase extends AbstractConfigChec
         new ConfigColumnMeta(4, "health", "long"),
         new ConfigColumnMeta(5, "reward", "long"),
         new ConfigColumnMeta(6, "gatherMillis", "long"),
-        new ConfigColumnMeta(7, "countPerRegion", "int"));
+        new ConfigColumnMeta(7, "countPerRegion", "int"),
+        new ConfigColumnMeta(8, "checkIntervalSec", "int"),
+        new ConfigColumnMeta(9, "jitterSec", "int"),
+        new ConfigColumnMeta(10, "batchSize", "int"));
   }
 }

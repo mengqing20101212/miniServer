@@ -94,7 +94,7 @@ public class ResourceModule extends AbstractModule {
         try {
             Resource.SC_ResourceChange message =
                     Resource.SC_ResourceChange.newBuilder().putAllChanges(changes).build();
-            player.sendMsg(ly.proto.Cmd.CMD.SC_ResourceChange, message);
+            player.pushMsg(ly.proto.Cmd.CMD.SC_ResourceChange, message);
         } catch (NoClassDefFoundError | Exception error) {
             ly.LoggerDef.SystemLogger.warn("资源变更通知失败, playerId={}", player.getPlayerId(), error);
         }

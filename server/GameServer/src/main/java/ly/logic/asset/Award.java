@@ -1,6 +1,8 @@
 package ly.logic.asset;
 
 import ly.logic.hero.module.HeroModule;
+import ly.db.PersistenceScope;
+import ly.proto.Cmd;
 import ly.logic.player.*;
 
 import java.util.*;
@@ -81,6 +83,9 @@ public final class Award {
             }
             for (var resource : resources.entrySet())
                 Consume.resource(player).addResource(resource.getKey(), resource.getValue());
+            if (!heroes.isEmpty() && player.getGamePlayer() != null) {
+                PersistenceScope.afterFlush(module, () -> player.pushMsg(Cmd.CMD.SC_HeroList, module.ownedHeroList()));
+            }
             Map<Integer, Long> changes = toMap();
             ly.db.PersistenceScope.afterFlush(
                     () ->

@@ -17,12 +17,20 @@ public final class SceneAoiService {
     public void remove(long playerId) { subscriptions.remove(playerId); }
 
     public void marchChanged(SceneMarchSnapshot march) {
+        notifyViews(march.origin(), march.target().point());
+    }
+
+    public void pointChanged(ScenePoint point) {
+        notifyViews(point, point);
+    }
+
+    private void notifyViews(ScenePoint start, ScenePoint end) {
         for (Subscription subscription : subscriptions.values()) {
             SceneViewRequest view = subscription.request();
             int size = scene.config().regionSize();
             int x = view.center().x() / size, y = view.center().y() / size;
             int radius = view.radiusBlocks();
-            if (!SceneRouteVisibility.intersects(march.origin(), march.target().point(),
+            if (!SceneRouteVisibility.intersects(start, end,
                     (x - radius) * size, (y - radius) * size,
                     (x + radius + 1) * size - 1, (y + radius + 1) * size - 1)) continue;
             scene.updateViewAsync(view).thenAccept(subscription.changed()).exceptionally(error -> {

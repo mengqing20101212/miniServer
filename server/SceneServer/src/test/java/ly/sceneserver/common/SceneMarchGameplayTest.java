@@ -4,14 +4,15 @@ import static org.junit.Assert.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
 import ly.config.SlgWorldObjectConfig;
 import ly.sceneserver.common.persistence.PlayerSceneProjection;
 import ly.sceneserver.common.march.*;
 import org.junit.Test;
 
 public class SceneMarchGameplayTest {
-    private final SlgWorldObjectConfig resource = new SlgWorldObjectConfig(1, "RESOURCE", 1, 1000, 0, 0, 50, 1);
-    private final SlgWorldObjectConfig monster = new SlgWorldObjectConfig(2, "MONSTER", 1, 0, 100, 100, 0, 1);
+    private final SlgWorldObjectConfig resource = new SlgWorldObjectConfig(1, "RESOURCE", 1, 1000, 0, 0, 50, 1, 900, 30, 20);
+    private final SlgWorldObjectConfig monster = new SlgWorldObjectConfig(2, "MONSTER", 1, 0, 100, 100, 0, 1, 60, 10, 20);
 
     @Test public void targetRegionOwnsGatheringThroughReturnAndAoiSeesRouteOutsideTargetRegion() throws Exception {
         try (SceneRuntime runtime = new SceneRuntime(0, 200, 1000)) {
@@ -22,7 +23,7 @@ public class SceneMarchGameplayTest {
             List<SceneObject> persisted = Collections.synchronizedList(new ArrayList<>());
             List<SceneMarchSnapshot> home = new ArrayList<>();
             for (int index = 0; index < 2; index++) scene.shard(index).marches().configure(
-                    () -> Map.of(1, resource, 2, monster), persisted::add, home::add);
+                    () -> Map.of(1, resource, 2, monster), (object, deleted) -> persisted.add(object), home::add);
             runtime.start();
             List<PlayerSceneProjection> cities = new ArrayList<>();
             AtomicLong ids = new AtomicLong(1000);
@@ -83,7 +84,7 @@ public class SceneMarchGameplayTest {
             SceneRuntime.SceneInstance scene = runtime.scene("test");
             setupRegions(scene);
             seed(scene, 99, SceneObjectType.MONSTER, 22, 2, monster);
-            scene.shard(1).marches().configure(() -> Map.of(2, monster), object -> {}, ignored -> {});
+            scene.shard(1).marches().configure(() -> Map.of(2, monster), (object, deleted) -> {}, ignored -> {});
             runtime.start();
             scene.shard(1).query(shard -> {
                 long now = System.currentTimeMillis();
@@ -100,6 +101,92 @@ public class SceneMarchGameplayTest {
                         new ScenePoint(1, 2), 99, new ScenePoint(22, 2), SceneMarchType.ATTACK, 100, 100, now, "game1001"));
                 return null;
             }).get(2, TimeUnit.SECONDS);
+        }
+    }
+
+    @Test public void restoredPartialMineSurvivesUntilEmptiedAndTargetsRefillInTheirRegion() throws Exception {
+        try (SceneRuntime runtime = new SceneRuntime(0, 200, 1000)) {
+            runtime.addScene(new SceneConfig("test", 24, 8, 2, 4, 5));
+            SceneRuntime.SceneInstance scene = runtime.scene("test");
+            setupRegions(scene);
+            scene.seedObject(new SceneObject(99, SceneObjectType.RESOURCE, 0, 22, 2,
+                    new SceneWorldObjectState(1, 1, 1, 1, 130, 0, 0, 0, 0, new byte[0])));
+            scene.seedObject(new SceneObject(98, SceneObjectType.MONSTER, 0, 20, 2,
+                    new SceneWorldObjectState(1, 2, 2, 1, 0, 0, 0, 0, 0, new byte[0])));
+            List<Long> removed = new ArrayList<>();
+            List<SceneMarchSnapshot> home = new ArrayList<>();
+            BiConsumer<SceneObject, Boolean> store = (object, deleted) -> {
+                if (deleted) removed.add(object.objectId());
+            };
+            AtomicLong ids = new AtomicLong(1000);
+            long now = System.currentTimeMillis();
+            SceneWorldSpawner.install(scene, () -> List.of(resource, monster), ids::incrementAndGet, store, now);
+            assertEquals(List.of(98L), removed);
+            SceneShard host = scene.shard(1);
+            host.marches().configure(() -> Map.of(1, resource, 2, monster), store, home::add);
+            runtime.start();
+            BlockingQueue<SceneViewSnapshot> changes = new LinkedBlockingQueue<>();
+            scene.aoi().subscribe(new SceneViewRequest(20, new ScenePoint(16, 4), 2, SceneViewLevel.DETAIL, 0), changes::add);
+            long replacementId = host.query(shard -> {
+                ScenePoint mine = new ScenePoint(22, 2);
+                ScenePoint origin = new ScenePoint(1, 0);
+                assertEquals(130, ((SceneWorldObjectState) shard.object(99).state()).amount());
+                for (int i = 0; i < 2; i++) {
+                    long id = 70 + i;
+                    SceneMarchSnapshot trip = shard.marches().start(id, 10, origin, 99, mine,
+                            SceneMarchType.GATHER, 100, 100, now, "game");
+                    shard.marches().tick(trip.arrivalAtMillis());
+                    shard.marches().tick(shard.marches().ownedSnapshot(id, 10).gatherEndAtMillis());
+                    shard.marches().tick(shard.marches().ownedSnapshot(id, 10).arrivalAtMillis());
+                    if (i == 0) assertEquals(30, ((SceneWorldObjectState) shard.object(99).state()).amount());
+                }
+                assertNull(shard.object(99));
+                SceneObject replacement = shard.worldObjects().stream()
+                        .filter(o -> o.type() == SceneObjectType.RESOURCE).findFirst().orElseThrow();
+                assertEquals(1000, ((SceneWorldObjectState) replacement.state()).amount());
+                SceneObject wild = shard.worldObjects().stream()
+                        .filter(o -> o.type() == SceneObjectType.MONSTER).findFirst().orElseThrow();
+                SceneMarchSnapshot attack = shard.marches().start(72, 10, origin, wild.objectId(),
+                        new ScenePoint(wild.x(), wild.y()), SceneMarchType.ATTACK, 100, 100, now, "game");
+                shard.marches().tick(attack.arrivalAtMillis());
+                assertNull(shard.object(wild.objectId()));
+                assertEquals(List.of(98L, 99L, wild.objectId()), removed);
+                assertEquals(2, shard.worldObjects().size());
+                for (SceneObject object : shard.worldObjects()) {
+                    assertEquals(202, shard.staticMap().regionId(object.x(), object.y()));
+                }
+                assertEquals(2, home.size());
+                assertEquals(100, home.get(0).rewardAmount());
+                assertEquals(30, home.get(1).rewardAmount());
+                return replacement.objectId();
+            }).get(2, TimeUnit.SECONDS);
+            SceneViewSnapshot refreshed = changes.poll(2, TimeUnit.SECONDS);
+            assertNotNull("新矿点所在视野没有收到推送", refreshed);
+            assertTrue(refreshed.objects().stream().anyMatch(object -> object.objectId() == replacementId));
+            assertFalse(refreshed.objects().stream().anyMatch(object -> object.objectId() == 99));
+        }
+    }
+
+    @Test public void periodicCheckRefillsOnlyMissingSlotsAndHonorsBatchSize() {
+        try (SceneRuntime runtime = new SceneRuntime(0, 200, 1000)) {
+            runtime.addScene(new SceneConfig("test", 24, 8, 2, 4, 5));
+            SceneRuntime.SceneInstance scene = runtime.scene("test");
+            setupRegions(scene);
+            SlgWorldObjectConfig rule = new SlgWorldObjectConfig(1, "RESOURCE", 1, 1000, 0, 0, 50, 3, 900, 30, 1);
+            AtomicLong ids = new AtomicLong(1000);
+            SceneWorldSpawner.install(scene, () -> List.of(rule), ids::incrementAndGet, (o, deleted) -> {}, 0);
+            SceneShard shard = scene.shard(1);
+            for (SceneObject object : List.copyOf(shard.worldObjects())) shard.removeObject(object.objectId());
+            long due = (900 + 202 % 31) * 1000L;
+            shard.worldSpawner.tick(due - 1);
+            assertTrue(shard.worldObjects().isEmpty());
+            shard.worldSpawner.tick(due);
+            assertEquals(1, shard.worldObjects().size());
+            shard.worldSpawner.tick(due + 5);
+            assertEquals(2, shard.worldObjects().size());
+            shard.worldSpawner.tick(due + 10);
+            assertEquals(3, shard.worldObjects().size());
+            assertEquals(3, scene.shard(0).worldObjects().size());
         }
     }
 

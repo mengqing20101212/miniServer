@@ -14,7 +14,12 @@ import ly.sceneserver.common.persistence.SceneRecoveryReport;
 import ly.sceneserver.common.persistence.SceneRecoveryService;
 import ly.sceneserver.common.persistence.SceneStaticMapLoader;
 
+import java.util.function.BiConsumer;
 import ly.LoggerDef;
+import ly.config.SlgWorldObjectConfigManager;
+import ly.db.MysqlService;
+import ly.sceneserver.common.SceneObject;
+import ly.sceneserver.common.SceneWorldSpawner;
 import ly.game.MiniPlayerHelper;
 import ly.proto.Cmd;
 import ly.proto.Scene;
@@ -86,16 +91,16 @@ public final class SceneBootstrap {
             SceneAggregatePersistenceService persistence = createdAggregatePersistence;
             for (String sceneId : created.registeredSceneIds()) {
                 SceneRuntime.SceneInstance scene = created.scene(sceneId);
-                java.util.function.Consumer<ly.sceneserver.common.SceneObject> save = object ->
-                        persistence.snapshotAndSubmit(sceneId, object, 1, false);
+                BiConsumer<SceneObject, Boolean> save = (object, deleted) ->
+                        persistence.snapshotAndSubmit(sceneId, object, 1, deleted);
                 for (int index = 0; index < scene.shardCount(); index++) {
                     scene.shard(index).marches().onChanged(scene.aoi()::marchChanged);
                     scene.shard(index).marches().configure(
-                            () -> ly.config.SlgWorldObjectConfigManager.getInstance().getConfigMap(), save, SceneBootstrap::sendHomeReward);
+                            () -> SlgWorldObjectConfigManager.getInstance().getConfigMap(), save, SceneBootstrap::sendHomeReward);
                 }
-                if (!fakeDataEnabled) ly.sceneserver.common.SceneWorldSpawner.seed(scene,
-                        ly.config.SlgWorldObjectConfigManager.getInstance().getConfigList(),
-                        () -> ly.db.MysqlService.getInstance().generateEntityId(), save);
+                if (!fakeDataEnabled) SceneWorldSpawner.install(scene,
+                        () -> SlgWorldObjectConfigManager.getInstance().getConfigList(),
+                        MysqlService.getInstance()::generateEntityId, save, System.currentTimeMillis());
             }
             if (fakeDataEnabled) {
                 int targetOnline = intProperty("slg.scene.fake-online", 10_000);

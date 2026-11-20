@@ -43,15 +43,7 @@ public class HeroController implements IGameController {
         Player player = context.player();
         HeroModule heroModule =
                 (HeroModule) player.getPlayerData().getModule(ModuleEnum.HERO_MODULE);
-        List<PlayerHeroEntry> heroList = heroModule.getHeroList();
-
-        Hero.SC_HeroList.Builder builder = Hero.SC_HeroList.newBuilder();
-        for (PlayerHeroEntry entry : heroList) {
-            Hero.HeroInfo info = buildHeroInfo(entry);
-            builder.addHeroList(info);
-        }
-
-        player.sendMsg(Cmd.CMD.SC_HeroList, builder.build());
+        player.sendMsg(Cmd.CMD.SC_HeroList, heroModule.ownedHeroList());
     }
 
     /** 处理英雄升级 */
@@ -118,7 +110,7 @@ public class HeroController implements IGameController {
         // 返回结果
         Hero.SC_HeroLevelUp.Builder builder = Hero.SC_HeroLevelUp.newBuilder();
         builder.setResult(ErrorMsg.ErrorCode.Ok);
-        builder.setHeroInfo(buildHeroInfo(hero));
+        builder.setHeroInfo(heroModule.buildHeroInfo(hero));
         player.sendMsg(Cmd.CMD.SC_HeroLevelUp, builder.build());
     }
 
@@ -168,7 +160,7 @@ public class HeroController implements IGameController {
         // 返回结果
         Hero.SC_HeroStarUp.Builder builder = Hero.SC_HeroStarUp.newBuilder();
         builder.setResult(ErrorMsg.ErrorCode.Ok);
-        builder.setHeroInfo(buildHeroInfo(hero));
+        builder.setHeroInfo(heroModule.buildHeroInfo(hero));
         player.sendMsg(Cmd.CMD.SC_HeroStarUp, builder.build());
     }
 
@@ -224,7 +216,7 @@ public class HeroController implements IGameController {
         // 返回结果
         Hero.SC_HeroAwaken.Builder builder = Hero.SC_HeroAwaken.newBuilder();
         builder.setResult(ErrorMsg.ErrorCode.Ok);
-        builder.setHeroInfo(buildHeroInfo(hero));
+        builder.setHeroInfo(heroModule.buildHeroInfo(hero));
         player.sendMsg(Cmd.CMD.SC_HeroAwaken, builder.build());
     }
 
@@ -253,28 +245,11 @@ public class HeroController implements IGameController {
                 player.sendErrorCode(Cmd.CMD.CS_HeroAdd, ErrorMsg.ErrorCode.HERO_SLOT_FULL);
                 return;
             }
-            builder.addHeroList(buildHeroInfo(hero));
+            builder.addHeroList(heroModule.buildHeroInfo(hero));
         }
 
         builder.setResult(ErrorMsg.ErrorCode.Ok);
         player.sendMsg(Cmd.CMD.SC_HeroAdd, builder.build());
-    }
-
-    /** 构建英雄信息 */
-    private Hero.HeroInfo buildHeroInfo(PlayerHeroEntry entry) {
-        Hero.HeroInfo.Builder builder = Hero.HeroInfo.newBuilder();
-        builder.setHeroUid(entry.getId());
-        builder.setHeroId(entry.getHeroId());
-        builder.setLevel(entry.getLevel());
-        builder.setStar(entry.getStar());
-        builder.setAwaken(entry.getAwaken());
-        builder.setExp(entry.getExp());
-
-        // 计算升级所需经验
-        long maxExp = calcMaxExp(entry.getHeroId(), entry.getLevel());
-        builder.setMaxExp(maxExp);
-
-        return builder.build();
     }
 
     private Consume upgradeCost(HeroExpConfig config) {
@@ -321,20 +296,4 @@ public class HeroController implements IGameController {
         return result;
     }
 
-    /** 计算升级所需经验 */
-    private long calcMaxExp(int heroId, int level) {
-        HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(heroId);
-        if (heroConfig == null) {
-            return 0;
-        }
-
-        HeroExpConfig expConfig =
-                HeroExpConfigManager.getInstance()
-                        .getByModelIdAndLevel(heroConfig.expModelId, level + 1);
-        if (expConfig == null) {
-            return 0; // 已达最高等级
-        }
-
-        return expConfig.exp;
-    }
 }

@@ -1,6 +1,10 @@
 package ly.bot.scenario;
 
 import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import java.util.concurrent.*;
 import com.google.protobuf.AbstractMessage;
 import ly.ProtoMessageFactory;
@@ -17,6 +21,9 @@ public final class SlgGameplayScenario implements RobotScenario {
     private final String scene = System.getProperty("slg.bot.scene-id", "world-1");
     private RobotSession session;
     private Scene.ScenePoint city;
+    private int width;
+    private int[] regions;
+    private final List<Scene.ScenePoint> regionWindows = new ArrayList<>();
 
     public SlgGameplayScenario(RobotSession observer) { this.observer = observer; }
     public CompletableFuture<Void> completion() { return completion; }
@@ -41,22 +48,37 @@ public final class SlgGameplayScenario implements RobotScenario {
         try {
             city = enter(session, 1, 1);
             enter(observer, 2, 2);
-            Map<Scene.SceneObjectKind, Scene.SceneObjectSnapshot> targets = findTargets();
+            loadRegionWindows();
+            Map<Long, Scene.SceneObjectSnapshot> before = regionTargets();
             long observerBalance = balance(observer, 1);
-            for (Scene.SceneObjectKind kind : List.of(Scene.SceneObjectKind.SCENE_OBJECT_RESOURCE,
-                    Scene.SceneObjectKind.SCENE_OBJECT_MONSTER)) {
-                runMarch(kind, targets.get(kind));
+            Scene.SceneObjectSnapshot mine = chooseTarget(before, Scene.SceneObjectKind.SCENE_OBJECT_RESOURCE);
+            long stock = mine.getPersistentState().getAmount();
+            require(stock > 100, "矿点余量不足以验证分次采集");
+            while (stock > 100) {
+                stock -= 100;
+                runMarch(mine, 100);
+                Scene.SceneObjectSnapshot partial = regionTargets().get(mine.getObjectId());
+                require(partial != null && partial.getPoint().equals(mine.getPoint())
+                        && partial.getPersistentState().getAmount() == stock, "原矿点未保留实际剩余量");
+                System.out.printf("[SLG-GAMEPLAY] partial mine=%d remaining=%d%n", mine.getObjectId(), stock);
             }
+            runMarch(mine, stock);
+            Map<Long, Scene.SceneObjectSnapshot> afterMine = regionTargets();
+            verifyReplacement(before, afterMine, mine);
+            Scene.SceneObjectSnapshot monster = chooseTarget(afterMine, Scene.SceneObjectKind.SCENE_OBJECT_MONSTER);
+            runMarch(monster, 100);
+            verifyReplacement(afterMine, regionTargets(), monster);
             require(balance(observer, 1) == observerBalance, "观察者收到其他玩家的奖励");
             for (RobotSession player : List.of(session, observer))
                 invoke(player, Cmd.CMD.CS_SceneLeave, Cmd.CMD.SC_SceneLeave,
                         Scene.csSceneLeave.newBuilder().setSceneId(scene).build(), Scene.scSceneLeave.class);
-            System.out.println("[SLG-GAMEPLAY] PASS gather, monster, automatic-return-award, read-only-query, cross-region-AOI");
+            System.out.println("[SLG-GAMEPLAY] PASS partial-gather, depleted-mine-respawn, monster-respawn, automatic-return-award, read-only-query, cross-region-AOI");
             completion.complete(null);
         } catch (Throwable failure) { completion.completeExceptionally(failure); }
     }
 
-    private void runMarch(Scene.SceneObjectKind kind, Scene.SceneObjectSnapshot target) throws Exception {
+    private void runMarch(Scene.SceneObjectSnapshot target, long reward) throws Exception {
+        Scene.SceneObjectKind kind = target.getKind();
         long before = balance(session, 1);
         int midX = (target.getPoint().getX() + city.getX()) / 2;
         int midY = (target.getPoint().getY() + city.getY()) / 2;
@@ -76,10 +98,12 @@ public final class SlgGameplayScenario implements RobotScenario {
         require(initial.getOwnerPlayerId() == session.getPlayerId(), "Game未绑定真实玩家");
         require(initial.getTroopCount() == 100 && initial.getPower() == 100, "Game未覆盖客户端兵力战力");
         require(initial.getTargetRegionId() == 25, "用例目标应位于公司地图中央区域25");
-        awaitPush(initial.getMarchId(), true);
+        awaitPush(initial.getMarchId(), Scene.SceneMarchStatus.SCENE_MARCH_MOVING);
+        awaitPush(initial.getMarchId(), Scene.SceneMarchStatus.SCENE_MARCH_RETURNING);
+        require(balance(session, 1) == before, "返程途中已经发奖");
         Scene.csSceneMarchQuery query = Scene.csSceneMarchQuery.newBuilder().setSceneId(scene)
                 .setMarchId(initial.getMarchId()).setTargetRegionId(initial.getTargetRegionId()).build();
-        awaitPush(initial.getMarchId(), false);
+        awaitPush(initial.getMarchId(), Scene.SceneMarchStatus.SCENE_MARCH_FINISHED);
         // 首次查行军前先通过独立的资产接口确认余额，防止查询触发发奖的回归。
         long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(30);
         long actual = balance(session, 1);
@@ -87,47 +111,95 @@ public final class SlgGameplayScenario implements RobotScenario {
             Thread.sleep(200);
             actual = balance(session, 1);
         }
-        require(actual == before + 100, "未查行军时返程奖励没有自动到账");
+        require(actual == before + reward, "未查行军时返程奖励没有自动到账");
         Scene.scSceneMarchQuery response = invoke(session, Cmd.CMD.CS_SceneMarchQuery, Cmd.CMD.SC_SceneMarchQuery,
                 query, Scene.scSceneMarchQuery.class);
         Scene.SceneMarchSnapshot finished = response.getMarch();
         require(response.getResult() == ErrorMsg.ErrorCode.Ok
                 && finished.getStatus() == Scene.SceneMarchStatus.SCENE_MARCH_FINISHED
                 && finished.getTargetRegionId() == initial.getTargetRegionId()
-                && finished.getVictory() && finished.getRewardAmount() == 100, "已结束行军记录错误");
+                && finished.getVictory() && finished.getRewardAmount() == reward, "已结束行军记录错误");
         invoke(session, Cmd.CMD.CS_SceneMarchQuery, Cmd.CMD.SC_SceneMarchQuery, query, Scene.scSceneMarchQuery.class);
         require(balance(session, 1) == actual, "查询行军改变了余额");
-        Scene.scSceneView after = view(session, target.getPoint().getX(), target.getPoint().getY());
-        Scene.SceneObjectSnapshot updated = after.getObjectsList().stream()
-                .filter(object -> object.getObjectId() == target.getObjectId()).findFirst().orElseThrow();
-        require(kind == Scene.SceneObjectKind.SCENE_OBJECT_RESOURCE
-                        ? updated.getPersistentState().getAmount() == target.getPersistentState().getAmount() - 100
-                        : updated.getPersistentState().getHealth() == 0, "目标状态未更新");
-        System.out.printf("[SLG-GAMEPLAY] kind=%s target=(%d,%d) observer=(%d,%d) hostRegion=%d balance=%d->%d AOI=appear/remove%n",
+        System.out.printf("[SLG-GAMEPLAY] kind=%s target=(%d,%d) observer=(%d,%d) observerRegion=%d hostRegion=%d balance=%d->%d AOI=moving/returning/removed%n",
                 kind, target.getPoint().getX(), target.getPoint().getY(), midX, midY,
-                finished.getTargetRegionId(), before, balance(session, 1));
+                regions[midY * width + midX], finished.getTargetRegionId(), before, actual);
     }
 
-    private Map<Scene.SceneObjectKind, Scene.SceneObjectSnapshot> findTargets() throws Exception {
-        Map<Scene.SceneObjectKind, Scene.SceneObjectSnapshot> targets = new EnumMap<>(Scene.SceneObjectKind.class);
-        for (int[] camera : new int[][]{{600, 450}, {664, 450}, {536, 482}, {600, 514}, {664, 514}}) {
-            for (Scene.SceneObjectSnapshot object : view(session, camera[0], camera[1]).getObjectsList()) {
-                if (object.getKind() == Scene.SceneObjectKind.SCENE_OBJECT_RESOURCE && object.getPersistentState().getAmount() >= 100
-                        || object.getKind() == Scene.SceneObjectKind.SCENE_OBJECT_MONSTER && object.getPersistentState().getHealth() > 0)
-                    targets.putIfAbsent(object.getKind(), object);
-            }
-            if (targets.size() == 2) return targets;
+    private void loadRegionWindows() throws Exception {
+        Path directory = Path.of(System.getProperty("slg.scene.map-dir", "maps/slg"));
+        JSONObject map = JSON.parseObject(Files.readString(directory.resolve("world-regions.json")));
+        width = map.getIntValue("width");
+        int height = map.getIntValue("height");
+        regions = map.getJSONArray("cellRegionIds").toJavaObject(int[].class);
+        // 一次九宫格覆盖 3×3 个 32 格视野块，盘点所有与目标区相交的窗口。
+        int stride = 96;
+        int columns = (width + stride - 1) / stride;
+        BitSet windows = new BitSet();
+        for (int index = 0; index < regions.length; index++) {
+            if (regions[index] == 25) windows.set((index / width / stride) * columns + index % width / stride);
         }
-        throw new IllegalStateException("中央区域缺少采集或怪物目标");
+        for (int window = windows.nextSetBit(0); window >= 0; window = windows.nextSetBit(window + 1)) {
+            regionWindows.add(point(Math.min(width - 1, (window % columns) * stride + stride / 2),
+                    Math.min(height - 1, (window / columns) * stride + stride / 2)));
+        }
     }
 
-    private void awaitPush(long marchId, boolean present) throws Exception {
+    private Map<Long, Scene.SceneObjectSnapshot> regionTargets() throws Exception {
+        Map<Long, Scene.SceneObjectSnapshot> targets = new LinkedHashMap<>();
+        for (Scene.ScenePoint center : regionWindows) {
+            for (Scene.SceneObjectSnapshot object : view(session, center.getX(), center.getY()).getObjectsList()) {
+                Scene.ScenePoint target = object.getPoint();
+                if (regions[target.getY() * width + target.getX()] == 25
+                        && (object.getKind() == Scene.SceneObjectKind.SCENE_OBJECT_RESOURCE
+                        || object.getKind() == Scene.SceneObjectKind.SCENE_OBJECT_MONSTER))
+                    targets.put(object.getObjectId(), object);
+            }
+        }
+        return targets;
+    }
+
+    private Scene.SceneObjectSnapshot chooseTarget(Map<Long, Scene.SceneObjectSnapshot> targets, Scene.SceneObjectKind kind) {
+        for (Scene.SceneObjectSnapshot object : targets.values()) {
+            Scene.ScenePoint target = object.getPoint();
+            int midX = (target.getX() + city.getX()) / 2;
+            int midY = (target.getY() + city.getY()) / 2;
+            if (object.getKind() == kind && regions[midY * width + midX] != 25
+                    && (kind != Scene.SceneObjectKind.SCENE_OBJECT_RESOURCE || object.getPersistentState().getAmount() > 100))
+                return object;
+        }
+        throw new IllegalStateException("中央区域缺少跨区行军目标 " + kind);
+    }
+
+    private void verifyReplacement(Map<Long, Scene.SceneObjectSnapshot> before,
+            Map<Long, Scene.SceneObjectSnapshot> after, Scene.SceneObjectSnapshot old) {
+        Set<Long> expected = new HashSet<>(before.keySet());
+        expected.remove(old.getObjectId());
+        require(!after.containsKey(old.getObjectId()) && after.size() == before.size()
+                && after.keySet().containsAll(expected), "原区域未按配额替换旧目标");
+        Scene.SceneObjectSnapshot fresh = after.values().stream()
+                .filter(candidate -> !before.containsKey(candidate.getObjectId())).findFirst().orElseThrow();
+        require(fresh.getKind() == old.getKind()
+                && fresh.getPersistentState().getConfigId() == old.getPersistentState().getConfigId()
+                && (fresh.getKind() == Scene.SceneObjectKind.SCENE_OBJECT_RESOURCE
+                ? fresh.getPersistentState().getAmount() >= old.getPersistentState().getAmount()
+                : fresh.getPersistentState().getHealth() > 0), "补点模板或初始状态错误");
+        System.out.printf("[SLG-GAMEPLAY] respawn kind=%s region=25 old=%d new=%d at=(%d,%d)%n",
+                fresh.getKind(), old.getObjectId(), fresh.getObjectId(), fresh.getPoint().getX(), fresh.getPoint().getY());
+    }
+
+    private void awaitPush(long marchId, Scene.SceneMarchStatus status) throws Exception {
         long deadline = System.nanoTime() + TimeUnit.MINUTES.toNanos(6);
         while (System.nanoTime() < deadline) {
             Scene.scSceneView view = pushes.poll(1, TimeUnit.SECONDS);
-            if (view != null && view.getObjectsList().stream().anyMatch(object -> object.getObjectId() == marchId) == present) return;
+            if (view == null) continue;
+            Optional<Scene.SceneObjectSnapshot> march = view.getObjectsList().stream()
+                    .filter(object -> object.getObjectId() == marchId).findFirst();
+            // 结束行军已退出 AOI，最后一次快照用对象消失表示到家。
+            if (status == Scene.SceneMarchStatus.SCENE_MARCH_FINISHED ? march.isEmpty()
+                    : march.isPresent() && march.get().getMarch().getStatus() == status) return;
         }
-        throw new IllegalStateException("跨区域AOI未收到行军" + (present ? "出现" : "移除") + "推送");
+        throw new IllegalStateException("跨区域AOI未收到行军状态 " + status + ", marchId=" + marchId);
     }
     private Scene.ScenePoint enter(RobotSession player, int x, int y) throws Exception {
         Scene.scSceneEnter response = invoke(player, Cmd.CMD.CS_SceneEnter, Cmd.CMD.SC_SceneEnter,

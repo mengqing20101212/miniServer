@@ -405,7 +405,9 @@ SceneServer 使用公司导出的 `WorldMap2.tmx` 和 `world-regions.json`。启
 AOI/迷雾/寻路的空间方格仍由 `slg.scene.region-size` 指定，默认32。九宫格用 `radius_blocks=1`。
 
 新配置源表为 `excel/slgWorldObject.xlsx`，通过已有转表器生成 `slgWorldObject.xml`，需放到服务配置目录。
-`countPerRegion` 控制每个区域的资源点/怪物数量。地图恢复后只补足缺少的配置实例，不覆盖已消耗的存档。
+`countPerRegion` 是每个区域内该模板的目标数量。怪物被击杀、矿点被采空后，所属区域线程删除旧实例，立即从本区可通行的空格中随机选点补缺，新实例分配新 ID。部分采集只扣库存，重启仍按剩余量恢复。
+
+刷新参数沿用公司服 `world_refresh_td` 普通怪物和资源两行。怪物每 60 秒巡检，资源每 900 秒巡检。各区首次巡检错开，最大偏移分别为 10 和 30 秒，每个模板每批最多补 20 个。周期、错峰和批量上限由源表的 `checkIntervalSec`、`jitterSec`、`batchSize` 控制。当前 miniServer 保留未采空的资源点。
 
 基础行军流程：
 
@@ -428,8 +430,8 @@ Scene的 `slg.march.speed=10` 单位为格/秒。采集时长、资源存量、�
 --test-slg-gameplay 127.0.0.1 8889 game1001 本次测试账号
 ```
 
-该入口针对当前公司地图中央区域25，走 Login→Gate→Game→Scene，检查采集与打怪、主城出发、首次查行军前奖励到账、重复查询余额不变，以及第二个玩家在路线中段收到行军出现和结束移除的AOI推送；观察者视野不包含行军两端。
+机器人按 `world-regions.json` 盘点第 25 区的资源和怪物 ID。对同一矿点连续采集直至采空，再击杀一只怪物。两次耗尽都要找到同区域的新实例。观察账号在其他区域订阅只覆盖路线中段的九宫格，接收主动推送。每次返程都先核对资产，再查行军，重复查询后余额应相同。
 
-2026-11-02 本地已完成构建、专项测试及1200×1200地图启动。真实机器人验证阻塞在远程Nacos的gRPC订阅超时，尚未跑通完整链路；不能据此认定上述机器人断言已经通过。
+要复跑恰好两次采空，可在临时副本的 `slgWorldObject.xlsx` 将矿点库存设为 130，用 `ToolMain buildConfigData` 导出到本次服务的配置目录；仓库默认库存为 1000。为避免恢复已有矿点库存，为 Scene 的 `slg.scene.local-id` 和 Bot 的 `slg.bot.scene-id` 指定同一个新场景 ID。联调可设 `slg.march.speed=200` 缩短等待。数据库、Redis、节点参数仍从 Nacos 获取。
 
-剩余联调任务、阻塞证据和复跑上下文见 [待办清单](TODO_AUDIT.md#当前待办slg-完整链路联调)。
+2026-11-20 使用真实双机器人验证了矿点分次采空、击杀后补怪、返程发奖和跨区域 AOI。见[联调记录](TODO_AUDIT.md#slg-完整链路联调)。

@@ -5,7 +5,11 @@ import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 
+import ly.config.HeroInfoConfig;
 import ly.config.HeroInfoConfigManager;
+import ly.config.HeroExpConfig;
+import ly.config.HeroExpConfigManager;
+import ly.proto.Hero;
 import ly.db.entry.PlayerHeroEntry;
 import ly.logic.player.AbstractModule;
 import ly.logic.player.event.PlayerEventParam;
@@ -60,6 +64,46 @@ public class HeroModule extends AbstractModule {
 
     public List<PlayerHeroEntry> getHeroList() {
         return Collections.unmodifiableList(heroes);
+    }
+
+    public Hero.SC_HeroList ownedHeroList() {
+        Hero.SC_HeroList.Builder list = Hero.SC_HeroList.newBuilder();
+        for (PlayerHeroEntry hero : heroes) list.addHeroList(buildHeroInfo(hero));
+        return list.build();
+    }
+
+    /** 构建英雄信息 */
+    public Hero.HeroInfo buildHeroInfo(PlayerHeroEntry entry) {
+        Hero.HeroInfo.Builder builder = Hero.HeroInfo.newBuilder();
+        builder.setHeroUid(entry.getId());
+        builder.setHeroId(entry.getHeroId());
+        builder.setLevel(entry.getLevel());
+        builder.setStar(entry.getStar());
+        builder.setAwaken(entry.getAwaken());
+        builder.setExp(entry.getExp());
+
+        // 计算升级所需经验
+        long maxExp = calcMaxExp(entry.getHeroId(), entry.getLevel());
+        builder.setMaxExp(maxExp);
+
+        return builder.build();
+    }
+
+    /** 计算升级所需经验 */
+    private long calcMaxExp(int heroId, int level) {
+        HeroInfoConfig heroConfig = HeroInfoConfigManager.getInstance().getConfigMap().get(heroId);
+        if (heroConfig == null) {
+            return 0;
+        }
+
+        HeroExpConfig expConfig =
+                HeroExpConfigManager.getInstance()
+                        .getByModelIdAndLevel(heroConfig.expModelId, level + 1);
+        if (expConfig == null) {
+            return 0; // 已达最高等级
+        }
+
+        return expConfig.exp;
     }
 
     public PlayerHeroEntry getHero(long uid) {

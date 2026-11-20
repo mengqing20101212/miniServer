@@ -5,6 +5,8 @@ import ly.sceneserver.common.march.SceneMarchState;
 import ly.sceneserver.common.march.SceneRallySnapshot;
 import ly.sceneserver.common.march.SceneRallyState;
 
+import ly.config.SlgWorldObjectConfig;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Comparator;
@@ -44,6 +46,13 @@ public final class SceneShard {
     private final Map<Long, SceneObject> objects = new HashMap<>();
     private final ly.sceneserver.common.march.SceneMarchService marchService =
             new ly.sceneserver.common.march.SceneMarchService(this);
+
+    SceneWorldSpawner worldSpawner;
+
+    public void removeDepletedTarget(SceneObject target, SlgWorldObjectConfig rule) {
+        removeObject(target.objectId());
+        if (worldSpawner != null) worldSpawner.replenish(rule, 1);
+    }
 
     public ly.sceneserver.common.march.SceneMarchService marches() { return marchService; }
     public java.util.Collection<SceneObject> worldObjects() { return objects.values(); }
@@ -618,7 +627,9 @@ public final class SceneShard {
                 processedCommands++;
             }
             try (ly.db.PersistenceScope persistence = ly.db.PersistenceScope.open()) {
-                marchService.tick(System.currentTimeMillis());
+                long now = System.currentTimeMillis();
+                marchService.tick(now);
+                if (worldSpawner != null) worldSpawner.tick(now);
             }
             tickNumber++;
             lastTickMillis = System.currentTimeMillis();

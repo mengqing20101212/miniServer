@@ -19,10 +19,10 @@ public class SceneAoiRoutePushTest {
                 map.set(x, y, SceneTerrainType.PLAIN, 0, SceneTileFlags.WALKABLE, 0);
             }
             map.loadRegionIds(regions); map.loadRegionDefinitions(List.of(101, 202)); scene.configureRegions();
-            SlgWorldObjectConfig rule = new SlgWorldObjectConfig(2, "MONSTER", 1, 0, 100, 100, 0, 1);
+            SlgWorldObjectConfig rule = new SlgWorldObjectConfig(2, "MONSTER", 1, 0, 100, 100, 0, 1, 60, 10, 20);
             scene.seedObject(new SceneObject(99, SceneObjectType.MONSTER, 0, 22, 2,
                     new SceneWorldObjectState(1, 2, 0, 1, 0, 100, 0, 0, 0, new byte[0])));
-            scene.shard(1).marches().configure(() -> Map.of(2, rule), object -> {}, ignored -> {});
+            scene.shard(1).marches().configure(() -> Map.of(2, rule), (object, deleted) -> {}, ignored -> {});
             scene.shard(1).marches().onChanged(scene.aoi()::marchChanged);
             BlockingQueue<SceneViewSnapshot> changes = new LinkedBlockingQueue<>();
             scene.aoi().subscribe(new SceneViewRequest(20, new ScenePoint(9, 2), 1, SceneViewLevel.DETAIL, 0), changes::add);
